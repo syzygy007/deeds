@@ -169,6 +169,13 @@
 .sigwrap.swap:hover .cap,.sigwrap.swap:focus-visible .cap,.sigwrap.swap.on .cap{color:#000;filter:blur(4px);opacity:.07}
 @media (prefers-reduced-motion:reduce){.sigwrap .sigtag,.sigwrap.swap .cap{transition:none}}
 </style>
+<style id="nav-actions">
+.navlink.nav-ico{display:inline-flex;align-items:center;padding-left:8px;padding-right:8px;}
+.navlink.nav-ico svg{display:block;}
+.navbtn{background:var(--forest);color:var(--ivory);border:1px solid var(--forest);font:inherit;font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:10px 16px;cursor:pointer;margin-left:10px;white-space:nowrap;}
+.navbtn:hover{filter:brightness(1.12);}
+@media (max-width:720px){.navbtn{padding:9px 12px;margin-left:6px;}}
+</style>
 </head>
 <body>
 <nav>
@@ -181,7 +188,8 @@
     <button class="navlink" data-go="giving">The Art of Giving</button>
     <button class="navlink" data-go="merch">Merch</button>
     
-    <button class="navlink" data-go="profile">Profile</button>
+    <button class="navlink nav-ico" data-go="profile" aria-label="Profile" title="Profile"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c1.3-3.4 4-5.1 7.2-5.1s5.9 1.7 7.2 5.1"/></svg></button>
+    <button class="navbtn" id="navlog">Log a Deed.</button>
   </div>
 </nav>
 
@@ -543,6 +551,7 @@
       <div class="anon" id="anonname"></div>
       <div class="toprow" style="margin-top:36px;"><span class="label">The Forty</span><span class="statuschip" id="memstatus">Not Accepted</span></div>
       <div class="counter" style="font-size:clamp(2.2rem,9vw,4.5rem);"><span id="profprog">0</span> / 40</div>
+      <div class="btnrow" style="margin-top:22px;"><button class="btn" id="proflog">Log a Deed.</button></div>
       <div class="toprow" style="margin-top:36px;"><span class="label">Your Causes</span><button class="textbtn" id="editcats">Edit</button></div>
       <div class="chips" id="memcats"></div>
       <div id="editwrap" style="display:none;">
@@ -1172,6 +1181,11 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   function closeModal(){ modal.classList.remove('on'); card.innerHTML=''; }
   window.dvCloseModal = closeModal;
 
+  var nl = el('navlog');
+  if(nl) nl.addEventListener('click', function(){ openLog(); });
+  var pl = el('proflog');
+  if(pl) pl.addEventListener('click', function(){ openLog(); });
+
   /* ---------- boot ---------- */
   function boot(){
     try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
@@ -1389,15 +1403,16 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   };
 
   function onSlot(slot){
+    var slotLabel = slot ? ('Deed No. '+String(slot).padStart(2,'0')) : 'Your Deed';
     if(!me){
       toast('Create a profile to start the Forty.');
       if(window.go) window.go('profile');
       return;
     }
-    var existing = (window._dvSlots||{})[slot];
+    var existing = slot ? (window._dvSlots||{})[slot] : null;
     if(existing){
       openModal(
-        '<span class="label">Deed No. '+String(slot).padStart(2,'0')+'</span>' +
+        '<span class="label">'+slotLabel+'</span>' +
         '<h3 style="margin-top:10px;">'+escapeHtml(existing.title)+'</h3>' +
         '<p class="sub" style="margin-top:10px;">'+ENUM_TO_CAT[existing.category]+' · '+new Date(existing.created_at).toLocaleDateString()+'</p>' +
         '<div class="dv-row"><button class="btn ghost" id="dv-undo">Remove This Deed.</button><button class="btn" onclick="dvCloseModal()">Close.</button></div>'
@@ -1416,7 +1431,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     }).join('');
 
     openModal(
-      '<span class="label">Deed No. '+String(slot).padStart(2,'0')+'</span>' +
+      '<span class="label">'+slotLabel+'</span>' +
       '<h3 style="margin-top:10px;">What did you do?</h3>' +
       '<p class="sub" style="margin-top:10px;font-size:.88rem;">Written plainly. No names, yours or theirs.</p>' +
       '<input class="dv-field" id="dv-title" maxlength="140" placeholder="Paid for the order behind me.">' +
@@ -1454,6 +1469,18 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       });
     });
     el('dv-pin').addEventListener('click', function(){ this.classList.toggle('active'); });
+  }
+
+
+  function openLog(){
+    if(!me){
+      if(window.go) go('profile');
+      toast('Create a profile first. It takes one code.');
+      return;
+    }
+    var open = null;
+    for(var i=1;i<=40;i++){ if(!(window._dvSlots||{})[i]){ open=i; break; } }
+    onSlot(open);
   }
 
   function refreshMe(){
