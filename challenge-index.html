@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Someone sent you the Forty.</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DEEDS.">
+<meta property="og:title" content="Someone sent you the Forty.">
+<meta property="og:description" content="Forty acts of kindness. Sent anonymously, person to person.">
+<meta property="og:url" content="https://deeds.fun/challenge/">
+<meta property="og:image" content="https://deeds.fun/challenge-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Forty circles, one filled in forest green. The Forty Challenge.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Someone sent you the Forty.">
+<meta name="twitter:description" content="Forty acts of kindness. Sent anonymously, person to person.">
+<meta name="twitter:image" content="https://deeds.fun/challenge-og.jpg">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<style>
+  body{margin:0;background:#F6F3EB;color:#15130E;font-family:Helvetica,Arial,sans-serif;
+       min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .card{max-width:480px;text-align:left;}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;opacity:.55;}
+  h1{font-size:clamp(1.9rem,7vw,2.6rem);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:14px 0 12px;}
+  h1 span{color:#1F4B3A;}
+  p{font-size:1rem;line-height:1.6;opacity:.75;margin:0 0 28px;}
+  a.btn{display:inline-block;background:#1F4B3A;color:#F6F3EB;text-decoration:none;
+        font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:15px 26px;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="label">The Forty Challenge</span>
+    <h1>Someone sent you this, anonymously<span>.</span></h1>
+    <p>Forty acts of kindness. Any order, any speed, no audience. They will never know if you accept. That is the point.</p>
+    <a class="btn" id="go" href="/">Open the Challenge.</a>
+  </div>
+<script>
+  (function(){
+    var c = new URLSearchParams(location.search).get('c');
+    var dest = '/' + (c ? '?c=' + encodeURIComponent(c) : '?c=');
+    document.getElementById('go').setAttribute('href', dest);
+    location.replace(dest);
+  })();
+</script>
+</body>
+</html>
