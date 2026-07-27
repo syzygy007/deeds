@@ -1213,7 +1213,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     box.innerHTML =
       '<div class="toprow"><span class="label">Your Email</span><span class="label">Private, Never Shown</span></div>' +
       '<input class="dv-field" id="dv-email" type="email" placeholder="you@example.com" autocomplete="email">' +
-      '<p class="dv-note">One six digit code, no password. Your address is never shown on the site and is used only for signing in and for reminders you switch on.</p>';
+      '<p class="dv-note">One emailed code, no password. Your address is never shown on the site and is used only for signing in and for reminders you switch on.</p>';
     host.insertBefore(box, row);
     box.appendChild(row);
 
@@ -1253,16 +1253,16 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   function askForCode(email){
     openModal(
       '<span class="label">Check Your Email</span>' +
-      '<h3 style="margin-top:10px;">Enter the six digits.</h3>' +
+      '<h3 style="margin-top:10px;">Enter the code.</h3>' +
       '<p class="sub" style="margin-top:10px;font-size:.9rem;">We sent a code to <strong>'+escapeHtml(email)+'</strong>. It is good for one hour.</p>' +
-      '<input class="dv-field" id="dv-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="font-size:2rem;letter-spacing:.35em;text-align:center;">' +
+      '<input class="dv-field" id="dv-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="00000000" style="font-size:1.7rem;letter-spacing:.28em;text-align:center;">' +
       '<div class="dv-row"><button class="btn" id="dv-verify">Sign In.</button><button class="btn ghost" id="dv-again">Send Again.</button></div>'
     );
     var inp = el('dv-code');
     inp.focus();
     function go(){
       var code = (inp.value||'').replace(/\D/g,'');
-      if(code.length!==6){ toast('Six digits.'); return; }
+      if(code.length<6 || code.length>10){ toast('Enter the full code from the newest email.'); return; }
       var b=el('dv-verify'); b.disabled=true; b.textContent='Checking\u2026';
       sb.auth.verifyOtp({ email: email, token: code, type: 'email' }).then(function(r){
         b.disabled=false; b.textContent='Sign In.';
