@@ -229,8 +229,8 @@
   <section class="tight reveal">
     <div class="toprow"><span class="label">Live Impact</span><span class="label">Updated Continuously</span></div>
     <div class="stats">
-      <div class="stat"><div class="num">1,204</div><div class="label">Deeds Today</div></div>
-      <div class="stat"><div class="num">36,402</div><div class="label">This Month</div></div>
+      <div class="stat"><div class="num">1,204</div><div class="label">This Week</div></div>
+      <div class="stat"><div class="num">36,402</div><div class="label">Community Members</div></div>
       <div class="stat"><div class="num">412,873</div><div class="label">Lifetime</div></div>
       <div class="stat"><div class="num">3,187</div><div class="label">The Forty Completed</div></div>
     </div>
@@ -1170,7 +1170,10 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     '.dv-row{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}',
     '.dv-note{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:26px;display:block;}',
     '.fdot.pend{opacity:.45;}',
-    '.dv-prefs{margin-top:36px;}'
+    '.dv-prefs{margin-top:36px;}',
+    '.tagfollow{background:none;border:0;color:#1F4B3A;font:inherit;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:0 0 0 12px;}',
+    '.post.exmpl{opacity:.6;}',
+    '.exchip{display:inline-block;background:rgba(21,19,14,.08);color:rgba(21,19,14,.55);font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;margin-left:10px;vertical-align:middle;}'
   ].join('');
   document.head.appendChild(css);
 
@@ -1232,9 +1235,9 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
 
     var box = ce('div','dv-signup');
     box.innerHTML =
-      '<div class="toprow"><span class="label">Your Email</span><span class="label">Private, Never Shown</span></div>' +
+      '<div class="toprow"><span class="label">Sign In or Join</span><span class="label">Same Door, One Code</span></div>' +
       '<input class="dv-field" id="dv-email" type="email" placeholder="you@example.com" autocomplete="email">' +
-      '<p class="dv-note">One emailed code, no password. Your address is never shown on the site and is used only for signing in and for reminders you switch on.</p>';
+      '<p class="dv-note">Sign in or create your profile, same door. A known email signs you back in, a new one starts a profile. One emailed code, no password, and your address is never shown on the site.</p>';
     host.insertBefore(box, row);
     box.appendChild(row);
 
@@ -1272,11 +1275,15 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     }).then(function(r){
       if(finished) return; finished=true; clearTimeout(guard); reset();
       if(r.error){
+        var emsg = r.error.message || '';
+        var detail = (emsg && emsg !== '{}')
+          ? 'The mail service said: \u201C'+escapeHtml(emsg)+'\u201D'
+          : 'The mail service gave no details, which almost always means the sending address is not fully verified yet.';
         openModal(
-          '<span class="label">Signups</span>' +
+          '<span class="label">Sign In</span>' +
           '<h3 style="margin-top:10px;">The code could not be sent.</h3>' +
-          '<p class="sub" style="margin-top:12px;font-size:.92rem;">The mail service said: \u201C'+escapeHtml(r.error.message)+'\u201D</p>' +
-          '<p class="sub" style="margin-top:10px;font-size:.92rem;">If this keeps happening, the sending domain is likely still being verified. Try again a little later.</p>' +
+          '<p class="sub" style="margin-top:12px;font-size:.92rem;">'+detail+'</p>' +
+          '<p class="sub" style="margin-top:10px;font-size:.92rem;">Nothing is wrong with your account. Try again in a little while.</p>' +
           '<div class="dv-row"><button class="btn" onclick="dvCloseModal()">Close.</button></div>'
         );
         return;
@@ -1340,6 +1347,22 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       }
 
       loadMyDeeds();
+      attachChallenger();
+    });
+  }
+
+  function attachChallenger(){
+    var ch = null;
+    try{ ch = localStorage.getItem('deeds_challenger'); }catch(e){}
+    if(!ch || !me) return;
+    sb.from('profiles').select('id,handle').eq('handle', ch).single().then(function(r){
+      try{ localStorage.removeItem('deeds_challenger'); }catch(e){}
+      if(r.error || !r.data || r.data.id === me.id) return;
+      sb.from('follows').insert({ follower_id: me.id, followed_id: r.data.id }).then(function(fr){
+        if(!fr.error){
+          toast('You follow '+r.data.handle+' now, anonymously. Their deeds will reach you.');
+        }
+      });
     });
   }
 
@@ -1549,6 +1572,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     if(!q.has('c')) return;
     var raw = q.get('c') || '';
     var handle = /^[A-Za-z0-9]{3,24}$/.test(raw) ? raw : 'A friend';
+    if(handle !== 'A friend'){ try{ localStorage.setItem('deeds_challenger', handle); }catch(e){} }
     if(window.go) go('giving');
     var dots=''; for(var di=0; di<40; di++){ dots += '<span style="display:inline-block;width:11px;height:11px;border-radius:50%;margin:3px;'+(di===0?'background:#1F4B3A;':'border:1.5px solid rgba(21,19,14,.3);')+'"></span>'; }
     openModal(
@@ -1773,7 +1797,13 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
 
   function applyWall(extra){
     if(!seedPosts) seedPosts = posts.slice();
-    var src = (masterPosts && masterPosts.length) ? masterPosts.slice() : seedPosts.slice();
+    var real = (masterPosts && masterPosts.length) ? masterPosts.slice() : [];
+    var exNeed = real.length ? Math.max(0, 8 - real.length) : seedPosts.length;
+    var src = real.concat(seedPosts.slice(0, exNeed).map(function(sp, si){
+      var c = {}; for(var k in sp){ c[k] = sp[k]; }
+      c.example = true; c.live = false; c.ts = -(si+1); c.r = [3,2,1,0];
+      return c;
+    }));
     if(extra && extra.length){
       var have = {};
       src.forEach(function(p){ have[p.id]=1; });
@@ -1795,6 +1825,18 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     decorateWall();
     var endnote = el('wallend');
     if(endnote) endnote.style.display = (!searchQ && wallDone && masterPosts && masterPosts.length) ? 'block' : 'none';
+  }
+
+  function sharePost(p){
+    var text = '\u201C' + p.body + '\u201D \u00B7 an anonymous deed on DEEDS.';
+    var url = 'https://deeds.fun/';
+    if(navigator.share){
+      navigator.share({ title: 'DEEDS.', text: text, url: url }).catch(function(){});
+    } else if(navigator.clipboard){
+      navigator.clipboard.writeText(text + ' ' + url).then(function(){
+        toast('Copied. Post it anywhere.');
+      });
+    } else { toast(url); }
   }
 
   function loadWall(){
@@ -1880,7 +1922,21 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       for(var j=0;j<posts.length;j++){
         if(posts[j].who===mono.textContent && posts[j].body===(node.querySelector('.post-body')||{}).textContent){ p=posts[j]; break; }
       }
-      if(!p || !p.live) return;
+      if(!p) return;
+
+      if(p.example){
+        node.classList.add('exmpl');
+        if(!node.querySelector('.exchip')){
+          var chp = ce('span','exchip','Example');
+          mono.parentNode.insertBefore(chp, mono.nextSibling);
+        }
+        var ax = node.querySelector('.post-actions');
+        if(ax) ax.remove();
+        var rx = node.querySelector('.reactions');
+        if(rx) rx.style.pointerEvents = 'none';
+        return;
+      }
+      if(!p.live) return;
 
       node.querySelectorAll('.react').forEach(function(b){
         var f=b.cloneNode(true);
@@ -1888,15 +1944,22 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
         f.addEventListener('click', function(){ react(p, +f.dataset.r, f); });
       });
 
-      var acts = node.querySelector('.post-actions');
-      if(acts && me && p.owner !== me.id){
-        var fb = ce('button','textbtn quiet','Follow');
-        fb.addEventListener('click', function(){
+      if(!node.querySelector('.tagfollow') && (!me || p.owner !== me.id)){
+        var tf = ce('button','tagfollow','Follow');
+        tf.addEventListener('click', function(){
+          if(!me){ toast('Create a profile to follow.'); if(window.go) go('profile'); return; }
           sb.from('follows').insert({ follower_id: me.id, followed_id: p.owner }).then(function(r){
-            toast(r.error ? 'Already following.' : 'Following. You will be told when they give.');
+            toast(r.error ? 'Already following.' : 'Following '+p.who+'. Their deeds will reach you.');
           });
         });
-        acts.appendChild(fb);
+        mono.parentNode.insertBefore(tf, mono.nextSibling);
+      }
+
+      var acts = node.querySelector('.post-actions');
+      if(acts && !acts.querySelector('.dv-share')){
+        var shb = ce('button','textbtn dv-share','Share');
+        shb.addEventListener('click', function(){ sharePost(p); });
+        acts.appendChild(shb);
       }
       if(acts){
         var chain = acts.querySelector('.textbtn');
