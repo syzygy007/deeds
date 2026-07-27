@@ -1554,7 +1554,17 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       });
     }
     el('dv-shtext').addEventListener('click', function(){
-      window.location.href = 'sms:?&body=' + encodeURIComponent(text + ' ' + url);
+      var body = encodeURIComponent(text + ' ' + url);
+      var ua = navigator.userAgent;
+      if(/iPhone|iPad|iPod/i.test(ua)){
+        window.location.href = 'sms:&body=' + body;
+      } else if(/Android/i.test(ua)){
+        window.location.href = 'sms:?body=' + body;
+      } else if(navigator.clipboard){
+        navigator.clipboard.writeText(text + ' ' + url).then(function(){
+          toast('Texting opens from your phone. Link copied instead.');
+        });
+      } else { toast(url); }
     });
     el('dv-shmail').addEventListener('click', function(){
       window.location.href = 'mailto:?subject=' + encodeURIComponent('The Forty Challenge') +
@@ -1801,7 +1811,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     var exNeed = real.length ? Math.max(0, 8 - real.length) : seedPosts.length;
     var src = real.concat(seedPosts.slice(0, exNeed).map(function(sp, si){
       var c = {}; for(var k in sp){ c[k] = sp[k]; }
-      c.example = true; c.live = false; c.ts = -(si+1); c.r = [3,2,1,0];
+      c.example = true; c.live = false; c.ts = -(si+1); c.r = [0,0,0,0];
       return c;
     }));
     if(extra && extra.length){
@@ -1830,13 +1840,18 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   function sharePost(p){
     var text = '\u201C' + p.body + '\u201D \u00B7 an anonymous deed on DEEDS.';
     var url = 'https://deeds.fun/';
+    function copy(){
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(text + ' ' + url).then(function(){
+          toast('Copied. Post it anywhere.');
+        }, function(){ toast(url); });
+      } else { toast(url); }
+    }
     if(navigator.share){
-      navigator.share({ title: 'DEEDS.', text: text, url: url }).catch(function(){});
-    } else if(navigator.clipboard){
-      navigator.clipboard.writeText(text + ' ' + url).then(function(){
-        toast('Copied. Post it anywhere.');
+      navigator.share({ title: 'DEEDS.', text: text, url: url }).catch(function(err){
+        if(!err || err.name !== 'AbortError') copy();
       });
-    } else { toast(url); }
+    } else copy();
   }
 
   function loadWall(){
@@ -1970,6 +1985,11 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
         }
       }
     });
+    var sink = [];
+    [].slice.call(wrap.children).forEach(function(n){
+      if(n.classList && n.classList.contains('exmpl')) sink.push(n);
+    });
+    sink.forEach(function(n){ wrap.appendChild(n); });
   }
 
   function react(p, idx, btn){
