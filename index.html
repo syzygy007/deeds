@@ -1773,7 +1773,32 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   /* ---------- the Wall: paged feed with search ---------- */
   var PAGE = 30, wallOffset = 0, wallDone = false, wallLoading = false;
   var masterPosts = null, seedPosts = null, searchQ = '', searchTimer = null, searchRun = 0;
-  var DEED_SELECT = 'id,title,story,category,city,created_at,chain_parent_id,profile_id,profiles(handle)';
+  var DEED_SELECT = 'id,title,story,category,city,created_at,chain_parent_id,profile_id';
+  var NAME_CACHE = {};
+
+  function fetchNames(rows){
+    var need = [];
+    rows.forEach(function(d){
+      if(d.profile_id && NAME_CACHE[d.profile_id] === undefined && need.indexOf(d.profile_id) < 0) need.push(d.profile_id);
+    });
+    function fill(){
+      rows.forEach(function(d){
+        d.profiles = { handle: (d.profile_id && NAME_CACHE[d.profile_id]) || null };
+      });
+      return rows;
+    }
+    if(!need.length) return Promise.resolve(fill());
+    return sb.from('profiles').select('id,handle').in('id', need).then(function(r){
+      (r.data||[]).forEach(function(p){ NAME_CACHE[p.id] = p.handle; });
+      need.forEach(function(id){ if(NAME_CACHE[id] === undefined) NAME_CACHE[id] = null; });
+      return fill();
+    }, function(){ return fill(); });
+  }
+
+  function feedFail(e){
+    var msg = (e && (e.message || e.error_description || e.hint)) || 'unknown error';
+    try{ toast('The feed could not load: ' + msg); }catch(_e){}
+  }
 
   function mapRows(rows, counts, base){
     return rows.map(function(d, i){
@@ -1861,15 +1886,17 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       .order('created_at',{ascending:false}).range(0, PAGE-1)
       .then(function(r){
         wallLoading = false;
-        if(r.error || !r.data) return;
+        if(r.error){ feedFail(r.error); return; }
+        if(!r.data) return;
         if(r.data.length < PAGE) wallDone = true;
         if(!r.data.length){ masterPosts = null; applyWall(); return; }
-        fetchCounts(r.data.map(function(d){ return d.id; })).then(function(counts){
-          masterPosts = mapRows(r.data, counts, 0);
+        Promise.all([fetchNames(r.data), fetchCounts(r.data.map(function(d){ return d.id; }))]).then(function(rs){
+          masterPosts = mapRows(r.data, rs[1], 0);
           wallOffset = r.data.length;
           applyWall();
         });
-      });
+      })
+      .catch(function(e){ wallLoading = false; feedFail(e); });
   }
 
   function loadWallMore(){
@@ -1879,15 +1906,17 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       .order('created_at',{ascending:false}).range(wallOffset, wallOffset+PAGE-1)
       .then(function(r){
         wallLoading = false;
-        if(r.error || !r.data){ return; }
+        if(r.error){ feedFail(r.error); return; }
+        if(!r.data){ return; }
         if(r.data.length < PAGE) wallDone = true;
         if(!r.data.length){ applyWall(); return; }
-        fetchCounts(r.data.map(function(d){ return d.id; })).then(function(counts){
-          masterPosts = masterPosts.concat(mapRows(r.data, counts, wallOffset));
+        Promise.all([fetchNames(r.data), fetchCounts(r.data.map(function(d){ return d.id; }))]).then(function(rs){
+          masterPosts = masterPosts.concat(mapRows(r.data, rs[1], wallOffset));
           wallOffset += r.data.length;
           applyWall();
         });
-      });
+      })
+      .catch(function(e){ wallLoading = false; feedFail(e); });
   }
 
   function serverSearch(q){
@@ -1899,11 +1928,12 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       .order('created_at',{ascending:false}).limit(30)
       .then(function(r){
         if(run !== searchRun || r.error || !r.data || !r.data.length) return;
-        fetchCounts(r.data.map(function(d){ return d.id; })).then(function(counts){
+        Promise.all([fetchNames(r.data), fetchCounts(r.data.map(function(d){ return d.id; }))]).then(function(rs){
           if(run !== searchRun) return;
-          applyWall(mapRows(r.data, counts, 10000));
+          applyWall(mapRows(r.data, rs[1], 10000));
         });
-      });
+      })
+      .catch(function(_e){});
   }
 
   function initWallExtras(){
