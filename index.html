@@ -1510,8 +1510,26 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
         '<button class="btn" id="dv-shmail">Email It.</button>' +
         '<button class="btn ghost" id="dv-shcopy">Copy the Link.</button>' +
       '</div>' +
+      (me ?
+        '<div class="toprow" style="margin-top:28px;margin-bottom:0;"><span class="label">Or Let DEEDS Send It</span><span class="label">From hello@deeds.fun</span></div>' +
+        '<input class="dv-field" id="dv-chemail" type="email" placeholder="their@email.com" autocomplete="off">' +
+        '<div class="dv-row"><button class="btn" id="dv-shsend">Send the Invitation.</button></div>'
+      : '') +
       '<span class="dv-note">The link opens to the forty circles and a welcome carrying your name</span>'
     );
+    if(me && el('dv-shsend')){
+      el('dv-shsend').addEventListener('click', function(){
+        var em = (el('dv-chemail').value||'').trim();
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ toast('That address does not look right.'); return; }
+        var b = el('dv-shsend'); b.disabled=true; b.textContent='Sending\u2026';
+        sb.rpc('send_challenge_email', { p_email: em }).then(function(r){
+          b.disabled=false; b.textContent='Send the Invitation.';
+          if(r.error){ toast(r.error.message); return; }
+          el('dv-chemail').value='';
+          toast('Sent. It arrives from DEEDS within the minute.');
+        });
+      });
+    }
     el('dv-shtext').addEventListener('click', function(){
       window.location.href = 'sms:?&body=' + encodeURIComponent(text + ' ' + url);
     });
