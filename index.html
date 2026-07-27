@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DEEDS · The Operating System for Generosity</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAADZ0lEQVR4nO2WS2wbVRSGz7n3zlw7xvHE8SMxpW4qRBMVFkE8pIIICMSiAQTqohISlSpYAFt2LECUVTesIyCREAI2PKIAXSCBgC4QCxCgIvqibZK2dhsnnvgRe+beuYeFE5S6YzuhdNd/6Xt1vplz/J9/MD+5D26m2E2tfguwFYnQXxGRM0ahZwSGDFH44ZYAiKi1LjfWMJzNIrYdldIQbQXTDkBEpfVwKvXSQxNBEFxffskt/3765KmFC7FIVHBuejFCAJ7v7xzKvfnya0A+IIIxcE0Vqtbrsz98e2R6quF5lhDd3yNkyK0WeWtuddWtrrpGK0AAIAACBK/ZZAAvPH3w/dffYog9u9RxyIJzzZiUcubLL078fTYakUSUS2Wee/Tx29PZ8nJh4oGHXz1w8OiHM8mEE9LM7oCWiEgIceyn43M/fu/E48YYHQTvzX328ZGjo7t2N+urhyef/eibY26lIjo3qpcPiOJ9sVTCSfYnBvoTw4PpxWLx7ekpzpivVDabnRi/r95sMNaxTm+jtR68JU/5Tjz+y6m/zl1ciNgSCO4f29t9Ctt2MmOstlafLxZsy6JA54eGbcsi0xGybQAC6CCo1GrAmDEm3hezhCAy/xtgg7Nu855W3jaAAAQXidhtYALOWKVWU1rhjQy5TcaY/lhs13DOVwqEOF+45CvFEBkiYsj26g3gjAm+LmnZK5XVB/feM7LjjqbvA9HPf/7BGDdEa15TaX09o5vRAAAQK/V6yS3rQAeGjDGj+ZE3XnxFaS1tuXj50vHffpW2xRkbv2usuFy6Wl6xLWuz6boBEFErdeCxJ+7efWdESiLKpTOT+x4ZTDjVes1JZt6dmSoul9IDyUP7nxnLj7i16vTc5+v/4A1GOICIdBAYYxqe9/yT+1FYQAQIQNBsNpTyneTQ3Hdfz3w1G5WRHZnsnp35klsedAbuHR07e3FB2nY3QGsFyT5HRq9d1wQAJG37qluemv30nU8+EJwDQKFUurKynEulfaVPL8wLLjavd2z7Lvo3cJ4KC5yG711eWjpx7szilWI8FmPIAMBXKjOQHN8zOl8snLxwvm0G7QDYyINqeGQi5yxiS2nZxgS06b6nlOB8c3N6tCiVcDqEPhmiwARt9y3LorCU7jbk0KNO9/9rHtywbgF66h+PKsT8LjOxBwAAAABJRU5ErkJggg==">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -11,16 +12,16 @@
 <meta name="theme-color" content="#1F4B3A">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DEEDS.">
-<meta property="og:title" content="DEEDS. The Operating System for Generosity">
-<meta property="og:description" content="A living record of anonymous acts of kindness. Not for recognition. Not for followers. Simply because good deeds deserve to be seen.">
+<meta property="og:title" content="DEEDS.">
+<meta property="og:description" content="The art of giving.">
 <meta property="og:url" content="https://deeds.fun/">
 <meta property="og:image" content="https://deeds.fun/deeds-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The art of giving. A painted beam of light over the DEEDS. wordmark.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DEEDS. The Operating System for Generosity">
-<meta name="twitter:description" content="A living record of anonymous acts of kindness.">
+<meta name="twitter:title" content="DEEDS.">
+<meta name="twitter:description" content="The art of giving.">
 <meta name="twitter:image" content="https://deeds.fun/deeds-og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1143,8 +1144,10 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     '#deeds-toast.on{transform:translateX(-50%) translateY(0);}',
     '.dv-modal{position:fixed;inset:0;background:rgba(21,19,14,.72);display:none;align-items:center;justify-content:center;z-index:9998;padding:22px;}',
     '.dv-modal.on{display:flex;}',
-    '.dv-card{background:#F6F3EB;color:#15130E;max-width:520px;width:100%;padding:34px 30px;max-height:88vh;overflow:auto;}',
-    '.dv-card h3{margin:0 0 6px;font-size:1.5rem;line-height:1.15;}',
+    '.dv-card{background:#F6F3EB;color:#15130E;max-width:520px;width:100%;padding:36px 34px 40px;max-height:88vh;overflow:auto;border-top:3px solid #1F4B3A;}',
+    '.dv-card h3{margin:0 0 6px;font-size:1.6rem;line-height:1.12;letter-spacing:-.01em;}',
+    '.dv-mark{font-weight:800;font-size:1.05rem;letter-spacing:-.02em;margin-bottom:24px;}',
+    '.dv-mark span{color:#1F4B3A;}',
     '.dv-field{width:100%;padding:14px 0;border:0;border-bottom:1px solid rgba(21,19,14,.3);background:transparent;font:inherit;font-size:1.05rem;color:inherit;margin-top:10px;border-radius:0;}',
     '.dv-field::placeholder{opacity:.38;}',
     '.dv-signup{max-width:560px;margin-top:36px;}',
@@ -1165,7 +1168,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   var card = ce('div','dv-card'); modal.appendChild(card);
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
-  function openModal(html){ card.innerHTML=html; modal.classList.add('on'); }
+  function openModal(html){ card.innerHTML='<div class="dv-mark">DEEDS<span>.</span></div>'+html; modal.classList.add('on'); }
   function closeModal(){ modal.classList.remove('on'); card.innerHTML=''; }
   window.dvCloseModal = closeModal;
 
@@ -1180,6 +1183,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       injectPrefsUI();
       handleQuickLink();
       initWallExtras();
+      loadMapDeeds();
       if(session) loadMe(); else afterProfileState();
       loadWall();
       loadStats();
@@ -1209,11 +1213,11 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     box.innerHTML =
       '<div class="toprow"><span class="label">Your Email</span><span class="label">Private, Never Shown</span></div>' +
       '<input class="dv-field" id="dv-email" type="email" placeholder="you@example.com" autocomplete="email">' +
-      '<p class="dv-note">One sign in link, no password. Your address is never shown on the site and is used only for that link and for reminders you switch on.</p>';
+      '<p class="dv-note">One six digit code, no password. Your address is never shown on the site and is used only for signing in and for reminders you switch on.</p>';
     host.insertBefore(box, row);
     box.appendChild(row);
 
-    btn.textContent='Send My Link.';
+    btn.textContent='Send My Code.';
     var fresh = btn.cloneNode(true);
     btn.parentNode.replaceChild(fresh, btn);
     fresh.addEventListener('click', sendLink);
@@ -1239,13 +1243,40 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       email: email,
       options: { emailRedirectTo: window.location.origin + window.location.pathname }
     }).then(function(r){
-      btn.disabled=false; btn.textContent='Send My Link.';
+      btn.disabled=false; btn.textContent='Send My Code.';
       if(r.error){ toast(r.error.message); return; }
-      openModal(
-        '<h3>Check your email.</h3>' +
-        '<p class="sub" style="margin-top:12px;">We sent a sign in link to <strong>'+email.replace(/</g,'&lt;')+'</strong>. Open it on this device and your profile is ready. Your anonymous name is assigned when you arrive.</p>' +
-        '<div class="dv-row"><button class="btn" onclick="dvCloseModal()">Done.</button></div>'
-      );
+      askForCode(email);
+    });
+  }
+
+
+  function askForCode(email){
+    openModal(
+      '<span class="label">Check Your Email</span>' +
+      '<h3 style="margin-top:10px;">Enter the six digits.</h3>' +
+      '<p class="sub" style="margin-top:10px;font-size:.9rem;">We sent a code to <strong>'+escapeHtml(email)+'</strong>. It is good for one hour.</p>' +
+      '<input class="dv-field" id="dv-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" style="font-size:2rem;letter-spacing:.35em;text-align:center;">' +
+      '<div class="dv-row"><button class="btn" id="dv-verify">Sign In.</button><button class="btn ghost" id="dv-again">Send Again.</button></div>'
+    );
+    var inp = el('dv-code');
+    inp.focus();
+    function go(){
+      var code = (inp.value||'').replace(/\D/g,'');
+      if(code.length!==6){ toast('Six digits.'); return; }
+      var b=el('dv-verify'); b.disabled=true; b.textContent='Checking\u2026';
+      sb.auth.verifyOtp({ email: email, token: code, type: 'email' }).then(function(r){
+        b.disabled=false; b.textContent='Sign In.';
+        if(r.error){ toast(r.error.message); inp.select(); return; }
+        closeModal();
+        toast('You are in.');
+      });
+    }
+    el('dv-verify').addEventListener('click', go);
+    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') go(); });
+    el('dv-again').addEventListener('click', function(){
+      sb.auth.signInWithOtp({ email: email }).then(function(r){
+        toast(r.error ? r.error.message : 'A new code is on the way.');
+      });
     });
   }
 
@@ -1392,6 +1423,8 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       '<select class="dv-field" id="dv-cat">'+opts+'</select>' +
       '<input class="dv-field" id="dv-city" maxlength="60" placeholder="City (optional)">' +
       '<textarea class="dv-field" id="dv-story" rows="3" maxlength="400" placeholder="How it felt (optional)"></textarea>' +
+      '<button class="chip" id="dv-pin" type="button" style="margin-top:16px;">Pin to the Deed Map</button>' +
+      '<p class="sub" style="margin-top:8px;font-size:.8rem;opacity:.55;">City area only, about 11 km. Never your exact spot.</p>' +
       '<div class="dv-row"><button class="btn" id="dv-save">Log It.</button><button class="btn ghost" onclick="dvCloseModal()">Cancel.</button></div>' +
       '<span class="dv-note">Posted anonymously as '+me.handle+'</span>'
     );
@@ -1401,20 +1434,26 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       var title=(el('dv-title').value||'').trim();
       if(title.length<3){ toast('Say what you did, even briefly.'); return; }
       var b=el('dv-save'); b.disabled=true; b.textContent='Logging…';
+      var wantPin = el('dv-pin') && el('dv-pin').classList.contains('active');
+      (wantPin ? getCoords() : Promise.resolve(null)).then(function(coords){
       sb.from('deeds').insert({
         profile_id: me.id,
         act_id: slot,
         title: title,
         story: (el('dv-story').value||'').trim() || null,
         category: el('dv-cat').value,
-        city: (el('dv-city').value||'').trim() || null
+        city: (el('dv-city').value||'').trim() || null,
+        lat: coords ? coords.lat : null,
+        lng: coords ? coords.lng : null
       }).then(function(r){
         if(r.error){ b.disabled=false; b.textContent='Log It.'; toast(r.error.message); return; }
         closeModal();
-        loadMyDeeds(); loadWall(); loadStats(); refreshMe();
+        loadMyDeeds(); loadWall(); loadStats(); loadMapDeeds(); refreshMe();
         toast('Logged. That is one.');
       });
+      });
     });
+    el('dv-pin').addEventListener('click', function(){ this.classList.toggle('active'); });
   }
 
   function refreshMe(){
@@ -1537,6 +1576,42 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
         c.classList.toggle('active', c.dataset.c === r.data.reminder_cadence);
       });
     });
+  }
+
+  function getCoords(){
+    return new Promise(function(res){
+      if(!('geolocation' in navigator)) return res(null);
+      navigator.geolocation.getCurrentPosition(
+        function(p){ res({ lat: Math.round(p.coords.latitude*10)/10,
+                           lng: Math.round(p.coords.longitude*10)/10 }); },
+        function(){ res(null); },
+        { timeout: 6000, maximumAge: 600000 }
+      );
+    });
+  }
+
+  function loadMapDeeds(){
+    sb.from('deeds').select('title,story,category,city,lat,lng')
+      .not('lat','is',null)
+      .order('created_at',{ascending:false}).limit(500)
+      .then(function(r){
+        if(r.error || !r.data || !r.data.length) return;
+        try{
+          geo.length = 0;
+          r.data.forEach(function(d){
+            geo.push({
+              city: d.city || 'Somewhere on Earth',
+              lat: +d.lat, lon: +d.lng,
+              cat: ENUM_TO_CAT[d.category] || 'Community',
+              body: d.title,
+              felt: d.story || 'Given quietly.'
+            });
+          });
+          if(window.renderMapRows) renderMapRows('All');
+          var active = document.querySelector('#mapchips .chip.active');
+          if(active && typeof mapInit !== 'undefined' && mapInit) active.click();
+        }catch(e){}
+      });
   }
 
   /* ---------- the Wall: paged feed with search ---------- */
@@ -1738,6 +1813,7 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       '<input class="dv-field" id="dv-title" maxlength="140" placeholder="What you did.">' +
       '<select class="dv-field" id="dv-cat">'+opts+'</select>' +
       '<input class="dv-field" id="dv-city" maxlength="60" placeholder="City (optional)">' +
+      '<button class="chip" id="dv-pin" type="button" style="margin-top:16px;">Pin to the Deed Map</button>' +
       '<div class="dv-row"><button class="btn" id="dv-save">Add to the Chain.</button><button class="btn ghost" onclick="dvCloseModal()">Cancel.</button></div>'
     );
     el('dv-save').addEventListener('click', function(){
@@ -1745,17 +1821,23 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       if(title.length<3){ toast('Say what you did.'); return; }
       var open = null;
       for(var i=1;i<=40;i++){ if(!(window._dvSlots||{})[i]){ open=i; break; } }
+      var wantPin = el('dv-pin') && el('dv-pin').classList.contains('active');
+      (wantPin ? getCoords() : Promise.resolve(null)).then(function(coords){
       sb.from('deeds').insert({
         profile_id: me.id, act_id: open, title: title,
         category: el('dv-cat').value,
         city: (el('dv-city').value||'').trim() || null,
-        chain_parent_id: p.id
+        chain_parent_id: p.id,
+        lat: coords ? coords.lat : null,
+        lng: coords ? coords.lng : null
       }).then(function(r){
         if(r.error){ toast(r.error.message); return; }
-        closeModal(); loadMyDeeds(); loadWall(); loadStats();
+        closeModal(); loadMyDeeds(); loadWall(); loadStats(); loadMapDeeds();
         toast('The chain is one longer.');
       });
+      });
     });
+    el('dv-pin').addEventListener('click', function(){ this.classList.toggle('active'); });
   }
 
   /* ---------- live stats ---------- */
