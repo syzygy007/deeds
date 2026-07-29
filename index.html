@@ -245,6 +245,19 @@ input,textarea{font:inherit;color:var(--ink)}
  .rvoice{font-size:10px;letter-spacing:.14em;color:#B3AEA0;font-weight:800;line-height:2;margin-top:6px;text-transform:uppercase}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* composer modes, posts, seconds */
+.modetog{display:flex;gap:8px;margin:2px 0 14px}
+.modetog button{flex:1;border:1px solid var(--line);border-radius:999px;padding:10px 0;font-size:12.5px;font-weight:800;letter-spacing:.08em}
+.modetog button.on{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+.chip.pk{color:#8B867A;background:#F0EDE3}
+.embed{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#FBF9F3;cursor:pointer}
+.embed .eh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.embed .eb{font-size:14px;line-height:1.45;color:#3E3A30}
+.embed .ei{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:.12em;margin-top:8px;text-transform:uppercase}
+#secondEmbed .embed{cursor:default;margin:0 0 14px}
+.flash{animation:flashbg 1.2s ease}
+@keyframes flashbg{0%{background:#F0F2EA}100%{background:transparent}}
 </style>
 </head>
 <body>
@@ -431,8 +444,10 @@ input,textarea{font:inherit;color:var(--ink)}
 
 <div class="sheet" id="logsheet">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3>Log a Deed.</h3>
+  <div class="modetog" id="modetog"><button id="modeDeed" class="on">DEED.</button><button id="modePost">POST.</button></div>
+  <h3 id="composeH">Log a Deed.</h3>
   <div class="chaintag" id="logchain" style="display:none"></div>
+  <div id="secondEmbed"></div>
   <textarea class="logarea" id="logtext" placeholder="What did you do?"></textarea>
   <div class="logrow" id="logdates">
     <button class="lchip on">Today.</button>
@@ -441,6 +456,7 @@ input,textarea{font:inherit;color:var(--ink)}
   </div>
   <div class="logrow">
     <button class="lchip" id="logphoto">Add a Photo.</button>
+    <button class="lchip" id="logvideo" style="display:none">Add a Video.</button>
     <button class="lchip" id="logpriv">Keep This One Private.</button>
   </div>
   <div class="logsub"><button class="logbtn" id="logsubmit">Log It.</button></div>
@@ -457,6 +473,7 @@ input,textarea{font:inherit;color:var(--ink)}
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Pass It On.</h3>
   <button class="sheetrowbtn" id="passchain">Continue the Chain.<small>Do the next act and log it as the next link.</small></button>
+  <button class="sheetrowbtn" id="passsecond">Second It.<small>Lift the deed with your words. It stays theirs.</small></button>
   <button class="sheetrowbtn" id="passshare">Share It Out.<small>Post this deed to your own feeds. It stays anonymous.</small></button>
 </div>
 
@@ -645,12 +662,14 @@ var ORGS={'Lincoln Elementary':{kind:'School',since:'February 2026',followers:12
 var POSTS=[
 {id:1,who:'TrueWren601',time:'2H',body:'Paid for someones groceries.',insp:11,cmts:[{who:'CedarPost615',body:'This is how it starts.'}]},
 {id:2,who:'MapleWard212',time:'3H',body:'Stayed late so a student could finish her science fair build. She nailed the wiring on the second try.',insp:64,media:{kind:'photo',plate:'A'},cmts:[{who:'PaperCrane441',body:'Teachers like you are the reason.'},{who:'LowTideRun228',body:'Second try is the best try.'}]},
-{id:3,who:'Lincoln Elementary',org:true,time:'5H',body:'Forty staff members took the Forty together. The circle chart in the staff room fills a little more every day.',insp:203,cmts:[{who:'MapleWard212',body:'Proud to be one of the forty.'}]},
+{id:3,kind:'post',who:'Lincoln Elementary',org:true,time:'5H',body:'Forty staff members took the Forty together. The circle chart in the staff room fills a little more every day.',insp:203,cmts:[{who:'MapleWard212',body:'Proud to be one of the forty.'}]},
 {id:4,who:'HarborLight077',time:'7H',body:'Sat with a patient who had no visitors. We watched the sunrise from the east window.',insp:151,media:{kind:'video',vid:0},cmts:[{who:'IvyGate303',body:'Presence is the whole gift.'}]},
 {id:5,who:'CedarPost615',time:'9H',body:'Shoveled three driveways before work. Nobody knows which neighbor did it.',insp:38,cmts:[]},
 {id:6,who:'PaperCrane441',time:'11H',body:'Tutored two kids in algebra at the library. Free, every Tuesday now.',insp:47,cmts:[{who:'MapleWard212',body:'Every Tuesday. That is the part that matters.'}]},
+{id:15,kind:'second',who:'PaperCrane441',time:'12H',ref:7,body:'This is the whole spirit of the thing. Rain and all.',cmts:[]},
 {id:7,who:'SlateCreek969',time:'13H',body:'Off shift. Changed a tire for a stranger on Route 9 in the rain.',insp:96,cmts:[]},
 {id:8,who:'WrenHollow084',time:'16H',chain:3,body:'The coffee chain reached me this morning. Bought the next three orders and kept it moving.',insp:72,cmts:[{who:'OpenDoor117',body:'Link four is out there right now.'}]},
+{id:16,kind:'post',who:'GoldfinchRow512',time:'18H',body:'Saturday crew at the food bank. Doors open at eight if you want in.',insp:21,media:{kind:'photo',plate:'M'},cmts:[]},
 {id:9,who:'GoldfinchRow512',time:'19H',body:'Sorted four hundred pounds of produce at the food bank before noon.',insp:59,media:{kind:'photo',plate:'B'},cmts:[]},
 {id:10,who:'LowTideRun228',time:'22H',body:'Drove the whole team home after practice. Every kid got a hot meal first.',insp:81,cmts:[]},
 {id:11,who:'IvyGate303',time:'1D',body:'Opened the fellowship hall for the cold night. Twenty two beds, all warm.',insp:187,media:{kind:'video',vid:1},cmts:[{who:'HarborLight077',body:'Warmth, counted in beds.'}]},
@@ -724,27 +743,37 @@ ctx.fillStyle='#1F4B3A';ctx.beginPath();ctx.arc(cx,cy,5,0,7);ctx.fill()}
 grain(ctx,w,h,240,.04)}
 /* ============ FEED ============ */
 var curPage='feed',lastPage='feed',searchQ='';
+function byId(id){return POSTS.filter(function(x){return x.id===id})[0]}
+function embedHTML(r){if(!r)return'';
+var b=r.body.length>160?r.body.slice(0,157)+'...':r.body;
+return '<div class="embed" data-embed="'+r.id+'"><div class="eh">'+avatarOf(r.who,26)+'<span class="mono">'+r.who+'</span>'+chipOf(r.who)+'</div><div class="eb">'+b+'</div><div class="ei">'+r.insp+' Inspired · '+r.time+'</div></div>'}
 function postHTML(p){var m=MEMBERS[p.who];var lit=my.inspired[p.id];
+var isPost=p.kind==='post',isSec=p.kind==='second';
 var h='<article class="post" data-id="'+p.id+'">';
 h+='<div class="p-head"><div class="p-av" data-member="'+p.who+'">'+avatarOf(p.who,40)+'</div>';
-h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-member="'+p.who+'">'+p.who+'</span>'+chipOf(p.who)+'</div>';
+h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-member="'+p.who+'">'+p.who+'</span>'+chipOf(p.who)+((isPost||isSec)?'<span class="chip pk">'+(isSec?'SECONDED':'POST')+'</span>':'')+'</div>';
 h+='<div class="p-time">'+p.time+'</div></div></div>';
-if(p.chain)h+='<div class="chaintag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"/><path d="M7.5 11 5 13.5a3.5 3.5 0 0 0 5 5L12.5 16"/><path d="M16.5 13 19 10.5a3.5 3.5 0 0 0-5-5L11.5 8"/></svg>CHAIN · LINK '+p.chain+'</div>';
+if(p.chain&&!isPost&&!isSec)h+='<div class="chaintag"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"/><path d="M7.5 11 5 13.5a3.5 3.5 0 0 0 5 5L12.5 16"/><path d="M16.5 13 19 10.5a3.5 3.5 0 0 0-5-5L11.5 8"/></svg>CHAIN · LINK '+p.chain+'</div>';
 h+='<p class="p-body">'+p.body+'</p>';
+if(isSec)h+=embedHTML(byId(p.ref));
 if(p.media){h+='<div class="p-media" data-media="'+p.id+'"><canvas width="1080" height="'+(p.media.kind==='video'?1350:760)+'"></canvas>';
 if(p.media.kind==='video')h+='<div class="playbadge">PLAY</div>';h+='</div>'}
 h+='<div class="p-acts">';
-h+='<button class="pa'+(lit?' lit':'')+'" data-insp="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l1.8 4.9 4.9 1.8-4.9 1.8L12 16.6l-1.8-4.9-4.9-1.8 4.9-1.8L12 3.2z"/></svg><span>'+(p.insp+(lit?1:0))+'</span></button>';
+if(!isSec)h+='<button class="pa'+(lit?' lit':'')+'" data-insp="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l1.8 4.9 4.9 1.8-4.9 1.8L12 16.6l-1.8-4.9-4.9-1.8 4.9-1.8L12 3.2z"/></svg><span>'+(p.insp+(lit?1:0))+'</span></button>';
 h+='<button class="pa" data-cmt="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.6c0 4-3.6 7.2-8 7.2-1 0-2-.2-2.9-.5L4 20l1.5-3.6A7 7 0 0 1 4 11.6c0-4 3.6-7.2 8-7.2s8 3.2 8 7.2z"/></svg><span>'+p.cmts.length+'</span></button>';
-h+='<button class="pa" data-pass="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"/><path d="M12 6.5 17.5 12 12 17.5"/><path d="M20.5 5.5v13"/></svg><span>Pass It On</span></button>';
+if(isPost||isSec)h+='<button class="pa" data-shareout="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M5 13v6h14v-6"/></svg><span>Share</span></button>';
+if(!isPost&&!isSec)h+='<button class="pa" data-pass="'+p.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"/><path d="M12 6.5 17.5 12 12 17.5"/><path d="M20.5 5.5v13"/></svg><span>Pass It On</span></button>';
 h+='<button class="pa more" data-more="'+p.id+'" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg></button>';
 h+='</div></article>';return h}
 function meetCard(hd){var f=my.following[hd];
 return '<div class="mr-card"><div data-member="'+hd+'">'+avatarOf(hd,52)+'</div><span class="mono" data-member="'+hd+'">'+hd+'</span>'+chipOf(hd)+'<button class="fbtn'+(f?' on':'')+'" data-follow="'+hd+'">'+(f?'Following':'Follow')+'</button></div>'}
 function renderFeed(){var el=$('#feed');var q=searchQ.toLowerCase();var shown=0;var h='';
 POSTS.forEach(function(p,idx){if(my.blocked[p.who])return;
+var refP=p.ref?byId(p.ref):null;
+if(p.kind==='second'&&(!refP||my.blocked[refP.who]))return;
 if(q){var lab=(MEMBERS[p.who]?DeedsTypes.LABELS[MEMBERS[p.who].type]:'')||'';
-if((p.body+' '+p.who+' '+lab).toLowerCase().indexOf(q)<0)return}
+var hay=p.body+' '+p.who+' '+lab+(refP?' '+refP.body+' '+refP.who:'');
+if(hay.toLowerCase().indexOf(q)<0)return}
 h+=postHTML(p);shown++;
 if(!q&&shown===3){h+='<div class="meetrail"><div class="micro">Meet.</div><div class="sub">Surfaced By Deeds, Not By You</div><div class="mr-scroll">';
 MEET.slice(0,4).forEach(function(m){h+=meetCard(m)});h+='</div></div>'}});
@@ -761,6 +790,12 @@ if(my.inspired[id])delete my.inspired[id];else my.inspired[id]=1;renderFeed()}})
 $$('[data-cmt]').forEach(function(b){b.onclick=function(){openCmts(+b.getAttribute('data-cmt'))}});
 $$('[data-pass]').forEach(function(b){b.onclick=function(){openPass(+b.getAttribute('data-pass'))}});
 $$('[data-more]').forEach(function(b){b.onclick=function(){openMore(+b.getAttribute('data-more'))}});
+$$('[data-shareout]').forEach(function(b){b.onclick=function(){var p=byId(+b.getAttribute('data-shareout'));
+var txt='"'+p.body+'" · from the DEEDS. feed · https://deeds.fun';
+if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
+$$('[data-embed]').forEach(function(d){if(d.closest('#secondEmbed'))return;d.onclick=function(){var id=+d.getAttribute('data-embed');
+var el=document.querySelector('#feed [data-id="'+id+'"]');
+if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash');setTimeout(function(){el.classList.remove('flash')},1300)}}});
 $$('[data-media]').forEach(function(d){d.onclick=function(){var id=+d.getAttribute('data-media');
 var p=POSTS.filter(function(x){return x.id===id})[0];
 if(p.media.kind==='video')openReels(p.media.vid);else openLightbox(p.media.plate)}});
@@ -856,7 +891,8 @@ cmtPost.cmts.push({who:my.handle,body:v});$('#cmtin').value='';openCmts(cmtPost.
 var passPost=null;
 function openPass(id){passPost=POSTS.filter(function(x){return x.id===id})[0];sheet('#passsheet')}
 $('#passchain').onclick=function(){closeSheets();chainLink=(passPost.chain||1)+1;
-$('#logchain').style.display='inline-flex';$('#logchain').textContent='CHAIN · LINK '+chainLink;openLog()};
+$('#logchain').style.display='inline-flex';$('#logchain').textContent='CHAIN · LINK '+chainLink;openCompose('deed')};
+$('#passsecond').onclick=function(){closeSheets();openCompose('second',passPost.id)};
 $('#passshare').onclick=function(){closeSheets();var txt='"'+passPost.body+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}};
 var morePost=null;
@@ -864,15 +900,36 @@ function openMore(id){morePost=POSTS.filter(function(x){return x.id===id})[0];sh
 $('#morereport').onclick=function(){closeSheets();toast('Reported. Thank you for guarding the feed.')};
 $('#moreblock').onclick=function(){var hd=morePost.who;my.blocked[hd]=1;closeSheets();renderFeed();toast('Blocked. Their deeds are gone from your feed.')};
 
-/* ============ LOG ============ */
-var chainLink=0,logPriv=false,logPhoto=false;
-function openLog(){logPriv=false;logPhoto=false;$$('#logdates .lchip').forEach(function(x,i){x.classList.toggle('on',i===0)});$('#logpriv').classList.remove('on');$('#logphoto').classList.remove('on');
-$('#logtext').value='';if(!chainLink){$('#logchain').style.display='none'}
+/* ============ COMPOSER ============ */
+var chainLink=0,logPriv=false,logPhoto=false,logVideo=false,composeMode='deed',secondRef=0,postN=1,secN=1;
+function switchMode(m){composeMode=m;
+$('#modeDeed').classList.toggle('on',m==='deed');
+$('#modePost').classList.toggle('on',m==='post');
+$('#composeH').textContent=m==='deed'?'Log a Deed.':(m==='post'?'Make a Post.':'Second It.');
+$('#logtext').placeholder=m==='deed'?'What did you do?':(m==='post'?'Say something good.':'Say why it moved you.');
+$('#logdates').style.display=m==='deed'?'flex':'none';
+$('#logpriv').style.display=m==='deed'?'':'none';
+$('#logphoto').style.display=m==='second'?'none':'';
+$('#logvideo').style.display=m==='post'?'':'none';
+$('#logsubmit').textContent=m==='deed'?'Log It.':(m==='post'?'Post It.':'Second It.');
+$('#secondEmbed').innerHTML=m==='second'?embedHTML(byId(secondRef)):''}
+function openCompose(mode,ref){secondRef=ref||0;logPriv=false;logPhoto=false;logVideo=false;
+$('#logpriv').classList.remove('on');$('#logphoto').classList.remove('on');$('#logvideo').classList.remove('on');
+$$('#logdates .lchip').forEach(function(x,i2){x.classList.toggle('on',i2===0)});
+$('#logtext').value='';
+if(!chainLink){$('#logchain').style.display='none'}
+$('#modetog').style.display=(mode==='second'||chainLink)?'none':'flex';
+switchMode(mode||'deed');
 sheet('#logsheet');setTimeout(function(){$('#logtext').focus()},350)}
+$('#modeDeed').onclick=function(){switchMode('deed')};
+$('#modePost').onclick=function(){switchMode('post')};
 $$('#logdates .lchip').forEach(function(b){b.onclick=function(){$$('#logdates .lchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on')}});
 $('#logpriv').onclick=function(){logPriv=!logPriv;$('#logpriv').classList.toggle('on',logPriv)};
-$('#logphoto').onclick=function(){logPhoto=!logPhoto;$('#logphoto').classList.toggle('on',logPhoto)};
-$('#logsubmit').onclick=function(){var v=$('#logtext').value.trim();if(!v){toast('Write the deed first.');return}
+$('#logphoto').onclick=function(){logPhoto=!logPhoto;if(logPhoto){logVideo=false;$('#logvideo').classList.remove('on')}$('#logphoto').classList.toggle('on',logPhoto)};
+$('#logvideo').onclick=function(){logVideo=!logVideo;if(logVideo){logPhoto=false;$('#logphoto').classList.remove('on')}$('#logvideo').classList.toggle('on',logVideo)};
+$('#logsubmit').onclick=function(){var v=$('#logtext').value.trim();
+if(!v){toast(composeMode==='second'?'Say why first.':'Write it first.');return}
+if(composeMode==='deed'){
 var when=$('#logdates .lchip.on').textContent.replace('.','');
 my.deeds.push({body:v,when:when,priv:logPriv});
 var n=deedCount();
@@ -881,9 +938,15 @@ chain:chainLink||undefined,media:logPhoto?{kind:'photo',plate:'M'}:undefined})}
 closeSheets();renderFeed();renderRail();renderProfile();
 toast('DEED '+n+'.'+(logPriv?' KEPT PRIVATE.':' JULY · '+monthCount()+' DEEDS. KEEP BUILDING.'));
 var ci=coinIdx(n);if(ci>=0&&n===COINS[ci][1]){setTimeout(function(){toast(COINS[ci][0].toUpperCase()+'. THE COIN IS YOURS.')},2800)}
-chainLink=0;$('#logchain').style.display='none'};
-$('#tLog').onclick=openLog;$('#pLog').onclick=openLog;
-var lb=$('#lLog');if(lb)lb.onclick=openLog;
+chainLink=0;$('#logchain').style.display='none'}
+else if(composeMode==='post'){
+POSTS.unshift({id:200+postN++,kind:'post',who:my.handle,time:'NOW',body:v,insp:0,cmts:[],
+media:logPhoto?{kind:'photo',plate:'M'}:(logVideo?{kind:'video',vid:(Math.random()*3)|0}:undefined)});
+closeSheets();renderFeed();toast('Posted.')}
+else{POSTS.unshift({id:300+secN++,kind:'second',who:my.handle,time:'NOW',ref:secondRef,body:v,cmts:[]});
+closeSheets();renderFeed();toast('Seconded. It stays theirs.')}};
+$('#tLog').onclick=function(){openCompose('deed')};$('#pLog').onclick=function(){openCompose('deed')};
+var lb=$('#lLog');if(lb)lb.onclick=function(){openCompose('deed')};
 /* ============ CHALLENGE ============ */
 $$('[data-open]').forEach(function(b){b.onclick=function(){$('#'+b.getAttribute('data-open')).classList.add('open')}});
 $$('#actchips .achip').forEach(function(b){b.onclick=function(){$$('#actchips .achip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');$('#deedCustom').value=''}});
@@ -917,7 +980,7 @@ $('#arriveGo').textContent=forty?'Accept the Forty.':'Accept the Deed.';
 $('#scrim').classList.add('on');$('#arrive').classList.add('on');
 $('#arriveGo').onclick=function(){closeSheets();
 if(forty){toast('Accepted. Your year starts today.');go('profile')}
-else{toast('Accepted. Do the act, then log it.');openLog()}};
+else{toast('Accepted. Do the act, then log it.');openCompose('deed')}};
 $('#arriveRead').onclick=function(){closeSheets();go('challenge');$('#chForty').classList.add('open')};
 try{history.replaceState(null,'',location.pathname)}catch(e){}}
 
@@ -955,7 +1018,7 @@ var arrival=parseArrival();
 if(arrival||safeGet('deeds_seen')){$('#threshold').style.display='none';$('#app').classList.add('on')}
 else{paintHero()}
 $('#thEnter').onclick=enter;
-$('#thLog').onclick=function(){enter();setTimeout(openLog,420)};
+$('#thLog').onclick=function(){enter();setTimeout(function(){openCompose('deed')},420)};
 renderFeed();renderRail();renderProfile();
 if(arrival)showArrival(arrival);
 </script>
