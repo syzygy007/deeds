@@ -1151,12 +1151,15 @@ var SHARESVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 var MORESVG='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 function livePostHTML(r){var nm=NAMES[r.profile_id]||{handle:'A Member',type:'doer',v:false};
 var mine=PROFILE&&r.profile_id===PROFILE.id;
-var body=r.story||r.title||'';
+var isPost=r._k==='post';
+var body=isPost?(r.body||''):(r.story||r.title||'');
 var h='<article class="post" data-lid="'+esc(r.id)+'">';
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
-h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
+h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
 h+='<p class="p-body">'+esc(body)+'</p>';
+if(r.media_path){var mu=esc(mediaURL(r.media_path));
+h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
 h+='<div class="p-acts"><button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
 if(!mine)h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'" aria-label="More">'+MORESVG+'</button>';
 h+='</div></article>';return h}
@@ -1208,27 +1211,48 @@ $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribu
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
 $$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh')};sheet('#moresheet')}});
-$$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}})}
+$$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
+$$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
 function findLive(id){var all=LIVEPOSTS.concat(SRES);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
 
 function feedFail(msg){feedFailMsg='The feed could not load: '+msg;renderFeed()}
 function loadFeed(){if(!sb)return;feedBusy=true;feedFailMsg='';
-sb.from('deeds').select('*').eq('is_private',false).order('created_at',{ascending:false}).range(0,29).then(function(r){
-feedBusy=false;
-if(r.error){feedFail(r.error.message);return}
-LIVEPOSTS=r.data||[];pageFrom=LIVEPOSTS.length;feedEnd=LIVEPOSTS.length<30;
+var dq=sb.from('deeds').select('*').eq('is_private',false).order('created_at',{ascending:false}).limit(30);
+var pq=sb.from('posts').select('*').order('created_at',{ascending:false}).limit(30);
+Promise.all([dq,pq]).then(function(res){feedBusy=false;
+var dr=res[0]||{},pr=res[1]||{};
+if(dr.error){feedFail(dr.error.message);return}
+var rows=(dr.data||[]).map(function(x){return markKind(x,'deed')});
+if(!pr.error)rows=rows.concat((pr.data||[]).map(function(x){return markKind(x,'post')}));
+rows.sort(byNew);
+feedEnd=rows.length<30;
+LIVEPOSTS=rows.slice(0,30);pageFrom=LIVEPOSTS.length;
 fetchNames(LIVEPOSTS).then(renderFeed)}).catch(function(e){feedBusy=false;feedFail(String(e&&e.message||e))})}
-function loadMore(){if(!liveOn||feedBusy||feedEnd||searchQ)return;feedBusy=true;
-sb.from('deeds').select('*').eq('is_private',false).order('created_at',{ascending:false}).range(pageFrom,pageFrom+29).then(function(r){
-feedBusy=false;if(r.error)return;var rows=(r.data||[]).filter(function(nw){return !LIVEPOSTS.some(function(x){return x.id===nw.id})});
-if((r.data||[]).length<30)feedEnd=true;
-LIVEPOSTS=LIVEPOSTS.concat(rows);pageFrom+=(r.data||[]).length;
+function loadMore(){if(!liveOn||feedBusy||feedEnd||searchQ)return;
+if(!LIVEPOSTS.length){feedEnd=true;return}
+feedBusy=true;
+var cur=LIVEPOSTS[LIVEPOSTS.length-1].created_at;
+var dq=sb.from('deeds').select('*').eq('is_private',false).lt('created_at',cur).order('created_at',{ascending:false}).limit(30);
+var pq=sb.from('posts').select('*').lt('created_at',cur).order('created_at',{ascending:false}).limit(30);
+Promise.all([dq,pq]).then(function(res){feedBusy=false;
+var dr=res[0]||{},pr=res[1]||{};
+if(dr.error)return;
+var rows=(dr.data||[]).map(function(x){return markKind(x,'deed')});
+if(!pr.error)rows=rows.concat((pr.data||[]).map(function(x){return markKind(x,'post')}));
+rows=rows.filter(function(nw){return !LIVEPOSTS.some(function(x){return String(x.id)===String(nw.id)})});
+rows.sort(byNew);
+if(!rows.length){feedEnd=true;renderFeed();return}
+rows=rows.slice(0,30);
+LIVEPOSTS=LIVEPOSTS.concat(rows);pageFrom=LIVEPOSTS.length;
 fetchNames(rows).then(renderFeed)}).catch(function(){feedBusy=false})}
 function prependLive(row){if(!row||row.is_private)return;
 if(LIVEPOSTS.some(function(x){return x.id===row.id}))return;
 LIVEPOSTS.unshift(row);pageFrom++;fetchNames([row]).then(renderFeed)}
 function subRealtime(){try{
-sb.channel('deeds-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'deeds'},function(pl){prependLive(pl.new)}).subscribe()
+sb.channel('deeds-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'deeds'},function(pl){prependLive(markKind(pl.new,'deed'))}).subscribe()
+}catch(e){}
+try{
+sb.channel('posts-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},function(pl){prependLive(markKind(pl.new,'post'))}).subscribe()
 }catch(e){}}
 function serverSearch(q){var s=q.replace(/[,%()]/g,'').trim();if(s.length<2||!sb)return;
 sb.from('deeds').select('*').eq('is_private',false).or('story.ilike.%'+s+'%,title.ilike.%'+s+'%').order('created_at',{ascending:false}).limit(30).then(function(r){
@@ -1369,11 +1393,60 @@ basePassChain&&basePassChain()};
 $('#passsecond').onclick=function(){if(liveOn){closeSheets();if(!PROFILE){openJoin();return}toast('Seconds go live in the next build.');return}
 basePassSecond&&basePassSecond()};
 
+/* ---- photo: pick, shrink in the browser, upload to storage ---- */
+var LPHOTO=null,LFILE=null;
+function mediaURL(p){try{return sb.storage.from('media').getPublicUrl(p).data.publicUrl}
+catch(e){return SB_URL+'/storage/v1/object/public/media/'+p}}
+function clearPhoto(){LPHOTO=null;var b=$('#logphoto');
+if(b){b.classList.remove('on');b.textContent='Add a Photo.'}
+if(LFILE)LFILE.value=''}
+function shrinkImage(file,maxpx,cb){var url=URL.createObjectURL(file);var img=new Image();
+img.onload=function(){var w=img.width||1,h=img.height||1;var sc=Math.min(1,maxpx/Math.max(w,h));
+var cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));
+var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
+try{cv.getContext('2d').drawImage(img,0,0,cw,ch)}catch(e){URL.revokeObjectURL(url);cb(null);return}
+cv.toBlob(function(bl){URL.revokeObjectURL(url);cb(bl,cw,ch)},'image/jpeg',0.82)};
+img.onerror=function(){URL.revokeObjectURL(url);cb(null)};img.src=url}
+function ensureFileInput(){if(LFILE)return LFILE;
+LFILE=document.createElement('input');LFILE.type='file';LFILE.accept='image/*';
+LFILE.style.cssText='position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+LFILE.addEventListener('change',function(){var f=LFILE.files&&LFILE.files[0];if(!f)return;
+var b=$('#logphoto');if(b)b.textContent='SIZING...';
+shrinkImage(f,1600,function(bl,w,h){
+if(!bl){clearPhoto();toast('That image could not be read.');return}
+LPHOTO={blob:bl,w:w,h:h};
+if(b){b.textContent='Photo Ready.';b.classList.add('on')}})});
+document.body.appendChild(LFILE);return LFILE}
+function uploadPhoto(cb){if(!LPHOTO||!PROFILE){cb(null);return}
+var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+sb.storage.from('media').upload(path,LPHOTO.blob,{contentType:'image/jpeg',upsert:false}).then(function(r){
+if(r&&r.error){cb(null,r.error.message);return}
+cb({path:path,w:LPHOTO.w,h:LPHOTO.h})}).catch(function(e){cb(null,String(e&&e.message||e))})}
+function liveLightbox(src){var o=document.getElementById('llbox');
+if(!o){o=document.createElement('div');o.id='llbox';
+o.style.cssText='position:fixed;inset:0;background:rgba(12,11,9,.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:18px';
+o.innerHTML='<img alt="" style="max-width:100%;max-height:100%;display:block;border-radius:10px">';
+o.onclick=function(){o.style.display='none'};document.body.appendChild(o)}
+o.querySelector('img').src=src;o.style.display='flex'}
+function markKind(r,k){if(r)r._k=k;return r}
+function byNew(a,b){return new Date(b.created_at)-new Date(a.created_at)}
+
+/* ---- keep video hidden in live mode, photo available in both modes ---- */
+var baseSwitchMode=switchMode;
+switchMode=function(m){baseSwitchMode(m);
+if(!liveOn)return;
+$('#logvideo').style.display='none';
+$('#logphoto').style.display=(m==='second')?'none':'';
+if(LPHOTO&&$('#logphoto'))$('#logphoto').classList.add('on')};
+
 /* ---- composer: real deeds into the database ---- */
 var baseOpenCompose=openCompose;
 openCompose=function(mode,ref){baseOpenCompose(mode,ref);
-if(liveOn){$('#modetog').style.display='none';$('#logphoto').style.display='none';$('#logvideo').style.display='none';
+if(liveOn){$('#logvideo').style.display='none';clearPhoto();
 if(new Date().getDate()===1){$$('#logdates .lchip').forEach(function(b){if(b.textContent.indexOf('Yesterday')===0)b.style.display='none'})}}};
+$('#logphoto').onclick=function(){if(!liveOn){logPhoto=!logPhoto;if(logPhoto){logVideo=false;$('#logvideo').classList.remove('on')}$('#logphoto').classList.toggle('on',logPhoto);return}
+if(LPHOTO){clearPhoto();return}
+ensureFileInput().click()};
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
 chainLink=0;$('#logchain').style.display='none';openCompose('deed')}
@@ -1386,7 +1459,19 @@ var baseSubmit=$('#logsubmit').onclick;
 $('#logsubmit').onclick=function(){
 if(!liveOn){baseSubmit&&baseSubmit();return}
 if(!PROFILE){closeSheets();openJoin();return}
-var txt=$('#logtext').value.trim();if(!txt){toast('Write it first.');return}
+var txt=$('#logtext').value.trim();if(!txt){toast(composeMode==='post'?'Say something first.':'Write it first.');return}
+if(composeMode==='second'){toast('Seconds go live in the next build.');return}
+if(composeMode==='post'){var pb=$('#logsubmit');pb.textContent='POSTING...';
+uploadPhoto(function(m,uerr){
+if(uerr){pb.textContent='Post It.';toast('The photo did not upload: '+uerr);return}
+var pay={profile_id:PROFILE.id,body:txt};
+if(m){pay.media_path=m.path;pay.media_kind='photo';pay.media_w=m.w;pay.media_h=m.h}
+sb.from('posts').insert(pay).select().single().then(function(r){
+pb.textContent='Post It.';
+if(r.error){toast('Could not post it: '+r.error.message);return}
+clearPhoto();prependLive(markKind(r.data,'post'));closeSheets();toast('POSTED.')
+}).catch(function(e){pb.textContent='Post It.';toast('Could not post it: '+String(e&&e.message||e))})});
+return}
 var chipEl=$('#logdates .lchip.on');var chipTxt=chipEl?chipEl.textContent:'Today.';
 var d=new Date();
 if(chipTxt.indexOf('Yesterday')===0)d.setDate(d.getDate()-1);
@@ -1394,16 +1479,21 @@ else if(chipTxt.indexOf('Earlier')===0)d=new Date(d.getFullYear(),d.getMonth(),1
 var first=new Date(d.getFullYear(),d.getMonth(),1);if(d<first)d=first;
 var title=txt.length>64?txt.slice(0,61)+'...':txt;
 var b=$('#logsubmit');b.textContent='LOGGING...';
-sb.from('deeds').insert({profile_id:PROFILE.id,title:title,story:txt,is_private:logPriv,done_on:ymd(d)}).select().single().then(function(r){
+uploadPhoto(function(mm,uerr2){
+if(uerr2){b.textContent='Log It.';toast('The photo did not upload: '+uerr2);return}
+var dpay={profile_id:PROFILE.id,title:title,story:txt,is_private:logPriv,done_on:ymd(d)};
+if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.media_h=mm.h}
+sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
 if(r.error){toast('Could not log it: '+r.error.message);return}
 my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
-if(!logPriv)prependLive(r.data);
+clearPhoto();
+if(!logPriv)prependLive(markKind(r.data,'deed'));
 closeSheets();renderProfile();renderRail();renderFeed();
 var n=my.deeds.length;
 toast('DEED '+n+'.'+(logPriv?' KEPT PRIVATE.':' '+MONTHS[new Date().getMonth()]+' · '+n+(n===1?' DEED':' DEEDS')+'. KEEP BUILDING.'));
 var ci=coinIdx(n);if(ci>=0&&n===COINS[ci][1]){setTimeout(function(){toast(COINS[ci][0].toUpperCase()+'. THE COIN IS YOURS.')},2800)}
-}).catch(function(e){b.textContent='Log It.';toast('Could not log it: '+String(e&&e.message||e))})};
+}).catch(function(e){b.textContent='Log It.';toast('Could not log it: '+String(e&&e.message||e))})})};
 
 /* ---- sign in or join: one door, one code ---- */
 function openJoin(){closeSheets();
