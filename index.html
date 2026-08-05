@@ -1042,7 +1042,7 @@ function deedAct(){var c=$('#deedCustom').value.trim();if(c)return c;
 var on=$('#actchips .achip.on');return on?on.textContent:'One act of your choosing.'}
 function buildSend(kind){var base='https://deeds.fun/challenge/?c='+my.handle;var msg,url;
 if(kind==='deed'){var act=deedAct();var note=$('#deedNote').value.trim();
-url=base+'&k=deed&a='+encodeURIComponent(act);
+url='https://deeds.fun/deed/?c='+my.handle+'&k=deed&a='+encodeURIComponent(act);
 msg=my.handle+' challenged you to one deed: '+act+(note?' · '+note:'')+' · See it: '+url}
 else{var note2=$('#fortyNote').value.trim();url=base;
 msg=my.handle+' sent you the Forty. Forty deeds. One year.'+(note2?' · '+note2:'')+' · See it: '+url}
