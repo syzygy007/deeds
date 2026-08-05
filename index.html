@@ -129,6 +129,15 @@ input,textarea{font:inherit;color:var(--ink)}
 .rline{font-size:13px;letter-spacing:.12em;font-weight:800;color:var(--forest)}
 .rline+.rline{margin-top:9px;color:var(--ink)}
 .prof-log{margin-top:20px}
+.pedit{margin-left:auto;align-self:flex-start;border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pedit.on{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
+.pbio{font-size:14px;line-height:1.6;color:#4A463C;margin-top:16px;max-width:460px;white-space:pre-wrap}
+.specrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.specrow:last-child{border-bottom:0;padding-bottom:0}
+.specrow .k{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--muted);text-transform:uppercase}
+.specrow .v{font-size:14px;font-weight:800}
+.bioin{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--ivory);font-size:15px;line-height:1.55;padding:12px 14px;outline:none;resize:none;min-height:84px}
+.bioin:focus{border-color:var(--forest)}
 .sect{padding:24px 18px;border-bottom:1px solid var(--line)}
 .sect .micro{color:var(--muted);margin-bottom:14px}
 .pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
@@ -439,7 +448,9 @@ input,textarea{font:inherit;color:var(--ink)}
             <div class="prof-name"><span class="mono" id="myHandle">TrueWren601</span><span class="coinbadge" id="myCoin" title="Status"></span></div>
             <div class="prof-since" id="mySince">Member Since July 2026</div>
           </div>
+          <button class="pedit" id="pEdit">Edit.</button>
         </div>
+        <div class="pbio" id="myBio" style="display:none"></div>
         <div class="rhythm">
           <div class="rline" id="rMonth"></div>
           <div class="rline" id="rForty"></div>
@@ -459,6 +470,16 @@ input,textarea{font:inherit;color:var(--ink)}
         <div class="micro">Notes</div>
         <div id="notelist"></div>
       </div>
+      <div class="sect" id="viewpane">
+        <div class="specrow"><span class="k">Type</span><span class="v" id="vType">Doer.</span></div>
+        <div class="specrow"><span class="k">Reminders</span><span class="v" id="vRemind">Monthly.</span></div>
+      </div>
+      <div id="editpane" style="display:none">
+      <div class="sect">
+        <div class="micro">Your Bio</div>
+        <textarea class="bioin" id="bioIn" maxlength="160" placeholder="Say why you are here."></textarea>
+        <p class="remnote" id="bioLeft">160 left.</p>
+      </div>
       <div class="sect">
         <div class="micro">What Describes You</div>
         <div class="pickgrid" id="pickgrid"></div>
@@ -471,6 +492,8 @@ input,textarea{font:inherit;color:var(--ink)}
           <button class="remchip">None.</button>
         </div>
         <p class="remnote">A small deed still counts.</p>
+      </div>
+      <div class="sect"><button class="chbtn" id="pDone">Done.</button></div>
       </div>
       <div class="sect">
         <div class="micro">Your Deeds</div>
@@ -867,7 +890,7 @@ var VIDWHO=['HarborLight077','IvyGate303','OpenDoor117'];
 var MEET=['MapleWard212','SlateCreek969','GoldfinchRow512','IvyGate303','PaperCrane441','HarborLight077'];
 var COINS=[['Copper',1,'#B87345'],['Iron',5,'#8A8D93'],['Bronze',12,'#A97C50'],['Silver',25,'#C9CDD3'],['Gold',50,'#D4AF5E'],['Platinum',100,'#DCE3E6'],['Diamond',200,'#BFE3EE'],['Emerald',365,'#2E7D5B']];
 var my={handle:'TrueWren601',deeds:[{body:'Paid for someones groceries.',when:'Today',priv:false}],
-inspired:{},following:{},blocked:{},remind:'Monthly.'};
+inspired:{},following:{},blocked:{},remind:'Monthly.',bio:''};
 MEMBERS[my.handle].following.forEach(function(h){my.following[h]=1});
 
 /* ============ HELPERS ============ */
@@ -996,7 +1019,7 @@ function go(p){lastPage=curPage;curPage=p;
 $$('.page').forEach(function(pg){pg.classList.toggle('on',pg.id==='pg-'+p)});
 $$('[data-go]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===p)});
 window.scrollTo(0,0);
-if(p==='profile')renderProfile();if(p==='meet')renderMeet();if(p==='status')renderStatus()}
+if(p==='profile'){setEdit(false);renderProfile()}if(p==='meet')renderMeet();if(p==='status')renderStatus()}
 $$('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-go'))})});
 $('#stBack').onclick=function(){go(lastPage==='status'?'feed':lastPage)};
 
@@ -1052,9 +1075,34 @@ $$('#pickgrid .pick').forEach(function(b){b.classList.toggle('on',b.getAttribute
 var tl='';for(var i=my.deeds.length-1;i>=0;i--){var d=my.deeds[i];
 tl+='<div class="trow"><div class="d">'+d.body+'</div>'+(d.priv?'<span class="privchip">PRIVATE</span>':'')+'<span class="p-time">'+d.when.toUpperCase()+'</span></div>'}
 $('#mytimeline').innerHTML=tl;
-$('#myCoin').onclick=function(){go('status')}}
+$('#myCoin').onclick=function(){go('status')};renderProfMeta()}
+function renderProfMeta(){var t=my.type||'doer';var L=DeedsTypes.LABELS[t]||'Doer';
+var vt=$('#vType');if(vt)vt.textContent=L.slice(-1)==='.'?L:L+'.';
+var vr=$('#vRemind');if(vr)vr.textContent=my.remind||'Monthly.';
+var b=$('#myBio');if(b){b.textContent=my.bio||'';b.style.display=my.bio?'block':'none'}
+var bi=$('#bioIn');if(bi&&document.activeElement!==bi)bi.value=my.bio||'';bioLeft()}
+function bioLeft(){var bi=$('#bioIn'),el=$('#bioLeft');if(!bi||!el)return;
+el.textContent=(160-(bi.value||'').length)+' left.'}
+function setEdit(on){var ep=$('#editpane'),vp=$('#viewpane'),eb=$('#pEdit');
+if(ep)ep.style.display=on?'block':'none';if(vp)vp.style.display=on?'none':'block';
+if(eb){eb.textContent=on?'Done.':'Edit.';eb.classList.toggle('on',on)}
+if(on){var bi=$('#bioIn');if(bi)bi.value=my.bio||'';bioLeft()}}
+function cleanBio(s){s=(s||'').replace(/https?:\/\/\S+/gi,' ').replace(/\bwww\.\S+/gi,' ');
+s=s.replace(/\b[\w-]+\.(com|net|org|io|co|gg|app|me|xyz|tv|fun|shop|link|site|us|uk|ca|edu|gov)\b\S*/gi,' ');
+s=s.replace(/[ \t]+/g,' ').replace(/ ?\n ?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+return s.slice(0,160)}
+function saveEdit(){var bi=$('#bioIn');var raw=bi?bi.value:(my.bio||'');var v=cleanBio(raw);
+var stripped=raw.trim().length>0&&v.replace(/\s/g,'')!==raw.replace(/\s/g,'');
+my.bio=v;if(bi)bi.value=v;
+var done=function(){setEdit(false);renderProfMeta();
+toast(stripped?'Saved. Links do not belong here.':'Saved.')};
+if(window._saveBio)window._saveBio(v,stripped,done);else done()}
+(function(){var eb=$('#pEdit');if(eb)eb.onclick=function(){
+var ep=$('#editpane');if(ep&&ep.style.display==='none')setEdit(true);else saveEdit()};
+var db=$('#pDone');if(db)db.onclick=function(){saveEdit()};
+var bi=$('#bioIn');if(bi)bi.oninput=bioLeft})();
 $$('.remchip').forEach(function(b){b.onclick=function(){$$('.remchip').forEach(function(x){x.classList.remove('on')});
-b.classList.add('on');my.remind=b.textContent;toast(b.textContent==='None.'?'No reminders. The door stays open.':b.textContent+' A small deed still counts.')}});
+b.classList.add('on');my.remind=b.textContent;renderProfMeta();toast(b.textContent==='None.'?'No reminders. The door stays open.':b.textContent+' A small deed still counts.')}});
 function renderStatus(){var n=deedCount(),nx=nextCoin(n);
 $('#stNext').textContent=nx<0?'YEAR MARKS. THE PATH NEVER ENDS.':COINS[nx][0].toUpperCase()+' · '+(COINS[nx][1]-n)+(COINS[nx][1]-n===1?' DEED AWAY.':' DEEDS AWAY.');
 var h='';COINS.forEach(function(c,i){var held=n>=c[1];
@@ -1421,6 +1469,11 @@ if(r.error){toast('Not saved: '+r.error.message);return}
 PROFILE.member_type=t;PROFILE.member_type_verified_at=null;
 if(NAMES[PROFILE.id]){NAMES[PROFILE.id].type=t;NAMES[PROFILE.id].v=false}
 renderFeed()}).catch(function(){})}}})}
+window._saveBio=function(v,stripped,done){
+if(!(liveOn&&PROFILE&&sb)){done();return}
+sb.from('profiles').update({bio:v||null}).eq('id',PROFILE.id).then(function(r){
+if(r.error){toast('Not saved: '+r.error.message);return}
+PROFILE.bio=v;done()}).catch(function(){toast('Not saved.')})};
 function doSignOut(){if(!sb)return;sb.auth.signOut().catch(function(){});toast('Signed out.');go('feed')}
 
 /* ---- organizations ---- */
@@ -1480,6 +1533,7 @@ var el=$('#memberbody');var nm=NAMES[p.id];
 var h='<div class="prof"><div class="prof-top"><div class="prof-av">'+DeedsTypes.svg(nm.type,88,{verified:nm.v})+'</div><div>';
 h+='<div class="prof-name"><span class="mono">'+esc(hd)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
 h+='<div class="prof-since">Member Since '+sinceStr(p.created_at).toUpperCase()+'</div></div></div>';
+if(p.bio)h+='<div class="pbio">'+esc(p.bio)+'</div>';
 h+='<div class="statline"><button data-cx="followers"><div class="n">'+fc.followers+'</div><div class="l">Followers</div></button>';
 h+='<button data-cx="following"><div class="n">'+fc.following+'</div><div class="l">Following</div></button></div>';
 h+='<div class="folblock"><button class="fbtn'+(MYFOLL[p.id]?' on':'')+'" data-follow="'+esc(hd)+'">'+(MYFOLL[p.id]?'Following':'Follow')+'</button>';
@@ -1700,7 +1754,7 @@ PROFILE=r.data;applyProfile()}).catch(function(){})}
 function loadMyDeeds(cb){sb.from('deeds').select('*').eq('profile_id',PROFILE.id).order('created_at',{ascending:true}).then(function(r){
 if(!r.error)my.deeds=(r.data||[]).map(function(d){return{body:d.story||d.title||'',when:whenStr(d),priv:!!d.is_private,dbid:d.id}});
 cb&&cb()}).catch(function(){cb&&cb()})}
-function applyProfile(){my.handle=PROFILE.handle;my.type=PROFILE.member_type||'doer';
+function applyProfile(){my.handle=PROFILE.handle;my.type=PROFILE.member_type||'doer';my.bio=PROFILE.bio||'';
 my.inspired={};my.following={};
 if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_verified_at,since:sinceStr(PROFILE.created_at),followers:0,following:[]};
 else{MEMBERS[my.handle].type=my.type}
