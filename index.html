@@ -277,6 +277,27 @@ input,textarea{font:inherit;color:var(--ink)}
 .orgrow:last-child{border-bottom:0}
 .orgrow .in{flex:1;min-width:0}
 #profguest h1 b{color:var(--forest)}
+.statline button{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.notebtn{color:var(--forest);border:1px solid var(--forest);font-size:11px;font-weight:800;letter-spacing:.06em;padding:6px 16px;border-radius:999px}
+.cxtabs{display:flex;gap:8px;margin:2px 0 14px}
+.cxtab{font-size:11px;letter-spacing:.1em;font-weight:800;text-transform:uppercase;padding:7px 15px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.cxtab.on{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+.cxrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.cxrow:last-child{border-bottom:0}
+.cxrow .in{flex:1;min-width:0}
+.cxrow .mono{font-size:14px;cursor:pointer}
+.noterow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;width:100%;text-align:left}
+.noterow:last-child{border-bottom:0}
+.noterow .in{flex:1;min-width:0}
+.noterow .mono{font-size:14px}
+.noterow .pv{font-size:13px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notedot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--forest);margin-left:7px;vertical-align:middle}
+.notethread{max-height:42vh;overflow-y:auto;padding:2px 0 6px}
+.nmsg{font-size:14.5px;line-height:1.5;padding:10px 13px;border-radius:14px;margin:8px 0;max-width:82%;word-wrap:break-word}
+.nmsg.them{background:var(--bone);border-bottom-left-radius:4px}
+.nmsg.me{background:var(--forest);color:var(--ivory);margin-left:auto;border-bottom-right-radius:4px}
+[data-go="profile"]{position:relative}
+[data-go="profile"].newnotes::after{content:'';position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--forest)}
 </style>
 </head>
 <body>
@@ -375,7 +396,7 @@ input,textarea{font:inherit;color:var(--ink)}
       <div id="profguest" style="display:none">
         <div class="prof">
           <div class="micro" style="color:var(--muted)">Profile</div>
-          <h1 style="font-size:34px;font-weight:800;letter-spacing:-.01em;line-height:1.05;margin-top:8px">Anonymous followers<b>.</b></h1>
+          <h1 style="font-size:34px;font-weight:800;letter-spacing:-.01em;line-height:1.05;margin-top:8px">Anonymous, and followed<b>.</b></h1>
           <p style="font-size:15px;color:#4A463C;line-height:1.55;margin-top:12px;max-width:440px">One profile. A generated handle. No headshots, no real names. The community knows what you do, never who you are.</p>
           <div class="mrow" style="margin-top:24px"><button class="mbtn" id="gJoin">Sign In or Join.</button></div>
           <p class="remnote" style="margin-top:14px">Same door, one code. It takes one minute.</p>
@@ -396,6 +417,14 @@ input,textarea{font:inherit;color:var(--ink)}
         </div>
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
+      </div>
+      <div class="sect" id="cxsect" style="display:none">
+        <div class="micro">Your Connections</div>
+        <div class="statline" id="cxstats" style="margin-top:0"></div>
+      </div>
+      <div class="sect" id="notesect" style="display:none">
+        <div class="micro">Notes</div>
+        <div id="notelist"></div>
       </div>
       <div class="sect">
         <div class="micro">What Describes You</div>
@@ -503,6 +532,25 @@ input,textarea{font:inherit;color:var(--ink)}
   <h3 id="cmtcount">Comments.</h3>
   <div id="cmtlist"></div>
   <div class="cmtin"><input id="cmtin" placeholder="Add yours."><button class="chbtn" id="cmtsend">Post.</button></div>
+</div>
+
+<div class="sheet" id="cxsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Connections.</h3>
+  <p class="remnote" style="margin:-8px 0 12px" id="cxwho"></p>
+  <div class="cxtabs" id="cxtabs">
+    <button class="cxtab on" data-cx="followers">Followers</button>
+    <button class="cxtab" data-cx="following">Following</button>
+  </div>
+  <div id="cxlist"></div>
+</div>
+
+<div class="sheet" id="notesheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Notes.</h3>
+  <p class="remnote" style="margin:-8px 0 12px">With <span class="mono" id="notewho"></span>. Only the two of you can read this.</p>
+  <div class="notethread" id="notethread"></div>
+  <div class="cmtin"><input id="notein" placeholder="Say something true." maxlength="2000"><button class="chbtn" id="notesend">Send.</button></div>
 </div>
 
 <div class="sheet" id="passsheet">
@@ -1157,6 +1205,8 @@ if(r.error){return sb.from('profiles').select('id,handle').in('id',ids).then(fun
 /* ---- live post card: real content, escaped, Share plus report or block ---- */
 var SHARESVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M5 13v6h14v-6"/></svg>';
 var MORESVG='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
+var INSPSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l1.8 4.9 4.9 1.8-4.9 1.8L12 16.6l-1.8-4.9-4.9-1.8 4.9-1.8L12 3.2z"/></svg>';
+var CMTSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.6c0 4-3.6 7.2-8 7.2-1 0-2-.2-2.9-.5L4 20l1.5-3.6A7 7 0 0 1 4 11.6c0-4 3.6-7.2 8-7.2s8 3.2 8 7.2z"/></svg>';
 function livePostHTML(r){var nm=NAMES[r.profile_id]||{handle:'A Member',type:'doer',v:false};
 var mine=PROFILE&&r.profile_id===PROFILE.id;
 var isPost=r._k==='post';
@@ -1168,7 +1218,11 @@ h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
 h+='<p class="p-body">'+esc(body)+'</p>';
 if(r.media_path){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
-h+='<div class="p-acts"><button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
+var tk=(isPost?'p:':'d:')+r.id;
+h+='<div class="p-acts">';
+h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSPSVG+'<span>'+(CINSP[tk]||0)+'</span></button>';
+h+='<button class="pa" data-lcmt="'+esc(tk)+'">'+CMTSVG+'<span>'+(CCMT[tk]||0)+'</span></button>';
+h+='<button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
 if(!mine)h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'" aria-label="More">'+MORESVG+'</button>';
 h+='</div></article>';return h}
 
@@ -1215,6 +1269,8 @@ else drawVideo(cv.getContext('2d'),cv.width,cv.height,1.7,p.media.vid)});
 wireFeed();wireLive()};
 
 function wireLive(){
+$$('[data-linsp]').forEach(function(b){b.onclick=function(e){e.stopPropagation();toggleInsp(b.getAttribute('data-linsp'))}});
+$$('[data-lcmt]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openLiveCmts(b.getAttribute('data-lcmt'))}});
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
@@ -1235,7 +1291,7 @@ if(!pr.error)rows=rows.concat((pr.data||[]).map(function(x){return markKind(x,'p
 rows.sort(byNew);
 feedEnd=rows.length<30;
 LIVEPOSTS=rows.slice(0,30);pageFrom=LIVEPOSTS.length;
-fetchNames(LIVEPOSTS).then(renderFeed)}).catch(function(e){feedBusy=false;feedFail(String(e&&e.message||e))})}
+fetchNames(LIVEPOSTS).then(function(){return loadCounts(LIVEPOSTS)}).then(renderFeed)}).catch(function(e){feedBusy=false;feedFail(String(e&&e.message||e))})}
 function loadMore(){if(!liveOn||feedBusy||feedEnd||searchQ)return;
 if(!LIVEPOSTS.length){feedEnd=true;return}
 feedBusy=true;
@@ -1252,7 +1308,7 @@ rows.sort(byNew);
 if(!rows.length){feedEnd=true;renderFeed();return}
 rows=rows.slice(0,30);
 LIVEPOSTS=LIVEPOSTS.concat(rows);pageFrom=LIVEPOSTS.length;
-fetchNames(rows).then(renderFeed)}).catch(function(){feedBusy=false})}
+fetchNames(rows).then(function(){return loadCounts(rows)}).then(renderFeed)}).catch(function(){feedBusy=false})}
 function prependLive(row){if(!row||row.is_private)return;
 if(LIVEPOSTS.some(function(x){return x.id===row.id}))return;
 LIVEPOSTS.unshift(row);pageFrom++;fetchNames([row]).then(renderFeed)}
@@ -1264,7 +1320,7 @@ sb.channel('posts-live').on('postgres_changes',{event:'INSERT',schema:'public',t
 }catch(e){}}
 function serverSearch(q){var s=q.replace(/[,%()]/g,'').trim();if(s.length<2||!sb)return;
 sb.from('deeds').select('*').eq('is_private',false).or('story.ilike.%'+s+'%,title.ilike.%'+s+'%').order('created_at',{ascending:false}).limit(30).then(function(r){
-if(r.error||!r.data)return;SRES=r.data;fetchNames(SRES).then(function(){if(searchQ)renderFeed()})}).catch(function(){})}
+if(r.error||!r.data)return;SRES=r.data;fetchNames(SRES).then(function(){return loadCounts(SRES)}).then(function(){if(searchQ)renderFeed()})}).catch(function(){})}
 $('#searchin').addEventListener('input',function(){var q=this.value.trim();clearTimeout(srvTimer);
 if(!liveOn||q.length<2){SRES=[];return}
 srvTimer=setTimeout(function(){serverSearch(q)},350)});
@@ -1305,7 +1361,7 @@ $('#mySince').textContent='Member Since '+sinceStr(PROFILE.created_at);
 $('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:!!PROFILE.member_type_verified_at});
 var rm=$('#rMonth');if(rm&&rm.textContent.indexOf('JULY')>=0)rm.textContent=rm.textContent.replace('JULY',MONTHS[new Date().getMonth()]);
 if(so){so.style.display='inline-block';so.onclick=doSignOut}
-hookPicks();renderOrgs()}
+hookPicks();renderOrgs();renderCxMine();renderNotes()}
 else if(so){so.style.display='none'}};
 function hookPicks(){$$('#pickgrid .pick').forEach(function(b){if(b._lw)return;b._lw=1;var o=b.onclick;
 b.onclick=function(){o&&o.call(b);
@@ -1353,21 +1409,36 @@ openMember=function(hd){if(PROFILE&&hd===PROFILE.handle){go('profile');return}
 if(MEMBERS[hd]||ORGS[hd]){baseOpenMember(hd);return}
 openLiveMember(hd)};
 function openLiveMember(hd){if(!sb)return;
+closeSheets();
 if(PROFILE&&hd===PROFILE.handle){go('profile');return}
 sb.from('profiles').select('*').eq('handle',hd).maybeSingle().then(function(r){
 if(r.error||!r.data){toast('That member could not load.');return}
-var p=r.data;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};
-sb.from('deeds').select('*').eq('profile_id',p.id).eq('is_private',false).order('created_at',{ascending:false}).limit(30).then(function(dr){
-var deeds=dr.data||[];var el=$('#memberbody');var nm=NAMES[p.id];
+var p=r.data;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id;
+var dq=sb.from('deeds').select('*').eq('profile_id',p.id).eq('is_private',false).order('created_at',{ascending:false}).limit(30);
+var pq=sb.from('posts').select('*').eq('profile_id',p.id).order('created_at',{ascending:false}).limit(30);
+Promise.all([dq,pq,countFollows(p.id)]).then(function(res){
+var dr=res[0]||{},pr=res[1]||{},fc=res[2];
+var rows=(dr.data||[]).map(function(x){return markKind(x,'deed')});
+var posts=(pr.error?[]:(pr.data||[])).map(function(x){return markKind(x,'post')});
+var anyPost=posts.length>0;
+rows=rows.concat(posts);rows.sort(byNew);
+loadCounts(rows).then(function(){
+var el=$('#memberbody');var nm=NAMES[p.id];
 var h='<div class="prof"><div class="prof-top"><div class="prof-av">'+DeedsTypes.svg(nm.type,88,{verified:nm.v})+'</div><div>';
 h+='<div class="prof-name"><span class="mono">'+esc(hd)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
 h+='<div class="prof-since">Member Since '+sinceStr(p.created_at).toUpperCase()+'</div></div></div>';
-h+='<div class="folblock"><button class="blockb" id="lblk">Block.</button></div></div>';
-if(deeds.length){h+='<div class="sect"><div class="micro">Their Deeds</div></div>';
-deeds.forEach(function(d){h+=livePostHTML(d)})}
+h+='<div class="statline"><button data-cx="followers"><div class="n">'+fc.followers+'</div><div class="l">Followers</div></button>';
+h+='<button data-cx="following"><div class="n">'+fc.following+'</div><div class="l">Following</div></button></div>';
+h+='<div class="folblock"><button class="fbtn'+(MYFOLL[p.id]?' on':'')+'" data-follow="'+esc(hd)+'">'+(MYFOLL[p.id]?'Following':'Follow')+'</button>';
+h+='<button class="notebtn" id="lnote">Send a Note.</button>';
+h+='<button class="blockb" id="lblk">Block.</button></div></div>';
+if(rows.length){h+='<div class="sect"><div class="micro">'+(anyPost?'Their Deeds And Posts':'Their Deeds')+'</div></div>';
+rows.forEach(function(d){h+=livePostHTML(d)})}
 el.innerHTML=h;go('member');
 $('#lblk').onclick=function(){BLK[hd]=1;saveBlk();toast('Blocked. Their deeds are gone from your feed.');renderFeed();go('feed')};
-wireLive()}).catch(function(){})}).catch(function(){})}
+$('#lnote').onclick=function(){if(!PROFILE){openJoin();return}openNote(p.id)};
+$$('#memberbody [data-cx]').forEach(function(b){b.onclick=function(){openCx(p.id,hd,b.getAttribute('data-cx'))}});
+wireLive();wireCommon()})}).catch(function(){})}).catch(function(){})}
 
 /* ---- report and block on real posts ---- */
 var morePostLive=null;
@@ -1380,21 +1451,40 @@ $('#moreblock').onclick=function(){if(morePostLive){var m=morePostLive;morePostL
 BLK[m.handle]=1;saveBlk();closeSheets();renderFeed();toast('Blocked. Their deeds are gone from your feed.');return}
 baseBlock&&baseBlock()};
 
-/* ---- comments on examples stay readable, writing waits for the table ---- */
+/* ---- comments: real on live cards, demo on the examples ---- */
 var baseCmtSend=$('#cmtsend').onclick;
-$('#cmtsend').onclick=function(){if(liveOn){if(!PROFILE){closeSheets();openJoin();return}
-toast('Comments go live in the next build.');return}
+var baseOpenCmts=openCmts;
+openCmts=function(id){LCMT=null;baseOpenCmts(id)};
+$('#cmtsend').onclick=function(){
+if(liveOn&&LCMT){if(!PROFILE){closeSheets();openJoin();return}
+var val=$('#cmtin').value.trim();if(!val)return;
+var p=tparts(LCMT),row={profile_id:PROFILE.id,body:val.slice(0,1000)};
+if(p.kind==='post')row.post_id=p.id;else row.deed_id=p.id;
+var b=this,k=LCMT;b.textContent='Posting...';
+sb.from('comments').insert(row).then(function(r){b.textContent='Post.';
+if(r.error){toast('Not posted: '+r.error.message);return}
+$('#cmtin').value='';openLiveCmts(k)}).catch(function(){b.textContent='Post.';toast('Not posted.')});
+return}
 baseCmtSend&&baseCmtSend()};
 
-/* ---- follows, chains, seconds: honest until their tables land ---- */
+/* ---- follows: real for real members, local for the example members ---- */
 wireCommon=function(){
 $$('[data-member]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openMember(el.getAttribute('data-member'))}});
 $$('[data-follow]').forEach(function(b){b.onclick=function(e){e.stopPropagation();
-if(!liveOn){var hd=b.getAttribute('data-follow');
-if(my.following[hd]){delete my.following[hd]}else{my.following[hd]=1;toast('You follow '+hd+' now, anonymously.')}
-$$('[data-follow="'+hd+'"]').forEach(function(x){var on=my.following[hd];x.classList.toggle('on',!!on);x.textContent=on?'Following':'Follow'});return}
+var hd=b.getAttribute('data-follow'),pid=liveOn?IDBY[hd]:null;
+if(!pid){
+if(my.following[hd]){delete my.following[hd]}else{my.following[hd]=1;toast('You follow '+hd+' now.')}
+paintFollow(hd,null);return}
 if(!PROFILE){openJoin();return}
-toast('Follows go live in the next build.')}})};
+var on=!!MYFOLL[pid];
+if(on)delete MYFOLL[pid];else MYFOLL[pid]=1;
+paintFollow(hd,pid);
+var q=on?sb.from('follows').delete().match({follower_id:PROFILE.id,followed_id:pid})
+        :sb.from('follows').insert({follower_id:PROFILE.id,followed_id:pid});
+q.then(function(r){
+if(r&&r.error){if(on)MYFOLL[pid]=1;else delete MYFOLL[pid];paintFollow(hd,pid);toast('Not saved: '+r.error.message);return}
+if(!on)toast('You follow '+hd+' now.');
+refreshCx()}).catch(function(){})}})};
 var basePassChain=$('#passchain').onclick,basePassSecond=$('#passsecond').onclick;
 $('#passchain').onclick=function(){if(liveOn){closeSheets();if(!PROFILE){openJoin();return}toast('Chains go live in the next build.');return}
 basePassChain&&basePassChain()};
@@ -1544,6 +1634,7 @@ justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.'
 
 /* ---- session, profile, welcome ---- */
 function guestUI(){PROFILE=null;MYORGS=[];
+MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;paintNoteDot();
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
 renderProfile();renderRail();renderFeed()}
 function authProblem(m){failAuth(m)}
@@ -1562,7 +1653,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadOrgs();
+loadOrgs();loadMyFollows().then(renderFeed);loadNotes();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -1585,6 +1676,185 @@ else{closeSheets();renderProfile();toast('Welcome, '+PROFILE.handle+'.')}}}
 /* ---- arrival accept routes to the door ---- */
 (function(){var g=$('#arriveGo');if(!g)return;var o=g.onclick;
 g.onclick=function(){o&&o();if(liveOn&&!PROFILE)setTimeout(openJoin,500)}})();
+
+/* ================= ENGAGEMENT: inspired, comments, follows, notes ================= */
+var IDBY={},CINSP={},CCMT={},MYINSP={},MYFOLL={};
+var LCMT=null,NOTES=[],NOTEWITH=null,NOTEUNREAD=0;
+var CXPID=null,CXTAB='followers',CXHD='';
+
+function tparts(k){return{kind:k.charAt(0)==='p'?'post':'deed',id:k.slice(2)}}
+function indexNames(){for(var id in NAMES){if(NAMES[id]&&NAMES[id].handle)IDBY[NAMES[id].handle]=id}}
+
+/* ---- counts for a page of cards: two questions, not two per card ---- */
+function loadCounts(rows){
+if(!sb||!rows||!rows.length)return Promise.resolve();
+indexNames();
+var ids=rows.map(function(r){return r.id});
+var qi=sb.from('inspired_counts').select('target_kind,target_id,count').in('target_id',ids);
+var qc=sb.from('comment_counts').select('target_kind,target_id,count').in('target_id',ids);
+var qm=PROFILE?sb.from('reactions').select('deed_id').eq('profile_id',PROFILE.id).eq('kind','inspired_me').limit(1000):Promise.resolve({data:[]});
+var qp=PROFILE?sb.from('post_reactions').select('post_id').eq('profile_id',PROFILE.id).eq('kind','inspired_me').limit(1000):Promise.resolve({data:[]});
+return Promise.all([qi,qc,qm,qp]).then(function(res){
+((res[0]||{}).data||[]).forEach(function(x){CINSP[(x.target_kind==='post'?'p:':'d:')+x.target_id]=x.count});
+((res[1]||{}).data||[]).forEach(function(x){CCMT[(x.target_kind==='post'?'p:':'d:')+x.target_id]=x.count});
+((res[2]||{}).data||[]).forEach(function(x){MYINSP['d:'+x.deed_id]=1});
+((res[3]||{}).data||[]).forEach(function(x){MYINSP['p:'+x.post_id]=1})}).catch(function(){})}
+
+/* ---- inspired ---- */
+function paintInsp(k){$$('[data-linsp="'+k+'"]').forEach(function(b){
+b.classList.toggle('lit',!!MYINSP[k]);var s=b.querySelector('span');if(s)s.textContent=CINSP[k]||0})}
+function bumpInsp(k,up){if(up){MYINSP[k]=1;CINSP[k]=(CINSP[k]||0)+1}
+else{delete MYINSP[k];CINSP[k]=Math.max(0,(CINSP[k]||1)-1)}}
+function toggleInsp(k){
+if(!liveOn)return;
+if(!PROFILE){openJoin();return}
+var p=tparts(k),on=!!MYINSP[k];
+var tbl=p.kind==='post'?'post_reactions':'reactions';
+var row=p.kind==='post'?{post_id:p.id,profile_id:PROFILE.id,kind:'inspired_me'}
+                       :{deed_id:p.id,profile_id:PROFILE.id,kind:'inspired_me'};
+bumpInsp(k,!on);paintInsp(k);
+var q=on?sb.from(tbl).delete().match(row):sb.from(tbl).insert(row);
+q.then(function(r){if(r&&r.error){bumpInsp(k,on);paintInsp(k);toast('Not saved: '+r.error.message)}}).catch(function(){})}
+
+/* ---- comments ---- */
+function paintCmt(k){$$('[data-lcmt="'+k+'"]').forEach(function(b){var s=b.querySelector('span');if(s)s.textContent=CCMT[k]||0})}
+function openLiveCmts(k){
+if(!sb){return}
+LCMT=k;var p=tparts(k);
+$('#cmtcount').textContent='Comments.';
+$('#cmtlist').innerHTML='<p class="remnote">Loading.</p>';
+sheet('#cmtsheet');
+var q=sb.from('comments').select('*').order('created_at',{ascending:true}).limit(200);
+q=(p.kind==='post')?q.eq('post_id',p.id):q.eq('deed_id',p.id);
+q.then(function(r){
+if(r.error){$('#cmtlist').innerHTML='<p class="remnote">Comments could not load: '+esc(r.error.message)+'</p>';return}
+var rows=r.data||[];
+fetchNames(rows).then(function(){indexNames();renderLiveCmts(k,rows)})}).catch(function(e){
+$('#cmtlist').innerHTML='<p class="remnote">Comments could not load.</p>'})}
+function renderLiveCmts(k,rows){
+CCMT[k]=rows.length;paintCmt(k);
+$('#cmtcount').textContent=rows.length?rows.length+(rows.length===1?' Comment.':' Comments.'):'Comments.';
+var h='';rows.forEach(function(c){var nm=NAMES[c.profile_id]||{handle:'A Member',type:'doer',v:false};
+h+='<div class="cmt"><div data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+DeedsTypes.svg(nm.type,34,{verified:nm.v})+'</div>';
+h+='<div class="b"><span class="mono" data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+esc(nm.handle)+'</span><br>'+esc(c.body)+'</div></div>'});
+$('#cmtlist').innerHTML=h||'<p class="remnote">No comments yet. Say the kind thing.</p>';
+wireLive()}
+
+/* ---- follows ---- */
+function paintFollow(hd,pid){$$('[data-follow="'+hd+'"]').forEach(function(x){
+var on=pid?!!MYFOLL[pid]:!!my.following[hd];
+x.classList.toggle('on',on);x.textContent=on?'Following':'Follow'})}
+function loadMyFollows(){if(!sb||!PROFILE)return Promise.resolve();
+return sb.from('follows').select('followed_id').eq('follower_id',PROFILE.id).limit(2000).then(function(r){
+MYFOLL={};if(!r.error)(r.data||[]).forEach(function(x){MYFOLL[x.followed_id]=1})}).catch(function(){})}
+function countFollows(pid){
+var a=sb.from('follows').select('follower_id',{count:'exact',head:true}).eq('followed_id',pid);
+var b=sb.from('follows').select('followed_id',{count:'exact',head:true}).eq('follower_id',pid);
+return Promise.all([a,b]).then(function(r){
+return{followers:(r[0]&&r[0].count)||0,following:(r[1]&&r[1].count)||0}}).catch(function(){return{followers:0,following:0}})}
+
+/* ---- connections sheet ---- */
+function openCx(pid,hd,tab){if(!sb)return;
+CXPID=pid;CXHD=hd||'';CXTAB=tab||'followers';
+$('#cxwho').textContent=hd?hd+'.':'Yours.';
+sheet('#cxsheet');renderCx()}
+function renderCx(){
+$$('#cxtabs .cxtab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-cx')===CXTAB)});
+var el=$('#cxlist');el.innerHTML='<p class="remnote">Loading.</p>';
+var q=(CXTAB==='followers')
+?sb.from('follows').select('follower_id').eq('followed_id',CXPID).order('created_at',{ascending:false}).limit(200)
+:sb.from('follows').select('followed_id').eq('follower_id',CXPID).order('created_at',{ascending:false}).limit(200);
+q.then(function(r){
+if(r.error){el.innerHTML='<p class="remnote">That list could not load: '+esc(r.error.message)+'</p>';return}
+var ids=(r.data||[]).map(function(x){return CXTAB==='followers'?x.follower_id:x.followed_id});
+if(!ids.length){el.innerHTML='<p class="remnote">'+(CXTAB==='followers'
+?'No followers yet. Keep building.'
+:'Not following anyone yet. Meet. is a good place to start.')+'</p>';return}
+fetchNames(ids.map(function(id){return{profile_id:id}})).then(function(){indexNames();
+var h='';ids.forEach(function(id){var nm=NAMES[id];if(!nm)return;
+h+='<div class="cxrow"><div data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</div>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
+if(!PROFILE||id!==PROFILE.id)h+='<button class="fbtn'+(MYFOLL[id]?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(MYFOLL[id]?'Following':'Follow')+'</button>';
+h+='</div>'});
+el.innerHTML=h;wireLive();wireCommon()})}).catch(function(){})}
+$$('#cxtabs .cxtab').forEach(function(b){b.onclick=function(){CXTAB=b.getAttribute('data-cx');renderCx()}});
+function renderCxMine(){var s=$('#cxsect'),ns=$('#notesect');
+if(!s)return;
+if(!liveOn||!PROFILE){s.style.display='none';if(ns)ns.style.display='none';return}
+s.style.display='block';if(ns)ns.style.display='block';
+countFollows(PROFILE.id).then(function(fc){
+var st=$('#cxstats');if(!st)return;
+st.innerHTML='<button data-cxm="followers"><div class="n">'+fc.followers+'</div><div class="l">Followers</div></button>'+
+'<button data-cxm="following"><div class="n">'+fc.following+'</div><div class="l">Following</div></button>';
+$$('#cxstats [data-cxm]').forEach(function(b){b.onclick=function(){openCx(PROFILE.id,'',b.getAttribute('data-cxm'))}})})}
+function refreshCx(){if(curPage==='profile')renderCxMine()}
+
+/* ---- notes ---- */
+function paintNoteDot(){$$('[data-go="profile"]').forEach(function(b){b.classList.toggle('newnotes',NOTEUNREAD>0)})}
+function countUnread(){NOTEUNREAD=NOTES.filter(function(n){return PROFILE&&n.recipient_id===PROFILE.id&&!n.read_at}).length}
+function loadNotes(){if(!sb||!PROFILE)return Promise.resolve();
+return sb.from('notes').select('*').or('sender_id.eq.'+PROFILE.id+',recipient_id.eq.'+PROFILE.id)
+.order('created_at',{ascending:false}).limit(300).then(function(r){
+if(r.error){NOTES=[];return Promise.resolve()}
+NOTES=r.data||[];countUnread();
+var need=[];NOTES.forEach(function(n){need.push({profile_id:n.sender_id});need.push({profile_id:n.recipient_id})});
+return fetchNames(need)}).then(function(){indexNames();paintNoteDot();
+if(curPage==='profile')renderNotes()}).catch(function(){})}
+function threads(){var t={},order=[];
+NOTES.forEach(function(n){if(!PROFILE)return;
+var other=n.sender_id===PROFILE.id?n.recipient_id:n.sender_id;
+if(!t[other]){t[other]={id:other,last:n,unread:0};order.push(other)}
+if(new Date(n.created_at)>new Date(t[other].last.created_at))t[other].last=n;
+if(n.recipient_id===PROFILE.id&&!n.read_at)t[other].unread++});
+return order.map(function(id){return t[id]})}
+function renderNotes(){var el=$('#notelist');if(!el)return;
+if(!PROFILE){el.innerHTML='';return}
+var th=threads();
+if(!th.length){el.innerHTML='<p class="remnote" style="margin-bottom:2px">No notes yet. Open any member and send one.</p>';return}
+var h='';th.forEach(function(t){var nm=NAMES[t.id]||{handle:'A Member',type:'doer',v:false};
+h+='<button class="noterow" data-note="'+esc(t.id)+'"><div>'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="mono">'+esc(nm.handle)+(t.unread?'<span class="notedot"></span>':'')+'</div>';
+h+='<div class="pv">'+esc(String(t.last.body||'').slice(0,90))+'</div></div>';
+h+='<span class="p-time">'+relTime(t.last.created_at)+'</span></button>'});
+el.innerHTML=h;
+$$('#notelist [data-note]').forEach(function(rw){rw.onclick=function(){openNote(rw.getAttribute('data-note'))}})}
+function openNote(pid){if(!PROFILE){openJoin();return}
+NOTEWITH=pid;var nm=NAMES[pid]||{handle:'A Member'};
+$('#notewho').textContent=nm.handle;
+renderThread();sheet('#notesheet');markRead(pid)}
+function renderThread(){var el=$('#notethread');if(!el)return;
+var msgs=NOTES.filter(function(n){
+return (n.sender_id===PROFILE.id&&n.recipient_id===NOTEWITH)||(n.sender_id===NOTEWITH&&n.recipient_id===PROFILE.id)})
+.sort(function(a,b){return new Date(a.created_at)-new Date(b.created_at)});
+var h='';msgs.forEach(function(n){h+='<div class="nmsg '+(n.sender_id===PROFILE.id?'me':'them')+'">'+esc(n.body)+'</div>'});
+el.innerHTML=h||'<p class="remnote">No notes yet. Say something true.</p>';
+el.scrollTop=el.scrollHeight}
+function markRead(pid){if(!PROFILE)return;
+var un=NOTES.filter(function(n){return n.sender_id===pid&&n.recipient_id===PROFILE.id&&!n.read_at});
+if(!un.length)return;
+var ids=un.map(function(n){return n.id}),stamp=new Date().toISOString();
+sb.from('notes').update({read_at:stamp}).in('id',ids).then(function(r){
+if(r&&r.error)return;
+un.forEach(function(n){n.read_at=stamp});
+countUnread();paintNoteDot();renderNotes()}).catch(function(){})}
+$('#notesend').onclick=function(){
+if(!PROFILE){closeSheets();openJoin();return}
+var val=$('#notein').value.trim();if(!val||!NOTEWITH)return;
+var b=this;b.textContent='Sending...';
+sb.from('notes').insert({sender_id:PROFILE.id,recipient_id:NOTEWITH,body:val.slice(0,2000)}).select().single()
+.then(function(r){b.textContent='Send.';
+if(r.error){toast(/row-level|policy/i.test(r.error.message)
+?'That is twenty notes today. The rest can wait.'
+:'Not sent: '+r.error.message);return}
+$('#notein').value='';NOTES.unshift(r.data);renderThread();renderNotes()})
+.catch(function(){b.textContent='Send.';toast('Not sent.')})};
+$('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#notesend').onclick()}});
+
+/* ---- repaint once: the demo script painted the feed before this layer
+   filtered the seeded rows, so the DOM could hold a card whose data was
+   already gone. Clicking it threw. One render keeps the two in step even
+   if the CDN never answers. ---- */
+renderFeed();
 
 /* ---- boot ---- */
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
