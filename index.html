@@ -314,6 +314,14 @@ input,textarea{font:inherit;color:var(--ink)}
 .ovrow{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.5}
 .ovrow:last-child{border-bottom:0}
 .ovrow .k{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);width:92px;flex:none;padding-top:4px}
+.advrow{padding:15px 0;border-bottom:1px solid var(--line)}
+.advrow:last-child{border-bottom:0}
+.advrow .hd{display:flex;gap:12px;align-items:center}
+.advrow .hd .in{flex:1;min-width:0}
+.advd{display:flex;gap:10px;font-size:13.5px;line-height:1.5;padding:5px 0 0}
+.advd .k{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);width:78px;flex:none;padding-top:3px}
+.advnote{width:100%;border:0;border-bottom:1px solid var(--line);background:none;font-size:14px;padding:8px 2px;outline:none;margin-top:12px}
+.advacts{display:flex;gap:10px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -438,6 +446,10 @@ input,textarea{font:inherit;color:var(--ink)}
         </div>
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
+      </div>
+      <div class="sect" id="advsect" style="display:none">
+        <div class="micro">Organizations To Review</div>
+        <div id="advlist"></div>
       </div>
       <div class="sect" id="cxsect" style="display:none">
         <div class="micro">Your Connections</div>
@@ -1399,7 +1411,7 @@ $('#mySince').textContent='Member Since '+sinceStr(PROFILE.created_at);
 $('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:!!PROFILE.member_type_verified_at});
 var rm=$('#rMonth');if(rm&&rm.textContent.indexOf('JULY')>=0)rm.textContent=rm.textContent.replace('JULY',MONTHS[new Date().getMonth()]);
 if(so){so.style.display='inline-block';so.onclick=doSignOut}
-hookPicks();renderOrgs();renderCxMine();renderNotes()}
+hookPicks();renderOrgs();renderCxMine();renderNotes();renderAdmin()}
 else if(so){so.style.display='none'}};
 function hookPicks(){$$('#pickgrid .pick').forEach(function(b){if(b._lw)return;b._lw=1;var o=b.onclick;
 b.onclick=function(){o&&o.call(b);
@@ -1414,8 +1426,11 @@ function doSignOut(){if(!sb)return;sb.auth.signOut().catch(function(){});toast('
 /* ---- organizations ---- */
 function renderOrgs(){var el=$('#orglist');if(!el)return;var h='';
 MYORGS.forEach(function(o){var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
+var state=vv?' · VERIFIED':(o.declined_at?' · NOT VERIFIED':' · IN REVIEW');
 h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
-h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+(vv?' · VERIFIED':' · IN REVIEW')+'</div></div></div>'});
+h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+state+'</div>';
+if(!vv&&o.declined_at&&o.review_note)h+='<div class="p-time" style="text-transform:none;letter-spacing:0;margin-top:4px">'+esc(o.review_note)+'</div>';
+h+='</div></div>'});
 el.innerHTML=h||'<p class="remnote" style="margin-bottom:2px">Companies, schools, churches and nonprofits carry real names here. The gold halo means DEEDS. verified them.</p>';
 var ob=$('#orgOpen');if(ob)ob.onclick=openOrg}
 function loadOrgs(){if(!sb||!PROFILE)return;
@@ -1672,7 +1687,7 @@ justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.'
 
 /* ---- session, profile, welcome ---- */
 function guestUI(){PROFILE=null;MYORGS=[];
-MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();
+MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();var av=$('#advsect');if(av)av.style.display='none';
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
 renderProfile();renderRail();renderFeed()}
 function authProblem(m){failAuth(m)}
@@ -1888,6 +1903,54 @@ if(r.error){toast(/row-level|policy/i.test(r.error.message)
 $('#notein').value='';NOTES.unshift(r.data);renderThread();renderNotes()})
 .catch(function(){b.textContent='Send.';toast('Not sent.')})};
 $('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#notesend').onclick()}});
+
+/* ================= ADMIN: organization review ================= */
+function renderAdmin(){var s=$('#advsect');if(!s)return;
+if(!liveOn||!PROFILE||!PROFILE.is_admin){s.style.display='none';return}
+s.style.display='block';loadPending()}
+
+function loadPending(){var el=$('#advlist');if(!el||!sb)return;
+sb.from('organizations').select('*').is('verified_at',null).is('declined_at',null)
+.order('created_at',{ascending:true}).limit(50).then(function(r){
+if(r.error){el.innerHTML='<p class="remnote" style="margin-bottom:2px">The queue could not load: '+esc(r.error.message)+'</p>';return}
+var rows=r.data||[];
+if(!rows.length){el.innerHTML='<p class="remnote" style="margin-bottom:2px">Nothing waiting. Every organization has been reviewed.</p>';return}
+fetchNames(rows.map(function(o){return{profile_id:o.owner_id}})).then(function(){indexNames();
+var h='';
+rows.forEach(function(o){OSTORE[o.id]=o;
+var own=NAMES[o.owner_id]||{handle:'A Member'};
+h+='<div class="advrow">';
+h+='<div class="hd"><div>'+pendSvg(o.display_name,44)+'</div><div class="in">';
+h+='<div style="font-weight:800;font-size:15px">'+esc(o.display_name)+'</div>';
+var age=relTime(o.created_at);
+h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+' · SUBMITTED '+(age==='NOW'?'JUST NOW':age+' AGO')+'</div></div></div>';
+function d(k,val){if(!val)return;h+='<div class="advd"><div class="k">'+k+'</div><div>'+val+'</div></div>'}
+d('Legal',esc(o.name||''));
+d('Owner','<span class="mono" data-lmember="'+esc(own.handle)+'" style="cursor:pointer">'+esc(own.handle)+'</span>');
+d('About',esc(o.description||''));
+d('Where',esc(o.address||''));
+if(o.website_url)d('Site','<a href="'+esc(o.website_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700">'+esc(String(o.website_url).replace(/^https?:\/\//,''))+'</a>');
+h+='<input class="advnote" id="advnote-'+esc(o.id)+'" placeholder="Reason, if you are declining.">';
+h+='<div class="advacts"><button class="fbtn" data-verify="'+esc(o.id)+'">Verify.</button>';
+h+='<button class="blockb" data-decline="'+esc(o.id)+'">Decline.</button></div>';
+h+='</div>'});
+el.innerHTML=h;
+$$('#advlist [data-verify]').forEach(function(b){b.onclick=function(){reviewOrg(b.getAttribute('data-verify'),true,b)}});
+$$('#advlist [data-decline]').forEach(function(b){b.onclick=function(){reviewOrg(b.getAttribute('data-decline'),false,b)}});
+wireLive()})}).catch(function(){})}
+
+function reviewOrg(id,ok,btn){
+if(!PROFILE||!PROFILE.is_admin)return;
+var noteEl=$('#advnote-'+id),note=noteEl?String(noteEl.value||'').trim():'';
+if(!ok&&!note){toast('Give a reason. They will see it.');if(noteEl)noteEl.focus();return}
+var label=btn.textContent;btn.textContent='...';
+var patch=ok?{verified_at:new Date().toISOString(),declined_at:null,review_note:null}
+            :{declined_at:new Date().toISOString(),review_note:note.slice(0,300)};
+sb.from('organizations').update(patch).eq('id',id).then(function(r){
+btn.textContent=label;
+if(r&&r.error){toast('Not saved: '+r.error.message);return}
+toast(ok?'Verified. The check is live.':'Declined. They can fix it and resubmit.');
+loadPending();loadOrgs()}).catch(function(){btn.textContent=label;toast('Not saved.')})}
 
 /* ================= SEARCH: people and organizations ================= */
 var OSTORE={};
