@@ -298,6 +298,22 @@ input,textarea{font:inherit;color:var(--ink)}
 .nmsg.me{background:var(--forest);color:var(--ivory);margin-left:auto;border-bottom-right-radius:4px}
 [data-go="profile"]{position:relative}
 [data-go="profile"].newnotes::after{content:'';position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--forest)}
+.bdot{display:none;width:8px;height:8px;border-radius:50%;background:var(--forest);margin-left:7px;flex:none}
+.bell.newalerts .bdot{display:inline-block}
+#mBell{position:relative}
+#mBell .bdot{position:absolute;top:-1px;right:-4px;margin:0}
+.vchk{vertical-align:-2px;margin-left:5px}
+.altrow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.altrow:last-child{border-bottom:0}
+.altrow .in{flex:1;min-width:0}
+.altrow .l{font-size:14.5px;font-weight:700;line-height:1.35}
+.altrow .s{font-size:13px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.altrow.new .l::after{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--forest);margin-left:7px;vertical-align:middle}
+#pplres{padding:4px 18px 2px}
+#pplres .cxrow{cursor:pointer}
+.ovrow{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.5}
+.ovrow:last-child{border-bottom:0}
+.ovrow .k{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);width:92px;flex:none;padding-top:4px}
 </style>
 </head>
 <body>
@@ -328,6 +344,7 @@ input,textarea{font:inherit;color:var(--ink)}
       <button data-go="feed" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
       <button data-go="challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>Challenge.</button>
       <button data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
+      <button id="lBell" class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>Alerts.<span class="bdot"></span></button>
       <button data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
     </nav>
     <button class="llog" id="lLog">Log a Deed.</button>
@@ -338,11 +355,15 @@ input,textarea{font:inherit;color:var(--ink)}
   <main class="colmain">
     <div class="mtop">
       <div class="mword" data-go="feed">D<b>.</b></div>
-      <button id="mSearchT" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/></svg></button>
+      <div style="display:flex;align-items:center;gap:18px">
+        <button id="mBell" class="bell" aria-label="Activity"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg><span class="bdot"></span></button>
+        <button id="mSearchT" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/></svg></button>
+      </div>
     </div>
 
     <div class="page on" id="pg-feed">
-      <div class="searchwrap" id="searchwrap"><input id="searchin" type="search" placeholder="Search deeds." autocomplete="off"></div>
+      <div class="searchwrap" id="searchwrap"><input id="searchin" type="search" placeholder="Search deeds, people, organizations." autocomplete="off"></div>
+      <div id="pplres" style="display:none"></div>
       <div id="feed"></div>
       <div class="endnote" id="endnote">That is every deed. Go make the next one.</div>
     </div>
@@ -534,6 +555,19 @@ input,textarea{font:inherit;color:var(--ink)}
   <div class="cmtin"><input id="cmtin" placeholder="Add yours."><button class="chbtn" id="cmtsend">Post.</button></div>
 </div>
 
+<div class="sheet" id="altsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Activity.</h3>
+  <div id="altlist"></div>
+</div>
+
+<div class="sheet" id="orgview">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3 id="ovName">Organization.</h3>
+  <p class="remnote" style="margin:-8px 0 14px" id="ovMeta"></p>
+  <div id="ovBody"></div>
+</div>
+
 <div class="sheet" id="cxsheet">
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Connections.</h3>
@@ -662,11 +696,15 @@ if(v)out+='<circle cx="24" cy="24" r="22.4" fill="none" stroke="'+BLUE+'" stroke
 out+='<circle cx="24" cy="24" r="'+disc+'" fill="'+INK+'"/>';
 out+='<g transform="translate('+shift+','+shift+') scale('+scale+')" fill="none" stroke="'+IVORY+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+g+'</g></svg>';
 return out}
-function orgSvg(name,px){var init=(name||'D').trim().charAt(0).toUpperCase();
-return '<svg viewBox="0 0 48 48" width="'+px+'" height="'+px+'" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="'+BONE+'"/><circle cx="24" cy="24" r="22.4" fill="none" stroke="'+GOLD+'" stroke-width="2.6"/><circle cx="24" cy="24" r="17" fill="'+FOREST+'"/><text x="24" y="24" text-anchor="middle" dominant-baseline="central" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-weight="800" font-size="16" fill="'+IVORY+'">'+init+'</text></svg>'}
+function orgSvg(name,px,verified){var init=(name||'D').trim().charAt(0).toUpperCase();
+var out='<svg viewBox="0 0 48 48" width="'+px+'" height="'+px+'" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="'+BONE+'"/><circle cx="24" cy="24" r="22.4" fill="none" stroke="'+GOLD+'" stroke-width="2.6"/><circle cx="24" cy="24" r="17" fill="'+FOREST+'"/><text x="24" y="24" text-anchor="middle" dominant-baseline="central" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-weight="800" font-size="16" fill="'+IVORY+'">'+init+'</text>';
+if(verified)out+='<circle cx="37.5" cy="37.5" r="10" fill="'+IVORY+'"/><circle cx="37.5" cy="37.5" r="8.2" fill="'+GOLD+'"/><path d="M33.4 37.7l2.9 2.9 5.1-5.9" fill="none" stroke="'+IVORY+'" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>';
+return out+'</svg>'}
+function chk(px){px=px||14;
+return '<svg class="vchk" viewBox="0 0 24 24" width="'+px+'" height="'+px+'" role="img" aria-label="Verified"><circle cx="12" cy="12" r="11" fill="'+GOLD+'"/><path d="M7.1 12.5l3.2 3.2 6.6-7.2" fill="none" stroke="'+IVORY+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
 function chip(type,v){if(type==='doer')return'';return '<span class="chip'+(v?' vm':'')+'">'+LABELS[type]+'</span>'}
 function orgChip(kind){return '<span class="chip vo">'+(kind||'School')+'</span>'}
-return{svg:svg,orgSvg:orgSvg,chip:chip,orgChip:orgChip,LABELS:LABELS,COLORS:{BLUE:BLUE,GOLD:GOLD}}
+return{svg:svg,orgSvg:orgSvg,chip:chip,orgChip:orgChip,chk:chk,LABELS:LABELS,COLORS:{BLUE:BLUE,GOLD:GOLD}}
 })();
 
 /* ============ THE PAINTING (procedural oil render + gilded frame) ============ */
@@ -1322,8 +1360,8 @@ function serverSearch(q){var s=q.replace(/[,%()]/g,'').trim();if(s.length<2||!sb
 sb.from('deeds').select('*').eq('is_private',false).or('story.ilike.%'+s+'%,title.ilike.%'+s+'%').order('created_at',{ascending:false}).limit(30).then(function(r){
 if(r.error||!r.data)return;SRES=r.data;fetchNames(SRES).then(function(){return loadCounts(SRES)}).then(function(){if(searchQ)renderFeed()})}).catch(function(){})}
 $('#searchin').addEventListener('input',function(){var q=this.value.trim();clearTimeout(srvTimer);
-if(!liveOn||q.length<2){SRES=[];return}
-srvTimer=setTimeout(function(){serverSearch(q)},350)});
+if(!liveOn||q.length<2){SRES=[];searchPeople('');return}
+srvTimer=setTimeout(function(){serverSearch(q);searchPeople(q)},350)});
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)loadMore()})});
 io.observe($('#endnote'));
 
@@ -1375,9 +1413,9 @@ function doSignOut(){if(!sb)return;sb.auth.signOut().catch(function(){});toast('
 
 /* ---- organizations ---- */
 function renderOrgs(){var el=$('#orglist');if(!el)return;var h='';
-MYORGS.forEach(function(o){var mark=o.verified_at?DeedsTypes.orgSvg(o.display_name,44):pendSvg(o.display_name,44);
-h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+'</div>';
-h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+(o.verified_at?' · VERIFIED':' · IN REVIEW')+'</div></div></div>'});
+MYORGS.forEach(function(o){var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
+h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
+h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+(vv?' · VERIFIED':' · IN REVIEW')+'</div></div></div>'});
 el.innerHTML=h||'<p class="remnote" style="margin-bottom:2px">Companies, schools, churches and nonprofits carry real names here. The gold halo means DEEDS. verified them.</p>';
 var ob=$('#orgOpen');if(ob)ob.onclick=openOrg}
 function loadOrgs(){if(!sb||!PROFILE)return;
@@ -1634,7 +1672,7 @@ justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.'
 
 /* ---- session, profile, welcome ---- */
 function guestUI(){PROFILE=null;MYORGS=[];
-MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;paintNoteDot();
+MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
 renderProfile();renderRail();renderFeed()}
 function authProblem(m){failAuth(m)}
@@ -1653,7 +1691,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadOrgs();loadMyFollows().then(renderFeed);loadNotes();
+loadOrgs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -1790,7 +1828,8 @@ $$('#cxstats [data-cxm]').forEach(function(b){b.onclick=function(){openCx(PROFIL
 function refreshCx(){if(curPage==='profile')renderCxMine()}
 
 /* ---- notes ---- */
-function paintNoteDot(){$$('[data-go="profile"]').forEach(function(b){b.classList.toggle('newnotes',NOTEUNREAD>0)})}
+function paintNoteDot(){
+$$('.bell').forEach(function(b){b.classList.toggle('newalerts',ALUNREAD>0)})}
 function countUnread(){NOTEUNREAD=NOTES.filter(function(n){return PROFILE&&n.recipient_id===PROFILE.id&&!n.read_at}).length}
 function loadNotes(){if(!sb||!PROFILE)return Promise.resolve();
 return sb.from('notes').select('*').or('sender_id.eq.'+PROFILE.id+',recipient_id.eq.'+PROFILE.id)
@@ -1849,6 +1888,125 @@ if(r.error){toast(/row-level|policy/i.test(r.error.message)
 $('#notein').value='';NOTES.unshift(r.data);renderThread();renderNotes()})
 .catch(function(){b.textContent='Send.';toast('Not sent.')})};
 $('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#notesend').onclick()}});
+
+/* ================= SEARCH: people and organizations ================= */
+var OSTORE={};
+function searchPeople(q){var el=$('#pplres');if(!el)return;
+var t=String(q||'').replace(/[,%()]/g,'').trim();
+if(!sb||t.length<2){el.innerHTML='';el.style.display='none';return}
+var pq=sb.from('profiles').select('id,handle,member_type,member_type_verified_at').ilike('handle','%'+t+'%').limit(8);
+var oq=sb.from('organizations').select('*').or('display_name.ilike.%'+t+'%,name.ilike.%'+t+'%').limit(8);
+Promise.all([pq,oq]).then(function(r){
+if(String($('#searchin').value||'').trim().indexOf(t)<0)return;
+var ppl=(r[0]&&!r[0].error)?(r[0].data||[]):[];
+var orgs=(r[1]&&!r[1].error)?(r[1].data||[]):[];
+if(!ppl.length&&!orgs.length){el.innerHTML='';el.style.display='none';return}
+var h='<div class="micro" style="color:var(--muted);margin-bottom:8px">People And Organizations</div>';
+orgs.forEach(function(o){OSTORE[o.id]=o;var vv=!!o.verified_at;
+h+='<div class="cxrow" data-org="'+esc(o.id)+'"><div>'+(vv?DeedsTypes.orgSvg(o.display_name,40,true):pendSvg(o.display_name,40))+'</div>';
+h+='<div class="in"><div class="mono">'+esc(o.display_name)+(vv?DeedsTypes.chk(14):'')+'</div>';
+h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+(vv?' · VERIFIED':' · IN REVIEW')+'</div></div></div>'});
+ppl.forEach(function(p){
+NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id;
+var nm=NAMES[p.id];
+h+='<div class="cxrow"><div data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</div>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
+if(!PROFILE||p.id!==PROFILE.id)h+='<button class="fbtn'+(MYFOLL[p.id]?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(MYFOLL[p.id]?'Following':'Follow')+'</button>';
+h+='</div>'});
+el.innerHTML=h;el.style.display='block';
+$$('#pplres [data-org]').forEach(function(rw){rw.onclick=function(){openOrgView(rw.getAttribute('data-org'))}});
+wireLive();wireCommon()}).catch(function(){})}
+
+function openOrgView(id){var o=OSTORE[id];if(!o)return;
+$('#ovName').textContent=o.display_name;
+$('#ovMeta').innerHTML=(KINDL[o.kind]||'ORGANIZATION')+(o.verified_at?' · VERIFIED BY DEEDS.':' · IN REVIEW');
+var h='';
+function row(k,val){if(!val)return;h+='<div class="ovrow"><div class="k">'+k+'</div><div>'+val+'</div></div>'}
+row('Name',esc(o.name||o.display_name));
+row('Status',o.verified_at?('Verified '+DeedsTypes.chk(14)):'In review. DEEDS. has not confirmed this one yet.');
+row('About',esc(o.description||''));
+row('Where',esc(o.address||''));
+if(o.website_url)row('Site','<a href="'+esc(o.website_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700">'+esc(String(o.website_url).replace(/^https?:\/\//,''))+'</a>');
+$('#ovBody').innerHTML=h;
+sheet('#orgview')}
+
+/* ================= ALERTS: the activity, listed ================= */
+var ALERTS=[],ALSEEN=0,ALUNREAD=0,ALAB={};
+function alertsKey(){return 'deeds_alerts_'+(PROFILE?PROFILE.id:'x')}
+function tword(k){return k&&k.charAt(0)==='p'?'your post':'your deed'}
+function labelOf(k){return String(ALAB[k]||'').slice(0,90)}
+function loadAlerts(){
+if(!sb||!PROFILE)return Promise.resolve();
+var me=PROFILE.id;
+ALSEEN=+(safeGet(alertsKey())||0)||0;
+var dq=sb.from('deeds').select('id,title,story').eq('profile_id',me).limit(200);
+var pq=sb.from('posts').select('id,body').eq('profile_id',me).limit(200);
+return Promise.all([dq,pq]).then(function(r){
+var deeds=(r[0]&&!r[0].error)?(r[0].data||[]):[];
+var posts=(r[1]&&!r[1].error)?(r[1].data||[]):[];
+var dids=deeds.map(function(x){return x.id}),pids=posts.map(function(x){return x.id});
+ALAB={};
+deeds.forEach(function(d){ALAB['d:'+d.id]=d.title||d.story||'Your deed.'});
+posts.forEach(function(p){ALAB['p:'+p.id]=p.body||'Your post.'});
+var none=Promise.resolve({data:[]});
+return Promise.all([
+dids.length?sb.from('comments').select('*').in('deed_id',dids).order('created_at',{ascending:false}).limit(100):none,
+pids.length?sb.from('comments').select('*').in('post_id',pids).order('created_at',{ascending:false}).limit(100):none,
+dids.length?sb.from('reactions').select('*').in('deed_id',dids).limit(300):none,
+pids.length?sb.from('post_reactions').select('*').in('post_id',pids).limit(300):none,
+sb.from('follows').select('*').eq('followed_id',me).order('created_at',{ascending:false}).limit(100),
+sb.from('notes').select('*').eq('recipient_id',me).order('created_at',{ascending:false}).limit(100)
+])}).then(function(res){
+function D(i){return (res[i]&&!res[i].error)?(res[i].data||[]):[]}
+var items=[],need=[];
+function add(o){items.push(o);if(o.actor)need.push({profile_id:o.actor})}
+D(0).concat(D(1)).forEach(function(c){if(c.profile_id===PROFILE.id)return;
+add({ts:c.created_at,kind:'comment',actor:c.profile_id,key:c.deed_id?('d:'+c.deed_id):('p:'+c.post_id),body:c.body})});
+var insp={};
+D(2).forEach(function(x){if(x.profile_id===PROFILE.id)return;var k='d:'+x.deed_id;(insp[k]=insp[k]||[]).push(x)});
+D(3).forEach(function(x){if(x.profile_id===PROFILE.id)return;var k='p:'+x.post_id;(insp[k]=insp[k]||[]).push(x)});
+Object.keys(insp).forEach(function(k){
+var arr=insp[k].sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)});
+if(arr.length>=3)add({ts:arr[0].created_at,kind:'inspgroup',n:arr.length,key:k});
+else arr.forEach(function(x){add({ts:x.created_at,kind:'insp',actor:x.profile_id,key:k})})});
+D(4).forEach(function(f){add({ts:f.created_at,kind:'follow',actor:f.follower_id})});
+D(5).forEach(function(n){add({ts:n.created_at,kind:'note',actor:n.sender_id,body:n.body})});
+items.sort(function(a,b){return new Date(b.ts)-new Date(a.ts)});
+ALERTS=items.slice(0,80);
+ALUNREAD=ALERTS.filter(function(a){return new Date(a.ts).getTime()>ALSEEN}).length;
+return fetchNames(need)}).then(function(){indexNames();paintNoteDot()}).catch(function(){})}
+
+function renderAlerts(){var el=$('#altlist');if(!el)return;
+if(!PROFILE){el.innerHTML='<p class="remnote">Sign in and your activity shows up here.</p>';return}
+if(!ALERTS.length){el.innerHTML='<p class="remnote">Nothing yet. It starts the first time someone finds one of your deeds.</p>';return}
+var h='';
+ALERTS.forEach(function(a,i){
+var nm=a.actor?(NAMES[a.actor]||{handle:'A Member',type:'doer',v:false}):{handle:'',type:'doer',v:false};
+var line='',sub='';
+if(a.kind==='comment'){line=esc(nm.handle)+' commented on '+tword(a.key)+'.';sub=esc(String(a.body||'').slice(0,90))}
+else if(a.kind==='insp'){line=esc(nm.handle)+' was inspired by '+tword(a.key)+'.';sub=esc(labelOf(a.key))}
+else if(a.kind==='inspgroup'){line=a.n+' people were inspired by '+tword(a.key)+'.';sub=esc(labelOf(a.key))}
+else if(a.kind==='follow'){line=esc(nm.handle)+' followed you.';sub='Open their profile.'}
+else{line=esc(nm.handle)+' sent you a note.';sub=esc(String(a.body||'').slice(0,90))}
+h+='<button class="altrow'+(new Date(a.ts).getTime()>ALSEEN?' new':'')+'" data-alt="'+i+'">';
+h+='<div>'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="l">'+line+'</div><div class="s">'+sub+'</div></div>';
+h+='<span class="p-time">'+relTime(a.ts)+'</span></button>'});
+el.innerHTML=h;
+$$('#altlist [data-alt]').forEach(function(b){b.onclick=function(){altGo(ALERTS[+b.getAttribute('data-alt')])}})}
+
+function altGo(a){if(!a)return;
+if(a.kind==='follow'){var nm=NAMES[a.actor];if(nm)openLiveMember(nm.handle);return}
+if(a.kind==='note'){openNote(a.actor);return}
+if(a.key)openLiveCmts(a.key)}
+
+function openAlerts(){
+if(!liveOn){toast('Activity needs a connection.');return}
+if(!PROFILE){closeSheets();openJoin();return}
+sheet('#altsheet');renderAlerts();
+loadAlerts().then(function(){renderAlerts();
+ALSEEN=Date.now();safeSet(alertsKey(),String(ALSEEN));ALUNREAD=0;paintNoteDot()})}
+$$('.bell').forEach(function(b){b.onclick=openAlerts});
 
 /* ---- repaint once: the demo script painted the feed before this layer
    filtered the seeded rows, so the DOM could hold a card whose data was
