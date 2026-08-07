@@ -331,6 +331,11 @@ input,textarea{font:inherit;color:var(--ink)}
 .advd .k{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);width:78px;flex:none;padding-top:3px}
 .advnote{width:100%;border:0;border-bottom:1px solid var(--line);background:none;font-size:14px;padding:8px 2px;outline:none;margin-top:12px}
 .advacts{display:flex;gap:10px;margin-top:12px}
+.dailycard{border-left:3px solid var(--forest)}
+.orghit{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(21,19,14,.1)}
+.orghit .in{flex:1;min-width:0}
+.joinbtn{border:1.5px solid var(--forest);background:none;color:var(--forest);font-weight:800;font-size:11px;letter-spacing:.12em;padding:7px 12px;border-radius:999px;cursor:pointer}
+.leaveorg{border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-decoration:underline;cursor:pointer;padding:0}
 </style>
 </head>
 <body>
@@ -568,6 +573,7 @@ input,textarea{font:inherit;color:var(--ink)}
   <div class="modetog" id="modetog"><button id="modeDeed" class="on">DEED.</button><button id="modePost">POST.</button></div>
   <h3 id="composeH">Log a Deed.</h3>
   <div class="chaintag" id="logchain" style="display:none"></div>
+  <div class="chaintag" id="logdaily" style="display:none"></div>
   <div id="secondEmbed"></div>
   <textarea class="logarea" id="logtext" placeholder="What did you do?"></textarea>
   <div class="logrow" id="logdates">
@@ -633,6 +639,7 @@ input,textarea{font:inherit;color:var(--ink)}
 <div class="sheet" id="moresheet">
   <div class="sword">DEEDS<b>.</b></div>
   <h3>This Post.</h3>
+  <button class="sheetrowbtn" id="morechain" style="display:none">Continue the Chain.<small>Do the next act and log it as the next link.</small></button>
   <button class="sheetrowbtn" id="morereport">Report this deed.<small>It will be reviewed.</small></button>
   <button class="sheetrowbtn" id="moreblock">Block this member.<small>You will not see their deeds again.</small></button>
 </div>
@@ -676,6 +683,9 @@ input,textarea{font:inherit;color:var(--ink)}
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Set Up an Organization.</h3>
   <p class="remnote" style="margin:0 0 12px">Organizations carry real names. DEEDS. reviews each one. The gold halo means verified.</p>
+  <input class="chfield" id="orgFind" placeholder="Find your organization first." autocomplete="off">
+  <div id="orgHits"></div>
+  <p class="remnote" id="orgSplit" style="margin:2px 0 12px">Can&#39;t find it? Create it below.</p>
   <div class="actchips" id="orgkinds">
     <button class="achip on" data-kind="company">Company.</button>
     <button class="achip" data-kind="school">School.</button>
@@ -1261,7 +1271,8 @@ if(arrival)showArrival(arrival);
 (function(){
 var SB_URL='https://helqqdygwaihrliglbvw.supabase.co';
 var SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
-var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],WTYPE='doer',JEMAIL='',justVerified=false;
+var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='doer',JEMAIL='',justVerified=false;
+var DAILY=null,DAILYN=0,DAILYLOG=0,chainParentLive=null,chainLinkLive=0;
 var LIVEPOSTS=[],SRES=[],NAMES={},feedEnd=false,feedBusy=true,pageFrom=0,feedFailMsg='',srvTimer=null;
 var BLK={};try{BLK=JSON.parse(safeGet('deeds_blk')||'{}')||{}}catch(e){BLK={}}
 var MONTHS=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
@@ -1301,6 +1312,7 @@ if(r.error){return sb.from('profiles').select('id,handle').in('id',ids).then(fun
 (r.data||[]).forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at}})}).catch(function(){})}
 
 /* ---- live post card: real content, escaped, Share plus report or block ---- */
+var CHAINSVG='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"/><path d="M7.5 11 5 13.5a3.5 3.5 0 0 0 5 5L12.5 16"/><path d="M16.5 13 19 10.5a3.5 3.5 0 0 0-5-5L11.5 8"/></svg>';
 var SHARESVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M5 13v6h14v-6"/></svg>';
 var MORESVG='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 var INSPSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l1.8 4.9 4.9 1.8-4.9 1.8L12 16.6l-1.8-4.9-4.9-1.8 4.9-1.8L12 3.2z"/></svg>';
@@ -1313,6 +1325,8 @@ var h='<article class="post" data-lid="'+esc(r.id)+'">';
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
 h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
+if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
+if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
 h+='<p class="p-body">'+esc(body)+'</p>';
 if(r.media_path){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
@@ -1345,6 +1359,7 @@ function mergeSearch(){var seen={},out=[];
 LIVEPOSTS.concat(SRES).forEach(function(r){if(!seen[r.id]){seen[r.id]=1;out.push(r)}});
 out.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)});return out}
 renderFeed=function(){var el=$('#feed');if(!el)return;var q=(searchQ||'').toLowerCase();var h='';var shown=0,real=0;
+if(!q)h+=dailyCardHTML();
 var list=q?mergeSearch():LIVEPOSTS;
 list.forEach(function(r){var nm=NAMES[r.profile_id]||{};if(nm.handle&&BLK[nm.handle])return;
 var body=(r.story||r.title||'');
@@ -1364,7 +1379,7 @@ $$('#feed .p-media canvas').forEach(function(cv){var id=+cv.parentNode.getAttrib
 var p=POSTS.filter(function(x){return x.id===id})[0];if(!p)return;
 if(p.media.kind==='photo')drawPlate(cv,p.media.plate);
 else drawVideo(cv.getContext('2d'),cv.width,cv.height,1.7,p.media.vid)});
-wireFeed();wireLive()};
+wireFeed();wireLive();wireDaily()};
 
 function wireLive(){
 $$('[data-linsp]').forEach(function(b){b.onclick=function(e){e.stopPropagation();toggleInsp(b.getAttribute('data-linsp'))}});
@@ -1372,11 +1387,34 @@ $$('[data-lcmt]').forEach(function(b){b.onclick=function(e){e.stopPropagation();
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
-$$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh')};sheet('#moresheet')}});
+$$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh')};
+var _r=findLive(morePostLive.id),_mc=$('#morechain');
+if(_mc)_mc.style.display=(_r&&_r._k!=='post'&&!_r.is_private)?'':'none';
+sheet('#moresheet')}});
 $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
 $$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
 function findLive(id){var all=LIVEPOSTS.concat(SRES);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
 
+/* ---- the daily deed: one act, everyone, every day ---- */
+function dailyCardHTML(){if(!DAILY)return'';
+var done=DAILYN===1?'1 member did it today.':DAILYN>1?DAILYN+' members did it today.':'Be the first today.';
+return '<article class="post dailycard"><div class="micro" style="color:var(--forest)">Today\u2019s Deed \u00B7 No. '+DAILY.day_no+'</div>'+
+'<p class="p-body" style="font-weight:800;font-size:19px;margin:8px 0 6px">'+esc(DAILY.act)+'</p>'+
+'<div class="p-time">'+done+'</div>'+
+'<div class="p-acts" style="margin-top:10px"><button class="pa lit" id="dailyGo">Do It. Log It.</button></div></article>'}
+function loadDaily(){if(!sb)return;
+sb.rpc('get_daily_deed',{p_date:ymd(new Date())}).then(function(r){
+if(r.error||!r.data||!r.data.length)return;
+DAILY=r.data[0];
+sb.from('daily_counts').select('n').eq('daily_no',DAILY.day_no).maybeSingle().then(function(c){
+DAILYN=(c.data&&c.data.n)||0;renderFeed()}).catch(function(){renderFeed()})
+}).catch(function(){})}
+function wireDaily(){var b=$('#dailyGo');if(!b)return;b.onclick=function(){
+if(!PROFILE){openJoin();return}
+DAILYLOG=DAILY?DAILY.day_no:0;chainParentLive=null;chainLinkLive=0;chainLink=0;
+openCompose('deed');
+var t=$('#logdaily');if(t){t.style.display='inline-flex';t.textContent='DAILY DEED \u00B7 No. '+DAILYLOG}
+var lc=$('#logchain');if(lc)lc.style.display='none'}}
 function feedFail(msg){feedFailMsg='The feed could not load: '+msg;renderFeed()}
 function loadFeed(){if(!sb)return;feedBusy=true;feedFailMsg='';
 var dq=sb.from('deeds').select('*').eq('is_private',false).order('created_at',{ascending:false}).limit(30);
@@ -1484,13 +1522,31 @@ h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weig
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+state+'</div>';
 if(!vv&&o.declined_at&&o.review_note)h+='<div class="p-time" style="text-transform:none;letter-spacing:0;margin-top:4px">'+esc(o.review_note)+'</div>';
 h+='</div></div>'});
+MYMEMB.forEach(function(o){if(MYORGS.some(function(x){return x.id===o.id}))return;
+var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
+h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
+h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+' \u00B7 MEMBER'+(vv?'':' \u00B7 IN REVIEW')+' \u00B7 <button class="leaveorg" data-leave="'+esc(o.id)+'">LEAVE.</button></div>';
+h+='</div></div>'});
 el.innerHTML=h||'<p class="remnote" style="margin-bottom:2px">Companies, schools, churches and nonprofits carry real names here. The gold halo means DEEDS. verified them.</p>';
+$$('#orglist [data-leave]').forEach(function(b){b.onclick=function(){
+if(!PROFILE)return;var oid=b.getAttribute('data-leave');
+sb.from('org_members').delete().match({org_id:oid,profile_id:PROFILE.id}).then(function(r){
+if(r.error){toast('Could not leave: '+r.error.message);return}
+toast('Left.');loadMemberships()}).catch(function(){})}});
 var ob=$('#orgOpen');if(ob)ob.onclick=openOrg}
 function loadOrgs(){if(!sb||!PROFILE)return;
 sb.from('organizations').select('*').eq('owner_id',PROFILE.id).order('created_at',{ascending:false}).then(function(r){
 if(r.error)return;MYORGS=r.data||[];if(curPage==='profile')renderOrgs()}).catch(function(){})}
+function loadMemberships(){if(!sb||!PROFILE){MYMEMB=[];return}
+sb.from('org_members').select('org_id').eq('profile_id',PROFILE.id).then(function(r){
+if(r.error){return}
+var ids=(r.data||[]).map(function(x){return x.org_id});
+if(!ids.length){MYMEMB=[];if(curPage==='profile')renderOrgs();return}
+sb.from('organizations').select('*').in('id',ids).then(function(o){
+MYMEMB=o.data||[];if(curPage==='profile')renderOrgs()}).catch(function(){})}).catch(function(){})}
 function openOrg(){if(!PROFILE){openJoin();return}
 ['#orgName','#orgDisplay','#orgDesc','#orgAddr','#orgUrl'].forEach(function(s){var el=$(s);if(el)el.value=''});
+var _of=$('#orgFind');if(_of)_of.value='';var _oh=$('#orgHits');if(_oh)_oh.innerHTML='';
 ORGKIND='company';
 $$('#orgkinds .achip').forEach(function(b,i){b.classList.toggle('on',i===0)});
 sheet('#orgsheet')}
@@ -1505,9 +1561,32 @@ var b=$('#orgSubmit');b.textContent='SUBMITTING...';
 sb.from('organizations').insert({owner_id:PROFILE.id,kind:ORGKIND,name:nm,display_name:dn,
 description:v('#orgDesc')||null,address:v('#orgAddr')||null,website_url:url||null}).select().single().then(function(r){
 b.textContent='Submit for Review.';
-if(r.error){toast('Could not submit: '+r.error.message);return}
+if(r.error){if(String(r.error.code)==='23505'||/name_ci_uidx/.test(String(r.error.message||''))){var _f=$('#orgFind');if(_f){_f.value=nm}orgSearch(nm);toast('That organization already exists. Join it above.')}else{toast('Could not submit: '+r.error.message)}return}
 MYORGS.unshift(r.data);closeSheets();renderOrgs();
 toast('Submitted. DEEDS. reviews every organization.')}).catch(function(e){b.textContent='Submit for Review.';toast('Could not submit: '+String(e&&e.message||e))})};
+
+/* ---- find your organization first ---- */
+var orgFindT=null;
+function orgHitHTML(o){var vv=o.status==='approved';
+var mark=vv?DeedsTypes.orgSvg(o.name,36,true):pendSvg(o.name,36);
+var mine=MYORGS.some(function(x){return x.id===o.id});
+var inMine=MYMEMB.some(function(x){return x.id===o.id});
+var btn=mine?'<span class="p-time">YOURS</span>':inMine?'<span class="p-time">JOINED</span>':'<button class="joinbtn" data-join="'+esc(o.id)+'">Join.</button>';
+return '<div class="orghit"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:14px">'+esc(o.name)+(vv?DeedsTypes.chk(14):'')+'</div><div class="p-time">'+(vv?'VERIFIED':'IN REVIEW')+'</div></div>'+btn+'</div>'}
+function orgSearch(q){if(!sb)return;
+sb.rpc('search_orgs',{q:q}).then(function(r){var hh=$('#orgHits');if(!hh)return;
+if(r.error||!r.data||!r.data.length){hh.innerHTML=(q&&q.length>=2)?'<p class="remnote" style="margin:6px 0 10px">Nothing by that name yet. Create it below.</p>':'';return}
+var h='';r.data.forEach(function(o){h+=orgHitHTML(o)});hh.innerHTML=h;
+$$('#orgHits [data-join]').forEach(function(b){b.onclick=function(){
+if(!PROFILE){closeSheets();openJoin();return}
+var oid=b.getAttribute('data-join');b.textContent='JOINING...';
+sb.from('org_members').insert({org_id:oid,profile_id:PROFILE.id}).then(function(r2){
+if(r2.error){b.textContent='Join.';toast(String(r2.error.code)==='23505'?'Already one of yours.':'Could not join: '+r2.error.message);return}
+toast('Joined. It shows on your profile.');loadMemberships();orgSearch(v('#orgFind'))
+}).catch(function(e){b.textContent='Join.';toast('Could not join: '+String(e&&e.message||e))})}})}).catch(function(){})}
+(function(){var f=$('#orgFind');if(!f)return;f.oninput=function(){clearTimeout(orgFindT);
+var q=f.value.trim();if(q.length<2){var hh=$('#orgHits');if(hh)hh.innerHTML='';return}
+orgFindT=setTimeout(function(){orgSearch(q)},260)}})();
 
 /* ---- members: live handles open live pages ---- */
 var baseOpenMember=openMember;
@@ -1549,6 +1628,14 @@ wireLive();wireCommon()})}).catch(function(){})}).catch(function(){})}
 
 /* ---- report and block on real posts ---- */
 var morePostLive=null;
+(function(){var mc=$('#morechain');if(!mc)return;mc.onclick=function(){if(!morePostLive)return;
+if(!PROFILE){morePostLive=null;closeSheets();openJoin();return}
+var r=findLive(morePostLive.id);morePostLive=null;closeSheets();
+if(!r||r._k==='post')return;
+chainParentLive=r.id;chainLinkLive=(r.chain_no||1)+1;DAILYLOG=0;chainLink=0;
+openCompose('deed');
+var t=$('#logchain');if(t){t.style.display='inline-flex';t.textContent='CHAIN \u00B7 LINK '+chainLinkLive}
+var ld=$('#logdaily');if(ld)ld.style.display='none'}})();
 var baseReport=$('#morereport').onclick,baseBlock=$('#moreblock').onclick;
 $('#morereport').onclick=function(){if(morePostLive){var m=morePostLive;morePostLive=null;closeSheets();
 location.href='mailto:hello@deeds.fun?subject='+encodeURIComponent('Report · deed '+m.id)+'&body='+encodeURIComponent('Reporting deed '+m.id+' by '+m.handle+' on deeds.fun.');
@@ -1663,7 +1750,8 @@ if(LPHOTO){clearPhoto();return}
 ensureFileInput().click()};
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
-chainLink=0;$('#logchain').style.display='none';openCompose('deed')}
+chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;
+$('#logchain').style.display='none';var _ld3=$('#logdaily');if(_ld3)_ld3.style.display='none';openCompose('deed')}
 $('#tLog').onclick=wantLog;$('#pLog').onclick=wantLog;
 var lb2=$('#lLog');if(lb2)lb2.onclick=wantLog;
 $('#thLog').onclick=function(){enter();setTimeout(wantLog,420)};
@@ -1696,11 +1784,15 @@ var b=$('#logsubmit');b.textContent='LOGGING...';
 uploadPhoto(function(mm,uerr2){
 if(uerr2){b.textContent='Log It.';toast('The photo did not upload: '+uerr2);return}
 var dpay={profile_id:PROFILE.id,title:title,story:txt,is_private:logPriv,done_on:ymd(d)};
+if(DAILYLOG)dpay.daily_no=DAILYLOG;
+if(chainParentLive)dpay.chain_parent_id=chainParentLive;
 if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.media_h=mm.h}
 sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
 if(r.error){toast('Could not log it: '+r.error.message);return}
 my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
+if(DAILYLOG){DAILYN++;DAILYLOG=0;var _ld=$('#logdaily');if(_ld)_ld.style.display='none'}
+if(chainParentLive){chainParentLive=null;chainLinkLive=0;var _lc=$('#logchain');if(_lc)_lc.style.display='none'}
 clearPhoto();
 if(!logPriv)prependLive(markKind(r.data,'deed'));
 closeSheets();renderProfile();renderRail();renderFeed();
@@ -1708,6 +1800,24 @@ var n=my.deeds.length;
 toast('DEED '+n+'.'+(logPriv?' KEPT PRIVATE.':' '+MONTHS[new Date().getMonth()]+' · '+n+(n===1?' DEED':' DEEDS')+'. KEEP BUILDING.'));
 var ci=coinIdx(n);if(ci>=0&&n===COINS[ci][1]){setTimeout(function(){toast(COINS[ci][0].toUpperCase()+'. THE COIN IS YOURS.')},2800)}
 }).catch(function(e){b.textContent='Log It.';toast('Could not log it: '+String(e&&e.message||e))})})};
+
+/* ---- reminders that save ---- */
+var CADMAP={'Weekly.':'weekly','Monthly.':'monthly','None.':'none'};
+function paintCad(cad){var t=cad==='weekly'?'Weekly.':cad==='monthly'?'Monthly.':'None.';
+$$('.remchip').forEach(function(x){x.classList.toggle('on',x.textContent===t)});
+my.remind=t;renderProfMeta()}
+function loadPrefs(){if(!sb||!PROFILE)return;
+sb.from('notification_prefs').select('reminder_cadence').eq('profile_id',PROFILE.id).maybeSingle().then(function(r){
+if(r.error||!r.data)return;
+var vv=r.data.reminder_cadence;paintCad(vv?String(vv).toLowerCase():'none')}).catch(function(){})}
+$$('.remchip').forEach(function(b){b.onclick=function(){
+var t=b.textContent,cad=CADMAP[t]||'none';
+if(!liveOn||!PROFILE){$$('.remchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');my.remind=t;renderProfMeta();toast(t==='None.'?'No reminders. The door stays open.':t+' A small deed still counts.');return}
+b.textContent='...';
+sb.rpc('set_reminder_cadence',{p_cadence:cad}).then(function(r){b.textContent=t;
+if(r.error){toast('Could not save: '+r.error.message);return}
+paintCad(cad);toast(cad==='none'?'Saved. No reminders. The door stays open.':'Saved. '+t+' A small deed still counts.')
+}).catch(function(e){b.textContent=t;toast('Could not save: '+String(e&&e.message||e))})}});
 
 /* ---- sign in or join: one door, one code ---- */
 function openJoin(){closeSheets();
@@ -1760,7 +1870,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadOrgs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
+loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -2135,7 +2245,7 @@ renderFeed();
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
 var blk=$('#impblock');if(blk)blk.style.display='none';
-guestUI();loadStats();loadFeed();subRealtime();
+guestUI();loadStats();loadFeed();loadDaily();subRealtime();
 sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;
 if(s){SESSION=s;loadProfile(0)}}).catch(function(){});
 sb.auth.onAuthStateChange(function(ev,s){
