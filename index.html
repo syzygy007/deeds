@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DEEDS. The Art of Giving</title>
+<title>DEEDS. The Art of Doing Good</title>
 <!-- DEEDS v2.2 · live layer: sessions, profiles, organizations, deeds -->
 <meta name="description" content="A living record of anonymous acts. Not for recognition.">
 <style>
@@ -478,7 +478,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="th-frame"><canvas id="heroPaint" width="1760" height="1150"></canvas></div>
   <div class="th-copy">
     <div class="th-eyebrow micro">A Living Record Of Anonymous Acts</div>
-    <div class="th-line">The art of giving<b>.</b></div>
+    <div class="th-line">The Art of Doing Good<b>.</b></div>
     <p class="th-voice">Not for recognition. Not for followers. Simply because good deeds deserve to be seen.</p>
     <div class="th-ctas">
       <button class="th-enter" id="thEnter">Enter DEEDS.</button>
@@ -576,10 +576,12 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="frail" id="wdRail"></div>
       <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
       <div id="wdBooks"></div>
-      <div class="wd-sec"><div class="micro">The Library</div><button class="mono" id="wdWrite" style="color:var(--forest)">Write.</button></div>
-      <div class="wd-sub" style="margin-bottom:8px">Studies and editorials by the readers. Free to read.</div>
+      <div class="wd-sec" id="wdBWSec" style="display:none"><div class="micro">More Books</div><div class="mono" style="color:var(--muted)">FREE</div></div>
+      <div class="lgrid" id="wdBookWorks" style="margin-bottom:6px"></div>
+      <div class="wd-sec"><div class="micro">Editorial</div><div class="mono" style="color:var(--muted)">BY THE DOERS</div></div>
+      <div class="wd-sub" style="margin-bottom:8px">Written by the members. Free to read.</div>
+      <div class="logrow" id="wdCats" style="flex-wrap:wrap;margin-bottom:10px"></div>
       <div class="lgrid" id="wdLib"></div>
-      <div id="wdMine"></div>
       <div class="wd-stat" id="wdStat"></div>
       <button class="wbtn ghost" id="wdShare" style="margin:6px 0 2px">Share the Progress.</button>
     </div>
@@ -612,6 +614,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="rhythm">
           <div class="rline" id="rMonth"></div>
           <div class="rline" id="rForty"></div>
+          <div class="rline" id="rRe"></div>
         </div>
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
@@ -625,12 +628,17 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="statline" id="cxstats" style="margin-top:0"></div>
       </div>
       <div class="sect" id="rnsect">
-        <div class="wd-sec" style="margin-top:0"><div class="micro">The Notes</div><button class="mono" id="wdNoteNew" style="color:var(--forest)">New Note.</button></div>
-        <div class="wd-sub" style="margin-bottom:4px">Save verses with Note. while you read. Open a note here, then Write from It.</div>
+        <div class="wd-sec" style="margin-top:0"><div class="micro">The Studies</div><button class="mono" id="wdNoteNew" style="color:var(--forest)">New Study.</button></div>
+        <div class="wd-sub" style="margin-bottom:4px">Save verses with Study. while you read. Open one here, then Write from It.</div>
         <div id="wdNotes"></div>
       </div>
+      <div class="sect" id="wrsect">
+        <div class="wd-sec" style="margin-top:0"><div class="micro">The Writing</div><button class="mono" id="wdWrite" style="color:var(--forest)">Write.</button></div>
+        <div class="wd-sub" style="margin-bottom:4px">Editorials and books. Private until you publish.</div>
+        <div id="wdMine"></div>
+      </div>
       <div class="sect" id="notesect" style="display:none">
-        <div class="micro">Notes From Members</div>
+        <div class="micro">Notes</div>
         <div id="notelist"></div>
       </div>
       <div class="sect" id="viewpane">
@@ -749,19 +757,22 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   </div>
 </div>
 <div id="writer">
-  <div class="wt-top"><button class="wt-x" id="wtClose">Close.</button><span class="wt-sv" id="wtSv"></span><button class="wbtn" id="wtPub">Publish.</button></div>
+  <div class="wt-top"><button class="wt-x" id="wtClose">Close.</button><span class="wt-sv" id="wtSv"></span><button class="wbtn" id="wtPub">Preview.</button></div>
   <div class="wt-scroll">
     <input class="wt-title" id="wtTitle" placeholder="The title.">
     <div class="logrow" style="margin:8px 0 6px"><button class="lchip on" id="wtIvory">Ivory.</button><button class="lchip" id="wtForest">Forest.</button><button class="lchip" id="wtImg">Cover Image.</button></div>
+    <div class="logrow" style="margin:0 0 6px"><button class="lchip on" id="wtKE">Editorial.</button><button class="lchip" id="wtKB">Book.</button><span class="mono" id="wtStat" style="color:var(--muted);font-size:10px;letter-spacing:.08em;align-self:center">PRIVATE.</span></div>
+    <div class="logrow" id="wtCats" style="flex-wrap:wrap;margin:0 0 4px"></div>
     <div id="wtCover"></div>
     <div id="wtBlocks"></div>
   </div>
   <div class="wt-add"><button data-ab="p">Paragraph.</button><button data-ab="v">Scripture.</button><button data-ab="img">Image.</button><button data-ab="q">Quote.</button><button data-ab="a">Link.</button></div>
   <input type="file" id="wtFile" accept="image/*" style="display:none">
 </div>
+<div class="vbar" id="pubbar"><span style="color:var(--ivory);font-weight:800;font-size:12px;letter-spacing:.05em">PRIVATE · PREVIEW</span><button class="em" id="pubGo">PUBLISH.</button></div>
 <div class="vbar" id="vbar">
   <button id="vbCard" class="em">Share.</button>
-  <button id="vbHl">Note.</button>
+  <button id="vbHl">Study.</button>
   <button id="vbClear" class="dim">Clear.</button>
 </div>
 <div class="sheet" id="picksheet">
@@ -783,26 +794,35 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="ccSave">Save the Image.</button><button class="wbtn" id="ccPost">Post It.</button></div>
 </div>
 
+<div class="sheet" id="redeedsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Redeed It.</h3>
+  <div class="chaintag" id="rdCount"></div>
+  <p class="p-body" id="rdBody" style="margin:10px 0 4px"></p>
+  <div class="micro" id="rdBy" style="margin-bottom:12px"></div>
+  <p class="chnote">You saw it. Now do it. Your deed posts under your name, the count on the original grows, and their Redeeds climb. One deed becomes a movement.</p>
+  <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="rdSend">Send It As A Challenge.</button><button class="wbtn" id="rdGo">REDEED IT.</button></div>
+</div>
 <div class="sheet" id="notepick">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3>The Note.</h3>
+  <h3>The Study.</h3>
   <div id="nsList"></div>
-  <div class="logrow" style="margin-top:12px"><input class="chfield" id="nsNew" placeholder="Name a new note." style="flex:1"><button class="wbtn" id="nsMake">Make It.</button></div>
+  <div class="logrow" style="margin-top:12px"><input class="chfield" id="nsNew" placeholder="Name a new study." style="flex:1"><button class="wbtn" id="nsMake">Make It.</button></div>
   <button class="wbtn ghost" id="nsSkip" style="margin-top:10px">Just Mark It.</button>
 </div>
 
 <div class="sheet" id="noteview">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3 id="nvTitle">The Note.</h3>
+  <h3 id="nvTitle">The Study.</h3>
   <div class="micro" id="nvMeta" style="margin-bottom:6px"></div>
   <div id="nvList"></div>
-  <div class="logrow" style="margin-top:14px"><button class="wbtn ghost" id="nvOpen">Open this Note.</button><button class="wbtn" id="nvWrite">Write from It.</button></div>
-  <button class="mono" id="nvDel" style="color:var(--muted);margin-top:12px">Delete the Note.</button>
+  <div class="logrow" style="margin-top:14px"><button class="wbtn ghost" id="nvOpen">Open this Study.</button><button class="wbtn" id="nvWrite">Write from It.</button></div>
+  <button class="mono" id="nvDel" style="color:var(--muted);margin-top:12px">Delete the Study.</button>
 </div>
 
 <div class="sheet" id="versesheet">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3>From the Notes.</h3>
+  <h3>From the Studies.</h3>
   <div id="vsList"></div>
 </div>
 
@@ -1314,6 +1334,7 @@ var n=deedCount(),m=monthCount(),ci=coinIdx(n);
 $('#myCoin').innerHTML=ci<0?'':coinSvg(ci,26);
 $('#rMonth').textContent=m>=4?'RHYTHM BUILT. KEEP GOING.':'JULY · '+m+(m===1?' DEED':' DEEDS')+'. KEEP BUILDING.';
 $('#rForty').textContent=Math.min(n,40)+' / 40 DEEDS. KEEP BUILDING.';
+var _re=$('#rRe');if(_re)_re.textContent=n+(n===1?' DEED':' DEEDS')+' \u00B7 '+((window.PROFILE&&window.PROFILE.redeeds)||0)+' REDEEDS \u00B7 PUBLIC';
 var pg=$('#pickgrid');if(!pg.innerHTML){var h='';Object.keys(DeedsTypes.LABELS).forEach(function(t){
 h+='<button class="pick" data-type="'+t+'">'+DeedsTypes.svg(t,44,{verified:false})+'<span>'+DeedsTypes.LABELS[t]+'</span></button>'});
 pg.innerHTML=h;
@@ -1558,13 +1579,14 @@ var SHARESVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 var MORESVG='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 var INSPSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l1.8 4.9 4.9 1.8-4.9 1.8L12 16.6l-1.8-4.9-4.9-1.8 4.9-1.8L12 3.2z"/></svg>';
 var CMTSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.6c0 4-3.6 7.2-8 7.2-1 0-2-.2-2.9-.5L4 20l1.5-3.6A7 7 0 0 1 4 11.6c0-4 3.6-7.2 8-7.2s8 3.2 8 7.2z"/></svg>';
+var REDEEDSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.5 21 6.5l-4 4"/><path d="M3 11V9a2.5 2.5 0 0 1 2.5-2.5H21"/><path d="M7 21.5 3 17.5l4-4"/><path d="M21 13v2a2.5 2.5 0 0 1-2.5 2.5H3"/></svg>';
 function livePostHTML(r){var nm=NAMES[r.profile_id]||{handle:'A Member',type:'doer',v:false};
 var mine=PROFILE&&r.profile_id===PROFILE.id;
 var isPost=r._k==='post';
 var body=isPost?(r.body||''):(r.story||r.title||'');
 var h='<article class="post" data-lid="'+esc(r.id)+'">';
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
-h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
+h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+((!isPost&&r.origin_id)?'<span class="chip pk">REDEED</span>':'')+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
 if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
@@ -1575,6 +1597,7 @@ var tk=(isPost?'p:':'d:')+r.id;
 h+='<div class="p-acts">';
 h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSPSVG+'<span>'+(CINSP[tk]||0)+'</span></button>';
 h+='<button class="pa" data-lcmt="'+esc(tk)+'">'+CMTSVG+'<span>'+(CCMT[tk]||0)+'</span></button>';
+if(!isPost&&!mine)h+='<button class="pa" data-redeed="'+esc(r.id)+'">'+REDEEDSVG+'<span>'+(r.redeed_count||0)+'</span></button>';
 h+='<button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
 if(!mine)h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'" aria-label="More">'+MORESVG+'</button>';
 h+='</div></article>';return h}
@@ -1622,9 +1645,34 @@ if(p.media.kind==='photo')drawPlate(cv,p.media.plate);
 else drawVideo(cv.getContext('2d'),cv.width,cv.height,1.7,p.media.vid)});
 wireFeed();wireLive();wireDaily()};
 
+var RDCUR=null;
+function openRedeed(id){var r=findLive(id);if(!r||r._k==='post')return;
+RDCUR=r;var nm=NAMES[r.profile_id]||{handle:'A Member'};
+var n=(r.redeed_count||0)+1;
+var c=$('#rdCount');if(c)c.textContent='DONE '+n+' TIME'+(n===1?'':'S')+' \u00B7 AND COUNTING';
+$('#rdBody').textContent='\u201C'+(r.story||r.title||'')+'\u201D';
+$('#rdBy').textContent='FIRST DONE BY '+String(nm.handle||'A MEMBER').toUpperCase();
+sheet('#redeedsheet')}
+$('#rdGo').onclick=function(){if(!RDCUR)return;
+if(!PROFILE){RDCUR=null;closeSheets();openJoin();return}
+var r=RDCUR,b=$('#rdGo');b.textContent='REDEEDING\u2026';
+sb.rpc('redeed',{origin:r.id}).then(function(q){b.textContent='REDEED IT.';
+var row=q.data&&q.data.length?q.data[0]:null;
+if(q.error||!row){toast('Could not redeed it'+(q.error?': '+q.error.message:'.'));return}
+var root=findLive(row.origin_id);if(root)root.redeed_count=(root.redeed_count||0)+1;
+RDCUR=null;closeSheets();prependLive(markKind(row,'deed'));
+toast('REDEEDED. Your deed is logged and the count grew.')}).catch(function(e){b.textContent='REDEED IT.';toast('Could not redeed it: '+String(e&&e.message||e))})};
+$('#rdSend').onclick=function(){if(!RDCUR)return;var r=RDCUR;
+var act=(r.title||r.story||'').slice(0,64);
+var ch=(PROFILE&&PROFILE.handle)||'DEEDS';
+var url='https://deeds.fun/deed/?c='+encodeURIComponent(ch)+'&k=deed&a='+encodeURIComponent(act);
+var txt='One deed. I challenge you: \u201C'+act+'\u201D';
+if(navigator.share){navigator.share({text:txt,url:url}).catch(function(){})}
+else{try{navigator.clipboard.writeText(txt+' '+url);toast('Copied. Send it to someone.')}catch(e){toast('Could not copy it.')}}};
 function wireLive(){
 $$('[data-linsp]').forEach(function(b){b.onclick=function(e){e.stopPropagation();toggleInsp(b.getAttribute('data-linsp'))}});
 $$('[data-lcmt]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openLiveCmts(b.getAttribute('data-lcmt'))}});
+$$('[data-redeed]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openRedeed(b.getAttribute('data-redeed'))}});
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
@@ -1842,8 +1890,9 @@ if(r.error||!r.data){toast('That member could not load.');return}
 var p=r.data;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id;
 var dq=sb.from('deeds').select('*').eq('profile_id',p.id).eq('is_private',false).order('created_at',{ascending:false}).limit(30);
 var pq=sb.from('posts').select('*').eq('profile_id',p.id).order('created_at',{ascending:false}).limit(30);
-Promise.all([dq,pq,countFollows(p.id)]).then(function(res){
+Promise.all([dq,pq,countFollows(p.id),sb.from('deeds').select('id',{count:'exact',head:true}).eq('profile_id',p.id).eq('is_private',false)]).then(function(res){
 var dr=res[0]||{},pr=res[1]||{},fc=res[2];
+var dcnt=(res[3]&&typeof res[3].count==='number')?res[3].count:0;
 var rows=(dr.data||[]).map(function(x){return markKind(x,'deed')});
 var posts=(pr.error?[]:(pr.data||[])).map(function(x){return markKind(x,'post')});
 var anyPost=posts.length>0;
@@ -1855,7 +1904,7 @@ h+='<div class="prof-name"><span class="mono">'+esc(hd)+'</span>'+DeedsTypes.chi
 h+='<div class="prof-since">Member Since '+sinceStr(p.created_at).toUpperCase()+'</div></div></div>';
 if(p.bio)h+='<div class="pbio">'+esc(p.bio)+'</div>';
 h+='<div class="statline"><button data-cx="followers"><div class="n">'+fc.followers+'</div><div class="l">Followers</div></button>';
-h+='<button data-cx="following"><div class="n">'+fc.following+'</div><div class="l">Following</div></button></div>';
+h+='<button data-cx="following"><div class="n">'+fc.following+'</div><div class="l">Following</div></button><button><div class="n">'+dcnt+'</div><div class="l">Deeds</div></button><button><div class="n">'+(p.redeeds||0)+'</div><div class="l">Redeeds</div></button></div>';
 h+='<div class="folblock"><button class="fbtn'+(MYFOLL[p.id]?' on':'')+'" data-follow="'+esc(hd)+'">'+(MYFOLL[p.id]?'Following':'Follow')+'</button>';
 h+='<button class="notebtn" id="lnote">Send a Note.</button>';
 h+='<button class="blockb" id="lblk">Block.</button></div></div>';
@@ -2572,17 +2621,17 @@ var runs=runsOf(SEL);if(!runs.length)return;
 var rows=runs.map(function(r){return{profile_id:PROFILE.id,tr:TR,book:cur.b,chapter:cur.c,v_start:r[0],v_end:r[1],note_id:note?note.id:null}});
 sb.from('highlights').insert(rows).select().then(function(r){
 if(r.error){if(window.toast)toast('Could not save it: '+r.error.message);return}
-HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast(note?('NOTED \u00B7 '+String(note.title).toUpperCase()):'NOTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
+HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast(note?('SAVED \u00B7 '+String(note.title).toUpperCase()):'SAVED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
 function removeHL(row){if(!window.sb||!row)return;
 sb.from('highlights').delete().eq('id',row.id).then(function(r){
 if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
-HLROWS=(HLROWS||[]).filter(function(h){return h.id!==row.id});hlMode=null;vbarSync();paintHLs();if(window.toast)toast('Note removed.')}).catch(function(e){})}
+HLROWS=(HLROWS||[]).filter(function(h){return h.id!==row.id});hlMode=null;vbarSync();paintHLs();if(window.toast)toast('Removed.')}).catch(function(e){})}
 /* ---- selection + verse bar ---- */
 function clearSel(){SEL={};hlMode=null;var vs=J('rdCols').querySelectorAll('.vv.sel');for(var i=0;i<vs.length;i++)vs[i].classList.remove('sel');vbarSync()}
 function selCount(){var n=0;for(var k in SEL)n++;return n}
 function vbarSync(){var bar=J('vbar');var on=selCount()>0||!!hlMode;bar.classList.toggle('on',on);
 if(!on)return;
-J('vbHl').textContent=hlMode?'Remove the Note.':'Note.';
+J('vbHl').textContent=hlMode?'Remove It.':'Study.';
 J('vbClear').textContent=hlMode?'Close.':'Clear.'}
 J('rdCols').addEventListener('click',function(ev){var el=ev.target.closest?ev.target.closest('.vv'):null;if(!el)return;
 var v=+el.getAttribute('data-v');
@@ -2605,7 +2654,7 @@ loadHLs(function(){
 getBook(TR,b,function(j,err){J('rdLoad').style.display='none';
 if(err){J('rdCols').innerHTML='<div style="font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:13px;color:var(--muted);padding:8px 0">The book could not load: '+err+'. Check the connection and try again.</div>';return}
 renderChapter(j,anchor||0)})})}
-function closeReader(){J('reader').classList.remove('on');lock(false);clearSel();WMODE=false;document.body.classList.remove('wk-on');renderShelf()}
+function closeReader(){J('reader').classList.remove('on');lock(false);clearSel();WMODE=false;document.body.classList.remove('wk-on');var pb=J('pubbar');if(pb)pb.classList.remove('on');if(PREVIEWING){PREVIEWING=false;J('writer').classList.add('on');lock(true)}renderShelf()}
 J('rdBack').onclick=closeReader;
 function vspan(n,t){return '<span class="vv" data-v="'+n+'"><span class="vn">'+n+'</span>'+t+'</span> '}
 function renderChapter(j,anchor){var vs=j.c[cur.c-1]||[];var h='<div class="rd-bkl">'+BOOKS[cur.b-1][0].toUpperCase()+'</div><div class="rd-num">'+cur.c+'</div><div>';
@@ -2626,6 +2675,7 @@ var pg=Math.max(1,Math.ceil(total/cur.step));
 while(pg>1&&(pg-1)*cur.step>=total)pg--;
 cur.pages=pg;cb&&cb()})}
 function gotoPage(p){if(p<0)p=0;if(p>cur.pages-1)p=cur.pages-1;cur.page=p;
+if(WMODE&&WKCUR&&!WKCUR.own&&!WKCUR.fin&&p>=cur.pages-1){WKCUR.fin=true;try{var _rk='deeds_wrd_'+WKCUR.id,_td=new Date().toISOString().slice(0,10);if(localStorage.getItem(_rk)!==_td){localStorage.setItem(_rk,_td);if(window.sb)sb.rpc('work_read',{w:WKCUR.id}).then(function(){}).catch(function(e){})}}catch(e){}}
 J('rdSlide').style.transform='translateX('+(-p*cur.step)+'px)';
 J('rdPg').textContent='PAGE '+(p+1)+' OF '+cur.pages}
 function gotoVerse(v){var el=J('rdCols').querySelector('.vv[data-v="'+v+'"]');if(!el){gotoPage(0);return}
@@ -2806,7 +2856,7 @@ if(window.closeSheets)closeSheets();if(window.toast)toast('POSTED.')})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('Could not post it: '+String(e&&e.message||e))})})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+String(e&&e.message||e))})},'image/jpeg',.88)};
 /* ---- the studies: notes, the writer, the library ---- */
-var WMODE=false,NOTES=null,NOTE_CUR=null,WLIB=null,MINE=null,WT=null,wtT=null,NCK='deeds_notecur';
+var WMODE=false,PREVIEWING=false,WKCUR=null,WCAT_SEL='',NOTES=null,NOTE_CUR=null,WLIB=null,MINE=null,WT=null,wtT=null,NCK='deeds_notecur';
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function vref(x){return refCaps(x.book||x.b,(x.chapter||x.c))+' : '+((x.v_start||x.s)===(x.v_end||x.e)?(x.v_start||x.s):(x.v_start||x.s)+'-'+(x.v_end||x.e))+' \u00B7 '+String(x.tr||'').toUpperCase()}
 function vtext(x,cb){var b=x.book||x.b,c=x.chapter||x.c,s=x.v_start||x.s,e=x.v_end||x.e;
@@ -2826,7 +2876,7 @@ if(NOTE_CUR){saveHL(NOTE_CUR);return}
 loadNotes(function(){openNoteSheet(function(n){saveHL(n)})})}
 function openNoteSheet(cb){var h='';(NOTES||[]).forEach(function(n){
 h+='<button class="nrow" data-np="'+n.id+'"><span class="nn">'+esc(n.title)+'</span><span class="nc">'+noteCount(n.id)+' SAVED'+(NOTE_CUR&&NOTE_CUR.id===n.id?' \u00B7 <b>OPEN</b>':'')+'</span></button>'});
-if(!h)h='<div class="wd-sub">No notes yet. Name the first one below.</div>';
+if(!h)h='<div class="wd-sub">No studies yet. Name the first one below.</div>';
 J('nsList').innerHTML=h;
 var rs=J('nsList').querySelectorAll('[data-np]');for(var i=0;i<rs.length;i++)rs[i].onclick=(function(id){return function(){var n=null;NOTES.forEach(function(x){if(x.id===id)n=x});setCur(n);if(window.closeSheets)closeSheets();cb&&cb(n)}})(rs[i].getAttribute('data-np'));
 J('nsMake').onclick=function(){var t=(J('nsNew').value||'').trim();if(!t){if(window.toast)toast('Name it first.');return}
@@ -2841,32 +2891,41 @@ function openNoteView(n){loadHLs(function(){var items=(HLROWS||[]).filter(functi
 J('nvTitle').textContent=n.title+'.';
 J('nvMeta').textContent=items.length+' SAVED \u00B7 TAP A REFERENCE TO READ';
 var h='';items.forEach(function(x,i){h+='<div class="nv-r"><button class="rf" data-go="'+i+'">'+vref(x)+'</button><div class="tx" data-tx="'+i+'">\u2026</div><button class="rm" data-rm="'+x.id+'">Remove.</button></div>'});
-if(!h)h='<div class="wd-sub">Nothing saved here yet. Tap Note. on a verse while you read.</div>';
+if(!h)h='<div class="wd-sub">Nothing saved here yet. Tap Study. on a verse while you read.</div>';
 J('nvList').innerHTML=h;
 items.forEach(function(x,i){vtext(x,function(t){var el=J('nvList').querySelector('[data-tx="'+i+'"]');if(el)el.textContent=t||''})});
 var gs=J('nvList').querySelectorAll('[data-go]');for(var i2=0;i2<gs.length;i2++)gs[i2].onclick=(function(x){return function(){if(window.closeSheets)closeSheets();TR=x.tr;openReader(x.book,x.chapter,x.v_start)}})(items[+gs[i2].getAttribute('data-go')]);
 var rms=J('nvList').querySelectorAll('[data-rm]');for(var i3=0;i3<rms.length;i3++)rms[i3].onclick=(function(id){return function(){var row=null;(HLROWS||[]).forEach(function(hh){if(hh.id===id)row=hh});if(row)removeHL(row);setTimeout(function(){openNoteView(n)},400)}})(rms[i3].getAttribute('data-rm'));
 J('nvOpen').onclick=function(){setCur(n);if(window.toast)toast('OPEN \u00B7 '+String(n.title).toUpperCase())};
 J('nvWrite').onclick=function(){if(window.closeSheets)closeSheets();openWriter(null,items)};
-J('nvDel').textContent='Delete the Note.';
+J('nvDel').textContent='Delete the Study.';
 J('nvDel').onclick=function(){if(J('nvDel').textContent!=='Tap Again to Delete.'){J('nvDel').textContent='Tap Again to Delete.';return}
 sb.from('notebooks').delete().eq('id',n.id).then(function(){NOTES=(NOTES||[]).filter(function(x){return x.id!==n.id});
 (HLROWS||[]).forEach(function(h){if(h.note_id===n.id)h.note_id=null});
 if(NOTE_CUR&&NOTE_CUR.id===n.id)setCur(null);
-if(window.closeSheets)closeSheets();renderNL();if(window.toast)toast('Note deleted. The marks stay.')}).catch(function(e){})};
+if(window.closeSheets)closeSheets();renderNL();if(window.toast)toast('Study deleted. The marks stay.')}).catch(function(e){})};
 if(window.sheet)sheet('#noteview')})}
 /* ---- the writer ---- */
+var WCATS=['Faith','Generosity','Service','Community','Family','Gratitude','Testimony','Purpose'];
+function kindLabel(k){return k==='book'?'A BOOK':'EDITORIAL'}
+function paintKind(){if(!WT)return;
+J('wtKE').classList.toggle('on',WT.kind!=='book');J('wtKB').classList.toggle('on',WT.kind==='book');
+var h='';WCATS.forEach(function(c){h+='<button class="lchip'+(WT.category===c?' on':'')+'" data-wc="'+c+'">'+c+'.</button>'});
+J('wtCats').innerHTML=h;
+var cs=J('wtCats').querySelectorAll('[data-wc]');for(var i=0;i<cs.length;i++)(function(b){b.onclick=function(){var c=b.getAttribute('data-wc');WT.category=WT.category===c?null:c;paintKind();touched()}})(cs[i]);
+J('wtStat').textContent=WT.status==='published'?'PUBLIC.':'PRIVATE.'}
 function nb(){return{id:'b'+Date.now()+Math.random().toString(36).slice(2,6)}}
 function openWriter(work,seed){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}
 WT=work?JSON.parse(JSON.stringify(work)):{id:null,title:'',status:'draft',cover:{cw:'ivory',img:null},blocks:[]};
 if(!WT.cover)WT.cover={cw:'ivory',img:null};
+if(!WT.kind)WT.kind='editorial';
 if(seed&&seed.length){seed.forEach(function(x){var b=nb();b.t='v';b.tr=x.tr;b.b=x.book;b.c=x.chapter;b.s=x.v_start;b.e=x.v_end;WT.blocks.push(b)});
 var p=nb();p.t='p';p.tx='';WT.blocks.push(p)}
 J('wtTitle').value=WT.title||'';
 J('wtIvory').classList.toggle('on',WT.cover.cw!=='forest');
 J('wtForest').classList.toggle('on',WT.cover.cw==='forest');
 J('wtSv').textContent=WT.id?'SAVED.':'';
-J('wtPub').textContent=WT.status==='published'?'Republish.':'Publish.';
+J('wtPub').textContent='Preview.';paintKind();
 drawWtCover();renderBlocks();
 J('writer').classList.add('on');lock(true)}
 function closeWriter(){J('writer').classList.remove('on');lock(false);renderNL()}
@@ -2878,13 +2937,15 @@ function touched(){J('wtSv').textContent='SAVING\u2026';clearTimeout(wtT);wtT=se
 function saveWork(cb){if(!WT){cb&&cb();return}
 WT.title=(J('wtTitle').value||'').trim();
 if(!WT.title&&!WT.blocks.length){cb&&cb();return}
-var pay={profile_id:PROFILE.id,title:WT.title||'Untitled.',status:WT.status,cover:WT.cover,blocks:WT.blocks,updated_at:new Date().toISOString()};
+var pay={profile_id:PROFILE.id,title:WT.title||'Untitled.',kind:WT.kind||'editorial',category:WT.category||null,status:WT.status,cover:WT.cover,blocks:WT.blocks,updated_at:new Date().toISOString()};
 var q=WT.id?sb.from('works').update(pay).eq('id',WT.id).select().single():sb.from('works').insert(pay).select().single();
 q.then(function(r){if(r.error){J('wtSv').textContent='NOT SAVED \u00B7 '+r.error.message;cb&&cb();return}
 WT.id=r.data.id;MINE=null;J('wtSv').textContent='SAVED.';cb&&cb()}).catch(function(e){J('wtSv').textContent='NOT SAVED.';cb&&cb()})}
 J('wtTitle').oninput=touched;
 J('wtIvory').onclick=function(){WT.cover.cw='ivory';J('wtIvory').classList.add('on');J('wtForest').classList.remove('on');touched()};
 J('wtForest').onclick=function(){WT.cover.cw='forest';J('wtForest').classList.add('on');J('wtIvory').classList.remove('on');touched()};
+J('wtKE').onclick=function(){WT.kind='editorial';paintKind();touched()};
+J('wtKB').onclick=function(){WT.kind='book';paintKind();touched()};
 var wtFileMode='cover',wtImgBlk=null;
 J('wtImg').onclick=function(){wtFileMode='cover';J('wtFile').click()};
 J('wtFile').onchange=function(){var f=J('wtFile').files[0];J('wtFile').value='';if(!f)return;
@@ -2928,27 +2989,34 @@ else if(t==='v'){loadNotes(function(){loadHLs(function(){openVerseSheet()})})}})
 function openVerseSheet(){var items=(HLROWS||[]).slice();
 var h='';items.forEach(function(x,i){var nm='';(NOTES||[]).forEach(function(n){if(n.id===x.note_id)nm=n.title});
 h+='<div class="nv-r"><button class="rf" data-vi="'+i+'">'+vref(x)+(nm?' \u00B7 '+esc(nm).toUpperCase():'')+'</button><div class="tx" data-vx="'+i+'">\u2026</div></div>'});
-if(!h)h='<div class="wd-sub">Nothing noted yet. Tap Note. on verses while you read, then come back.</div>';
+if(!h)h='<div class="wd-sub">Nothing saved yet. Tap Study. on verses while you read, then come back.</div>';
 J('vsList').innerHTML=h;
 items.forEach(function(x,i){vtext(x,function(t){var el=J('vsList').querySelector('[data-vx="'+i+'"]');if(el)el.textContent=t||''})});
 var vs=J('vsList').querySelectorAll('[data-vi]');for(var i=0;i<vs.length;i++)vs[i].onclick=(function(x){return function(){
 var b=nb();b.t='v';b.tr=x.tr;b.b=x.book;b.c=x.chapter;b.s=x.v_start;b.e=x.v_end;WT.blocks.push(b);
 if(window.closeSheets)closeSheets();renderBlocks();touched()}})(items[+vs[i].getAttribute('data-vi')]);
 if(window.sheet)sheet('#versesheet')}
-J('wtPub').onclick=function(){WT.title=(J('wtTitle').value||'').trim();
+function publishNow(b){WT.title=(J('wtTitle').value||'').trim();
 if(!WT.title){if(window.toast)toast('Give it a title first.');return}
 if(!WT.blocks.length){if(window.toast)toast('Write something first.');return}
-WT.status='published';var b=J('wtPub');b.textContent='PUBLISHING\u2026';
-saveWork(function(){if(!WT.id){b.textContent='Publish.';return}
+WT.status='published';b.textContent='PUBLISHING\u2026';
+saveWork(function(){if(!WT.id){b.textContent='PUBLISH.';return}
 sb.from('works').update({published_at:new Date().toISOString()}).eq('id',WT.id).then(function(){}).catch(function(e){});
 drawCoverCv(function(bl){if(!bl){b.textContent='Republish.';finishPub();return}
 var path=PROFILE.id+'/'+Date.now()+'-cover.jpg';
 sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r.error){finishPub();return}
-sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+' \u00B7 a study on DEEDS \u00B7 deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
+sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+(WT.kind==='book'?' \u00B7 a book on DEEDS \u00B7 ':' \u00B7 an editorial on DEEDS \u00B7 ')+'deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
 if(!q.error&&window.prependLive&&window.markKind)prependLive(markKind(q.data,'post'));
 finishPub()}).catch(function(e){finishPub()})}).catch(function(e){finishPub()})})});
-function finishPub(){b.textContent='Republish.';WLIB=null;MINE=null;if(window.toast)toast('PUBLISHED.');closeWriter()}};
+function finishPub(){b.textContent='PUBLISH.';WLIB=null;MINE=null;if(window.toast)toast('PUBLISHED. It is on the shelf.');
+PREVIEWING=false;var pb=J('pubbar');if(pb)pb.classList.remove('on');
+if(J('reader').classList.contains('on'))closeReader();closeWriter()}}
+J('wtPub').onclick=function(){WT.title=(J('wtTitle').value||'').trim();
+if(!WT.title&&!WT.blocks.length){if(window.toast)toast('Write something first.');return}
+saveWork(function(){if(!WT.id){if(window.toast)toast('Could not save it yet.');return}
+PREVIEWING=true;J('writer').classList.remove('on');openWork(WT.id)})};
+J('pubGo').onclick=function(){publishNow(J('pubGo'))};
 function drawCoverCv(cb){var cv=J('cardcv'),ctx=cv.getContext('2d');var W=1080,H=1350,M=96;
 var iv=WT.cover.cw!=='forest';
 var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
@@ -2958,7 +3026,7 @@ if(img){var s=Math.max(W/img.width,620/img.height);var dw=img.width*s,dh=img.hei
 ctx.drawImage(img,(W-dw)/2,0,dw,dh>620?620:dh);ty=700;
 ctx.fillStyle=bg;ctx.fillRect(0,620,W,H-620)}
 ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
-spaced(ctx,'A STUDY \u00B7 '+(PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'DEEDS'),M,img?680:152,8);
+spaced(ctx,kindLabel(WT.kind)+' \u00B7 '+(PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'DEEDS'),M,img?680:152,8);
 var fit=wrapFit(ctx,WT.title,W-2*M,360,72,40,1.2);
 ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px Georgia,"Times New Roman",serif';
 fit.lines.forEach(function(L,i){ctx.fillText(L,M,ty+i*fit.size*1.2)});
@@ -2976,27 +3044,37 @@ im.src=(u&&u.data?u.data.publicUrl:'')}else paint(null)}
 /* ---- the library + your works ---- */
 function loadLib(cb){if(WLIB){cb&&cb();return}
 if(!window.sb){WLIB=[];cb&&cb();return}
-sb.from('works').select('id,title,kind,cover,read_count,published_at,profiles(handle)').eq('status','published').order('published_at',{ascending:false}).limit(24).then(function(r){
+sb.from('works').select('id,title,kind,category,cover,read_count,view_count,published_at,profiles(handle)').eq('status','published').order('published_at',{ascending:false}).limit(24).then(function(r){
 WLIB=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){WLIB=[];cb&&cb()})}
 function loadMine(cb){if(MINE){cb&&cb();return}
 if(!window.sb||!window.PROFILE){MINE=[];cb&&cb();return}
-sb.from('works').select('id,title,status,cover,blocks,read_count,published_at').eq('profile_id',PROFILE.id).order('updated_at',{ascending:false}).limit(24).then(function(r){
+sb.from('works').select('id,title,kind,category,status,cover,blocks,read_count,view_count,published_at').eq('profile_id',PROFILE.id).order('updated_at',{ascending:false}).limit(24).then(function(r){
 MINE=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){MINE=[];cb&&cb()})}
 function renderNL(){var pg=J('pg-read');if(!pg)return;
 if(window.PROFILE){loadNotes(function(){loadHLs(function(){var h='';(NOTES||[]).forEach(function(n){
 h+='<button class="nrow" data-nv="'+n.id+'"><span class="nn">'+esc(n.title)+'</span><span class="nc">'+noteCount(n.id)+' SAVED'+(NOTE_CUR&&NOTE_CUR.id===n.id?' \u00B7 <b>OPEN</b>':'')+'</span></button>'});
-if(!h)h='<div class="wd-sub">Name a note, then tap Note. on any verse to fill it.</div>';
+if(!h)h='<div class="wd-sub">Name a study, then tap Study. on any verse to fill it.</div>';
 J('wdNotes').innerHTML=h;
 var rs=J('wdNotes').querySelectorAll('[data-nv]');for(var i=0;i<rs.length;i++)rs[i].onclick=(function(id){return function(){var n=null;(NOTES||[]).forEach(function(x){if(x.id===id)n=x});if(n)openNoteView(n)}})(rs[i].getAttribute('data-nv'))})})}
-else J('wdNotes').innerHTML='<div class="wd-sub">Notes live on your profile. Join free to keep them.</div>';
-loadLib(function(){var h='';(WLIB||[]).forEach(function(w,i){var fo=w.cover&&w.cover.cw==='forest';
+else J('wdNotes').innerHTML='<div class="wd-sub">Studies live on your profile. Join free to keep them.</div>';
+loadLib(function(){function tile(w){var fo=w.cover&&w.cover.cw==='forest';
 var img='';if(w.cover&&w.cover.img&&window.sb){var u=sb.storage.from('media').getPublicUrl(w.cover.img);img='<img class="li" src="'+esc(u&&u.data?u.data.publicUrl:'')+'" alt="">'}
-h+='<button class="lcov '+(fo?'fo':'iv')+'" data-wo="'+w.id+'">'+img+'<div><div class="lm">A STUDY \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+'</div><div class="lt">'+esc(w.title)+'</div><div class="lm" style="margin-top:8px">'+(w.read_count||0)+' READERS.</div></div></button>'});
-if(!h)h='<div class="wd-sub" style="grid-column:1/-1">The shelf is waiting for its first study. Tap Write.</div>';
+return '<button class="lcov '+(fo?'fo':'iv')+'" data-wo="'+w.id+'">'+img+'<div><div class="lm">'+kindLabel(w.kind)+' \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+(w.category?' \u00B7 '+esc(String(w.category).toUpperCase()):'')+'</div><div class="lt">'+esc(w.title)+'</div><div class="lm" style="margin-top:8px">'+(w.read_count||0)+' READS.</div></div></button>'}
+var bks=(WLIB||[]).filter(function(w){return w.kind==='book'});
+var eds=(WLIB||[]).filter(function(w){return w.kind!=='book'&&(!WCAT_SEL||w.category===WCAT_SEL)});
+var bw=J('wdBWSec');if(bw)bw.style.display=bks.length?'flex':'none';
+var bg='';bks.forEach(function(w){bg+=tile(w)});J('wdBookWorks').innerHTML=bg;
+var ch='<button class="lchip'+(WCAT_SEL?'':' on')+'" data-lc="">All.</button>';
+WCATS.forEach(function(c){ch+='<button class="lchip'+(WCAT_SEL===c?' on':'')+'" data-lc="'+c+'">'+c+'.</button>'});
+J('wdCats').innerHTML=ch;
+var chs=J('wdCats').querySelectorAll('[data-lc]');for(var i0=0;i0<chs.length;i0++)(function(b){b.onclick=function(){WCAT_SEL=b.getAttribute('data-lc');renderNL()}})(chs[i0]);
+var h='';eds.forEach(function(w){h+=tile(w)});
+if(!h)h='<div class="wd-sub" style="grid-column:1/-1">'+(WCAT_SEL?'Nothing in '+esc(WCAT_SEL)+' yet.':'The shelf is waiting for its first editorial. Tap Write. on your profile.')+'</div>';
 J('wdLib').innerHTML=h;
-var ws=J('wdLib').querySelectorAll('[data-wo]');for(var i=0;i<ws.length;i++)ws[i].onclick=(function(id){return function(){openWork(id)}})(ws[i].getAttribute('data-wo'))});
+var all=[].concat(Array.prototype.slice.call(J('wdLib').querySelectorAll('[data-wo]')),Array.prototype.slice.call(J('wdBookWorks').querySelectorAll('[data-wo]')));
+for(var i=0;i<all.length;i++)all[i].onclick=(function(id){return function(){openWork(id)}})(all[i].getAttribute('data-wo'))});
 if(window.PROFILE){loadMine(function(){var h='';(MINE||[]).forEach(function(w){
-h+='<button class="nrow" data-me="'+w.id+'"><span class="nn">'+esc(w.title)+'</span><span class="nc">'+(w.status==='published'?((w.read_count||0)+' READERS'):'DRAFT')+' \u00B7 EDIT</span></button>'});
+h+='<button class="nrow" data-me="'+w.id+'"><span class="nn">'+esc(w.title)+'</span><span class="nc">'+(w.status==='published'?((w.read_count||0)+' READS \u00B7 '+(w.view_count||0)+' VIEWS'):'PRIVATE')+' \u00B7 EDIT</span></button>'});
 J('wdMine').innerHTML=h;
 var ms=J('wdMine').querySelectorAll('[data-me]');for(var i=0;i<ms.length;i++)ms[i].onclick=(function(id){return function(){var w=null;(MINE||[]).forEach(function(x){if(x.id===id)w=x});if(w)openWriter(w,null)}})(ms[i].getAttribute('data-me'))})}
 else J('wdMine').innerHTML=''}
@@ -3010,16 +3088,17 @@ J('reader').classList.add('on');lock(true);
 J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
 J('rdPill').textContent=String(w.title||'A STUDY').toUpperCase().slice(0,26);
 var own=window.PROFILE&&PROFILE.id===w.profile_id;
+WKCUR={id:w.id,own:own,fin:false};
 var gk='deeds_wr_'+w.id,today=new Date().toISOString().slice(0,10),seen='';
 try{seen=localStorage.getItem(gk)||''}catch(e){}
 if(!own&&seen!==today){try{localStorage.setItem(gk,today)}catch(e){}
-sb.rpc('work_read',{w:w.id}).then(function(){}).catch(function(e){});w.read_count=(w.read_count||0)+1}
+sb.rpc('work_view',{w:w.id}).then(function(){}).catch(function(e){});w.view_count=(w.view_count||0)+1}
 var vbs=(w.blocks||[]).filter(function(b){return b.t==='v'});
 var need={};vbs.forEach(function(b){need[b.tr+':'+b.b]=b});
 var keys=Object.keys(need),left=keys.length;
 function build(){var h='<div class="wk-cv">';
 if(w.cover&&w.cover.img){var u=sb.storage.from('media').getPublicUrl(w.cover.img);h+='<img src="'+esc(u&&u.data?u.data.publicUrl:'')+'" alt="">'}
-h+='<div class="mc">A STUDY \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+' \u00B7 '+(w.read_count||0)+' READERS</div><div class="tt">'+esc(w.title)+'</div><div class="by">FREE ON DEEDS \u00B7 '+String(w.published_at||w.created_at||'').slice(0,10)+'</div></div>';
+h+='<div class="mc">'+kindLabel(w.kind)+' \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+(w.category?' \u00B7 '+esc(String(w.category).toUpperCase()):'')+' \u00B7 '+(w.read_count||0)+' READS \u00B7 '+(w.view_count||0)+' VIEWS</div><div class="tt">'+esc(w.title)+'</div><div class="by">FREE ON DEEDS \u00B7 '+String(w.published_at||w.created_at||'').slice(0,10)+'</div></div>';
 (w.blocks||[]).forEach(function(b){
 if(b.t==='p'&&b.tx)h+='<p class="wk-p">'+esc(b.tx).replace(/\n/g,'<br>')+'</p>';
 else if(b.t==='q'&&b.tx)h+='<div class="wk-q">'+esc(b.tx)+'</div>';
@@ -3031,6 +3110,7 @@ else if(b.t==='a'&&b.u)h+='<a class="wk-a" href="'+esc(b.u)+'" target="_blank" r
 h+='<div class="rd-end"><button class="wbtn ghost" id="wkDone">Close the Study.</button></div>';
 J('rdLoad').style.display='none';J('rdCols').innerHTML=h;
 var d=J('wkDone');if(d)d.onclick=closeReader;
+var pb=J('pubbar');if(pb){pb.classList.toggle('on',PREVIEWING&&own);var pg2=J('pubGo');if(pg2)pg2.textContent=w.status==='published'?'REPUBLISH.':'PUBLISH.'}
 layout(function(){gotoPage(0)})}
 if(!left)build();
 else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;if(!left)build()})})}).catch(function(e){if(window.toast)toast('That study could not open.')})}
