@@ -337,6 +337,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .joinbtn{border:1.5px solid var(--forest);background:none;color:var(--forest);font-weight:800;font-size:11px;letter-spacing:.12em;padding:7px 12px;border-radius:999px;cursor:pointer}
 .leaveorg{border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-decoration:underline;cursor:pointer;padding:0}
 /* ============ THE WORD (reader) ============ */
+#pg-read{padding:24px 18px 8px}
 .wd-title{font-weight:800;font-size:34px;letter-spacing:-.01em;margin:2px 0 2px}
 .wd-sub{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:16px}
 .wdcard{border:1px solid var(--line);border-radius:18px;padding:16px;background:rgba(255,255,255,.5);margin-bottom:14px}
@@ -349,7 +350,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .wd-sec{margin:20px 0 8px;display:flex;align-items:baseline;justify-content:space-between}
 .wd-sec .micro{color:var(--forest)}
 .wd-sec .mono{font-size:11px;color:var(--muted)}
-.frail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:4px 20px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.frail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:4px 18px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .frail::-webkit-scrollbar{display:none}
 .fcard{flex:0 0 172px;scroll-snap-align:start;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;background:rgba(255,255,255,.5);text-align:left}
 .fcard .fn{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;color:var(--sage)}
@@ -2426,10 +2427,15 @@ function trUC(){return TR.toUpperCase()}
 function b2f(b,c){return CUM[b-1]+(c-1)}
 function f2b(f){for(var i=65;i>=0;i--){if(f>=CUM[i])return[i+1,f-CUM[i]+1]}return[1,1]}
 /* ---- fetch ---- */
+var VOL={},VREQ={};
 function getBook(tr,b,cb){var kk=tr+':'+b;if(CACHE[kk]){cb(CACHE[kk],null);return}
-fetch('bible/'+tr+'/'+b+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-.then(function(j){CACHE[kk]=j;cb(j,null)})
-.catch(function(e){cb(null,String(e&&e.message||e))})}
+if(VOL[tr]){var j=VOL[tr][b];if(j){CACHE[kk]=j;cb(j,null)}else{cb(null,'Missing book '+b)}return}
+if(VREQ[tr]){VREQ[tr].push([b,cb]);return}
+VREQ[tr]=[[b,cb]];
+fetch('bible-'+tr+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+.then(function(arr){var m={};for(var i=0;i<arr.length;i++)m[arr[i].n]=arr[i];VOL[tr]=m;
+var q=VREQ[tr];VREQ[tr]=null;for(var k=0;k<q.length;k++)getBook(tr,q[k][0],q[k][1])})
+.catch(function(e){var q=VREQ[tr]||[];VREQ[tr]=null;var msg=String(e&&e.message||e);for(var k=0;k<q.length;k++)q[k][1](null,msg)})}
 /* ---- daily plan ---- */
 var REPOCH=Date.UTC(2026,7,10);
 function dayN(){var n=new Date();var loc=Date.UTC(n.getFullYear(),n.getMonth(),n.getDate());var d=Math.floor((loc-REPOCH)/864e5)+1;return d<1?1:d}
@@ -2678,7 +2684,7 @@ if(window.closeSheets)closeSheets();if(window.toast)toast('POSTED.')})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('Could not post it: '+String(e&&e.message||e))})})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+String(e&&e.message||e))})},'image/jpeg',.88)};
 /* ---- nav hook ---- */
-if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read')renderShelf()}}
+if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}}}
 renderShelf();
 })();
 </script>
