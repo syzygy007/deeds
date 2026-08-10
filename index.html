@@ -2670,9 +2670,17 @@ J('ccIvory').classList.add('on');J('ccForest').classList.remove('on');drawCard()
 J('ccForest').onclick=function(){CW='forest';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
 J('ccForest').classList.add('on');J('ccIvory').classList.remove('on');drawCard()};
 J('ccSave').onclick=function(){var cv=J('cardcv');
-cv.toBlob(function(bl){if(!bl)return;var a=document.createElement('a');
-a.href=URL.createObjectURL(bl);a.download='deeds-'+CARD.ref.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.jpg';
-document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)},'image/jpeg',.9)};
+cv.toBlob(function(bl){if(!bl)return;
+var nm='deeds-'+CARD.ref.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.jpg';
+function dl(){var a=document.createElement('a');
+a.href=URL.createObjectURL(bl);a.download=nm;
+document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)}
+var fl=null;try{fl=new File([bl],nm,{type:'image/jpeg'})}catch(e){}
+if(fl&&navigator.share&&navigator.canShare&&navigator.canShare({files:[fl]})){
+navigator.share({files:[fl]}).catch(function(err){if(!err||err.name!=='AbortError')dl()});return}
+dl()},'image/jpeg',.9)};
+try{var _tf=new File([''],'t.jpg',{type:'image/jpeg'});
+if(navigator.share&&navigator.canShare&&navigator.canShare({files:[_tf]}))J('ccSave').textContent='Share It.'}catch(e){}
 J('ccPost').onclick=function(){if(!window.sb||!window.PROFILE){if(window.closeSheets)closeSheets();if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
 var b=J('ccPost');b.textContent='POSTING\u2026';
 J('cardcv').toBlob(function(bl){if(!bl){b.textContent='Post It.';return}
