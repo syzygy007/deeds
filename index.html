@@ -345,6 +345,54 @@ input,textarea{font:inherit;color:var(--ink)}
 .wd-port{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
 .wchip{border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--ink);background:none}
 .wchip.done{background:var(--forest);border-color:var(--forest);color:var(--ivory)}.fcard.done{border-color:var(--forest);background:rgba(31,75,58,.07)}.fcard.done .fn{color:var(--forest)}.fo-r.rd{opacity:.55}
+#writer{position:fixed;inset:0;z-index:120;background:var(--ivory);display:none;flex-direction:column}
+#writer.on{display:flex}
+.wt-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.wt-x{font-weight:800;font-size:13px;color:var(--muted)}
+.wt-sv{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);letter-spacing:.08em}
+.wt-scroll{flex:1;overflow-y:auto;padding:18px 18px 130px;-webkit-overflow-scrolling:touch}
+.wt-title{width:100%;border:0;background:none;font-family:Georgia,"Times New Roman",serif;font-size:30px;color:var(--ink);padding:6px 0}
+.wt-blk{position:relative;margin:16px 0}
+.wt-blk textarea{width:100%;border:0;background:none;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.62;color:var(--ink);resize:none;min-height:52px;display:block}
+.wt-blk.q textarea{font-style:italic;font-size:21px}
+.wt-vq{border-left:3px solid var(--forest);padding:4px 0 4px 14px;font-family:Georgia,"Times New Roman",serif;font-size:16px;line-height:1.6;color:var(--ink)}
+.wt-vr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--forest);letter-spacing:.08em;margin-top:6px}
+.wt-a input{width:100%;border:0;border-bottom:1px solid var(--line);background:none;font-size:14px;padding:8px 0;color:var(--ink)}
+.wt-blk img{width:100%;border-radius:14px;display:block}
+.wt-ct{position:absolute;top:-10px;right:0;display:flex;gap:10px}
+.wt-ct button{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.05em}
+.wt-add{position:fixed;left:14px;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--ink);border-radius:16px;padding:10px 12px;display:none;gap:6px;justify-content:space-between;z-index:125;box-shadow:0 18px 44px rgba(21,19,14,.3)}
+#writer.on ~ .wt-add,#writer.on .wt-add{display:flex}
+.wt-add button{color:var(--ivory);font-weight:800;font-size:11px;letter-spacing:.04em}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lcov{border-radius:16px;padding:14px;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;border:1px solid var(--line);overflow:hidden}
+.lcov.iv{background:#F6F3EB}.lcov.fo{background:var(--forest);border-color:var(--forest)}
+.lcov .li{width:calc(100% + 28px);margin:-14px -14px 10px;height:76px;object-fit:cover;display:block}
+.lcov .lm{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;letter-spacing:.08em;margin-bottom:6px}
+.lcov.iv .lm{color:var(--forest)}.lcov.fo .lm{color:#A0B0A4}
+.lcov .lt{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.25}
+.lcov.iv .lt{color:var(--ink)}.lcov.fo .lt{color:var(--ivory)}
+.nrow{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 2px;border-bottom:1px solid var(--line);text-align:left}
+.nrow .nn{font-weight:800;font-size:14px;color:var(--ink)}
+.nrow .nc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);letter-spacing:.06em}
+.nrow .nc b{color:var(--forest)}
+.nv-r{padding:10px 2px;border-bottom:1px solid var(--line)}
+.nv-r .rf{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--forest);letter-spacing:.08em}
+.nv-r .tx{font-family:Georgia,"Times New Roman",serif;font-size:14px;color:var(--ink);line-height:1.5;margin-top:4px}
+.nv-r .rm{font-size:10px;font-weight:800;color:var(--muted);margin-top:6px}
+.wk-cv{margin-bottom:26px;break-inside:avoid}
+.wk-cv .mc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.1em;color:var(--forest);margin-bottom:14px}
+.wk-cv .tt{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.15;color:var(--ink)}
+.wk-cv .by{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.08em;color:var(--muted);margin-top:12px}
+.wk-cv img{width:100%;border-radius:12px;margin-bottom:16px}
+.wk-p{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.66;margin:0 0 16px;color:var(--ink)}
+.wk-v{border-left:3px solid var(--forest);padding:2px 0 2px 14px;margin:0 0 16px;break-inside:avoid}
+.wk-v .t{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.6;color:var(--ink)}
+.wk-v .r{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--forest);letter-spacing:.08em;margin-top:6px}
+.wk-q{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:22px;line-height:1.5;margin:0 0 18px;color:var(--ink)}
+.wk-img{width:100%;border-radius:12px;margin:0 0 16px;break-inside:avoid;display:block}
+.wk-a{display:block;font-size:13px;font-weight:800;color:var(--forest);margin:0 0 16px}
+body.wk-on #rdTr,body.wk-on #rd40,body.wk-on #rdMark{display:none}
 .wd-modes{display:flex;gap:8px;align-items:center}
 .wd-modes .lbl{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--muted);text-transform:uppercase;margin-right:2px}
 .wd-sec{margin:20px 0 8px;display:flex;align-items:baseline;justify-content:space-between}
@@ -528,6 +576,12 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="frail" id="wdRail"></div>
       <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
       <div id="wdBooks"></div>
+      <div class="wd-sec"><div class="micro">The Notes</div><button class="mono" id="wdNoteNew" style="color:var(--forest)">New Note.</button></div>
+      <div id="wdNotes"></div>
+      <div class="wd-sec"><div class="micro">The Library</div><button class="mono" id="wdWrite" style="color:var(--forest)">Write.</button></div>
+      <div class="wd-sub" style="margin-bottom:8px">Studies and editorials by the readers. Free to read.</div>
+      <div class="lgrid" id="wdLib"></div>
+      <div id="wdMine"></div>
       <div class="wd-stat" id="wdStat"></div>
       <button class="wbtn ghost" id="wdShare" style="margin:6px 0 2px">Share the Progress.</button>
     </div>
@@ -691,6 +745,17 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     </div>
   </div>
 </div>
+<div id="writer">
+  <div class="wt-top"><button class="wt-x" id="wtClose">Close.</button><span class="wt-sv" id="wtSv"></span><button class="wbtn" id="wtPub">Publish.</button></div>
+  <div class="wt-scroll">
+    <input class="wt-title" id="wtTitle" placeholder="The title.">
+    <div class="logrow" style="margin:8px 0 6px"><button class="lchip on" id="wtIvory">Ivory.</button><button class="lchip" id="wtForest">Forest.</button><button class="lchip" id="wtImg">Cover Image.</button></div>
+    <div id="wtCover"></div>
+    <div id="wtBlocks"></div>
+  </div>
+  <div class="wt-add"><button data-ab="p">Paragraph.</button><button data-ab="v">Scripture.</button><button data-ab="img">Image.</button><button data-ab="q">Quote.</button><button data-ab="a">Link.</button></div>
+  <input type="file" id="wtFile" accept="image/*" style="display:none">
+</div>
 <div class="vbar" id="vbar">
   <button id="vbCard" class="em">Share.</button>
   <button id="vbHl">Note.</button>
@@ -713,6 +778,29 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <canvas id="cardcv" width="1080" height="1350"></canvas>
   <div class="logrow"><button class="lchip on" id="ccIvory">Ivory.</button><button class="lchip" id="ccForest">Forest.</button></div>
   <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="ccSave">Save the Image.</button><button class="wbtn" id="ccPost">Post It.</button></div>
+</div>
+
+<div class="sheet" id="notepick">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>The Note.</h3>
+  <div id="nsList"></div>
+  <div class="logrow" style="margin-top:12px"><input class="chfield" id="nsNew" placeholder="Name a new note." style="flex:1"><button class="wbtn" id="nsMake">Make It.</button></div>
+  <button class="wbtn ghost" id="nsSkip" style="margin-top:10px">Just Mark It.</button>
+</div>
+
+<div class="sheet" id="noteview">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3 id="nvTitle">The Note.</h3>
+  <div class="micro" id="nvMeta" style="margin-bottom:6px"></div>
+  <div id="nvList"></div>
+  <div class="logrow" style="margin-top:14px"><button class="wbtn ghost" id="nvOpen">Open this Note.</button><button class="wbtn" id="nvWrite">Write from It.</button></div>
+  <button class="mono" id="nvDel" style="color:var(--muted);margin-top:12px">Delete the Note.</button>
+</div>
+
+<div class="sheet" id="versesheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>From the Notes.</h3>
+  <div id="vsList"></div>
 </div>
 
 <div class="sheet" id="logsheet">
@@ -2469,19 +2557,19 @@ if(window.toast)toast(refCaps(b,c)+' \u00B7 READ.');paintMark();renderShelf()}
 /* ---- highlights ---- */
 function loadHLs(cb){if(HLROWS){cb&&cb();return}
 if(!window.sb||!window.PROFILE){HLROWS=[];cb&&cb();return}
-sb.from('highlights').select('id,tr,book,chapter,v_start,v_end').then(function(r){
+sb.from('highlights').select('id,tr,book,chapter,v_start,v_end,note_id').then(function(r){
 HLROWS=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){HLROWS=[];cb&&cb()})}
 function hlFor(b,c){var out=[];(HLROWS||[]).forEach(function(h){if(h.tr===TR&&h.book===b&&h.chapter===c)out.push(h)});return out}
 function paintHLs(){var rows=hlFor(cur.b,cur.c);var m={};rows.forEach(function(h){for(var v=h.v_start;v<=h.v_end;v++)m[v]=1});
 var vs=J('rdCols').querySelectorAll('.vv');for(var i=0;i<vs.length;i++){var v=+vs[i].getAttribute('data-v');vs[i].classList.toggle('hl',!!m[v])}}
 function runsOf(sel){var vs=[];for(var k in sel)vs.push(+k);vs.sort(function(a,b){return a-b});
 var runs=[];vs.forEach(function(v){var L=runs[runs.length-1];if(L&&v===L[1]+1)L[1]=v;else runs.push([v,v])});return runs}
-function saveHL(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
+function saveHL(note){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
 var runs=runsOf(SEL);if(!runs.length)return;
-var rows=runs.map(function(r){return{profile_id:PROFILE.id,tr:TR,book:cur.b,chapter:cur.c,v_start:r[0],v_end:r[1]}});
+var rows=runs.map(function(r){return{profile_id:PROFILE.id,tr:TR,book:cur.b,chapter:cur.c,v_start:r[0],v_end:r[1],note_id:note?note.id:null}});
 sb.from('highlights').insert(rows).select().then(function(r){
 if(r.error){if(window.toast)toast('Could not save it: '+r.error.message);return}
-HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast('NOTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
+HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast(note?('NOTED \u00B7 '+String(note.title).toUpperCase()):'NOTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
 function removeHL(row){if(!window.sb||!row)return;
 sb.from('highlights').delete().eq('id',row.id).then(function(r){
 if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
@@ -2501,7 +2589,7 @@ if(hlMode){hlMode=null}
 if(SEL[v]){delete SEL[v];el.classList.remove('sel')}else{SEL[v]=1;el.classList.add('sel')}
 vbarSync()});
 J('vbClear').onclick=function(){clearSel()};
-J('vbHl').onclick=function(){if(hlMode){removeHL(hlMode)}else{saveHL()}};
+J('vbHl').onclick=function(){if(hlMode){removeHL(hlMode)}else{noteTap()}};
 J('vbCard').onclick=function(){var has=hlMode?[[hlMode.v_start,hlMode.v_end]]:runsOf(SEL);if(!has.length)return;openCard(has)};
 /* ---- reader ---- */
 function lock(on){document.body.classList.toggle('rd-lock',on)}
@@ -2514,7 +2602,7 @@ loadHLs(function(){
 getBook(TR,b,function(j,err){J('rdLoad').style.display='none';
 if(err){J('rdCols').innerHTML='<div style="font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:13px;color:var(--muted);padding:8px 0">The book could not load: '+err+'. Check the connection and try again.</div>';return}
 renderChapter(j,anchor||0)})})}
-function closeReader(){J('reader').classList.remove('on');lock(false);clearSel();renderShelf()}
+function closeReader(){J('reader').classList.remove('on');lock(false);clearSel();WMODE=false;document.body.classList.remove('wk-on');renderShelf()}
 J('rdBack').onclick=closeReader;
 function vspan(n,t){return '<span class="vv" data-v="'+n+'"><span class="vn">'+n+'</span>'+t+'</span> '}
 function renderChapter(j,anchor){var vs=j.c[cur.c-1]||[];var h='<div class="rd-bkl">'+BOOKS[cur.b-1][0].toUpperCase()+'</div><div class="rd-num">'+cur.c+'</div><div>';
@@ -2544,7 +2632,7 @@ function pageStep(d){var n=cur.page+d;
 if(n>cur.pages-1){stepChapter(1);return}
 if(n<0){stepChapter(-1,true);return}
 gotoPage(n)}
-function stepChapter(d,toEnd){var b=cur.b,c=cur.c+d;
+function stepChapter(d,toEnd){if(WMODE)return;var b=cur.b,c=cur.c+d;
 if(c>BOOKS[b-1][1]){b++;c=1;if(b>66){if(window.toast)toast('That is the whole Word.');return}}
 if(c<1){b--;if(b<1){gotoPage(0);return}c=BOOKS[b-1][1]}
 openReaderKeep(b,c,toEnd)}
@@ -2555,8 +2643,8 @@ getBook(TR,b,function(j,err){if(err){if(window.toast)toast('The book could not l
 renderChapter(j,0);if(toEnd){setTimeout(function(){gotoPage(cur.pages-1)},60)}})}
 J('rdTzL').onclick=function(){pageStep(-1)};
 J('rdTzR').onclick=function(){pageStep(1)};
-J('rdPrev').onclick=function(){stepChapter(-1)};
-J('rdNext').onclick=function(){stepChapter(1)};
+J('rdPrev').onclick=function(){if(WMODE)pageStep(-1);else stepChapter(-1)};
+J('rdNext').onclick=function(){if(WMODE)pageStep(1);else stepChapter(1)};
 var tx=0,ty=0;
 J('rdView').addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY},{passive:true});
 J('rdView').addEventListener('touchend',function(e){var t=e.changedTouches[0];var dx=t.clientX-tx,dy=t.clientY-ty;
@@ -2566,11 +2654,11 @@ if(e.key==='ArrowRight')pageStep(1);if(e.key==='ArrowLeft')pageStep(-1);if(e.key
 var rsT;window.addEventListener('resize',function(){if(!J('reader').classList.contains('on'))return;
 clearTimeout(rsT);rsT=setTimeout(function(){var keep=cur.page;layout(function(){gotoPage(Math.min(keep,cur.pages-1))})},160)});
 /* ---- version toggle ---- */
-J('rdTr').onclick=function(){TR=TR==='web'?'kjv':'web';try{localStorage.setItem('deeds_tr',TR)}catch(e){}
+J('rdTr').onclick=function(){if(WMODE)return;TR=TR==='web'?'kjv':'web';try{localStorage.setItem('deeds_tr',TR)}catch(e){}
 J('rdTr').textContent=trUC();var l=J('wdTrL');if(l)l.textContent=trUC();
 getBook(TR,cur.b,function(j,err){if(err){if(window.toast)toast('The book could not load: '+err);return}renderChapter(j,0)})};
 /* ---- picker ---- */
-function openPick(){pickBooks();if(window.sheet)sheet('#picksheet')}
+function openPick(){if(WMODE)return;pickBooks();if(window.sheet)sheet('#picksheet')}
 J('rdPill').onclick=openPick;
 function pickBooks(){J('pkH').textContent='The Word.';var h='<div class="pk-t">The Old Testament</div>';
 for(var i=0;i<39;i++)h+='<button class="pk-b" data-pb="'+(i+1)+'"><span class="n">'+BOOKS[i][0]+'</span><span class="c">'+BOOKS[i][1]+'</span></button>';
@@ -2618,7 +2706,7 @@ var bs=J('wdBooks').querySelectorAll('[data-wb]');for(var q3=0;q3<bs.length;q3++
 var n=rlCount();
 J('wdStat').textContent='DAY '+p.day+' OF 365 \u00B7 '+n+' OF '+TOTCH+' CHAPTERS \u00B7 THE FORTY '+forty40()+' OF 40 \u00B7 '+trUC();
 var fl4=J('wd40L');if(fl4)fl4.textContent='The Forty \u00B7 '+forty40()+' of 40';
-var l=J('wdTrL');if(l)l.textContent=trUC()}
+var l=J('wdTrL');if(l)l.textContent=trUC();if(typeof renderNL==='function')renderNL()}
 J('wmOrder').onclick=function(){MODE='order';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wmShuffle').onclick=function(){MODE='shuffle';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wdFortyAll').onclick=openForty;
@@ -2714,6 +2802,238 @@ if(window.prependLive&&window.markKind)prependLive(markKind(q.data,'post'));
 if(window.closeSheets)closeSheets();if(window.toast)toast('POSTED.')})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('Could not post it: '+String(e&&e.message||e))})})
 .catch(function(e){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+String(e&&e.message||e))})},'image/jpeg',.88)};
+/* ---- the studies: notes, the writer, the library ---- */
+var WMODE=false,NOTES=null,NOTE_CUR=null,WLIB=null,MINE=null,WT=null,wtT=null,NCK='deeds_notecur';
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function vref(x){return refCaps(x.book||x.b,(x.chapter||x.c))+' : '+((x.v_start||x.s)===(x.v_end||x.e)?(x.v_start||x.s):(x.v_start||x.s)+'-'+(x.v_end||x.e))+' \u00B7 '+String(x.tr||'').toUpperCase()}
+function vtext(x,cb){var b=x.book||x.b,c=x.chapter||x.c,s=x.v_start||x.s,e=x.v_end||x.e;
+getBook(x.tr,b,function(j,err){if(err||!j){cb('');return}
+var vs=j.c[c-1]||[],out=[];for(var v=s;v<=e;v++){if(vs[v-1])out.push(vs[v-1])}
+cb(decode(out.join(' ')))})}
+function loadNotes(cb){if(NOTES){cb&&cb();return}
+if(!window.sb||!window.PROFILE){NOTES=[];cb&&cb();return}
+sb.from('notes').select('id,title,created_at').order('created_at').then(function(r){
+NOTES=(r.error||!r.data)?[]:r.data;
+try{var cid=localStorage.getItem(NCK);if(cid)NOTES.forEach(function(n){if(n.id===cid)NOTE_CUR=n})}catch(e){}
+cb&&cb()}).catch(function(e){NOTES=[];cb&&cb()})}
+function setCur(n){NOTE_CUR=n;try{if(n)localStorage.setItem(NCK,n.id);else localStorage.removeItem(NCK)}catch(e){}renderNL()}
+function noteCount(id){var n=0;(HLROWS||[]).forEach(function(h){if(h.note_id===id)n++});return n}
+function noteTap(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}
+if(NOTE_CUR){saveHL(NOTE_CUR);return}
+loadNotes(function(){openNoteSheet(function(n){saveHL(n)})})}
+function openNoteSheet(cb){var h='';(NOTES||[]).forEach(function(n){
+h+='<button class="nrow" data-np="'+n.id+'"><span class="nn">'+esc(n.title)+'</span><span class="nc">'+noteCount(n.id)+' SAVED'+(NOTE_CUR&&NOTE_CUR.id===n.id?' \u00B7 <b>OPEN</b>':'')+'</span></button>'});
+if(!h)h='<div class="wd-sub">No notes yet. Name the first one below.</div>';
+J('nsList').innerHTML=h;
+var rs=J('nsList').querySelectorAll('[data-np]');for(var i=0;i<rs.length;i++)rs[i].onclick=(function(id){return function(){var n=null;NOTES.forEach(function(x){if(x.id===id)n=x});setCur(n);if(window.closeSheets)closeSheets();cb&&cb(n)}})(rs[i].getAttribute('data-np'));
+J('nsMake').onclick=function(){var t=(J('nsNew').value||'').trim();if(!t){if(window.toast)toast('Name it first.');return}
+sb.from('notes').insert({profile_id:PROFILE.id,title:t}).select().single().then(function(r){
+if(r.error){if(window.toast)toast('Could not make it: '+r.error.message);return}
+NOTES.push(r.data);setCur(r.data);J('nsNew').value='';if(window.closeSheets)closeSheets();cb&&cb(r.data)}).catch(function(e){})};
+J('nsSkip').onclick=function(){if(window.closeSheets)closeSheets();cb&&cb(null)};
+if(window.sheet)sheet('#notepick')}
+J('wdNoteNew').onclick=function(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}
+loadNotes(function(){openNoteSheet(null)})};
+function openNoteView(n){loadHLs(function(){var items=(HLROWS||[]).filter(function(h){return h.note_id===n.id});
+J('nvTitle').textContent=n.title+'.';
+J('nvMeta').textContent=items.length+' SAVED \u00B7 TAP A REFERENCE TO READ';
+var h='';items.forEach(function(x,i){h+='<div class="nv-r"><button class="rf" data-go="'+i+'">'+vref(x)+'</button><div class="tx" data-tx="'+i+'">\u2026</div><button class="rm" data-rm="'+x.id+'">Remove.</button></div>'});
+if(!h)h='<div class="wd-sub">Nothing saved here yet. Tap Note. on a verse while you read.</div>';
+J('nvList').innerHTML=h;
+items.forEach(function(x,i){vtext(x,function(t){var el=J('nvList').querySelector('[data-tx="'+i+'"]');if(el)el.textContent=t||''})});
+var gs=J('nvList').querySelectorAll('[data-go]');for(var i2=0;i2<gs.length;i2++)gs[i2].onclick=(function(x){return function(){if(window.closeSheets)closeSheets();TR=x.tr;openReader(x.book,x.chapter,x.v_start)}})(items[+gs[i2].getAttribute('data-go')]);
+var rms=J('nvList').querySelectorAll('[data-rm]');for(var i3=0;i3<rms.length;i3++)rms[i3].onclick=(function(id){return function(){var row=null;(HLROWS||[]).forEach(function(hh){if(hh.id===id)row=hh});if(row)removeHL(row);setTimeout(function(){openNoteView(n)},400)}})(rms[i3].getAttribute('data-rm'));
+J('nvOpen').onclick=function(){setCur(n);if(window.toast)toast('OPEN \u00B7 '+String(n.title).toUpperCase())};
+J('nvWrite').onclick=function(){if(window.closeSheets)closeSheets();openWriter(null,items)};
+J('nvDel').textContent='Delete the Note.';
+J('nvDel').onclick=function(){if(J('nvDel').textContent!=='Tap Again to Delete.'){J('nvDel').textContent='Tap Again to Delete.';return}
+sb.from('notes').delete().eq('id',n.id).then(function(){NOTES=(NOTES||[]).filter(function(x){return x.id!==n.id});
+(HLROWS||[]).forEach(function(h){if(h.note_id===n.id)h.note_id=null});
+if(NOTE_CUR&&NOTE_CUR.id===n.id)setCur(null);
+if(window.closeSheets)closeSheets();renderNL();if(window.toast)toast('Note deleted. The marks stay.')}).catch(function(e){})};
+if(window.sheet)sheet('#noteview')})}
+/* ---- the writer ---- */
+function nb(){return{id:'b'+Date.now()+Math.random().toString(36).slice(2,6)}}
+function openWriter(work,seed){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}
+WT=work?JSON.parse(JSON.stringify(work)):{id:null,title:'',status:'draft',cover:{cw:'ivory',img:null},blocks:[]};
+if(!WT.cover)WT.cover={cw:'ivory',img:null};
+if(seed&&seed.length){seed.forEach(function(x){var b=nb();b.t='v';b.tr=x.tr;b.b=x.book;b.c=x.chapter;b.s=x.v_start;b.e=x.v_end;WT.blocks.push(b)});
+var p=nb();p.t='p';p.tx='';WT.blocks.push(p)}
+J('wtTitle').value=WT.title||'';
+J('wtIvory').classList.toggle('on',WT.cover.cw!=='forest');
+J('wtForest').classList.toggle('on',WT.cover.cw==='forest');
+J('wtSv').textContent=WT.id?'SAVED.':'';
+J('wtPub').textContent=WT.status==='published'?'Republish.':'Publish.';
+drawWtCover();renderBlocks();
+J('writer').classList.add('on');lock(true)}
+function closeWriter(){J('writer').classList.remove('on');lock(false);renderNL()}
+J('wtClose').onclick=function(){saveWork(function(){closeWriter()})};
+function drawWtCover(){var h='';if(WT&&WT.cover&&WT.cover.img){var u=sb.storage.from('media').getPublicUrl(WT.cover.img);
+h='<img src="'+esc(u&&u.data?u.data.publicUrl:'')+'" style="width:100%;border-radius:14px;margin:4px 0 6px" alt="">'}
+J('wtCover').innerHTML=h}
+function touched(){J('wtSv').textContent='SAVING\u2026';clearTimeout(wtT);wtT=setTimeout(function(){saveWork()},900)}
+function saveWork(cb){if(!WT){cb&&cb();return}
+WT.title=(J('wtTitle').value||'').trim();
+if(!WT.title&&!WT.blocks.length){cb&&cb();return}
+var pay={profile_id:PROFILE.id,title:WT.title||'Untitled.',status:WT.status,cover:WT.cover,blocks:WT.blocks,updated_at:new Date().toISOString()};
+var q=WT.id?sb.from('works').update(pay).eq('id',WT.id).select().single():sb.from('works').insert(pay).select().single();
+q.then(function(r){if(r.error){J('wtSv').textContent='NOT SAVED \u00B7 '+r.error.message;cb&&cb();return}
+WT.id=r.data.id;MINE=null;J('wtSv').textContent='SAVED.';cb&&cb()}).catch(function(e){J('wtSv').textContent='NOT SAVED.';cb&&cb()})}
+J('wtTitle').oninput=touched;
+J('wtIvory').onclick=function(){WT.cover.cw='ivory';J('wtIvory').classList.add('on');J('wtForest').classList.remove('on');touched()};
+J('wtForest').onclick=function(){WT.cover.cw='forest';J('wtForest').classList.add('on');J('wtIvory').classList.remove('on');touched()};
+var wtFileMode='cover',wtImgBlk=null;
+J('wtImg').onclick=function(){wtFileMode='cover';J('wtFile').click()};
+J('wtFile').onchange=function(){var f=J('wtFile').files[0];J('wtFile').value='';if(!f)return;
+shrink(f,1600,function(bl,w,hh){if(!bl){if(window.toast)toast('That image could not load.');return}
+var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
+if(r.error){if(window.toast)toast('The image did not upload: '+r.error.message);return}
+if(wtFileMode==='cover'){WT.cover.img=path;drawWtCover()}
+else if(wtImgBlk){wtImgBlk.p=path;wtImgBlk.w=w;wtImgBlk.h=hh;renderBlocks()}
+touched()}).catch(function(e){})})};
+function shrink(file,max,cb){var img=new Image();img.onload=function(){
+var s=Math.min(1,max/Math.max(img.width,img.height));var w=Math.round(img.width*s),h=Math.round(img.height*s);
+var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+c.toBlob(function(b){cb(b,w,h)},'image/jpeg',.86)};
+img.onerror=function(){cb(null)};img.src=URL.createObjectURL(file)}
+function renderBlocks(){var h='';WT.blocks.forEach(function(b,i){
+h+='<div class="wt-blk'+(b.t==='q'?' q':'')+'" data-bi="'+i+'"><div class="wt-ct"><button data-up="'+i+'">Up.</button><button data-cut="'+i+'">Cut.</button></div>';
+if(b.t==='p'||b.t==='q')h+='<textarea data-tx="'+i+'" placeholder="'+(b.t==='q'?'The quote.':'Write.')+'">'+esc(b.tx||'')+'</textarea>';
+else if(b.t==='v')h+='<div class="wt-vq"><span data-vt="'+i+'">\u2026</span><div class="wt-vr">'+vref(b)+'</div></div>';
+else if(b.t==='img'){if(b.p){var u=sb.storage.from('media').getPublicUrl(b.p);h+='<img src="'+esc(u&&u.data?u.data.publicUrl:'')+'" alt="">'}else h+='<div class="wd-sub">Choosing the image\u2026</div>'}
+else if(b.t==='a')h+='<div class="wt-a"><input data-au="'+i+'" placeholder="https:// the link." value="'+esc(b.u||'')+'"></div>';
+h+='</div>'});
+if(!h)h='<div class="wd-sub" style="margin-top:14px">Start below. Paragraphs, scripture from your notes, images, quotes, links.</div>';
+J('wtBlocks').innerHTML=h;
+WT.blocks.forEach(function(b,i){if(b.t==='v')vtext(b,function(t){var el=J('wtBlocks').querySelector('[data-vt="'+i+'"]');if(el)el.textContent=t||''})});
+var ts=J('wtBlocks').querySelectorAll('[data-tx]');for(var i1=0;i1<ts.length;i1++)(function(el){
+el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px';
+el.oninput=function(){WT.blocks[+el.getAttribute('data-tx')].tx=el.value;el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px';touched()}})(ts[i1]);
+var as=J('wtBlocks').querySelectorAll('[data-au]');for(var i2=0;i2<as.length;i2++)(function(el){
+el.oninput=function(){WT.blocks[+el.getAttribute('data-au')].u=el.value;touched()}})(as[i2]);
+var cs=J('wtBlocks').querySelectorAll('[data-cut]');for(var i3=0;i3<cs.length;i3++)(function(el){
+el.onclick=function(){WT.blocks.splice(+el.getAttribute('data-cut'),1);renderBlocks();touched()}})(cs[i3]);
+var us=J('wtBlocks').querySelectorAll('[data-up]');for(var i4=0;i4<us.length;i4++)(function(el){
+el.onclick=function(){var i=+el.getAttribute('data-up');if(i<1)return;var t=WT.blocks[i-1];WT.blocks[i-1]=WT.blocks[i];WT.blocks[i]=t;renderBlocks();touched()}})(us[i4])}
+var addBar=document.querySelector('.wt-add');
+addBar.addEventListener('click',function(ev){var t=ev.target.getAttribute&&ev.target.getAttribute('data-ab');if(!t)return;
+if(t==='p'||t==='q'){var b=nb();b.t=t;b.tx='';WT.blocks.push(b);renderBlocks();touched()}
+else if(t==='a'){var b2=nb();b2.t='a';b2.u='';WT.blocks.push(b2);renderBlocks();touched()}
+else if(t==='img'){var b3=nb();b3.t='img';b3.p=null;WT.blocks.push(b3);wtFileMode='block';wtImgBlk=b3;renderBlocks();J('wtFile').click()}
+else if(t==='v'){loadNotes(function(){loadHLs(function(){openVerseSheet()})})}});
+function openVerseSheet(){var items=(HLROWS||[]).slice();
+var h='';items.forEach(function(x,i){var nm='';(NOTES||[]).forEach(function(n){if(n.id===x.note_id)nm=n.title});
+h+='<div class="nv-r"><button class="rf" data-vi="'+i+'">'+vref(x)+(nm?' \u00B7 '+esc(nm).toUpperCase():'')+'</button><div class="tx" data-vx="'+i+'">\u2026</div></div>'});
+if(!h)h='<div class="wd-sub">Nothing noted yet. Tap Note. on verses while you read, then come back.</div>';
+J('vsList').innerHTML=h;
+items.forEach(function(x,i){vtext(x,function(t){var el=J('vsList').querySelector('[data-vx="'+i+'"]');if(el)el.textContent=t||''})});
+var vs=J('vsList').querySelectorAll('[data-vi]');for(var i=0;i<vs.length;i++)vs[i].onclick=(function(x){return function(){
+var b=nb();b.t='v';b.tr=x.tr;b.b=x.book;b.c=x.chapter;b.s=x.v_start;b.e=x.v_end;WT.blocks.push(b);
+if(window.closeSheets)closeSheets();renderBlocks();touched()}})(items[+vs[i].getAttribute('data-vi')]);
+if(window.sheet)sheet('#versesheet')}
+J('wtPub').onclick=function(){WT.title=(J('wtTitle').value||'').trim();
+if(!WT.title){if(window.toast)toast('Give it a title first.');return}
+if(!WT.blocks.length){if(window.toast)toast('Write something first.');return}
+WT.status='published';var b=J('wtPub');b.textContent='PUBLISHING\u2026';
+saveWork(function(){if(!WT.id){b.textContent='Publish.';return}
+sb.from('works').update({published_at:new Date().toISOString()}).eq('id',WT.id).then(function(){}).catch(function(e){});
+drawCoverCv(function(bl){if(!bl){b.textContent='Republish.';finishPub();return}
+var path=PROFILE.id+'/'+Date.now()+'-cover.jpg';
+sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
+if(r.error){finishPub();return}
+sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+' \u00B7 a study on DEEDS \u00B7 deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
+if(!q.error&&window.prependLive&&window.markKind)prependLive(markKind(q.data,'post'));
+finishPub()}).catch(function(e){finishPub()})}).catch(function(e){finishPub()})})});
+function finishPub(){b.textContent='Republish.';WLIB=null;MINE=null;if(window.toast)toast('PUBLISHED.');closeWriter()}};
+function drawCoverCv(cb){var cv=J('cardcv'),ctx=cv.getContext('2d');var W=1080,H=1350,M=96;
+var iv=WT.cover.cw!=='forest';
+var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
+function paint(img){ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+var ty=560;
+if(img){var s=Math.max(W/img.width,620/img.height);var dw=img.width*s,dh=img.height*s;
+ctx.drawImage(img,(W-dw)/2,0,dw,dh>620?620:dh);ty=700;
+ctx.fillStyle=bg;ctx.fillRect(0,620,W,H-620)}
+ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
+spaced(ctx,'A STUDY \u00B7 '+(PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'DEEDS'),M,img?680:152,8);
+var fit=wrapFit(ctx,WT.title,W-2*M,360,72,40,1.2);
+ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px Georgia,"Times New Roman",serif';
+fit.lines.forEach(function(L,i){ctx.fillText(L,M,ty+i*fit.size*1.2)});
+ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
+ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';
+spaced(ctx,'FREE ON DEEDS.FUN',M,1216,6);
+ctx.font='800 46px "Helvetica Neue",Helvetica,Arial,sans-serif';
+var w=ctx.measureText('DEEDS').width,pw=ctx.measureText('.').width;
+ctx.fillText('DEEDS',W-M-w-pw-4,1222);ctx.fillStyle=ac;ctx.fillText('.',W-M-pw,1222);
+cv.toBlob(function(b){cb(b)},'image/jpeg',.88)}
+if(WT.cover.img){var u=sb.storage.from('media').getPublicUrl(WT.cover.img);
+var im=new Image();im.crossOrigin='anonymous';
+im.onload=function(){paint(im)};im.onerror=function(){paint(null)};
+im.src=(u&&u.data?u.data.publicUrl:'')}else paint(null)}
+/* ---- the library + your works ---- */
+function loadLib(cb){if(WLIB){cb&&cb();return}
+if(!window.sb){WLIB=[];cb&&cb();return}
+sb.from('works').select('id,title,kind,cover,read_count,published_at,profiles(handle)').eq('status','published').order('published_at',{ascending:false}).limit(24).then(function(r){
+WLIB=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){WLIB=[];cb&&cb()})}
+function loadMine(cb){if(MINE){cb&&cb();return}
+if(!window.sb||!window.PROFILE){MINE=[];cb&&cb();return}
+sb.from('works').select('id,title,status,cover,blocks,read_count,published_at').eq('profile_id',PROFILE.id).order('updated_at',{ascending:false}).limit(24).then(function(r){
+MINE=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){MINE=[];cb&&cb()})}
+function renderNL(){var pg=J('pg-read');if(!pg)return;
+if(window.PROFILE){loadNotes(function(){loadHLs(function(){var h='';(NOTES||[]).forEach(function(n){
+h+='<button class="nrow" data-nv="'+n.id+'"><span class="nn">'+esc(n.title)+'</span><span class="nc">'+noteCount(n.id)+' SAVED'+(NOTE_CUR&&NOTE_CUR.id===n.id?' \u00B7 <b>OPEN</b>':'')+'</span></button>'});
+if(!h)h='<div class="wd-sub">Name a note, then tap Note. on any verse to fill it.</div>';
+J('wdNotes').innerHTML=h;
+var rs=J('wdNotes').querySelectorAll('[data-nv]');for(var i=0;i<rs.length;i++)rs[i].onclick=(function(id){return function(){var n=null;(NOTES||[]).forEach(function(x){if(x.id===id)n=x});if(n)openNoteView(n)}})(rs[i].getAttribute('data-nv'))})})}
+else J('wdNotes').innerHTML='<div class="wd-sub">Notes live on your profile. Join free to keep them.</div>';
+loadLib(function(){var h='';(WLIB||[]).forEach(function(w,i){var fo=w.cover&&w.cover.cw==='forest';
+var img='';if(w.cover&&w.cover.img&&window.sb){var u=sb.storage.from('media').getPublicUrl(w.cover.img);img='<img class="li" src="'+esc(u&&u.data?u.data.publicUrl:'')+'" alt="">'}
+h+='<button class="lcov '+(fo?'fo':'iv')+'" data-wo="'+w.id+'">'+img+'<div><div class="lm">A STUDY \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+'</div><div class="lt">'+esc(w.title)+'</div><div class="lm" style="margin-top:8px">'+(w.read_count||0)+' READERS.</div></div></button>'});
+if(!h)h='<div class="wd-sub" style="grid-column:1/-1">The shelf is waiting for its first study. Tap Write.</div>';
+J('wdLib').innerHTML=h;
+var ws=J('wdLib').querySelectorAll('[data-wo]');for(var i=0;i<ws.length;i++)ws[i].onclick=(function(id){return function(){openWork(id)}})(ws[i].getAttribute('data-wo'))});
+if(window.PROFILE){loadMine(function(){var h='';(MINE||[]).forEach(function(w){
+h+='<button class="nrow" data-me="'+w.id+'"><span class="nn">'+esc(w.title)+'</span><span class="nc">'+(w.status==='published'?((w.read_count||0)+' READERS'):'DRAFT')+' \u00B7 EDIT</span></button>'});
+J('wdMine').innerHTML=h;
+var ms=J('wdMine').querySelectorAll('[data-me]');for(var i=0;i<ms.length;i++)ms[i].onclick=(function(id){return function(){var w=null;(MINE||[]).forEach(function(x){if(x.id===id)w=x});if(w)openWriter(w,null)}})(ms[i].getAttribute('data-me'))})}
+else J('wdMine').innerHTML=''}
+J('wdWrite').onclick=function(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}openWriter(null,null)};
+/* ---- the work reader ---- */
+function openWork(id){if(!window.sb){setTimeout(function(){openWork(id)},900);return}
+sb.from('works').select('*,profiles(handle)').eq('id',id).single().then(function(r){
+if(r.error||!r.data){if(window.toast)toast('That study could not open.');return}
+var w=r.data;WMODE=true;document.body.classList.add('wk-on');
+J('reader').classList.add('on');lock(true);
+J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
+J('rdPill').textContent=String(w.title||'A STUDY').toUpperCase().slice(0,26);
+var own=window.PROFILE&&PROFILE.id===w.profile_id;
+var gk='deeds_wr_'+w.id,today=new Date().toISOString().slice(0,10),seen='';
+try{seen=localStorage.getItem(gk)||''}catch(e){}
+if(!own&&seen!==today){try{localStorage.setItem(gk,today)}catch(e){}
+sb.rpc('work_read',{w:w.id}).then(function(){}).catch(function(e){});w.read_count=(w.read_count||0)+1}
+var vbs=(w.blocks||[]).filter(function(b){return b.t==='v'});
+var need={};vbs.forEach(function(b){need[b.tr+':'+b.b]=b});
+var keys=Object.keys(need),left=keys.length;
+function build(){var h='<div class="wk-cv">';
+if(w.cover&&w.cover.img){var u=sb.storage.from('media').getPublicUrl(w.cover.img);h+='<img src="'+esc(u&&u.data?u.data.publicUrl:'')+'" alt="">'}
+h+='<div class="mc">A STUDY \u00B7 '+esc(w.profiles&&w.profiles.handle?String(w.profiles.handle).toUpperCase():'DEEDS')+' \u00B7 '+(w.read_count||0)+' READERS</div><div class="tt">'+esc(w.title)+'</div><div class="by">FREE ON DEEDS \u00B7 '+String(w.published_at||w.created_at||'').slice(0,10)+'</div></div>';
+(w.blocks||[]).forEach(function(b){
+if(b.t==='p'&&b.tx)h+='<p class="wk-p">'+esc(b.tx).replace(/\n/g,'<br>')+'</p>';
+else if(b.t==='q'&&b.tx)h+='<div class="wk-q">'+esc(b.tx)+'</div>';
+else if(b.t==='v'){var kk=b.tr+':'+b.b,j=CACHE[kk],tx='';
+if(j){var vsx=j.c[b.c-1]||[],out=[];for(var v=b.s;v<=b.e;v++){if(vsx[v-1])out.push(vsx[v-1])}tx=out.join(' ')}
+h+='<div class="wk-v"><div class="t">'+tx+'</div><div class="r">'+vref(b)+'</div></div>'}
+else if(b.t==='img'&&b.p){var u2=sb.storage.from('media').getPublicUrl(b.p);h+='<img class="wk-img" src="'+esc(u2&&u2.data?u2.data.publicUrl:'')+'" alt="">'}
+else if(b.t==='a'&&b.u)h+='<a class="wk-a" href="'+esc(b.u)+'" target="_blank" rel="noopener">'+esc(b.u)+'</a>'});
+h+='<div class="rd-end"><button class="wbtn ghost" id="wkDone">Close the Study.</button></div>';
+J('rdLoad').style.display='none';J('rdCols').innerHTML=h;
+var d=J('wkDone');if(d)d.onclick=closeReader;
+layout(function(){gotoPage(0)})}
+if(!left)build();
+else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;if(!left)build()})})}).catch(function(e){if(window.toast)toast('That study could not open.')})}
+function route(){var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m)openWork(m[1])}
+window.addEventListener('hashchange',route);
+setTimeout(route,700);
 /* ---- nav hook ---- */
 if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}}}
 renderShelf();
