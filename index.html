@@ -3044,8 +3044,15 @@ im.src=(u&&u.data?u.data.publicUrl:'')}else paint(null)}
 /* ---- the library + your works ---- */
 function loadLib(cb){if(WLIB){cb&&cb();return}
 if(!window.sb){WLIB=[];cb&&cb();return}
-sb.from('works').select('id,title,kind,category,cover,read_count,view_count,published_at,profiles(handle)').eq('status','published').order('published_at',{ascending:false}).limit(24).then(function(r){
-WLIB=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){WLIB=[];cb&&cb()})}
+sb.from('works').select('id,title,kind,category,cover,read_count,view_count,published_at,profile_id').eq('status','published').order('published_at',{ascending:false}).limit(24).then(function(r){
+var rows=(r.error||!r.data)?[]:r.data;
+var ids=[];rows.forEach(function(w){if(ids.indexOf(w.profile_id)<0)ids.push(w.profile_id)});
+if(!ids.length){WLIB=rows;cb&&cb();return}
+sb.from('profiles').select('id,handle').in('id',ids).then(function(p){
+var m={};((p&&p.data)||[]).forEach(function(x){m[x.id]=x.handle});
+rows.forEach(function(w){w.profiles={handle:m[w.profile_id]||'DEEDS'}});
+WLIB=rows;cb&&cb()}).catch(function(e){rows.forEach(function(w){w.profiles=null});WLIB=rows;cb&&cb()})
+}).catch(function(e){WLIB=[];cb&&cb()})}
 function loadMine(cb){if(MINE){cb&&cb();return}
 if(!window.sb||!window.PROFILE){MINE=[];cb&&cb();return}
 sb.from('works').select('id,title,kind,category,status,cover,blocks,read_count,view_count,published_at').eq('profile_id',PROFILE.id).order('updated_at',{ascending:false}).limit(24).then(function(r){
@@ -3081,9 +3088,12 @@ else J('wdMine').innerHTML=''}
 J('wdWrite').onclick=function(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();return}openWriter(null,null)};
 /* ---- the work reader ---- */
 function openWork(id){if(!window.sb){setTimeout(function(){openWork(id)},900);return}
-sb.from('works').select('*,profiles(handle)').eq('id',id).single().then(function(r){
-if(r.error||!r.data){if(window.toast)toast('That study could not open.');return}
-var w=r.data;WMODE=true;document.body.classList.add('wk-on');
+sb.from('works').select('*').eq('id',id).single().then(function(r){
+if(r.error||!r.data){if(window.toast)toast('That study could not open'+(r.error?': '+r.error.message:'.'));return}
+var w=r.data;
+sb.from('profiles').select('id,handle').eq('id',w.profile_id).maybeSingle().then(function(pp){
+w.profiles=(pp&&pp.data&&pp.data.handle)?{handle:pp.data.handle}:null;cont()}).catch(function(e){w.profiles=null;cont()});
+function cont(){WMODE=true;document.body.classList.add('wk-on');
 J('reader').classList.add('on');lock(true);
 J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
 J('rdPill').textContent=String(w.title||'A STUDY').toUpperCase().slice(0,26);
@@ -3113,7 +3123,7 @@ var d=J('wkDone');if(d)d.onclick=closeReader;
 var pb=J('pubbar');if(pb){pb.classList.toggle('on',PREVIEWING&&own);var pg2=J('pubGo');if(pg2)pg2.textContent=w.status==='published'?'REPUBLISH.':'PUBLISH.'}
 layout(function(){gotoPage(0)})}
 if(!left)build();
-else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;if(!left)build()})})}).catch(function(e){if(window.toast)toast('That study could not open.')})}
+else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;if(!left)build()})})}}).catch(function(e){if(window.toast)toast('That study could not open.')})}
 function route(){var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m)openWork(m[1])}
 window.addEventListener('hashchange',route);
 setTimeout(route,700);
