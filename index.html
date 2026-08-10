@@ -367,7 +367,7 @@ input,textarea{font:inherit;color:var(--ink)}
 /* overlay */
 #reader{position:fixed;inset:0;z-index:120;background:var(--ivory);display:none;flex-direction:column}
 #reader.on{display:flex}
-body.rd-lock{overflow:hidden}
+body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet{z-index:170}body.rd-lock .modal{z-index:175}body.rd-lock #toast{z-index:180;bottom:calc(150px + env(safe-area-inset-bottom))}
 .rd-top{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .rd-top .rback{padding:6px;color:var(--ink)}
 .rd-top .rback svg{width:20px;height:20px;display:block}
@@ -1418,6 +1418,9 @@ if(arrival)showArrival(arrival);
 var SB_URL='https://helqqdygwaihrliglbvw.supabase.co';
 var SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
 var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='doer',JEMAIL='',justVerified=false;
+/* bridge: the reader script lives in its own scope and reads these from window */
+try{Object.defineProperty(window,'PROFILE',{get:function(){return PROFILE}});Object.defineProperty(window,'sb',{get:function(){return sb}})}catch(e){}
+window.openJoin=openJoin;window.prependLive=prependLive;window.markKind=markKind;
 var DAILY=null,DAILYN=0,DAILYLOG=0,chainParentLive=null,chainLinkLive=0;
 var LIVEPOSTS=[],SRES=[],NAMES={},feedEnd=false,feedBusy=true,pageFrom=0,feedFailMsg='',srvTimer=null;
 var BLK={};try{BLK=JSON.parse(safeGet('deeds_blk')||'{}')||{}}catch(e){BLK={}}
