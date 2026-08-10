@@ -336,6 +336,89 @@ input,textarea{font:inherit;color:var(--ink)}
 .orghit .in{flex:1;min-width:0}
 .joinbtn{border:1.5px solid var(--forest);background:none;color:var(--forest);font-weight:800;font-size:11px;letter-spacing:.12em;padding:7px 12px;border-radius:999px;cursor:pointer}
 .leaveorg{border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-decoration:underline;cursor:pointer;padding:0}
+/* ============ THE WORD (reader) ============ */
+.wd-title{font-weight:800;font-size:34px;letter-spacing:-.01em;margin:2px 0 2px}
+.wd-sub{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:16px}
+.wdcard{border:1px solid var(--line);border-radius:18px;padding:16px;background:rgba(255,255,255,.5);margin-bottom:14px}
+.wdcard .micro{color:var(--forest)}
+.wd-port{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.wchip{border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--ink);background:none}
+.wchip.done{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+.wd-modes{display:flex;gap:8px;align-items:center}
+.wd-modes .lbl{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--muted);text-transform:uppercase;margin-right:2px}
+.wd-sec{margin:20px 0 8px;display:flex;align-items:baseline;justify-content:space-between}
+.wd-sec .micro{color:var(--forest)}
+.wd-sec .mono{font-size:11px;color:var(--muted)}
+.frail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:4px 20px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.frail::-webkit-scrollbar{display:none}
+.fcard{flex:0 0 172px;scroll-snap-align:start;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;background:rgba(255,255,255,.5);text-align:left}
+.fcard .fn{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;color:var(--sage)}
+.fcard .ft{font-weight:800;font-size:15px;line-height:1.25;margin:6px 0 8px;color:var(--ink)}
+.fcard .fr{font-size:9.5px;letter-spacing:.13em;font-weight:800;color:var(--forest);text-transform:uppercase}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bk{display:flex;align-items:baseline;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.bk .bn{font-weight:700;font-size:13.5px;color:var(--ink)}
+.bk .bc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--muted)}
+.wd-stat{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);margin:16px 0 4px;letter-spacing:.04em}
+.wbtn{background:var(--forest);color:var(--ivory);font-weight:800;font-size:13px;letter-spacing:.05em;padding:12px 18px;border-radius:999px}
+.wbtn.ghost{background:none;color:var(--forest);border:1px solid var(--forest)}
+.wbtn.done{background:var(--sage);color:var(--ink)}
+/* overlay */
+#reader{position:fixed;inset:0;z-index:120;background:var(--ivory);display:none;flex-direction:column}
+#reader.on{display:flex}
+body.rd-lock{overflow:hidden}
+.rd-top{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.rd-top .rback{padding:6px;color:var(--ink)}
+.rd-top .rback svg{width:20px;height:20px;display:block}
+.rd-pill{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:700;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--ink)}
+.rd-sp{flex:1}
+.rd-tr{font-size:10px;letter-spacing:.14em;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--forest)}
+.rd-40{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--ink)}
+.rd-view{flex:1;overflow:hidden;position:relative}
+.rd-slide{height:100%;transition:transform .28s cubic-bezier(.32,.72,.3,1);will-change:transform}
+.rd-cols{height:100%;column-gap:52px;font-family:Georgia,'Iowan Old Style','Times New Roman',serif;font-size:19px;line-height:1.78;color:var(--ink)}
+.rd-bkl{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:11px;letter-spacing:.16em;color:var(--forest);text-transform:uppercase}
+.rd-num{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:64px;line-height:1;margin:6px 0 20px;color:var(--ink)}
+.vv{cursor:pointer;border-radius:3px}
+.vv .vn{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:10.5px;color:var(--sage);vertical-align:.42em;letter-spacing:.02em;padding:0 3px 0 1px}
+.vv.hl{background:rgba(160,176,164,.4)}
+.vv.sel{background:rgba(31,75,58,.16)}
+.vv.hl.sel{background:rgba(31,75,58,.24)}
+.vv.fl{animation:vfl 1.5s ease 1}
+@keyframes vfl{0%{background:rgba(190,154,78,.42)}100%{background:none}}
+.rd-end{margin:28px 0 10px;display:flex;gap:10px;flex-wrap:wrap;break-inside:avoid}
+.rd-tz{position:absolute;top:0;bottom:0;width:25%;z-index:5}
+.rd-tz.l{left:0}.rd-tz.r{right:0}
+.rd-bot{display:flex;align-items:center;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.rd-pg{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.rd-ch{display:flex;gap:6px}
+.rd-ch button{padding:7px;color:var(--ink);border:1px solid var(--line);border-radius:999px}
+.rd-ch button svg{width:15px;height:15px;display:block}
+.rd-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--muted)}
+.vbar{position:fixed;left:14px;right:14px;bottom:calc(70px + env(safe-area-inset-bottom));z-index:130;background:var(--ink);border-radius:16px;padding:9px 10px;display:none;gap:6px;justify-content:space-between;align-items:center;box-shadow:0 18px 44px rgba(21,19,14,.3)}
+.vbar.on{display:flex}
+.vbar button{color:var(--ivory);font-weight:800;font-size:12px;letter-spacing:.04em;padding:8px 10px;border-radius:10px}
+.vbar button.em{background:var(--forest)}
+.vbar button.dim{color:var(--sage)}
+/* picker + forty + card sheets */
+.pk-t{font-size:10px;letter-spacing:.16em;font-weight:800;color:var(--forest);text-transform:uppercase;margin:14px 0 6px}
+.pk-b{display:flex;align-items:baseline;justify-content:space-between;width:100%;padding:11px 4px;border-bottom:1px solid var(--line);text-align:left}
+.pk-b .n{font-weight:700;font-size:14.5px;color:var(--ink)}
+.pk-b .c{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--muted)}
+.pk-c{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
+.pk-c button{border:1px solid var(--line);border-radius:10px;padding:10px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;font-weight:700;color:var(--ink)}
+.pk-c button.rd{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+.fo-r{display:flex;align-items:center;gap:12px;width:100%;padding:11px 2px;border-bottom:1px solid var(--line);text-align:left}
+.fo-r .fn{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;color:var(--sage);flex:0 0 22px}
+.fo-r .in{flex:1;min-width:0}
+.fo-r .ft{font-weight:800;font-size:14.5px;color:var(--ink)}
+.fo-r .fr{font-size:9.5px;letter-spacing:.13em;font-weight:800;color:var(--forest);text-transform:uppercase;margin-top:2px}
+#cardcv{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);display:block;margin:10px 0 12px}
+@media(min-width:1080px){
+ .bgrid{grid-template-columns:1fr 1fr 1fr}
+ .fcard{flex-basis:188px}
+ .rd-num{font-size:76px}
+}
 </style>
 </head>
 <body>
@@ -365,6 +448,7 @@ input,textarea{font:inherit;color:var(--ink)}
     <nav class="lnav">
       <button data-go="feed" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
       <button data-go="challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>Challenge.</button>
+      <button data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
       <button data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
       <button id="lBell" class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>Alerts.<span class="bdot"></span></button>
       <button data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
@@ -430,6 +514,21 @@ input,textarea{font:inherit;color:var(--ink)}
       </div>
     </div>
 
+<div class="page" id="pg-read">
+      <div class="wd-title">The Word<b style="color:var(--forest)">.</b></div>
+      <div class="wd-sub">Scripture, read like a book. Free forever.</div>
+      <div class="wdcard" id="wdDaily">
+        <div class="micro" id="wdDayL">Today&#8217;s Reading</div>
+        <div class="wd-port" id="wdPort"></div>
+        <div class="wd-modes"><span class="lbl">Plan</span><button class="wchip" id="wmOrder">In Order.</button><button class="wchip" id="wmShuffle">Shuffled.</button></div>
+      </div>
+      <div class="wd-sec"><div class="micro">The Forty</div><button class="mono" id="wdFortyAll" style="color:var(--forest)">See All.</button></div>
+      <div class="wd-sub" style="margin-bottom:8px">Forty passages that move. Skip between the peaks.</div>
+      <div class="frail" id="wdRail"></div>
+      <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
+      <div id="wdBooks"></div>
+      <div class="wd-stat" id="wdStat"></div>
+    </div>
     <div class="page" id="pg-meet">
       <div class="pghead"><h1>Meet<b>.</b></h1><div class="micro">Surfaced By Deeds, Not By You</div></div>
       <div id="meetlist"></div>
@@ -560,6 +659,7 @@ input,textarea{font:inherit;color:var(--ink)}
   <button class="tab on" data-go="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
   <button class="tab" data-go="challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>Challenge.</button>
   <button class="tab tab-log" id="tLog" aria-label="Log a Deed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="tab" data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
   <button class="tab" data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
   <button class="tab" data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
 </nav>
@@ -567,6 +667,51 @@ input,textarea{font:inherit;color:var(--ink)}
 
 <!-- OVERLAYS -->
 <div class="scrim" id="scrim"></div>
+<div id="reader">
+  <div class="rd-top">
+    <button class="rback" id="rdBack" aria-label="Close the reader"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="rd-pill" id="rdPill">JOHN 1</button>
+    <div class="rd-sp"></div>
+    <button class="rd-40" id="rd40">40</button>
+    <button class="rd-tr" id="rdTr">WEB</button>
+  </div>
+  <div class="rd-view" id="rdView">
+    <div class="rd-slide" id="rdSlide"><div class="rd-cols" id="rdCols"></div></div>
+    <div class="rd-tz l" id="rdTzL"></div>
+    <div class="rd-tz r" id="rdTzR"></div>
+    <div class="rd-load" id="rdLoad" style="display:none">OPENING&#8230;</div>
+  </div>
+  <div class="rd-bot">
+    <div class="rd-pg" id="rdPg">PAGE 1 OF 1</div>
+    <div class="rd-ch">
+      <button id="rdPrev" aria-label="Previous chapter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button id="rdNext" aria-label="Next chapter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+</div>
+<div class="vbar" id="vbar">
+  <button id="vbHl" class="em">Highlight.</button>
+  <button id="vbCard">The Card.</button>
+  <button id="vbClear" class="dim">Clear.</button>
+</div>
+<div class="sheet" id="picksheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3 id="pkH">The Word.</h3>
+  <div id="pkBody"></div>
+</div>
+<div class="sheet" id="fortysheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>The Forty.</h3>
+  <div class="wd-sub">Forty passages that move. Skip between the peaks.</div>
+  <div id="foList"></div>
+</div>
+<div class="sheet" id="cardsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>The Card.</h3>
+  <canvas id="cardcv" width="1080" height="1350"></canvas>
+  <div class="logrow"><button class="lchip on" id="ccIvory">Ivory.</button><button class="lchip" id="ccForest">Forest.</button></div>
+  <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="ccSave">Save the Image.</button><button class="wbtn" id="ccPost">Post It.</button></div>
+</div>
 
 <div class="sheet" id="logsheet">
   <div class="sword">DEEDS<b>.</b></div>
@@ -2257,6 +2402,284 @@ cdn.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 cdn.onload=init;
 cdn.onerror=function(){};
 document.head.appendChild(cdn);
+})();
+</script>
+<script>
+/* ============ THE WORD ============ */
+(function(){
+if(!document.getElementById('pg-read'))return;
+var BOOKS=[["Genesis",50],["Exodus",40],["Leviticus",27],["Numbers",36],["Deuteronomy",34],["Joshua",24],["Judges",21],["Ruth",4],["1 Samuel",31],["2 Samuel",24],["1 Kings",22],["2 Kings",25],["1 Chronicles",29],["2 Chronicles",36],["Ezra",10],["Nehemiah",13],["Esther",10],["Job",42],["Psalms",150],["Proverbs",31],["Ecclesiastes",12],["Song of Solomon",8],["Isaiah",66],["Jeremiah",52],["Lamentations",5],["Ezekiel",48],["Daniel",12],["Hosea",14],["Joel",3],["Amos",9],["Obadiah",1],["Jonah",4],["Micah",7],["Nahum",3],["Habakkuk",3],["Zephaniah",3],["Haggai",2],["Zechariah",14],["Malachi",4],["Matthew",28],["Mark",16],["Luke",24],["John",21],["Acts",28],["Romans",16],["1 Corinthians",16],["2 Corinthians",13],["Galatians",6],["Ephesians",6],["Philippians",4],["Colossians",4],["1 Thessalonians",5],["2 Thessalonians",3],["1 Timothy",6],["2 Timothy",4],["Titus",3],["Philemon",1],["Hebrews",13],["James",5],["1 Peter",5],["2 Peter",3],["1 John",5],["2 John",1],["3 John",1],["Jude",1],["Revelation",22]];
+var ABBR=["GEN","EXO","LEV","NUM","DEU","JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST","JOB","PSA","PRO","ECC","SNG","ISA","JER","LAM","EZK","DAN","HOS","JOL","AMO","OBA","JON","MIC","NAM","HAB","ZEP","HAG","ZEC","MAL","MAT","MRK","LUK","JHN","ACT","ROM","1CO","2CO","GAL","EPH","PHP","COL","1TH","2TH","1TI","2TI","TIT","PHM","HEB","JAS","1PE","2PE","1JN","2JN","3JN","JUD","REV"];
+var FORTY=[[1,1,1,"In the Beginning."],[1,50,20,"Meant for Good."],[2,14,21,"The Sea Parts."],[2,20,1,"The Ten Words."],[5,6,4,"Hear, O Israel."],[6,1,9,"Be Strong. Take Courage."],[8,1,16,"Where You Go, I Go."],[9,17,45,"The Giant Falls."],[19,23,1,"The Shepherd."],[19,91,1,"The Shelter."],[19,139,14,"Fearfully, Wonderfully Made."],[20,3,5,"Trust With All Your Heart."],[21,3,1,"A Time for Everything."],[23,40,31,"Wings Like Eagles."],[23,53,5,"The Suffering Servant."],[24,29,11,"Plans to Give You Hope."],[33,6,8,"Do Justly. Love Mercy."],[40,5,3,"The Beatitudes."],[40,6,9,"The Lord&#39;s Prayer."],[40,25,40,"The Least of These."],[42,2,10,"A Savior Is Born."],[42,10,30,"The Good Samaritan."],[42,15,20,"The Prodigal Comes Home."],[43,1,1,"The Word Was God."],[43,3,16,"So Loved the World."],[43,13,14,"He Washed Their Feet."],[43,15,12,"The Vine."],[43,19,30,"It Is Finished."],[43,20,1,"The Empty Tomb."],[44,2,1,"The Spirit Comes."],[45,8,28,"More Than Conquerors."],[45,12,21,"Overcome Evil With Good."],[46,13,4,"Love Never Fails."],[48,5,22,"The Fruit of the Spirit."],[49,2,10,"Created for Good Works."],[50,4,4,"Rejoice Always."],[58,11,1,"By Faith."],[59,2,17,"Faith Without Works."],[62,4,18,"Perfect Love Casts Out Fear."],[66,21,4,"All Things New."]];
+var CUM=[],tc=0;for(var bi=0;bi<66;bi++){CUM.push(tc);tc+=BOOKS[bi][1]}
+var TOTCH=tc;
+var TR=localStorage.getItem('deeds_tr')||'web';
+var MODE=localStorage.getItem('deeds_rmode')||'order';
+var CW=localStorage.getItem('deeds_cw')||'ivory';
+var CACHE={},cur={b:0,c:0,page:0,pages:1,colW:0,left:0,step:0};
+var SEL={},HLROWS=null,hlMode=null,RL={},rlDb=false,POSK='deeds_pos',RLK='deeds_rl2';
+try{var _g=JSON.parse(localStorage.getItem(RLK)||'{}');for(var k in _g)RL[k]=1}catch(e){}
+function J(s){return document.getElementById(s)}
+function disp(b,ch){var n=BOOKS[b-1][0];if(b===19)n='Psalm';return n+(ch?' '+ch:'')}
+function refCaps(b,ch){return disp(b,ch).toUpperCase()}
+function trUC(){return TR.toUpperCase()}
+function b2f(b,c){return CUM[b-1]+(c-1)}
+function f2b(f){for(var i=65;i>=0;i--){if(f>=CUM[i])return[i+1,f-CUM[i]+1]}return[1,1]}
+/* ---- fetch ---- */
+function getBook(tr,b,cb){var kk=tr+':'+b;if(CACHE[kk]){cb(CACHE[kk],null);return}
+fetch('bible/'+tr+'/'+b+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+.then(function(j){CACHE[kk]=j;cb(j,null)})
+.catch(function(e){cb(null,String(e&&e.message||e))})}
+/* ---- daily plan ---- */
+var REPOCH=Date.UTC(2026,7,10);
+function dayN(){var n=new Date();var loc=Date.UTC(n.getFullYear(),n.getMonth(),n.getDate());var d=Math.floor((loc-REPOCH)/864e5)+1;return d<1?1:d}
+function djb2(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h}
+function mul32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296}}
+function portion(){var dn=dayN(),cyc=Math.floor((dn-1)/365),pos=(dn-1)%365;
+var idx=[];for(var i=0;i<TOTCH;i++)idx.push(i);
+if(MODE==='shuffle'){var seed=(djb2(window.PROFILE&&PROFILE.id?String(PROFILE.id):'guest')^(cyc+1))>>>0;var rnd=mul32(seed);
+for(var j=idx.length-1;j>0;j--){var r=Math.floor(rnd()*(j+1));var t2=idx[j];idx[j]=idx[r];idx[r]=t2}}
+var s=Math.round(pos*TOTCH/365),e=Math.round((pos+1)*TOTCH/365);
+var out=[];for(var q=s;q<e;q++)out.push(f2b(idx[q]));
+return{day:dn,list:out}}
+/* ---- reading log ---- */
+function rlKey(b,c){return b+':'+c}
+function rlCount(){var n=0;for(var k in RL)n++;return n}
+function loadRL(){if(rlDb||!window.sb||!window.PROFILE)return;rlDb=true;
+sb.from('reading_log').select('book,chapter').then(function(r){if(r.error||!r.data)return;
+r.data.forEach(function(x){RL[rlKey(x.book,x.chapter)]=1});renderShelf();paintMark()}).catch(function(e){})}
+function markRead(b,c){var kk=rlKey(b,c);if(RL[kk]){if(window.toast)toast('Already read.');return}
+RL[kk]=1;
+if(window.sb&&window.PROFILE){sb.from('reading_log').upsert({profile_id:PROFILE.id,book:b,chapter:c},{ignoreDuplicates:true}).then(function(r){
+if(r.error&&window.toast)toast('Could not save it: '+r.error.message)}).catch(function(e){})}
+else{try{localStorage.setItem(RLK,JSON.stringify(RL))}catch(e){}}
+if(window.toast)toast(refCaps(b,c)+' \u00B7 READ.');paintMark();renderShelf()}
+/* ---- highlights ---- */
+function loadHLs(cb){if(HLROWS){cb&&cb();return}
+if(!window.sb||!window.PROFILE){HLROWS=[];cb&&cb();return}
+sb.from('highlights').select('id,tr,book,chapter,v_start,v_end').then(function(r){
+HLROWS=(r.error||!r.data)?[]:r.data;cb&&cb()}).catch(function(e){HLROWS=[];cb&&cb()})}
+function hlFor(b,c){var out=[];(HLROWS||[]).forEach(function(h){if(h.tr===TR&&h.book===b&&h.chapter===c)out.push(h)});return out}
+function paintHLs(){var rows=hlFor(cur.b,cur.c);var m={};rows.forEach(function(h){for(var v=h.v_start;v<=h.v_end;v++)m[v]=1});
+var vs=J('rdCols').querySelectorAll('.vv');for(var i=0;i<vs.length;i++){var v=+vs[i].getAttribute('data-v');vs[i].classList.toggle('hl',!!m[v])}}
+function runsOf(sel){var vs=[];for(var k in sel)vs.push(+k);vs.sort(function(a,b){return a-b});
+var runs=[];vs.forEach(function(v){var L=runs[runs.length-1];if(L&&v===L[1]+1)L[1]=v;else runs.push([v,v])});return runs}
+function saveHL(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
+var runs=runsOf(SEL);if(!runs.length)return;
+var rows=runs.map(function(r){return{profile_id:PROFILE.id,tr:TR,book:cur.b,chapter:cur.c,v_start:r[0],v_end:r[1]}});
+sb.from('highlights').insert(rows).select().then(function(r){
+if(r.error){if(window.toast)toast('Could not save it: '+r.error.message);return}
+HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast('HIGHLIGHTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
+function removeHL(row){if(!window.sb||!row)return;
+sb.from('highlights').delete().eq('id',row.id).then(function(r){
+if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
+HLROWS=(HLROWS||[]).filter(function(h){return h.id!==row.id});hlMode=null;vbarSync();paintHLs();if(window.toast)toast('Removed.')}).catch(function(e){})}
+/* ---- selection + verse bar ---- */
+function clearSel(){SEL={};hlMode=null;var vs=J('rdCols').querySelectorAll('.vv.sel');for(var i=0;i<vs.length;i++)vs[i].classList.remove('sel');vbarSync()}
+function selCount(){var n=0;for(var k in SEL)n++;return n}
+function vbarSync(){var bar=J('vbar');var on=selCount()>0||!!hlMode;bar.classList.toggle('on',on);
+if(!on)return;
+J('vbHl').textContent=hlMode?'Remove the Highlight.':'Highlight.';
+J('vbClear').textContent=hlMode?'Close.':'Clear.'}
+J('rdCols').addEventListener('click',function(ev){var el=ev.target.closest?ev.target.closest('.vv'):null;if(!el)return;
+var v=+el.getAttribute('data-v');
+if(selCount()===0&&!hlMode&&el.classList.contains('hl')){var rows=hlFor(cur.b,cur.c);for(var i=0;i<rows.length;i++){if(v>=rows[i].v_start&&v<=rows[i].v_end){hlMode=rows[i];break}}
+vbarSync();return}
+if(hlMode){hlMode=null}
+if(SEL[v]){delete SEL[v];el.classList.remove('sel')}else{SEL[v]=1;el.classList.add('sel')}
+vbarSync()});
+J('vbClear').onclick=function(){clearSel()};
+J('vbHl').onclick=function(){if(hlMode){removeHL(hlMode)}else{saveHL()}};
+J('vbCard').onclick=function(){var has=hlMode?[[hlMode.v_start,hlMode.v_end]]:runsOf(SEL);if(!has.length)return;openCard(has)};
+/* ---- reader ---- */
+function lock(on){document.body.classList.toggle('rd-lock',on)}
+function openReader(b,c,anchor){cur.b=b;cur.c=c;clearSel();
+J('reader').classList.add('on');lock(true);
+J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
+J('rdPill').textContent=refCaps(b,c);J('rdTr').textContent=trUC();
+try{localStorage.setItem(POSK,JSON.stringify({b:b,c:c}))}catch(e){}
+loadHLs(function(){
+getBook(TR,b,function(j,err){J('rdLoad').style.display='none';
+if(err){J('rdCols').innerHTML='<div style="font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:13px;color:var(--muted);padding:8px 0">The book could not load: '+err+'. Check the connection and try again.</div>';return}
+renderChapter(j,anchor||0)})})}
+function closeReader(){J('reader').classList.remove('on');lock(false);clearSel();renderShelf()}
+J('rdBack').onclick=closeReader;
+function vspan(n,t){return '<span class="vv" data-v="'+n+'"><span class="vn">'+n+'</span>'+t+'</span> '}
+function renderChapter(j,anchor){var vs=j.c[cur.c-1]||[];var h='<div class="rd-bkl">'+BOOKS[cur.b-1][0].toUpperCase()+'</div><div class="rd-num">'+cur.c+'</div><div>';
+for(var i=0;i<vs.length;i++){if(vs[i])h+=vspan(i+1,vs[i])}
+h+='</div><div class="rd-end"><button class="wbtn" id="rdMark"></button><button class="wbtn ghost" id="rdNx2">Next Chapter.</button></div>';
+J('rdCols').innerHTML=h;paintMark();
+J('rdMark').onclick=function(){markRead(cur.b,cur.c)};
+J('rdNx2').onclick=function(){stepChapter(1)};
+layout(function(){if(anchor)gotoVerse(anchor);else gotoPage(0)});paintHLs()}
+function paintMark(){var b=J('rdMark');if(!b)return;var rd=RL[rlKey(cur.b,cur.c)];
+b.textContent=rd?'Read.':'Mark the Chapter Read.';b.classList.toggle('done',!!rd)}
+function layout(cb){var view=J('rdView'),cols=J('rdCols');
+var pw=view.clientWidth,colW=Math.min(pw-48,640),left=Math.round((pw-colW)/2);
+cur.colW=colW;cur.left=left;cur.step=colW+52;
+cols.style.columnWidth=colW+'px';cols.style.padding='26px '+left+'px';
+requestAnimationFrame(function(){var total=cols.scrollWidth-left;
+var pg=Math.max(1,Math.ceil(total/cur.step));
+while(pg>1&&(pg-1)*cur.step>=total)pg--;
+cur.pages=pg;cb&&cb()})}
+function gotoPage(p){if(p<0)p=0;if(p>cur.pages-1)p=cur.pages-1;cur.page=p;
+J('rdSlide').style.transform='translateX('+(-p*cur.step)+'px)';
+J('rdPg').textContent='PAGE '+(p+1)+' OF '+cur.pages}
+function gotoVerse(v){var el=J('rdCols').querySelector('.vv[data-v="'+v+'"]');if(!el){gotoPage(0);return}
+var p=Math.floor((el.offsetLeft-cur.left+4)/cur.step);gotoPage(p);
+el.classList.add('fl');setTimeout(function(){el.classList.remove('fl')},1600)}
+function pageStep(d){var n=cur.page+d;
+if(n>cur.pages-1){stepChapter(1);return}
+if(n<0){stepChapter(-1,true);return}
+gotoPage(n)}
+function stepChapter(d,toEnd){var b=cur.b,c=cur.c+d;
+if(c>BOOKS[b-1][1]){b++;c=1;if(b>66){if(window.toast)toast('That is the whole Word.');return}}
+if(c<1){b--;if(b<1){gotoPage(0);return}c=BOOKS[b-1][1]}
+openReaderKeep(b,c,toEnd)}
+function openReaderKeep(b,c,toEnd){cur.b=b;cur.c=c;clearSel();
+J('rdPill').textContent=refCaps(b,c);
+try{localStorage.setItem(POSK,JSON.stringify({b:b,c:c}))}catch(e){}
+getBook(TR,b,function(j,err){if(err){if(window.toast)toast('The book could not load: '+err);return}
+renderChapter(j,0);if(toEnd){setTimeout(function(){gotoPage(cur.pages-1)},60)}})}
+J('rdTzL').onclick=function(){pageStep(-1)};
+J('rdTzR').onclick=function(){pageStep(1)};
+J('rdPrev').onclick=function(){stepChapter(-1)};
+J('rdNext').onclick=function(){stepChapter(1)};
+var tx=0,ty=0;
+J('rdView').addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY},{passive:true});
+J('rdView').addEventListener('touchend',function(e){var t=e.changedTouches[0];var dx=t.clientX-tx,dy=t.clientY-ty;
+if(Math.abs(dx)>44&&Math.abs(dy)<80)pageStep(dx<0?1:-1)},{passive:true});
+document.addEventListener('keydown',function(e){if(!J('reader').classList.contains('on'))return;
+if(e.key==='ArrowRight')pageStep(1);if(e.key==='ArrowLeft')pageStep(-1);if(e.key==='Escape')closeReader()});
+var rsT;window.addEventListener('resize',function(){if(!J('reader').classList.contains('on'))return;
+clearTimeout(rsT);rsT=setTimeout(function(){var keep=cur.page;layout(function(){gotoPage(Math.min(keep,cur.pages-1))})},160)});
+/* ---- version toggle ---- */
+J('rdTr').onclick=function(){TR=TR==='web'?'kjv':'web';try{localStorage.setItem('deeds_tr',TR)}catch(e){}
+J('rdTr').textContent=trUC();var l=J('wdTrL');if(l)l.textContent=trUC();
+getBook(TR,cur.b,function(j,err){if(err){if(window.toast)toast('The book could not load: '+err);return}renderChapter(j,0)})};
+/* ---- picker ---- */
+function openPick(){pickBooks();if(window.sheet)sheet('#picksheet')}
+J('rdPill').onclick=openPick;
+function pickBooks(){J('pkH').textContent='The Word.';var h='<div class="pk-t">The Old Testament</div>';
+for(var i=0;i<39;i++)h+='<button class="pk-b" data-pb="'+(i+1)+'"><span class="n">'+BOOKS[i][0]+'</span><span class="c">'+BOOKS[i][1]+'</span></button>';
+h+='<div class="pk-t">The New Testament</div>';
+for(var j=39;j<66;j++)h+='<button class="pk-b" data-pb="'+(j+1)+'"><span class="n">'+BOOKS[j][0]+'</span><span class="c">'+BOOKS[j][1]+'</span></button>';
+J('pkBody').innerHTML=h;
+var bs=J('pkBody').querySelectorAll('[data-pb]');for(var q=0;q<bs.length;q++)bs[q].onclick=(function(bb){return function(){pickChaps(bb)}})(+bs[q].getAttribute('data-pb'))}
+function pickChaps(b){J('pkH').textContent=BOOKS[b-1][0]+'.';var n=BOOKS[b-1][1];
+var h='<button class="pk-b" id="pkBackB"><span class="n">All the Books.</span><span class="c">BACK</span></button><div class="pk-c">';
+for(var c=1;c<=n;c++)h+='<button data-pc="'+c+'"'+(RL[rlKey(b,c)]?' class="rd"':'')+'>'+c+'</button>';
+h+='</div>';J('pkBody').innerHTML=h;
+J('pkBackB').onclick=pickBooks;
+var cs=J('pkBody').querySelectorAll('[data-pc]');for(var q=0;q<cs.length;q++)cs[q].onclick=(function(cc){return function(){if(window.closeSheets)closeSheets();openReader(b,cc,0)}})(+cs[q].getAttribute('data-pc'))}
+/* ---- the forty ---- */
+function jump40(i){var f=FORTY[i];if(window.closeSheets)closeSheets();openReader(f[0],f[1],f[2])}
+function fortyList(){var h='';FORTY.forEach(function(f,i){
+h+='<button class="fo-r" data-fj="'+i+'"><span class="fn">'+(i<9?'0':'')+(i+1)+'</span><span class="in"><span class="ft">'+f[3]+'</span><div class="fr">'+refCaps(f[0],f[1])+'</div></span></button>'});
+J('foList').innerHTML=h;
+var rs=J('foList').querySelectorAll('[data-fj]');for(var q=0;q<rs.length;q++)rs[q].onclick=(function(ii){return function(){jump40(ii)}})(+rs[q].getAttribute('data-fj'))}
+function openForty(){fortyList();if(window.sheet)sheet('#fortysheet')}
+J('rd40').onclick=openForty;
+/* ---- shelf ---- */
+function renderShelf(){var pg=J('pg-read');if(!pg)return;loadRL();
+var p=portion();
+J('wdDayL').textContent='Today\u2019s Reading \u00B7 Day '+p.day;
+var h='';p.list.forEach(function(bc){var done=RL[rlKey(bc[0],bc[1])];
+h+='<button class="wchip'+(done?' done':'')+'" data-wp="'+bc[0]+':'+bc[1]+'">'+ABBR[bc[0]-1]+' '+bc[1]+(done?' \u2713':'')+'</button>'});
+J('wdPort').innerHTML=h;
+var ws=J('wdPort').querySelectorAll('[data-wp]');for(var q=0;q<ws.length;q++)ws[q].onclick=(function(s){return function(){var a=s.split(':');openReader(+a[0],+a[1],0)}})(ws[q].getAttribute('data-wp'));
+J('wmOrder').classList.toggle('done',MODE==='order');
+J('wmShuffle').classList.toggle('done',MODE==='shuffle');
+var rh='';FORTY.forEach(function(f,i){
+rh+='<button class="fcard" data-fr="'+i+'"><div class="fn">'+(i<9?'0':'')+(i+1)+'</div><div class="ft">'+f[3]+'</div><div class="fr">'+refCaps(f[0],f[1])+'</div></button>'});
+J('wdRail').innerHTML=rh;
+var rc=J('wdRail').querySelectorAll('[data-fr]');for(var q2=0;q2<rc.length;q2++)rc[q2].onclick=(function(ii){return function(){jump40(ii)}})(+rc[q2].getAttribute('data-fr'));
+var res='';try{var pos=JSON.parse(localStorage.getItem(POSK)||'null');if(pos&&pos.b)res='<button class="pk-b" id="wdRes"><span class="n">Keep Reading.</span><span class="c">'+refCaps(pos.b,pos.c)+'</span></button>'}catch(e){}
+var bh=res+'<div class="pk-t">The Old Testament</div><div class="bgrid">';
+for(var i=0;i<39;i++)bh+='<button class="bk" data-wb="'+(i+1)+'"><span class="bn">'+BOOKS[i][0]+'</span><span class="bc">'+BOOKS[i][1]+'</span></button>';
+bh+='</div><div class="pk-t">The New Testament</div><div class="bgrid">';
+for(var j=39;j<66;j++)bh+='<button class="bk" data-wb="'+(j+1)+'"><span class="bn">'+BOOKS[j][0]+'</span><span class="bc">'+BOOKS[j][1]+'</span></button>';
+bh+='</div>';
+J('wdBooks').innerHTML=bh;
+var wr=J('wdRes');if(wr)wr.onclick=function(){try{var pos=JSON.parse(localStorage.getItem(POSK));openReader(pos.b,pos.c,0)}catch(e){}};
+var bs=J('wdBooks').querySelectorAll('[data-wb]');for(var q3=0;q3<bs.length;q3++)bs[q3].onclick=(function(bb){return function(){openReader(bb,1,0)}})(+bs[q3].getAttribute('data-wb'));
+var n=rlCount();
+J('wdStat').textContent=n+' OF '+TOTCH+' CHAPTERS READ \u00B7 '+trUC();
+var l=J('wdTrL');if(l)l.textContent=trUC()}
+J('wmOrder').onclick=function(){MODE='order';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
+J('wmShuffle').onclick=function(){MODE='shuffle';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
+J('wdFortyAll').onclick=openForty;
+/* ---- the card ---- */
+var CARD={runs:[],text:'',ref:''};
+function decode(s){var d=document.createElement('div');d.innerHTML=s;return d.textContent}
+function openCard(runs){var kk=TR+':'+cur.b;var j=CACHE[kk];if(!j)return;
+var vs=j.c[cur.c-1]||[];var parts=[];
+runs.forEach(function(r){var seg=[];for(var v=r[0];v<=r[1];v++){if(vs[v-1])seg.push(vs[v-1])}parts.push(seg.join(' '))});
+CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
+var rt=runs.map(function(r){return r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]}).join(', ');
+CARD.ref=refCaps(cur.b,cur.c)+' : '+rt;
+CARD.body=disp(cur.b,cur.c)+':'+rt+' \u00B7 '+trUC();
+drawCard();if(window.sheet)sheet('#cardsheet')}
+function spaced(ctx,t,x,y,ls){var cx=x;for(var i=0;i<t.length;i++){ctx.fillText(t[i],cx,y);cx+=ctx.measureText(t[i]).width+ls}return cx-ls}
+function wrapFit(ctx,text,maxW,maxH,start,min,lh){var size=start;
+while(size>=min){ctx.font='400 '+size+'px Georgia,"Times New Roman",serif';
+var words=text.split(' '),lines=[],line='';
+for(var i=0;i<words.length;i++){var t=line?line+' '+words[i]:words[i];
+if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=words[i]}else line=t}
+if(line)lines.push(line);
+if(lines.length*size*lh<=maxH)return{size:size,lines:lines};
+size-=2}
+ctx.font='400 '+min+'px Georgia,"Times New Roman",serif';
+var words2=text.split(' '),lines2=[],line2='';
+for(var i2=0;i2<words2.length;i2++){var t2=line2?line2+' '+words2[i2]:words2[i2];
+if(ctx.measureText(t2).width>maxW&&line2){lines2.push(line2);line2=words2[i2]}else line2=t2}
+if(line2)lines2.push(line2);
+var maxL=Math.floor(maxH/(min*lh));
+if(lines2.length>maxL){lines2=lines2.slice(0,maxL);lines2[maxL-1]=lines2[maxL-1].replace(/\s+\S*$/,'')+' \u2026'}
+return{size:min,lines:lines2}}
+function drawCard(){var cv=J('cardcv'),ctx=cv.getContext('2d');var W=1080,H=1350,M=96;
+var iv=CW==='ivory';
+var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
+ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
+spaced(ctx,'THE WORD \u00B7 '+trUC(),M,152,8);
+var txt=decode(CARD.text);
+var fit=wrapFit(ctx,txt,W-2*M,760,60,30,1.44);
+ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px Georgia,"Times New Roman",serif';
+var bh=fit.lines.length*fit.size*1.44;
+var y0=240+(800-bh)/2+fit.size;
+fit.lines.forEach(function(L,i){ctx.fillText(L,M,y0+i*fit.size*1.44)});
+ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
+ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';
+spaced(ctx,CARD.ref,M,1216,6);
+ctx.font='800 46px "Helvetica Neue",Helvetica,Arial,sans-serif';
+var w=ctx.measureText('DEEDS').width,pw=ctx.measureText('.').width;
+ctx.fillText('DEEDS',W-M-w-pw-4,1222);
+ctx.fillStyle=ac;ctx.fillText('.',W-M-pw,1222)}
+J('ccIvory').onclick=function(){CW='ivory';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
+J('ccIvory').classList.add('on');J('ccForest').classList.remove('on');drawCard()};
+J('ccForest').onclick=function(){CW='forest';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
+J('ccForest').classList.add('on');J('ccIvory').classList.remove('on');drawCard()};
+J('ccSave').onclick=function(){var cv=J('cardcv');
+cv.toBlob(function(bl){if(!bl)return;var a=document.createElement('a');
+a.href=URL.createObjectURL(bl);a.download='deeds-'+CARD.ref.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.jpg';
+document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)},'image/jpeg',.9)};
+J('ccPost').onclick=function(){if(!window.sb||!window.PROFILE){if(window.closeSheets)closeSheets();if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
+var b=J('ccPost');b.textContent='POSTING\u2026';
+J('cardcv').toBlob(function(bl){if(!bl){b.textContent='Post It.';return}
+var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
+if(r.error){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+r.error.message);return}
+var pay={profile_id:PROFILE.id,body:CARD.body,media_path:path,media_kind:'photo',media_w:1080,media_h:1350};
+sb.from('posts').insert(pay).select().single().then(function(q){b.textContent='Post It.';
+if(q.error){if(window.toast)toast('Could not post it: '+q.error.message);return}
+if(window.prependLive&&window.markKind)prependLive(markKind(q.data,'post'));
+if(window.closeSheets)closeSheets();if(window.toast)toast('POSTED.')})
+.catch(function(e){b.textContent='Post It.';if(window.toast)toast('Could not post it: '+String(e&&e.message||e))})})
+.catch(function(e){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+String(e&&e.message||e))})},'image/jpeg',.88)};
+/* ---- nav hook ---- */
+if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read')renderShelf()}}
+renderShelf();
 })();
 </script>
 </body>
