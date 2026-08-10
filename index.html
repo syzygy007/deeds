@@ -576,8 +576,6 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="frail" id="wdRail"></div>
       <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
       <div id="wdBooks"></div>
-      <div class="wd-sec"><div class="micro">The Notes</div><button class="mono" id="wdNoteNew" style="color:var(--forest)">New Note.</button></div>
-      <div id="wdNotes"></div>
       <div class="wd-sec"><div class="micro">The Library</div><button class="mono" id="wdWrite" style="color:var(--forest)">Write.</button></div>
       <div class="wd-sub" style="margin-bottom:8px">Studies and editorials by the readers. Free to read.</div>
       <div class="lgrid" id="wdLib"></div>
@@ -626,8 +624,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="micro">Your Connections</div>
         <div class="statline" id="cxstats" style="margin-top:0"></div>
       </div>
+      <div class="sect" id="rnsect">
+        <div class="wd-sec" style="margin-top:0"><div class="micro">The Notes</div><button class="mono" id="wdNoteNew" style="color:var(--forest)">New Note.</button></div>
+        <div class="wd-sub" style="margin-bottom:4px">Save verses with Note. while you read. Open a note here, then Write from It.</div>
+        <div id="wdNotes"></div>
+      </div>
       <div class="sect" id="notesect" style="display:none">
-        <div class="micro">Notes</div>
+        <div class="micro">Notes From Members</div>
         <div id="notelist"></div>
       </div>
       <div class="sect" id="viewpane">
@@ -2812,7 +2815,7 @@ var vs=j.c[c-1]||[],out=[];for(var v=s;v<=e;v++){if(vs[v-1])out.push(vs[v-1])}
 cb(decode(out.join(' ')))})}
 function loadNotes(cb){if(NOTES){cb&&cb();return}
 if(!window.sb||!window.PROFILE){NOTES=[];cb&&cb();return}
-sb.from('notes').select('id,title,created_at').order('created_at').then(function(r){
+sb.from('notebooks').select('id,title,created_at').order('created_at').then(function(r){
 NOTES=(r.error||!r.data)?[]:r.data;
 try{var cid=localStorage.getItem(NCK);if(cid)NOTES.forEach(function(n){if(n.id===cid)NOTE_CUR=n})}catch(e){}
 cb&&cb()}).catch(function(e){NOTES=[];cb&&cb()})}
@@ -2827,7 +2830,7 @@ if(!h)h='<div class="wd-sub">No notes yet. Name the first one below.</div>';
 J('nsList').innerHTML=h;
 var rs=J('nsList').querySelectorAll('[data-np]');for(var i=0;i<rs.length;i++)rs[i].onclick=(function(id){return function(){var n=null;NOTES.forEach(function(x){if(x.id===id)n=x});setCur(n);if(window.closeSheets)closeSheets();cb&&cb(n)}})(rs[i].getAttribute('data-np'));
 J('nsMake').onclick=function(){var t=(J('nsNew').value||'').trim();if(!t){if(window.toast)toast('Name it first.');return}
-sb.from('notes').insert({profile_id:PROFILE.id,title:t}).select().single().then(function(r){
+sb.from('notebooks').insert({profile_id:PROFILE.id,title:t}).select().single().then(function(r){
 if(r.error){if(window.toast)toast('Could not make it: '+r.error.message);return}
 NOTES.push(r.data);setCur(r.data);J('nsNew').value='';if(window.closeSheets)closeSheets();cb&&cb(r.data)}).catch(function(e){})};
 J('nsSkip').onclick=function(){if(window.closeSheets)closeSheets();cb&&cb(null)};
@@ -2847,7 +2850,7 @@ J('nvOpen').onclick=function(){setCur(n);if(window.toast)toast('OPEN \u00B7 '+St
 J('nvWrite').onclick=function(){if(window.closeSheets)closeSheets();openWriter(null,items)};
 J('nvDel').textContent='Delete the Note.';
 J('nvDel').onclick=function(){if(J('nvDel').textContent!=='Tap Again to Delete.'){J('nvDel').textContent='Tap Again to Delete.';return}
-sb.from('notes').delete().eq('id',n.id).then(function(){NOTES=(NOTES||[]).filter(function(x){return x.id!==n.id});
+sb.from('notebooks').delete().eq('id',n.id).then(function(){NOTES=(NOTES||[]).filter(function(x){return x.id!==n.id});
 (HLROWS||[]).forEach(function(h){if(h.note_id===n.id)h.note_id=null});
 if(NOTE_CUR&&NOTE_CUR.id===n.id)setCur(null);
 if(window.closeSheets)closeSheets();renderNL();if(window.toast)toast('Note deleted. The marks stay.')}).catch(function(e){})};
@@ -3035,7 +3038,7 @@ function route(){var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m
 window.addEventListener('hashchange',route);
 setTimeout(route,700);
 /* ---- nav hook ---- */
-if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}}}
+if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}if(p==='profile'&&typeof renderNL==='function')renderNL()}}
 renderShelf();
 })();
 </script>
