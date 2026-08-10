@@ -765,6 +765,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <div class="logrow" id="wtCats" style="flex-wrap:wrap;margin:0 0 4px"></div>
     <div id="wtCover"></div>
     <div id="wtBlocks"></div>
+    <button class="mono" id="wtDel" style="color:var(--muted);display:block;margin:28px auto 8px">Delete the Writing.</button>
   </div>
   <div class="wt-add"><button data-ab="p">Paragraph.</button><button data-ab="v">Scripture.</button><button data-ab="img">Image.</button><button data-ab="q">Quote.</button><button data-ab="a">Link.</button></div>
   <input type="file" id="wtFile" accept="image/*" style="display:none">
@@ -2926,6 +2927,7 @@ J('wtIvory').classList.toggle('on',WT.cover.cw!=='forest');
 J('wtForest').classList.toggle('on',WT.cover.cw==='forest');
 J('wtSv').textContent=WT.id?'SAVED.':'';
 J('wtPub').textContent='Preview.';paintKind();
+var _wd=J('wtDel');if(_wd)_wd.textContent='Delete the Writing.';
 drawWtCover();renderBlocks();
 J('writer').classList.add('on');lock(true)}
 function closeWriter(){J('writer').classList.remove('on');lock(false);renderNL()}
@@ -3017,6 +3019,17 @@ if(!WT.title&&!WT.blocks.length){if(window.toast)toast('Write something first.')
 saveWork(function(){if(!WT.id){if(window.toast)toast('Could not save it yet.');return}
 PREVIEWING=true;J('writer').classList.remove('on');openWork(WT.id)})};
 J('pubGo').onclick=function(){publishNow(J('pubGo'))};
+J('wtDel').onclick=function(){var b=J('wtDel');
+if(b.textContent!=='Tap Again to Delete.'){b.textContent='Tap Again to Delete.';return}
+if(!WT||!WT.id){WT=null;closeWriter();return}
+var wid=WT.id;
+sb.from('works').delete().eq('id',wid).then(function(r){
+if(r.error){b.textContent='Delete the Writing.';if(window.toast)toast('Could not delete it: '+r.error.message);return}
+try{var paths=[];if(WT.cover&&WT.cover.img)paths.push(WT.cover.img);
+(WT.blocks||[]).forEach(function(x){if(x.t==='img'&&x.p)paths.push(x.p)});
+if(paths.length)sb.storage.from('media').remove(paths).then(function(){}).catch(function(e){})}catch(e){}
+try{sb.from('posts').delete().eq('profile_id',PROFILE.id).like('body','%deeds.fun/#w='+wid+'%').then(function(){}).catch(function(e){})}catch(e){}
+MINE=null;WLIB=null;WT=null;if(window.toast)toast('Deleted.');closeWriter()}).catch(function(e){b.textContent='Delete the Writing.';if(window.toast)toast('Could not delete it: '+String(e&&e.message||e))})};
 function drawCoverCv(cb){var cv=J('cardcv'),ctx=cv.getContext('2d');var W=1080,H=1350,M=96;
 var iv=WT.cover.cw!=='forest';
 var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
