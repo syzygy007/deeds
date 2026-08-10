@@ -344,7 +344,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .wdcard .micro{color:var(--forest)}
 .wd-port{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
 .wchip{border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:800;font-size:12px;letter-spacing:.05em;color:var(--ink);background:none}
-.wchip.done{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+.wchip.done{background:var(--forest);border-color:var(--forest);color:var(--ivory)}.fcard.done{border-color:var(--forest);background:rgba(31,75,58,.07)}.fcard.done .fn{color:var(--forest)}.fo-r.rd{opacity:.55}
 .wd-modes{display:flex;gap:8px;align-items:center}
 .wd-modes .lbl{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--muted);text-transform:uppercase;margin-right:2px}
 .wd-sec{margin:20px 0 8px;display:flex;align-items:baseline;justify-content:space-between}
@@ -523,12 +523,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="wd-port" id="wdPort"></div>
         <div class="wd-modes"><span class="lbl">Plan</span><button class="wchip" id="wmOrder">In Order.</button><button class="wchip" id="wmShuffle">Shuffled.</button></div>
       </div>
-      <div class="wd-sec"><div class="micro">The Forty</div><button class="mono" id="wdFortyAll" style="color:var(--forest)">See All.</button></div>
+      <div class="wd-sec"><div class="micro" id="wd40L">The Forty</div><button class="mono" id="wdFortyAll" style="color:var(--forest)">See All.</button></div>
       <div class="wd-sub" style="margin-bottom:8px">Forty passages that move. Skip between the peaks.</div>
       <div class="frail" id="wdRail"></div>
       <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
       <div id="wdBooks"></div>
       <div class="wd-stat" id="wdStat"></div>
+      <button class="wbtn ghost" id="wdShare" style="margin:6px 0 2px">Share the Progress.</button>
     </div>
     <div class="page" id="pg-meet">
       <div class="pghead"><h1>Meet<b>.</b></h1><div class="micro">Surfaced By Deeds, Not By You</div></div>
@@ -691,8 +692,8 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   </div>
 </div>
 <div class="vbar" id="vbar">
-  <button id="vbHl" class="em">Highlight.</button>
-  <button id="vbCard">The Card.</button>
+  <button id="vbCard" class="em">Share.</button>
+  <button id="vbHl">Note.</button>
   <button id="vbClear" class="dim">Clear.</button>
 </div>
 <div class="sheet" id="picksheet">
@@ -2444,13 +2445,15 @@ var REPOCH=Date.UTC(2026,7,10);
 function dayN(){var n=new Date();var loc=Date.UTC(n.getFullYear(),n.getMonth(),n.getDate());var d=Math.floor((loc-REPOCH)/864e5)+1;return d<1?1:d}
 function djb2(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h}
 function mul32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296}}
-function portion(){var dn=dayN(),cyc=Math.floor((dn-1)/365),pos=(dn-1)%365;
-var idx=[];for(var i=0;i<TOTCH;i++)idx.push(i);
-if(MODE==='shuffle'){var seed=(djb2(window.PROFILE&&PROFILE.id?String(PROFILE.id):'guest')^(cyc+1))>>>0;var rnd=mul32(seed);
+function planDay(){return Math.min(365,Math.floor(rlCount()*365/TOTCH)+1)}
+function forty40(){var n=0;FORTY.forEach(function(f){if(RL[rlKey(f[0],f[1])])n++});return n}
+function portion(){var idx=[];for(var i=0;i<TOTCH;i++)idx.push(i);
+if(MODE==='shuffle'){var seed=(djb2(window.PROFILE&&PROFILE.id?String(PROFILE.id):'guest')^1)>>>0;var rnd=mul32(seed);
 for(var j=idx.length-1;j>0;j--){var r=Math.floor(rnd()*(j+1));var t2=idx[j];idx[j]=idx[r];idx[r]=t2}}
-var s=Math.round(pos*TOTCH/365),e=Math.round((pos+1)*TOTCH/365);
-var out=[];for(var q=s;q<e;q++)out.push(f2b(idx[q]));
-return{day:dn,list:out}}
+var day=planDay();
+var k=Math.round(day*TOTCH/365)-Math.round((day-1)*TOTCH/365);
+var out=[];for(var q=0;q<idx.length&&out.length<k;q++){var bc=f2b(idx[q]);if(!RL[rlKey(bc[0],bc[1])])out.push(bc)}
+return{day:day,list:out}}
 /* ---- reading log ---- */
 function rlKey(b,c){return b+':'+c}
 function rlCount(){var n=0;for(var k in RL)n++;return n}
@@ -2478,17 +2481,17 @@ var runs=runsOf(SEL);if(!runs.length)return;
 var rows=runs.map(function(r){return{profile_id:PROFILE.id,tr:TR,book:cur.b,chapter:cur.c,v_start:r[0],v_end:r[1]}});
 sb.from('highlights').insert(rows).select().then(function(r){
 if(r.error){if(window.toast)toast('Could not save it: '+r.error.message);return}
-HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast('HIGHLIGHTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
+HLROWS=(HLROWS||[]).concat(r.data||[]);clearSel();paintHLs();if(window.toast)toast('NOTED.')}).catch(function(e){if(window.toast)toast('Could not save it: '+String(e&&e.message||e))})}
 function removeHL(row){if(!window.sb||!row)return;
 sb.from('highlights').delete().eq('id',row.id).then(function(r){
 if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
-HLROWS=(HLROWS||[]).filter(function(h){return h.id!==row.id});hlMode=null;vbarSync();paintHLs();if(window.toast)toast('Removed.')}).catch(function(e){})}
+HLROWS=(HLROWS||[]).filter(function(h){return h.id!==row.id});hlMode=null;vbarSync();paintHLs();if(window.toast)toast('Note removed.')}).catch(function(e){})}
 /* ---- selection + verse bar ---- */
 function clearSel(){SEL={};hlMode=null;var vs=J('rdCols').querySelectorAll('.vv.sel');for(var i=0;i<vs.length;i++)vs[i].classList.remove('sel');vbarSync()}
 function selCount(){var n=0;for(var k in SEL)n++;return n}
 function vbarSync(){var bar=J('vbar');var on=selCount()>0||!!hlMode;bar.classList.toggle('on',on);
 if(!on)return;
-J('vbHl').textContent=hlMode?'Remove the Highlight.':'Highlight.';
+J('vbHl').textContent=hlMode?'Remove the Note.':'Note.';
 J('vbClear').textContent=hlMode?'Close.':'Clear.'}
 J('rdCols').addEventListener('click',function(ev){var el=ev.target.closest?ev.target.closest('.vv'):null;if(!el)return;
 var v=+el.getAttribute('data-v');
@@ -2583,8 +2586,8 @@ J('pkBackB').onclick=pickBooks;
 var cs=J('pkBody').querySelectorAll('[data-pc]');for(var q=0;q<cs.length;q++)cs[q].onclick=(function(cc){return function(){if(window.closeSheets)closeSheets();openReader(b,cc,0)}})(+cs[q].getAttribute('data-pc'))}
 /* ---- the forty ---- */
 function jump40(i){var f=FORTY[i];if(window.closeSheets)closeSheets();openReader(f[0],f[1],f[2])}
-function fortyList(){var h='';FORTY.forEach(function(f,i){
-h+='<button class="fo-r" data-fj="'+i+'"><span class="fn">'+(i<9?'0':'')+(i+1)+'</span><span class="in"><span class="ft">'+f[3]+'</span><div class="fr">'+refCaps(f[0],f[1])+'</div></span></button>'});
+function fortyList(){var h='';FORTY.forEach(function(f,i){var fd=RL[rlKey(f[0],f[1])];
+h+='<button class="fo-r'+(fd?' rd':'')+'" data-fj="'+i+'"><span class="fn">'+(i<9?'0':'')+(i+1)+'</span><span class="in"><span class="ft">'+f[3]+'</span><div class="fr">'+refCaps(f[0],f[1])+(fd?' \u2713':'')+'</div></span></button>'});
 J('foList').innerHTML=h;
 var rs=J('foList').querySelectorAll('[data-fj]');for(var q=0;q<rs.length;q++)rs[q].onclick=(function(ii){return function(){jump40(ii)}})(+rs[q].getAttribute('data-fj'))}
 function openForty(){fortyList();if(window.sheet)sheet('#fortysheet')}
@@ -2592,15 +2595,15 @@ J('rd40').onclick=openForty;
 /* ---- shelf ---- */
 function renderShelf(){var pg=J('pg-read');if(!pg)return;loadRL();
 var p=portion();
-J('wdDayL').textContent='Today\u2019s Reading \u00B7 Day '+p.day;
+J('wdDayL').textContent='Today\u2019s Reading \u00B7 Day '+p.day+' of 365';
 var h='';p.list.forEach(function(bc){var done=RL[rlKey(bc[0],bc[1])];
 h+='<button class="wchip'+(done?' done':'')+'" data-wp="'+bc[0]+':'+bc[1]+'">'+ABBR[bc[0]-1]+' '+bc[1]+(done?' \u2713':'')+'</button>'});
-J('wdPort').innerHTML=h;
+if(!p.list.length)h='<span class="wchip done">The whole Word \u00B7 Read \u2713</span>';J('wdPort').innerHTML=h;
 var ws=J('wdPort').querySelectorAll('[data-wp]');for(var q=0;q<ws.length;q++)ws[q].onclick=(function(s){return function(){var a=s.split(':');openReader(+a[0],+a[1],0)}})(ws[q].getAttribute('data-wp'));
 J('wmOrder').classList.toggle('done',MODE==='order');
 J('wmShuffle').classList.toggle('done',MODE==='shuffle');
-var rh='';FORTY.forEach(function(f,i){
-rh+='<button class="fcard" data-fr="'+i+'"><div class="fn">'+(i<9?'0':'')+(i+1)+'</div><div class="ft">'+f[3]+'</div><div class="fr">'+refCaps(f[0],f[1])+'</div></button>'});
+var rh='';FORTY.forEach(function(f,i){var fd=RL[rlKey(f[0],f[1])];
+rh+='<button class="fcard'+(fd?' done':'')+'" data-fr="'+i+'"><div class="fn">'+(i<9?'0':'')+(i+1)+'</div><div class="ft">'+f[3]+'</div><div class="fr">'+refCaps(f[0],f[1])+(fd?' \u2713':'')+'</div></button>'});
 J('wdRail').innerHTML=rh;
 var rc=J('wdRail').querySelectorAll('[data-fr]');for(var q2=0;q2<rc.length;q2++)rc[q2].onclick=(function(ii){return function(){jump40(ii)}})(+rc[q2].getAttribute('data-fr'));
 var res='';try{var pos=JSON.parse(localStorage.getItem(POSK)||'null');if(pos&&pos.b)res='<button class="pk-b" id="wdRes"><span class="n">Keep Reading.</span><span class="c">'+refCaps(pos.b,pos.c)+'</span></button>'}catch(e){}
@@ -2613,18 +2616,24 @@ J('wdBooks').innerHTML=bh;
 var wr=J('wdRes');if(wr)wr.onclick=function(){try{var pos=JSON.parse(localStorage.getItem(POSK));openReader(pos.b,pos.c,0)}catch(e){}};
 var bs=J('wdBooks').querySelectorAll('[data-wb]');for(var q3=0;q3<bs.length;q3++)bs[q3].onclick=(function(bb){return function(){openReader(bb,1,0)}})(+bs[q3].getAttribute('data-wb'));
 var n=rlCount();
-J('wdStat').textContent=n+' OF '+TOTCH+' CHAPTERS READ \u00B7 '+trUC();
+J('wdStat').textContent='DAY '+p.day+' OF 365 \u00B7 '+n+' OF '+TOTCH+' CHAPTERS \u00B7 THE FORTY '+forty40()+' OF 40 \u00B7 '+trUC();
+var fl4=J('wd40L');if(fl4)fl4.textContent='The Forty \u00B7 '+forty40()+' of 40';
 var l=J('wdTrL');if(l)l.textContent=trUC()}
 J('wmOrder').onclick=function(){MODE='order';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wmShuffle').onclick=function(){MODE='shuffle';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wdFortyAll').onclick=openForty;
+function openProgress(){CARD.kind='prog';CARD.day=planDay();CARD.f40=forty40();CARD.chs=rlCount();
+CARD.ref=(window.PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'THE WORD');
+CARD.body='The Word \u00B7 Day '+CARD.day+' of 365 \u00B7 The Forty '+CARD.f40+' of 40';
+drawCard();if(window.sheet)sheet('#cardsheet')}
+J('wdShare').onclick=openProgress;
 /* ---- the card ---- */
 var CARD={runs:[],text:'',ref:''};
 function decode(s){var d=document.createElement('div');d.innerHTML=s;return d.textContent}
 function openCard(runs){var kk=TR+':'+cur.b;var j=CACHE[kk];if(!j)return;
 var vs=j.c[cur.c-1]||[];var parts=[];
 runs.forEach(function(r){var seg=[];for(var v=r[0];v<=r[1];v++){if(vs[v-1])seg.push(vs[v-1])}parts.push(seg.join(' '))});
-CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
+CARD.kind='verse';CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
 var rt=runs.map(function(r){return r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]}).join(', ');
 CARD.ref=refCaps(cur.b,cur.c)+' : '+rt;
 CARD.body=disp(cur.b,cur.c)+':'+rt+' \u00B7 '+trUC();
@@ -2651,13 +2660,24 @@ var iv=CW==='ivory';
 var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
 ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
-spaced(ctx,'THE WORD \u00B7 '+trUC(),M,152,8);
+spaced(ctx,CARD.kind==='prog'?'THE WORD \u00B7 PROGRESS':'THE WORD \u00B7 '+trUC(),M,152,8);
+if(CARD.kind==='prog'){
+ctx.fillStyle=ink;ctx.font='400 122px Georgia,"Times New Roman",serif';
+ctx.fillText('Day '+CARD.day+'.',M,566);
+ctx.fillStyle=ac;ctx.font='400 52px Georgia,"Times New Roman",serif';
+ctx.fillText('of 365 in The Word.',M,648);
+ctx.fillStyle=ink;ctx.font='400 64px Georgia,"Times New Roman",serif';
+ctx.fillText('The Forty \u00B7 '+CARD.f40+' of 40.',M,836);
+ctx.fillStyle=ac;ctx.font='400 40px Georgia,"Times New Roman",serif';
+ctx.fillText(CARD.chs+' chapters read.',M,912);
+}else{
 var txt=decode(CARD.text);
 var fit=wrapFit(ctx,txt,W-2*M,760,60,30,1.44);
 ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px Georgia,"Times New Roman",serif';
 var bh=fit.lines.length*fit.size*1.44;
 var y0=240+(800-bh)/2+fit.size;
 fit.lines.forEach(function(L,i){ctx.fillText(L,M,y0+i*fit.size*1.44)});
+}
 ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
 ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';
 spaced(ctx,CARD.ref,M,1216,6);
@@ -2671,7 +2691,7 @@ J('ccForest').onclick=function(){CW='forest';try{localStorage.setItem('deeds_cw'
 J('ccForest').classList.add('on');J('ccIvory').classList.remove('on');drawCard()};
 J('ccSave').onclick=function(){var cv=J('cardcv');
 cv.toBlob(function(bl){if(!bl)return;
-var nm='deeds-'+CARD.ref.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.jpg';
+var nm=CARD.kind==='prog'?'deeds-progress-day-'+CARD.day+'.jpg':'deeds-'+CARD.ref.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.jpg';
 function dl(){var a=document.createElement('a');
 a.href=URL.createObjectURL(bl);a.download=nm;
 document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)}
