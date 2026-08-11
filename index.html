@@ -2214,7 +2214,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -2275,7 +2275,7 @@ var row=p.kind==='post'?{post_id:p.id,profile_id:PROFILE.id,kind:'inspired_me'}
                        :{deed_id:p.id,profile_id:PROFILE.id,kind:'inspired_me'};
 bumpInsp(k,!on);paintInsp(k);
 var q=on?sb.from(tbl).delete().match(row):sb.from(tbl).insert(row);
-q.then(function(r){if(r&&r.error){bumpInsp(k,on);paintInsp(k);toast('Not saved: '+r.error.message)}}).catch(function(){})}
+q.then(function(r){if(r&&r.error){if(!on&&/duplicate key/i.test(r.error.message)){MYINSP[k]=1;CINSP[k]=Math.max(0,(CINSP[k]||1)-1);paintInsp(k);toast('Already inspired.');return}bumpInsp(k,on);paintInsp(k);toast('Not saved: '+r.error.message)}}).catch(function(){})}
 
 /* ---- comments ---- */
 function paintCmt(k){$$('[data-lcmt="'+k+'"]').forEach(function(b){var s=b.querySelector('span');if(s)s.textContent=CCMT[k]||0})}
