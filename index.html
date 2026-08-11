@@ -476,7 +476,23 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .fcard{flex-basis:188px}
  .rd-num{font-size:76px}
 }
+.applnk{background:none;border:0;padding:0;font-size:14px;font-weight:800;color:var(--forest);letter-spacing:.01em;text-align:right}
+.applnk.mut{color:var(--muted)}
+#pwacard{display:none;border-left:3px solid var(--forest)}
+#pwacard.on{display:block}
+#pwacard .pwline{font-weight:800;font-size:16.5px;margin:6px 0 0}
+.appsteps{margin:12px 0 2px;padding:0;list-style:none}
+.appsteps li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.appsteps li:last-child{border-bottom:0}
+.appsteps .n{flex:0 0 22px;height:22px;border-radius:50%;background:var(--forest);color:var(--ivory);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.shareglyph{display:inline-block;width:14px;height:14px;vertical-align:-2px}
 </style>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="theme-color" content="#1F4B3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DEEDS.">
 </head>
 <body>
 
@@ -527,6 +543,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <div class="page on" id="pg-feed">
       <div class="searchwrap" id="searchwrap"><input id="searchin" type="search" placeholder="Search deeds, people, organizations." autocomplete="off"></div>
       <div id="pplres" style="display:none"></div>
+      <div class="post" id="pwacard"><div class="micro" style="color:var(--forest)" id="pwamicro">The App</div>
+        <p class="pwline" id="pwline">Put DEEDS. on your Home Screen.</p>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:9px">
+          <button class="wbtn" id="pwgo">Show Me How.</button>
+          <button class="applnk mut" id="pwno">Not Now.</button>
+        </div>
+      </div>
       <div id="feed"></div>
       <div class="endnote" id="endnote">That is every deed. Go make the next one.</div>
     </div>
@@ -653,6 +676,8 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="sect" id="viewpane">
         <div class="specrow"><span class="k">Type</span><span class="v" id="vType">Doer.</span></div>
         <div class="specrow"><span class="k">Reminders</span><span class="v" id="vRemind">Monthly.</span></div>
+        <div class="specrow"><span class="k">The App</span><button class="applnk" id="vApp">Show Me How.</button></div>
+        <div class="specrow"><span class="k">Alerts</span><button class="applnk" id="vAl">Turn On.</button></div>
       </div>
       <div id="editpane" style="display:none">
       <div class="sect">
@@ -742,6 +767,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 </div>
 
 <!-- OVERLAYS -->
+<div class="sheet" id="appsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Put DEEDS. on your phone.</h3>
+  <p class="remnote" style="margin-top:0">The full app. No app store.</p>
+  <ol class="appsteps" id="appSteps"></ol>
+  <button class="wbtn" id="appAct" style="display:none;width:100%;margin-top:12px">Install DEEDS.</button>
+  <p class="remnote">Inside the app, sign in with the same email. One code, same profile.</p>
+</div>
 <div class="scrim" id="scrim"></div>
 <div id="reader">
   <div class="rd-top">
@@ -3192,6 +3225,114 @@ setTimeout(route,700);
 /* ---- nav hook ---- */
 if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}if(p==='profile'&&typeof renderNL==='function')renderNL()}}
 renderShelf();
+})();
+</script>
+<script>
+/* ---- DEEDS. app layer: home screen install + push alerts (v3.0) ---- */
+(function(){
+'use strict';
+var PUB='BO3d7l9TkA-nlbtBkzjr_AB-973abfcvi-h-1fYeH8jwEpyl1Fg21mB9Sq_VnW1fz2hKffr2JTzJWK0qdZmyGrw';
+function q(s){return document.querySelector(s)}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+var iOS=/iphone|ipad|ipod/i.test(navigator.userAgent||'');
+var standalone=false;
+try{standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true}catch(e){}
+var canPush=('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window);
+var deferred=null;
+
+if(location.protocol==='https:'&&('serviceWorker' in navigator)){
+navigator.serviceWorker.register('/sw.js').catch(function(){});
+document.addEventListener('visibilitychange',function(){
+if(document.visibilityState!=='visible')return;
+navigator.serviceWorker.getRegistration().then(function(r){if(r)r.update()}).catch(function(){})});
+navigator.serviceWorker.addEventListener('message',function(ev){
+if(ev.data&&ev.data.deeds==='alerts'){var b=q('.bell');if(b)b.click()}});
+}
+
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;paint()});
+window.addEventListener('appinstalled',function(){lsSet('deeds_pwadis','1');paint()});
+
+function shareGlyph(){return '<svg class="shareglyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4 -4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/></svg>'}
+function fillSteps(){var el=q('#appSteps');if(!el)return;
+if(deferred){el.innerHTML='<li><span class="n">1</span><span>Tap Install DEEDS. below.</span></li><li><span class="n">2</span><span>Open DEEDS. from your Home Screen.</span></li><li><span class="n">3</span><span>Turn on Alerts from your Profile.</span></li>';return}
+if(iOS){el.innerHTML='<li><span class="n">1</span><span>Tap the Share button in Safari '+shareGlyph()+'</span></li><li><span class="n">2</span><span>Choose Add to Home Screen.</span></li><li><span class="n">3</span><span>Open DEEDS. from your Home Screen and turn on Alerts.</span></li>';return}
+el.innerHTML='<li><span class="n">1</span><span>Open deeds.fun on your phone.</span></li><li><span class="n">2</span><span>Add it to your Home Screen from the browser menu.</span></li>'}
+function openApp(){fillSteps();
+var act=q('#appAct');
+if(act){
+if(deferred){act.style.display='block';act.onclick=function(){var d=deferred;deferred=null;act.style.display='none';try{d.prompt()}catch(e){}}}
+else{act.style.display='none'}}
+if(window.sheet)window.sheet('#appsheet')}
+
+function u8(b64){var pad=new Array((4-b64.length%4)%4+1).join('=');
+var s=(b64+pad).replace(/-/g,'+').replace(/_/g,'/');
+var raw=atob(s);var a=new Uint8Array(raw.length);
+for(var i=0;i<raw.length;i++)a[i]=raw.charCodeAt(i);
+return a}
+function pushState(cb){if(!canPush){cb('unsupported');return}
+navigator.serviceWorker.ready.then(function(reg){return reg.pushManager.getSubscription()})
+.then(function(s){cb(s?'on':(Notification.permission==='denied'?'denied':'off'))})
+.catch(function(){cb('off')})}
+function pushOn(){
+if(!window.PROFILE){if(window.closeSheets)closeSheets();if(window.openJoin)openJoin();return}
+if(!canPush){openApp();return}
+Notification.requestPermission().then(function(p){
+if(p!=='granted'){if(window.toast)toast('Alerts stay off.');paint();return}
+navigator.serviceWorker.ready
+.then(function(reg){return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(PUB)})})
+.then(function(sub){var j=sub.toJSON();
+return window.sb.from('push_subs').upsert({profile_id:window.PROFILE.id,endpoint:sub.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,ua:String(navigator.userAgent||'').slice(0,140)},{onConflict:'endpoint'})})
+.then(function(r){
+if(r&&r.error){if(window.toast)toast('Not saved: '+r.error.message);return}
+if(window.toast)toast('Alerts are on.');
+paint()})
+.catch(function(){if(window.toast)toast('Alerts could not start.');paint()})})}
+
+function paint(){
+var vApp=q('#vApp');
+if(vApp){
+if(standalone){vApp.textContent='On Your Home Screen.';vApp.onclick=null;vApp.classList.add('mut')}
+else if(deferred||iOS){vApp.textContent='Show Me How.';vApp.onclick=openApp;vApp.classList.remove('mut')}
+else{vApp.textContent='Open deeds.fun On Your Phone.';vApp.onclick=null;vApp.classList.add('mut')}}
+pushState(function(st){
+var vAl=q('#vAl');
+if(vAl){
+if(st==='on'){vAl.textContent='On.';vAl.onclick=null;vAl.classList.add('mut')}
+else if(st==='denied'){vAl.textContent='Blocked In Settings.';vAl.onclick=null;vAl.classList.add('mut')}
+else if(st==='unsupported'){
+if(iOS&&!standalone){vAl.textContent='Add To Home Screen First.';vAl.onclick=openApp;vAl.classList.remove('mut')}
+else{vAl.textContent='Not On This Browser.';vAl.onclick=null;vAl.classList.add('mut')}}
+else{vAl.textContent='Turn On.';vAl.onclick=pushOn;vAl.classList.remove('mut')}}
+var card=q('#pwacard');if(!card)return;
+var mob=true;try{mob=matchMedia('(max-width:1079px)').matches}catch(e){}
+var micro=q('#pwamicro'),line=q('#pwline'),go=q('#pwgo');
+if(!standalone&&mob&&(iOS||deferred)&&!lsGet('deeds_pwadis')){
+micro.textContent='The App';
+line.textContent='Put DEEDS. on your Home Screen.';
+go.textContent=deferred?'Install.':'Show Me How.';
+go.onclick=openApp;card.classList.add('on')}
+else if(standalone&&canPush&&st==='off'&&window.PROFILE&&!lsGet('deeds_pushdis')){
+micro.textContent='Alerts';
+line.textContent='Know the moment your deeds move.';
+go.textContent='Turn On Alerts.';
+go.onclick=pushOn;card.classList.add('on')}
+else{card.classList.remove('on')}})}
+
+var pn=q('#pwno');
+if(pn)pn.onclick=function(){lsSet(standalone?'deeds_pushdis':'deeds_pwadis','1');var c=q('#pwacard');if(c)c.classList.remove('on')};
+
+if(/[?&]al=1/.test(location.search)){
+try{history.replaceState(null,'',location.pathname)}catch(e){}
+var tries=0,tm=setInterval(function(){tries++;
+if(window.PROFILE){clearInterval(tm);var b=q('.bell');if(b)b.click()}
+else if(tries>48){clearInterval(tm)}},250)}
+
+try{var _go=window.go;
+if(typeof _go==='function'){window.go=function(p){_go(p);if(p==='profile')setTimeout(paint,60)}}}catch(e){}
+paint();
+setTimeout(paint,1200);setTimeout(paint,3200);setTimeout(paint,7000);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')setTimeout(paint,200)});
 })();
 </script>
 </body>
