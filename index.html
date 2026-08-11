@@ -350,7 +350,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .wt-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .wt-x{font-weight:800;font-size:13px;color:var(--muted)}
 .wt-sv{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);letter-spacing:.08em}
-.wt-scroll{flex:1;overflow-y:auto;padding:18px 18px 130px;-webkit-overflow-scrolling:touch}
+.wt-scroll{flex:1;overflow-y:auto;padding:18px 18px 130px;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}.wt-scroll>*{flex:0 0 auto}
 .wt-title{width:100%;border:0;background:none;font-family:Georgia,"Times New Roman",serif;font-size:30px;color:var(--ink);padding:6px 0}
 .wt-blk{position:relative;margin:16px 0}
 .wt-blk textarea{width:100%;border:0;background:none;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.62;color:var(--ink);resize:none;min-height:52px;display:block}
@@ -392,7 +392,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .wk-q{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:22px;line-height:1.5;margin:0 0 18px;color:var(--ink)}
 .wk-img{width:100%;border-radius:12px;margin:0 0 16px;break-inside:avoid;display:block}
 .wk-a{display:block;font-size:13px;font-weight:800;color:var(--forest);margin:0 0 16px}
-body.wk-on #rdTr,body.wk-on #rd40,body.wk-on #rdMark{display:none}
+body.wk-on #rdTr,body.wk-on #rd40,body.wk-on #rdMark,body.wk-on #rdFind{display:none}
 .wd-modes{display:flex;gap:8px;align-items:center}
 .wd-modes .lbl{font-size:10px;letter-spacing:.14em;font-weight:800;color:var(--muted);text-transform:uppercase;margin-right:2px}
 .wd-sec{margin:20px 0 8px;display:flex;align-items:baseline;justify-content:space-between}
@@ -423,6 +423,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .rd-sp{flex:1}
 .rd-tr{font-size:10px;letter-spacing:.14em;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--forest)}
 .rd-40{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:7px 11px;color:var(--ink)}
+.rd-prog{height:2px;background:rgba(21,19,14,.08)}.rd-prog i{display:block;height:100%;width:0;background:var(--forest);transition:width .25s ease}
+.bk{position:relative}.bkbar{position:absolute;left:12px;right:12px;bottom:0;height:2px}.bkbar i{display:block;height:100%;background:var(--forest);border-radius:1px}
+.wpbar{height:3px;background:rgba(21,19,14,.08);border-radius:2px;margin:14px 0 10px;overflow:hidden}.wpbar i{display:block;height:100%;width:0;background:var(--forest);transition:width .4s ease}
+.fsrow{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 0}
+.fsref{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--forest)}
+.fstx{display:block;font-family:Georgia,"Times New Roman",serif;font-size:14px;line-height:1.45;color:var(--ink);margin-top:3px}
+.fstx b{font-weight:400;background:rgba(31,75,58,.16);border-radius:2px}
+.fsct{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.08em;color:var(--muted);margin:10px 0 2px}
 .rd-view{flex:1;overflow:hidden;position:relative}
 .rd-slide{height:100%;transition:transform .28s cubic-bezier(.32,.72,.3,1);will-change:transform}
 .rd-cols{height:100%;column-gap:52px;font-family:Georgia,'Iowan Old Style','Times New Roman',serif;font-size:19px;line-height:1.78;color:var(--ink)}
@@ -582,6 +590,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="wd-sub" style="margin-bottom:8px">Written by the members. Free to read.</div>
       <div class="logrow" id="wdCats" style="flex-wrap:wrap;margin-bottom:10px"></div>
       <div class="lgrid" id="wdLib"></div>
+      <div class="wpbar"><i id="wdBar"></i></div>
       <div class="wd-stat" id="wdStat"></div>
       <button class="wbtn ghost" id="wdShare" style="margin:6px 0 2px">Share the Progress.</button>
     </div>
@@ -739,9 +748,11 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <button class="rback" id="rdBack" aria-label="Close the reader"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
     <button class="rd-pill" id="rdPill">JOHN 1</button>
     <div class="rd-sp"></div>
+    <button class="rd-40" id="rdFind" aria-label="Search the Word"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="display:block"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg></button>
     <button class="rd-40" id="rd40">40</button>
     <button class="rd-tr" id="rdTr">WEB</button>
   </div>
+  <div class="rd-prog"><i id="rdProg"></i></div>
   <div class="rd-view" id="rdView">
     <div class="rd-slide" id="rdSlide"><div class="rd-cols" id="rdCols"></div></div>
     <div class="rd-tz l" id="rdTzL"></div>
@@ -765,7 +776,8 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <div class="logrow" id="wtCats" style="flex-wrap:wrap;margin:0 0 4px"></div>
     <div id="wtCover"></div>
     <div id="wtBlocks"></div>
-    <button class="mono" id="wtDel" style="color:var(--muted);display:block;margin:28px auto 8px">Delete the Writing.</button>
+    <div style="flex:1 0 44px"></div>
+    <button class="mono" id="wtDel" style="color:var(--muted);display:block;margin:0 auto 8px">Delete the Writing.</button>
   </div>
   <div class="wt-add"><button data-ab="p">Paragraph.</button><button data-ab="v">Scripture.</button><button data-ab="img">Image.</button><button data-ab="q">Quote.</button><button data-ab="a">Link.</button></div>
   <input type="file" id="wtFile" accept="image/*" style="display:none">
@@ -786,6 +798,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <h3>The Forty.</h3>
   <div class="wd-sub">Forty passages that move. Skip between the peaks.</div>
   <div id="foList"></div>
+</div>
+<div class="sheet" id="findsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Search the Word.</h3>
+  <div class="wd-sub">Every verse of the whole Bible.</div>
+  <input class="chfield" id="fsQ" placeholder="A word or a phrase." autocomplete="off">
+  <div class="fsct" id="fsCt"></div>
+  <div id="fsList"></div>
 </div>
 <div class="sheet" id="cardsheet">
   <div class="sword">DEEDS<b>.</b></div>
@@ -2678,7 +2698,8 @@ cur.pages=pg;cb&&cb()})}
 function gotoPage(p){if(p<0)p=0;if(p>cur.pages-1)p=cur.pages-1;cur.page=p;
 if(WMODE&&WKCUR&&!WKCUR.own&&!WKCUR.fin&&p>=cur.pages-1){WKCUR.fin=true;try{var _rk='deeds_wrd_'+WKCUR.id,_td=new Date().toISOString().slice(0,10);if(localStorage.getItem(_rk)!==_td){localStorage.setItem(_rk,_td);if(window.sb)sb.rpc('work_read',{w:WKCUR.id}).then(function(){}).catch(function(e){})}}catch(e){}}
 J('rdSlide').style.transform='translateX('+(-p*cur.step)+'px)';
-J('rdPg').textContent='PAGE '+(p+1)+' OF '+cur.pages}
+J('rdPg').textContent='PAGE '+(p+1)+' OF '+cur.pages;
+var _pf=J('rdProg');if(_pf)_pf.style.width=(cur.pages?Math.round(((p+1)/cur.pages)*100):0)+'%'}
 function gotoVerse(v){var el=J('rdCols').querySelector('.vv[data-v="'+v+'"]');if(!el){gotoPage(0);return}
 var p=Math.floor((el.offsetLeft-cur.left+4)/cur.step);gotoPage(p);
 el.classList.add('fl');setTimeout(function(){el.classList.remove('fl')},1600)}
@@ -2697,6 +2718,29 @@ getBook(TR,b,function(j,err){if(err){if(window.toast)toast('The book could not l
 renderChapter(j,0);if(toEnd){setTimeout(function(){gotoPage(cur.pages-1)},60)}})}
 J('rdTzL').onclick=function(){pageStep(-1)};
 J('rdTzR').onclick=function(){pageStep(1)};
+/* ---- search the Word ---- */
+function fsEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fsSnip(t,q){var lo=t.toLowerCase(),i=lo.indexOf(q);if(i<0)return fsEsc(t.slice(0,120));
+var a=Math.max(0,i-46),b=Math.min(t.length,i+q.length+74);
+return (a>0?'\u2026':'')+fsEsc(t.slice(a,i))+'<b>'+fsEsc(t.slice(i,i+q.length))+'</b>'+fsEsc(t.slice(i+q.length,b))+(b<t.length?'\u2026':'')}
+var fsT=null;
+function fsRun(){var q=(J('fsQ').value||'').trim().toLowerCase();
+if(q.length<2){J('fsList').innerHTML='';J('fsCt').textContent=q.length?'TYPE AT LEAST 2 LETTERS.':'';return}
+if(!VOL[TR]){J('fsCt').textContent='OPENING THE WORD\u2026';getBook(TR,1,function(){fsRun()});return}
+var hits=[],total=0;
+for(var b=1;b<=66;b++){var bk=VOL[TR][b];if(!bk)continue;
+for(var c=0;c<bk.c.length;c++){var vs=bk.c[c]||[];
+for(var v=0;v<vs.length;v++){var t=vs[v];if(!t)continue;
+if(t.toLowerCase().indexOf(q)>-1){total++;if(hits.length<200)hits.push([b,c+1,v+1,t])}}}}
+J('fsCt').textContent=total?(total+(total===1?' VERSE':' VERSES')+' \u00B7 '+trUC()+(total>200?' \u00B7 SHOWING THE FIRST 200':'')):('NOTHING FOUND \u00B7 '+trUC());
+var h='';hits.forEach(function(r){h+='<button class="fsrow" data-fs="'+r[0]+':'+r[1]+':'+r[2]+'"><span class="fsref">'+refCaps(r[0],r[1])+':'+r[2]+'</span><span class="fstx">'+fsSnip(r[3],q)+'</span></button>'});
+J('fsList').innerHTML=h}
+J('fsQ').addEventListener('input',function(){clearTimeout(fsT);fsT=setTimeout(fsRun,220)});
+J('fsList').addEventListener('click',function(ev){var el=ev.target.closest?ev.target.closest('.fsrow'):null;if(!el)return;
+var a=el.getAttribute('data-fs').split(':');
+if(window.closeSheets)closeSheets();
+openReader(+a[0],+a[1],+a[2])});
+J('rdFind').onclick=function(){if(window.sheet)sheet('#findsheet');setTimeout(function(){try{J('fsQ').focus()}catch(e){}},80)};
 J('rdPrev').onclick=function(){if(WMODE)pageStep(-1);else stepChapter(-1)};
 J('rdNext').onclick=function(){if(WMODE)pageStep(1);else stepChapter(1)};
 var tx=0,ty=0;
@@ -2749,16 +2793,20 @@ rh+='<button class="fcard'+(fd?' done':'')+'" data-fr="'+i+'"><div class="fn">'+
 J('wdRail').innerHTML=rh;
 var rc=J('wdRail').querySelectorAll('[data-fr]');for(var q2=0;q2<rc.length;q2++)rc[q2].onclick=(function(ii){return function(){jump40(ii)}})(+rc[q2].getAttribute('data-fr'));
 var res='';try{var pos=JSON.parse(localStorage.getItem(POSK)||'null');if(pos&&pos.b)res='<button class="pk-b" id="wdRes"><span class="n">Keep Reading.</span><span class="c">'+refCaps(pos.b,pos.c)+'</span></button>'}catch(e){}
+var perB={};for(var kx in RL){var bx=+String(kx).split(':')[0];perB[bx]=(perB[bx]||0)+1}
+function bkTile(i){var rdn=perB[i+1]||0,tot=BOOKS[i][1],pc=Math.min(100,Math.round(rdn*100/tot));
+return '<button class="bk" data-wb="'+(i+1)+'"><span class="bn">'+BOOKS[i][0]+'</span><span class="bc">'+(rdn>0?rdn+' / ':'')+BOOKS[i][1]+'</span>'+(rdn>0?'<span class="bkbar"><i style="width:'+pc+'%"></i></span>':'')+'</button>'}
 var bh=res+'<div class="pk-t">The Old Testament</div><div class="bgrid">';
-for(var i=0;i<39;i++)bh+='<button class="bk" data-wb="'+(i+1)+'"><span class="bn">'+BOOKS[i][0]+'</span><span class="bc">'+BOOKS[i][1]+'</span></button>';
+for(var i=0;i<39;i++)bh+=bkTile(i);
 bh+='</div><div class="pk-t">The New Testament</div><div class="bgrid">';
-for(var j=39;j<66;j++)bh+='<button class="bk" data-wb="'+(j+1)+'"><span class="bn">'+BOOKS[j][0]+'</span><span class="bc">'+BOOKS[j][1]+'</span></button>';
+for(var j=39;j<66;j++)bh+=bkTile(j);
 bh+='</div>';
 J('wdBooks').innerHTML=bh;
 var wr=J('wdRes');if(wr)wr.onclick=function(){try{var pos=JSON.parse(localStorage.getItem(POSK));openReader(pos.b,pos.c,0)}catch(e){}};
 var bs=J('wdBooks').querySelectorAll('[data-wb]');for(var q3=0;q3<bs.length;q3++)bs[q3].onclick=(function(bb){return function(){openReader(bb,1,0)}})(+bs[q3].getAttribute('data-wb'));
 var n=rlCount();
 J('wdStat').textContent='DAY '+p.day+' OF 365 \u00B7 '+n+' OF '+TOTCH+' CHAPTERS \u00B7 THE FORTY '+forty40()+' OF 40 \u00B7 '+trUC();
+var _wb=J('wdBar');if(_wb)_wb.style.width=(Math.round(n*1000/TOTCH)/10)+'%';
 var fl4=J('wd40L');if(fl4)fl4.textContent='The Forty \u00B7 '+forty40()+' of 40';
 var l=J('wdTrL');if(l)l.textContent=trUC();if(typeof renderNL==='function')renderNL()}
 J('wmOrder').onclick=function(){MODE='order';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
@@ -3008,9 +3056,10 @@ drawCoverCv(function(bl){if(!bl){b.textContent='Republish.';finishPub();return}
 var path=PROFILE.id+'/'+Date.now()+'-cover.jpg';
 sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r.error){finishPub();return}
-sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+(WT.kind==='book'?' \u00B7 a book on DEEDS \u00B7 ':' \u00B7 an editorial on DEEDS \u00B7 ')+'deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
+function annPost(){sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+(WT.kind==='book'?' \u00B7 a book on DEEDS \u00B7 ':' \u00B7 an editorial on DEEDS \u00B7 ')+'deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
 if(!q.error&&window.prependLive&&window.markKind)prependLive(markKind(q.data,'post'));
-finishPub()}).catch(function(e){finishPub()})}).catch(function(e){finishPub()})})});
+finishPub()}).catch(function(e){finishPub()})}
+sb.from('posts').delete().eq('profile_id',PROFILE.id).like('body','%deeds.fun/#w='+WT.id+'%').then(function(){annPost()}).catch(function(e){annPost()})}).catch(function(e){finishPub()})})});
 function finishPub(){b.textContent='PUBLISH.';WLIB=null;MINE=null;if(window.toast)toast('PUBLISHED. It is on the shelf.');
 PREVIEWING=false;var pb=J('pubbar');if(pb)pb.classList.remove('on');
 if(J('reader').classList.contains('on'))closeReader();closeWriter()}}
@@ -3036,10 +3085,10 @@ var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A
 function paint(img){ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 var ty=560;
 if(img){var s=Math.max(W/img.width,620/img.height);var dw=img.width*s,dh=img.height*s;
-ctx.drawImage(img,(W-dw)/2,0,dw,dh>620?620:dh);ty=700;
+ctx.drawImage(img,(W-dw)/2,0,dw,dh>620?620:dh);ty=764;
 ctx.fillStyle=bg;ctx.fillRect(0,620,W,H-620)}
 ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
-spaced(ctx,kindLabel(WT.kind)+' \u00B7 '+(PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'DEEDS'),M,img?680:152,8);
+spaced(ctx,kindLabel(WT.kind)+' \u00B7 '+(PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'DEEDS'),M,img?668:152,8);
 var fit=wrapFit(ctx,WT.title,W-2*M,360,72,40,1.2);
 ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px Georgia,"Times New Roman",serif';
 fit.lines.forEach(function(L,i){ctx.fillText(L,M,ty+i*fit.size*1.2)});
