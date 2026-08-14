@@ -975,9 +975,18 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 <div class="sheet" id="moresheet">
   <div class="sword">DEEDS<b>.</b></div>
   <h3>This Post.</h3>
+  <button class="sheetrowbtn" id="moreedit" style="display:none">Edit It.<small>Fix your words. Redeeds keep the copy they carried.</small></button>
   <button class="sheetrowbtn" id="morechain" style="display:none">Continue the Chain.<small>Do the next act and log it as the next link.</small></button>
   <button class="sheetrowbtn" id="morereport">Report this deed.<small>It will be reviewed.</small></button>
   <button class="sheetrowbtn" id="moreblock">Block this member.<small>You will not see their deeds again.</small></button>
+</div>
+
+<div class="sheet" id="editsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Fix It.</h3>
+  <p class="remnote" style="margin:0 0 10px">Your words only. Redeeds and seconds keep the copy they carried.</p>
+  <textarea class="logarea" id="edittext"></textarea>
+  <div class="logsub"><button class="logbtn" id="editsave">Save It.</button></div>
 </div>
 
 <div class="modal" id="arrive">
@@ -1476,7 +1485,7 @@ $('#passsecond').onclick=function(){closeSheets();openCompose('second',passPost.
 $('#passshare').onclick=function(){closeSheets();var txt='"'+passPost.body+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}};
 var morePost=null;
-function openMore(id){morePost=POSTS.filter(function(x){return x.id===id})[0];sheet('#moresheet')}
+function openMore(id){morePost=POSTS.filter(function(x){return x.id===id})[0];var _me=$('#moreedit');if(_me)_me.style.display='none';var _mr=$('#morereport');if(_mr)_mr.style.display='';var _mb=$('#moreblock');if(_mb)_mb.style.display='';sheet('#moresheet')}
 $('#morereport').onclick=function(){closeSheets();toast('Reported. Thank you for guarding the feed.')};
 $('#moreblock').onclick=function(){var hd=morePost.who;my.blocked[hd]=1;closeSheets();renderFeed();toast('Blocked. Their deeds are gone from your feed.')};
 
@@ -1686,7 +1695,7 @@ h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSP
 h+='<button class="pa" data-lcmt="'+esc(tk)+'">'+CMTSVG+'<span>'+(CCMT[tk]||0)+'</span></button>';
 if(!isPost&&!mine)h+='<button class="pa" data-redeed="'+esc(r.id)+'">'+REDEEDSVG+'<span>'+(r.redeed_count||0)+'</span></button>';
 h+='<button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
-if(!mine)h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'" aria-label="More">'+MORESVG+'</button>';
+h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'"'+(mine?' data-lown="1"':'')+' aria-label="More">'+MORESVG+'</button>';
 h+='</div></article>';return h}
 
 /* ---- example treatment for the seeded frame posts ---- */
@@ -1763,9 +1772,12 @@ $$('[data-redeed]').forEach(function(b){b.onclick=function(e){e.stopPropagation(
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
-$$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh')};
-var _r=findLive(morePostLive.id),_mc=$('#morechain');
-if(_mc)_mc.style.display=(_r&&_r._k!=='post'&&!_r.is_private)?'':'none';
+$$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh'),own:b.hasAttribute('data-lown')};
+var _r=findLive(morePostLive.id),_mc=$('#morechain'),_me2=$('#moreedit'),_mr2=$('#morereport'),_mb2=$('#moreblock');
+if(_me2)_me2.style.display=morePostLive.own?'':'none';
+if(_mr2)_mr2.style.display=morePostLive.own?'none':'';
+if(_mb2)_mb2.style.display=morePostLive.own?'none':'';
+if(_mc)_mc.style.display=(!morePostLive.own&&_r&&_r._k!=='post'&&!_r.is_private)?'':'none';
 sheet('#moresheet')}});
 $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
 $$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
@@ -2177,6 +2189,36 @@ var n=my.deeds.length;
 toast('DEED '+n+'.'+(logPriv?' KEPT PRIVATE.':' '+MONTHS[new Date().getMonth()]+' · '+n+(n===1?' DEED':' DEEDS')+'. KEEP BUILDING.'));
 var ci=coinIdx(n);if(ci>=0&&n===COINS[ci][1]){setTimeout(function(){toast(COINS[ci][0].toUpperCase()+'. THE COIN IS YOURS.')},2800)}
 }).catch(function(e){b.textContent='Log It.';toast('Could not log it: '+String(e&&e.message||e))})})};
+
+/* ---- fix it: edit your own words ---- */
+var EDITCUR=null;
+var _meBtn=$('#moreedit');
+if(_meBtn)_meBtn.onclick=function(){
+if(!liveOn||!PROFILE){closeSheets();return}
+var r=morePostLive?findLive(morePostLive.id):null;
+if(!r){closeSheets();toast('Could not open it.');return}
+EDITCUR=r;closeSheets();
+$('#edittext').value=r._k==='post'?(r.body||''):(r.story||r.title||'');
+sheet('#editsheet');
+setTimeout(function(){var t=$('#edittext');t.focus();t.setSelectionRange(t.value.length,t.value.length)},80)};
+var _esBtn=$('#editsave');
+if(_esBtn)_esBtn.onclick=function(){
+if(!EDITCUR||!sb||!PROFILE)return;
+var txt=$('#edittext').value.trim();
+if(!txt){toast(EDITCUR._k==='post'?'Say something first.':'Write it first.');return}
+var bb=$('#editsave');bb.textContent='SAVING...';
+var isPost=EDITCUR._k==='post';
+var pay=isPost?{body:txt}:{title:(txt.length>64?txt.slice(0,61)+'...':txt),story:txt};
+sb.from(isPost?'posts':'deeds').update(pay).eq('id',EDITCUR.id).eq('profile_id',PROFILE.id).select().single().then(function(r){
+bb.textContent='Save It.';
+if(r.error){toast('Could not save it: '+r.error.message);return}
+var all=LIVEPOSTS.concat(SRES);
+for(var i=0;i<all.length;i++){var x=all[i];
+if(String(x.id)===String(EDITCUR.id)&&x._k===EDITCUR._k){if(isPost){x.body=txt}else{x.title=pay.title;x.story=txt}}}
+if(!isPost){for(var j=0;j<my.deeds.length;j++)if(my.deeds[j].dbid===EDITCUR.id)my.deeds[j].body=txt}
+EDITCUR=null;closeSheets();renderFeed();renderProfile();
+toast('SAVED.')
+}).catch(function(e){bb.textContent='Save It.';toast('Could not save it: '+String(e&&e.message||e))})};
 
 /* ---- reminders that save ---- */
 var CADMAP={'Weekly.':'weekly','Monthly.':'monthly','None.':'none'};
