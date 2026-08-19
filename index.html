@@ -662,6 +662,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
           <div class="rline" id="rMonth"></div>
           <div class="rline" id="rForty"></div>
           <div class="rline" id="rRe"></div>
+          <div class="rline" id="rReach" style="display:none"></div>
         </div>
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
@@ -2283,13 +2284,34 @@ PROFILE=r.data;applyProfile()}).catch(function(){})}
 function loadMyDeeds(cb){sb.from('deeds').select('*').eq('profile_id',PROFILE.id).order('created_at',{ascending:true}).then(function(r){
 if(!r.error)my.deeds=(r.data||[]).map(function(d){return{body:d.story||d.title||'',when:whenStr(d),priv:!!d.is_private,dbid:d.id}});
 cb&&cb()}).catch(function(){cb&&cb()})}
+/* ---- the invite line: claim once, then show the reach ---- */
+function clearChallenger(){try{localStorage.removeItem('deeds_challenger')}catch(e){}}
+function claimInviter(){try{
+var h=safeGet('deeds_challenger');
+if(!h||!window.PROFILE)return;
+if(PROFILE.invited_by){clearChallenger();return}
+sb.rpc('claim_inviter',{p_handle:h}).then(function(r){
+clearChallenger();
+var row=r&&r.data&&r.data[0];
+if(row&&row.inviter_handle){PROFILE.invited_by=true;
+toast('Invited by '+row.inviter_handle+'. Their deeds will reach you.');
+loadMyFollows().then(renderFeed)}
+}).catch(clearChallenger)
+}catch(e){}}
+function loadReach(){if(!sb||!PROFILE)return;
+sb.from('invite_stats').select('direct_invites,network_size,network_deeds').eq('profile_id',PROFILE.id).maybeSingle().then(function(r){
+var s=r&&r.data,el=$('#rReach');if(!el)return;
+if(!s||!s.network_size){el.style.display='none';return}
+el.textContent=s.network_size+(s.network_size===1?' PERSON':' PEOPLE')+' \u00B7 '+s.network_deeds+(s.network_deeds===1?' DEED':' DEEDS')+' \u00B7 FROM YOUR INVITES';
+el.style.display='';
+}).catch(function(){})}
 function applyProfile(){my.handle=PROFILE.handle;my.type=PROFILE.member_type||'doer';my.bio=PROFILE.bio||'';
 my.inspired={};my.following={};
 if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_verified_at,since:sinceStr(PROFILE.created_at),followers:0,following:[]};
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimInviter();loadReach();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -2574,6 +2596,10 @@ row('About',esc(o.description||''));
 row('Where',esc(o.address||''));
 if(o.website_url)row('Site','<a href="'+esc(o.website_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700">'+esc(String(o.website_url).replace(/^https?:\/\//,''))+'</a>');
 $('#ovBody').innerHTML=h;
+if(liveOn&&sb){sb.from('org_stats').select('member_count,total_deeds').eq('org_id',id).maybeSingle().then(function(r){
+var s=r&&r.data;if(!s)return;var b=$('#ovBody');if(!b)return;
+b.innerHTML+='<div class="ovrow"><div class="k">Impact</div><div>'+(s.member_count||0)+((s.member_count||0)===1?' member':' members')+' \u00B7 '+(s.total_deeds||0)+((s.total_deeds||0)===1?' deed':' deeds')+' and counting.</div></div>'
+}).catch(function(){})}
 sheet('#orgview')}
 
 /* ================= ALERTS: the activity, listed ================= */
