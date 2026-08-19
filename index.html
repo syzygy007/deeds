@@ -671,6 +671,10 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="micro">Organizations To Review</div>
         <div id="advlist"></div>
       </div>
+      <div class="sect" id="modsect" style="display:none">
+        <div class="micro">The Moderation Desk</div>
+        <div id="modlist"></div>
+      </div>
       <div class="sect" id="cxsect" style="display:none">
         <div class="micro">Your Connections</div>
         <div class="statline" id="cxstats" style="margin-top:0"></div>
@@ -1683,13 +1687,15 @@ var isPost=r._k==='post';
 var body=isPost?(r.body||''):(r.story||r.title||'');
 var h='<article class="post" data-lid="'+esc(r.id)+'">';
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
-h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+((!isPost&&r.origin_id)?'<span class="chip pk">REDEED</span>':'')+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+'</div>';
+h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+((!isPost&&r.origin_id)?'<span class="chip pk">REDEED</span>':'')+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+(r.mod_status==='hold'?'<span class="privchip">IN REVIEW</span>':(r.mod_status==='removed'?'<span class="privchip">REMOVED</span>':''))+'</div>';
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
 if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
 h+='<p class="p-body">'+esc(body)+'</p>';
-if(r.media_path){var mu=esc(mediaURL(r.media_path));
+var mlive=!r.media_status||r.media_status==='live';
+if(r.media_path&&mlive){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
+else if(r.media_path&&r.media_status==='pending'&&mine){h+='<div class="chaintag">PHOTO IN REVIEW \u00B7 IT SHOWS WHEN IT CLEARS</div>'}
 var tk=(isPost?'p:':'d:')+r.id;
 h+='<div class="p-acts">';
 h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSPSVG+'<span>'+(CINSP[tk]||0)+'</span></button>';
@@ -2028,7 +2034,8 @@ var t=$('#logchain');if(t){t.style.display='inline-flex';t.textContent='CHAIN \u
 var ld=$('#logdaily');if(ld)ld.style.display='none'}})();
 var baseReport=$('#morereport').onclick,baseBlock=$('#moreblock').onclick;
 $('#morereport').onclick=function(){if(morePostLive){var m=morePostLive;morePostLive=null;closeSheets();
-location.href='mailto:hello@deeds.fun?subject='+encodeURIComponent('Report · deed '+m.id)+'&body='+encodeURIComponent('Reporting deed '+m.id+' by '+m.handle+' on deeds.fun.');
+if(sb&&PROFILE){sb.rpc('mod_report',{p_kind:(m._k==='post'?'post':'deed'),p_id:m.id}).then(function(){toast('Reported, quietly. The desk will look.')}).catch(function(){toast('Reported.')})}
+else toast('Join DEEDS to report.');
 return}
 baseReport&&baseReport()};
 $('#moreblock').onclick=function(){if(morePostLive){var m=morePostLive;morePostLive=null;
@@ -2110,9 +2117,14 @@ if(b){b.textContent='Photo Ready.';b.classList.add('on')}})});
 document.body.appendChild(LFILE);return LFILE}
 function uploadPhoto(cb){if(!LPHOTO||!PROFILE){cb(null);return}
 var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
-sb.storage.from('media').upload(path,LPHOTO.blob,{contentType:'image/jpeg',upsert:false}).then(function(r){
+sb.storage.from('incoming').upload(path,LPHOTO.blob,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r&&r.error){cb(null,r.error.message);return}
 cb({path:path,w:LPHOTO.w,h:LPHOTO.h})}).catch(function(e){cb(null,String(e&&e.message||e))})}
+function publishMedia(kind,id){if(!sb)return;
+try{sb.functions.invoke('mod-media',{body:{action:'publish',kind:kind,id:id}}).then(function(r){
+var st=r&&r.data&&r.data.status;
+if(st==='pending')toast('Your photo is in review. It shows when it clears.')
+}).catch(function(){})}catch(e){}}
 function liveLightbox(src){var o=document.getElementById('llbox');
 if(!o){o=document.createElement('div');o.id='llbox';
 o.style.cssText='position:fixed;inset:0;background:rgba(12,11,9,.95);z-index:9999;display:none;align-items:center;justify-content:center;padding:18px';
@@ -2161,7 +2173,7 @@ if(m){pay.media_path=m.path;pay.media_kind='photo';pay.media_w=m.w;pay.media_h=m
 sb.from('posts').insert(pay).select().single().then(function(r){
 pb.textContent='Post It.';
 if(r.error){toast('Could not post it: '+r.error.message);return}
-clearPhoto();prependLive(markKind(r.data,'post'));closeSheets();toast('POSTED.')
+clearPhoto();if(pay.media_path)publishMedia('post',r.data.id);prependLive(markKind(r.data,'post'));closeSheets();toast('POSTED.')
 }).catch(function(e){pb.textContent='Post It.';toast('Could not post it: '+String(e&&e.message||e))})});
 return}
 var chipEl=$('#logdates .lchip.on');var chipTxt=chipEl?chipEl.textContent:'Today.';
@@ -2180,7 +2192,7 @@ if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.me
 sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
 if(r.error){toast('Could not log it: '+r.error.message);return}
-my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
+if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
 if(DAILYLOG){DAILYN++;DAILYLOG=0;var _ld=$('#logdaily');if(_ld)_ld.style.display='none'}
 if(chainParentLive){chainParentLive=null;chainLinkLive=0;var _lc=$('#logchain');if(_lc)_lc.style.display='none'}
 clearPhoto();
@@ -2271,7 +2283,7 @@ justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.'
 
 /* ---- session, profile, welcome ---- */
 function guestUI(){PROFILE=null;MYORGS=[];
-MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();var av=$('#advsect');if(av)av.style.display='none';
+MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();var av=$('#advsect');if(av)av.style.display='none';var mv2=$('#modsect');if(mv2)mv2.style.display='none';
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
 renderProfile();renderRail();renderFeed()}
 function authProblem(m){failAuth(m)}
@@ -2510,9 +2522,9 @@ $('#notein').value='';NOTES.unshift(r.data);renderThread();renderNotes()})
 $('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#notesend').onclick()}});
 
 /* ================= ADMIN: organization review ================= */
-function renderAdmin(){var s=$('#advsect');if(!s)return;
-if(!liveOn||!PROFILE||!PROFILE.is_admin){s.style.display='none';return}
-s.style.display='block';loadPending()}
+function renderAdmin(){var s=$('#advsect'),ms=$('#modsect');if(!s)return;
+if(!liveOn||!PROFILE||!PROFILE.is_admin){s.style.display='none';if(ms)ms.style.display='none';return}
+s.style.display='block';if(ms)ms.style.display='block';loadPending();loadModQueue()}
 
 function loadPending(){var el=$('#advlist');if(!el||!sb)return;
 sb.from('organizations').select('*').is('verified_at',null).is('declined_at',null)
@@ -2557,6 +2569,40 @@ if(r&&r.error){toast('Not saved: '+r.error.message);return}
 toast(ok?'Verified. The check is live.':'Declined. They can fix it and resubmit.');
 loadPending();loadOrgs()}).catch(function(){btn.textContent=label;toast('Not saved.')})}
 
+function loadModQueue(){var el=$('#modlist');if(!el||!sb)return;
+sb.from('moderation_queue').select('*').eq('status','open').order('created_at',{ascending:true}).limit(50).then(function(r){
+if(r.error){el.innerHTML='<p class="remnote" style="margin-bottom:2px">The desk could not load: '+esc(r.error.message)+'</p>';return}
+var rows=r.data||[];
+if(!rows.length){el.innerHTML='<p class="remnote" style="margin-bottom:2px">The desk is clear. Nothing waiting.</p>';return}
+var h='';rows.forEach(function(q){
+h+='<div class="advrow" id="modrow-'+q.id+'">';
+h+='<div class="p-time">'+esc(String(q.kind||'').toUpperCase())+' \u00B7 '+esc(String(q.target_kind||'').toUpperCase())+' \u00B7 '+relTime(q.created_at)+' AGO'+(q.reason?' \u00B7 '+esc(q.reason):'')+'</div>';
+h+='<p class="p-body" style="margin:6px 0">'+esc(q.excerpt||'')+'</p>';
+if(q.kind==='media')h+='<div class="p-media" id="modimg-'+q.id+'" style="min-height:40px"></div>';
+h+='<div class="advacts">';
+h+='<button class="fbtn" data-modact="approve" data-modq="'+q.id+'">Approve.</button>';
+h+='<button class="blockb" data-modact="remove" data-modq="'+q.id+'">Remove.</button>';
+if(q.kind==='report')h+='<button class="fbtn" data-modact="dismiss" data-modq="'+q.id+'">Dismiss.</button>';
+if(q.kind==='media')h+='<button class="blockb" data-modact="escalate" data-modq="'+q.id+'">Escalate.</button>';
+h+='</div></div>'});
+el.innerHTML=h;MODQ={};rows.forEach(function(q){MODQ[String(q.id)]=q});
+rows.forEach(function(q){if(q.kind!=='media')return;
+var tbl=q.target_kind==='post'?'posts':'deeds';
+sb.from(tbl).select('media_path').eq('id',q.target_id).maybeSingle().then(function(rr){
+var p=rr&&rr.data&&rr.data.media_path;var box=$('#modimg-'+q.id);if(!p||!box)return;
+sb.storage.from('incoming').createSignedUrl(p,600).then(function(su){
+var u=su&&su.data&&su.data.signedUrl;if(u&&box)box.innerHTML='<img src="'+esc(u)+'" alt="" style="width:100%;height:auto;display:block">'}).catch(function(){})}).catch(function(){})});
+$$('#modlist [data-modact]').forEach(function(b){b.onclick=function(){modAct(b.getAttribute('data-modq'),b.getAttribute('data-modact'),b)}})}).catch(function(){})}
+var MODQ={};
+function modAct(qid,action,btn){if(!PROFILE||!PROFILE.is_admin)return;
+var q=MODQ[String(qid)];if(!q){toast('That one is gone.');loadModQueue();return}
+var label=btn.textContent;btn.textContent='...';
+function done(err){btn.textContent=label;if(err){toast('Not saved: '+err);return}
+toast(action==='approve'?'Approved. It is live.':action==='remove'?'Removed. The strike is logged.':action==='dismiss'?'Dismissed.':'Escalated and preserved.');
+loadModQueue()}
+if(q.kind==='media'){sb.functions.invoke('mod-media',{body:{action:(action==='remove'?'reject':action),kind:q.target_kind,id:q.target_id,queue_id:+qid}}).then(function(rr){
+done(rr&&rr.error?(rr.error.message||'edge error'):null)}).catch(function(e){done(String(e&&e.message||e))})}
+else{sb.rpc('mod_resolve',{p_queue_id:+qid,p_action:action}).then(function(rr){done(rr&&rr.error?rr.error.message:null)}).catch(function(e){done(String(e&&e.message||e))})}}
 /* ================= SEARCH: people and organizations ================= */
 var OSTORE={};
 function searchPeople(q){var el=$('#pplres');if(!el)return;
@@ -3028,7 +3074,7 @@ if(navigator.share&&navigator.canShare&&navigator.canShare({files:[_tf]}))J('ccS
 J('ccPost').onclick=function(){if(!window.sb||!window.PROFILE){if(window.closeSheets)closeSheets();if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
 var b=J('ccPost');b.textContent='POSTING\u2026';
 J('cardcv').toBlob(function(bl){if(!bl){b.textContent='Post It.';return}
-var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+var path=PROFILE.id+'/wcv-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
 sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r.error){b.textContent='Post It.';if(window.toast)toast('The card did not upload: '+r.error.message);return}
 var pay={profile_id:PROFILE.id,body:CARD.body,media_path:path,media_kind:'photo',media_w:1080,media_h:1350};
@@ -3134,7 +3180,7 @@ var wtFileMode='cover',wtImgBlk=null;
 J('wtImg').onclick=function(){wtFileMode='cover';J('wtFile').click()};
 J('wtFile').onchange=function(){var f=J('wtFile').files[0];J('wtFile').value='';if(!f)return;
 shrink(f,1600,function(bl,w,hh){if(!bl){if(window.toast)toast('That image could not load.');return}
-var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+var path=PROFILE.id+'/wcv-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
 sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r.error){if(window.toast)toast('The image did not upload: '+r.error.message);return}
 if(wtFileMode==='cover'){WT.cover.img=path;drawWtCover()}
@@ -3187,7 +3233,7 @@ WT.status='published';b.textContent='PUBLISHING\u2026';
 saveWork(function(){if(!WT.id){b.textContent='PUBLISH.';return}
 sb.from('works').update({published_at:new Date().toISOString()}).eq('id',WT.id).then(function(){}).catch(function(e){});
 drawCoverCv(function(bl){if(!bl){b.textContent='Republish.';finishPub();return}
-var path=PROFILE.id+'/'+Date.now()+'-cover.jpg';
+var path=PROFILE.id+'/wcv-'+Date.now()+'-cover.jpg';
 sb.storage.from('media').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r.error){finishPub();return}
 function annPost(){sb.from('posts').insert({profile_id:PROFILE.id,body:WT.title+(WT.kind==='book'?' \u00B7 a book on DEEDS \u00B7 ':' \u00B7 an editorial on DEEDS \u00B7 ')+'deeds.fun/#w='+WT.id,media_path:path,media_kind:'photo',media_w:1080,media_h:1350}).select().single().then(function(q){
