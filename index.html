@@ -261,6 +261,7 @@ input,textarea{font:inherit;color:var(--ink)}
  .rmeet:last-child{border-bottom:0}
  .rmeet .in{flex:1;min-width:0}
  .rmeet .fbtn{flex:0 0 auto}
+.cbar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:5px 0 3px}.cbar i{display:block;height:100%;background:var(--forest)}.cbar i.met{background:#C9A34E}.cmicro{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
  .rvoice{font-size:10px;letter-spacing:.14em;color:#B3AEA0;font-weight:800;line-height:2;margin-top:6px;text-transform:uppercase}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -1921,15 +1922,16 @@ function doSignOut(){if(!sb)return;sb.auth.signOut().catch(function(){});toast('
 
 /* ---- organizations ---- */
 function renderOrgs(){var el=$('#orglist');if(!el)return;var h='';
+MYORGS.concat(MYMEMB).forEach(function(o){OSTORE[o.id]=o});
 MYORGS.forEach(function(o){var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
 var state=vv?' · VERIFIED':(o.declined_at?' · NOT VERIFIED':' · IN REVIEW');
-h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
+h+='<div class="orgrow" data-orgopen="'+esc(o.id)+'" style="cursor:pointer"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+state+'</div>';
 if(!vv&&o.declined_at&&o.review_note)h+='<div class="p-time" style="text-transform:none;letter-spacing:0;margin-top:4px">'+esc(o.review_note)+'</div>';
 h+='</div></div>'});
 MYMEMB.forEach(function(o){if(MYORGS.some(function(x){return x.id===o.id}))return;
 var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
-h+='<div class="orgrow"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
+h+='<div class="orgrow" data-orgopen="'+esc(o.id)+'" style="cursor:pointer"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+' \u00B7 MEMBER'+(vv?'':' \u00B7 IN REVIEW')+' \u00B7 <button class="leaveorg" data-leave="'+esc(o.id)+'">LEAVE.</button></div>';
 h+='</div></div>'});
 el.innerHTML=h||'<p class="remnote" style="margin-bottom:2px">Companies, schools, churches and nonprofits carry real names here. The gold halo means DEEDS. verified them.</p>';
@@ -1938,6 +1940,9 @@ if(!PROFILE)return;var oid=b.getAttribute('data-leave');
 sb.from('org_members').delete().match({org_id:oid,profile_id:PROFILE.id}).then(function(r){
 if(r.error){toast('Could not leave: '+r.error.message);return}
 toast('Left.');loadMemberships()}).catch(function(){})}});
+$$('#orglist [data-orgopen]').forEach(function(rw){rw.onclick=function(ev){
+if(ev&&ev.target&&ev.target.closest&&ev.target.closest('[data-leave]'))return;
+var oid=rw.getAttribute('data-orgopen');if(OSTORE[oid])openOrgView(oid)}});
 var ob=$('#orgOpen');if(ob)ob.onclick=openOrg}
 function loadOrgs(){if(!sb||!PROFILE)return;
 sb.from('organizations').select('*').eq('owner_id',PROFILE.id).order('created_at',{ascending:false}).then(function(r){
@@ -2673,25 +2678,80 @@ if(nm){toast('You joined '+nm+'. '+(mc||1)+' strong.');loadMemberships()}
 function joinCampaign(cid,t){if(!PROFILE){openJoin();return}
 closeSheets();wantLog();CAMPLOG=cid;CAMPTITLE=String(t||'');
 var c=$('#logcamp');if(c){c.style.display='inline-flex';c.textContent='CAMPAIGN \u00B7 '+CAMPTITLE.toUpperCase().slice(0,40)}}
+function campPct(a,b){if(!b)return 0;var p=a/b;return p<0?0:(p>1?1:p)}
+function cdShort(s){if(!s)return'';var d=new Date(s+'T12:00:00');var M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return M[d.getMonth()]+' '+d.getDate()}
+function campIsPast(c){if(c.status==='closed')return true;if(!c.ends_on)return false;return c.ends_on<(new Date()).toISOString().slice(0,10)}
+function campCard(c,s,ally,opts){var dc=(s&&s.deed_count)||0,pp=(s&&s.participants)||0;
+var h='<div style="margin:0 0 16px">';
+h+='<div style="font-weight:800">'+esc(c.title)+(campIsPast(c)?' <span class="cmicro">'+(c.status==='closed'?'CLOSED':'ENDED')+'</span>':'')+'</div>';
+if(ally&&ally.length)h+='<div class="cmicro" style="margin-top:2px">WITH '+ally.map(esc).join(', ')+'</div>';
+if(c.description&&!campIsPast(c))h+='<div class="remnote" style="margin:2px 0 4px">'+esc(c.description)+'</div>';
+if(c.goal_deeds){var gp=campPct(dc,c.goal_deeds);var met=dc>=c.goal_deeds;
+h+='<div class="cmicro" style="margin-top:6px">'+dc+' / '+c.goal_deeds+' DEEDS'+(met?' \u00B7 GOAL MET.':'')+'</div>';
+h+='<div class="cbar"><i class="'+(met?'met':'')+'" style="width:'+Math.round(gp*100)+'%"></i></div>'}
+else h+='<div class="remnote" style="margin-top:6px">'+pp+(pp===1?' person':' people')+' \u00B7 '+dc+(dc===1?' deed':' deeds')+'</div>';
+if(c.starts_on&&c.ends_on){var now=new Date(),st=new Date(c.starts_on+'T00:00:00'),en=new Date(c.ends_on+'T23:59:59');
+var tp=campPct(now-st,en-st);var lab;
+if(now<st)lab='STARTS '+cdShort(c.starts_on);
+else if(now>en)lab='RAN '+cdShort(c.starts_on)+' TO '+cdShort(c.ends_on);
+else{var dl=Math.max(1,Math.ceil((en-now)/86400000));lab=dl+(dl===1?' DAY':' DAYS')+' LEFT \u00B7 ENDS '+cdShort(c.ends_on)}
+h+='<div class="cmicro" style="margin-top:5px">'+lab+'</div>';
+if(now>=st)h+='<div class="cbar"><i style="width:'+Math.round(tp*100)+'%;opacity:.45"></i></div>'}
+else if(c.ends_on)h+='<div class="cmicro" style="margin-top:5px">ENDS '+cdShort(c.ends_on)+'</div>';
+if(c.goal_deeds&&campIsPast(c))h+='<div class="remnote" style="margin-top:3px">'+pp+(pp===1?' person':' people')+' joined in.</div>';
+if(!campIsPast(c))h+='<button class="fbtn" data-campjoin="'+c.id+'" data-campt="'+esc(c.title)+'" style="margin-top:7px">Join In.</button>';
+if(opts&&opts.own&&!campIsPast(c)){
+h+=' <button class="fbtn" data-campinv="'+c.id+'" style="margin-top:7px">Invite an Organization.</button>';
+h+=' <button class="fbtn" data-campclose="'+c.id+'" style="margin-top:7px">Close It.</button>';
+h+='<div id="ally-'+c.id+'"></div>'}
+h+='</div>';return h}
 function loadOrgPanel(id,o){
 var own=PROFILE&&o.owner_id===PROFILE.id;
 var pm=PROFILE?sb.from('org_members').select('org_id').eq('org_id',id).eq('profile_id',PROFILE.id).maybeSingle():Promise.resolve({data:null});
-Promise.all([sb.from('org_campaigns').select('*').eq('org_id',id).eq('status','open').order('created_at',{ascending:false}).limit(12),pm]).then(function(rr){
+Promise.all([
+sb.from('org_campaigns').select('*').eq('org_id',id).in('status',['open','closed']).order('created_at',{ascending:false}).limit(20),
+pm,
+sb.from('campaign_orgs').select('*').eq('org_id',id)
+]).then(function(rr){
 var cams=(rr[0]&&!rr[0].error)?(rr[0].data||[]):[];
 var isMember=!!(rr[1]&&rr[1].data)||own;
+var corows=(rr[2]&&!rr[2].error)?(rr[2].data||[]):[];
+var accepted=corows.filter(function(x){return x.status==='accepted'});
+var pending=own?corows.filter(function(x){return x.status==='invited'}):[];
+var causeIds=accepted.concat(pending).map(function(x){return x.campaign_id});
+var cq=causeIds.length?sb.from('org_campaigns').select('*').in('id',causeIds):Promise.resolve({data:[]});
+cq.then(function(cr){
+var causes=(cr&&cr.data)||[];var CA={};causes.forEach(function(c){CA[c.id]=c});
+var allIds=cams.map(function(c){return c.id}).concat(causes.map(function(c){return c.id}));
+var hostIds=causes.map(function(c){return c.org_id});
+var sq=allIds.length?sb.from('campaign_stats').select('*').in('campaign_id',allIds):Promise.resolve({data:[]});
+var aq=cams.length?sb.from('campaign_orgs').select('*').eq('status','accepted').in('campaign_id',cams.map(function(c){return c.id})):Promise.resolve({data:[]});
+var allyOrgIds=[];
+Promise.all([sq,aq]).then(function(s2){
+var ST={};(((s2[0]||{}).data)||[]).forEach(function(s){ST[s.campaign_id]=s});
+var AL={};(((s2[1]||{}).data)||[]).forEach(function(a){(AL[a.campaign_id]=AL[a.campaign_id]||[]).push(a.org_id);allyOrgIds.push(a.org_id)});
+var nameIds=hostIds.concat(allyOrgIds).filter(function(v,i,arr){return v&&arr.indexOf(v)===i});
+var nq=nameIds.length?sb.from('organizations').select('id,display_name,name').in('id',nameIds):Promise.resolve({data:[]});
+nq.then(function(nr){
+var NM={};((nr&&nr.data)||[]).forEach(function(x){NM[x.id]=x.display_name||x.name});
 var b=$('#ovBody');if(!b)return;
-var ids=cams.map(function(c){return c.id});
-var sq=ids.length?sb.from('campaign_stats').select('*').in('campaign_id',ids):Promise.resolve({data:[]});
-sq.then(function(sr){
-var ST={};((sr&&sr.data)||[]).forEach(function(s){ST[s.campaign_id]=s});
 var h='';
-if(cams.length){
-h+='<div class="ovrow"><div class="k">Campaigns</div><div>';
-cams.forEach(function(c){var s=ST[c.id]||{};
-h+='<div style="margin:0 0 12px"><div style="font-weight:800">'+esc(c.title)+'</div>';
-if(c.description)h+='<div class="remnote" style="margin:2px 0 4px">'+esc(c.description)+'</div>';
-h+='<div class="remnote">'+(s.participants||0)+((s.participants||0)===1?' person':' people')+' \u00B7 '+(s.deed_count||0)+((s.deed_count||0)===1?' deed':' deeds')+'</div>';
-h+='<button class="fbtn" data-campjoin="'+c.id+'" data-campt="'+esc(c.title)+'" style="margin-top:6px">Join In.</button></div>'});
+var openC=cams.filter(function(c){return !campIsPast(c)});
+var pastC=cams.filter(campIsPast);
+if(openC.length){h+='<div class="ovrow"><div class="k">Campaigns</div><div>';
+openC.forEach(function(c){h+=campCard(c,ST[c.id],(AL[c.id]||[]).map(function(x){return NM[x]||'An ally'}),{own:own})});
+h+='</div></div>'}
+if(pending.length){h+='<div class="ovrow"><div class="k">Invited</div><div>';
+pending.forEach(function(p){var c=CA[p.campaign_id];if(!c)return;
+h+='<div style="margin:0 0 12px"><div style="font-weight:800">'+esc(NM[c.org_id]||'An organization')+' asks this company into '+esc(c.title)+'.</div>';
+h+='<button class="fbtn" data-cause-acc="'+c.id+'" style="margin-top:6px">Accept.</button> <button class="fbtn" data-cause-dec="'+c.id+'" style="margin-top:6px">Decline.</button></div>'});
+h+='</div></div>'}
+var accC=accepted.map(function(a){return CA[a.campaign_id]}).filter(function(c){return c});
+if(accC.length){h+='<div class="ovrow"><div class="k">Causes</div><div>';
+accC.forEach(function(c){h+='<div class="cmicro">A CAUSE WITH '+esc((NM[c.org_id]||'AN ORGANIZATION').toUpperCase())+'</div>'+campCard(c,ST[c.id],null,{})});
+h+='</div></div>'}
+if(pastC.length){h+='<div class="ovrow"><div class="k">Past Campaigns</div><div>';
+pastC.forEach(function(c){h+=campCard(c,ST[c.id],(AL[c.id]||[]).map(function(x){return NM[x]||'An ally'}),{})});
 h+='</div></div>'}
 if(own)h+='<div class="ovrow"><div class="k">Run It</div><div><button class="fbtn" id="ovNewCamp">New Campaign.</button><div id="ovCampForm"></div></div></div>';
 if(isMember){
@@ -2702,11 +2762,39 @@ h+='<div class="remnote" id="growNote" style="margin-top:6px"></div></div></div>
 if(!h)return;
 b.innerHTML+=h;
 $$('#ovBody [data-campjoin]').forEach(function(btn){btn.onclick=function(){joinCampaign(btn.getAttribute('data-campjoin'),btn.getAttribute('data-campt'))}});
+$$('#ovBody [data-campclose]').forEach(function(btn){btn.onclick=function(){
+sb.from('org_campaigns').update({status:'closed'}).eq('id',btn.getAttribute('data-campclose')).then(function(r){
+if(r.error){toast('Not closed: '+r.error.message);return}
+toast('Closed. It moves to the record.');openOrgView(id)}).catch(function(){})}});
+$$('#ovBody [data-cause-acc],#ovBody [data-cause-dec]').forEach(function(btn){btn.onclick=function(){
+var acc=btn.hasAttribute('data-cause-acc');
+sb.rpc('respond_campaign_invite',{p_campaign:btn.getAttribute(acc?'data-cause-acc':'data-cause-dec'),p_org:id,p_accept:acc}).then(function(){
+toast(acc?'Accepted. The cause shows on this company now.':'Declined, quietly.');openOrgView(id)}).catch(function(){})}});
+$$('#ovBody [data-campinv]').forEach(function(btn){btn.onclick=function(){
+var cid=btn.getAttribute('data-campinv');var f=$('#ally-'+cid);if(!f)return;
+f.innerHTML='<input class="oin" id="allyFind-'+cid+'" placeholder="Search verified organizations" style="margin:8px 0 6px"><div id="allyHits-'+cid+'"></div>';
+var inp=$('#allyFind-'+cid);inp.oninput=function(){var t=(inp.value||'').trim();var hits=$('#allyHits-'+cid);if(!hits)return;
+if(t.length<2){hits.innerHTML='';return}
+sb.from('organizations').select('id,display_name,name').not('verified_at','is',null).or('display_name.ilike.%'+t+'%,name.ilike.%'+t+'%').neq('id',id).limit(6).then(function(r){
+var rows=(r&&r.data)||[];
+hits.innerHTML=rows.length?rows.map(function(x){return '<div class="rmeet"><div class="in"><div class="mono">'+esc(x.display_name||x.name)+'</div></div><button class="fbtn" data-allyinv="'+x.id+'">Invite.</button></div>'}).join(''):'<p class="remnote">No verified organization by that name.</p>';
+$$('#allyHits-'+cid+' [data-allyinv]').forEach(function(ib){ib.onclick=function(){
+sb.rpc('invite_org_to_campaign',{p_campaign:cid,p_org:ib.getAttribute('data-allyinv')}).then(function(rr){
+var v=rr&&rr.data;
+toast(v==='ok'?'Invited. Their owner decides from their sheet.':v==='full'?'Ten allies is the table. It is full.':'That one cannot be invited.');
+}).catch(function(){})}})}).catch(function(){})};inp.focus()}});
 var nb=$('#ovNewCamp');if(nb)nb.onclick=function(){
 var f=$('#ovCampForm');if(!f)return;
-f.innerHTML='<input class="oin" id="ncTitle" maxlength="80" placeholder="Canned Food Drive" style="margin:8px 0 6px"><textarea class="logarea" id="ncDesc" maxlength="500" style="min-height:52px" placeholder="What it is, where, when."></textarea><button class="fbtn" id="ncGo" style="margin-top:6px">Create It.</button>';
+f.innerHTML='<input class="oin" id="ncTitle" maxlength="80" placeholder="Canned Food Drive" style="margin:8px 0 6px">'
++'<textarea class="logarea" id="ncDesc" maxlength="500" style="min-height:52px" placeholder="What it is, where, when."></textarea>'
++'<input class="oin" id="ncGoal" type="number" min="1" max="100000" placeholder="Goal in deeds (optional)" style="margin:6px 0 0">'
++'<div style="display:flex;gap:8px;margin-top:6px"><input class="oin" id="ncStart" type="date" style="flex:1"><input class="oin" id="ncEnd" type="date" style="flex:1"></div>'
++'<div class="cmicro" style="margin-top:4px">START AND END SET THE TERM. BOTH OPTIONAL.</div>'
++'<button class="fbtn" id="ncGo" style="margin-top:8px">Create It.</button>';
 $('#ncGo').onclick=function(){var t=($('#ncTitle').value||'').trim();if(t.length<3){toast('Give it a name.');return}
-sb.from('org_campaigns').insert({org_id:id,created_by:PROFILE.id,title:t,description:($('#ncDesc').value||'').trim()||null}).then(function(r){
+var g=parseInt($('#ncGoal').value,10);var s0=$('#ncStart').value||null,e0=$('#ncEnd').value||null;
+if(s0&&e0&&e0<s0){toast('The end comes after the start.');return}
+sb.from('org_campaigns').insert({org_id:id,created_by:PROFILE.id,title:t,description:($('#ncDesc').value||'').trim()||null,goal_deeds:(g>0?g:null),starts_on:s0,ends_on:e0}).then(function(r){
 if(r.error){toast('Not saved: '+r.error.message);return}
 toast('Campaign is up.');openOrgView(id)}).catch(function(){})}};
 var gb2=$('#growBtn');if(gb2)gb2.onclick=function(){
@@ -2719,7 +2807,7 @@ if(r.error){toast('Not sent: '+r.error.message);return}
 var n=r.data||0;var gn=$('#growNote');
 if(gn)gn.textContent=n?(n+(n===1?' invitation':' invitations')+' on the way, from hello@deeds.fun.'):'None sent. Repeats, bad addresses, or the daily twenty is used.';
 if(n)$('#growTa').value=''}).catch(function(){gb2.textContent='Send the Invitations.'})}
-})}).catch(function(){})}
+})})})}).catch(function(){})}
 function openGoodCompanies(){var el=$('#goodlist');if(el)el.innerHTML='<p class="remnote">Counting the good...</p>';
 sheet('#goodsheet');if(!sb)return;
 sb.rpc('good_companies').then(function(r){
