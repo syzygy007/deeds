@@ -634,6 +634,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     </div>
     <div class="page" id="pg-meet">
       <div class="pghead"><h1>Meet<b>.</b></h1><div class="micro">Surfaced By Deeds, Not By You</div></div>
+      <div class="rline" id="goodbar" style="cursor:pointer;font-weight:800">GOOD COMPANIES &#183; THE LIST.</div>
       <div id="meetlist"></div>
     </div>
 
@@ -915,6 +916,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <h3 id="composeH">Log a Deed.</h3>
   <div class="chaintag" id="logchain" style="display:none"></div>
   <div class="chaintag" id="logdaily" style="display:none"></div>
+  <div class="chaintag" id="logcamp" style="display:none"></div>
   <div id="secondEmbed"></div>
   <textarea class="logarea" id="logtext" placeholder="What did you do?"></textarea>
   <div class="logrow" id="logdates">
@@ -948,6 +950,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <h3 id="ovName">Organization.</h3>
   <p class="remnote" style="margin:-8px 0 14px" id="ovMeta"></p>
   <div id="ovBody"></div>
+</div>
+
+<div class="sheet" id="goodsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>GOOD COMPANIES<b>.</b></h3>
+  <p class="remnote" style="margin:-8px 0 12px">Verified organizations, ranked by the good they do.</p>
+  <div id="goodlist"></div>
 </div>
 
 <div class="sheet" id="cxsheet">
@@ -1571,7 +1580,7 @@ $('#lWhy').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefau
 function parseArrival(){var q=location.search;if(q.indexOf('c=')<0)return null;
 var sp={};q.replace(/^\?/,'').split('&').forEach(function(kv){var p=kv.split('=');sp[p[0]]=decodeURIComponent(String(p[1]||'').replace(/\+/g,' '))});
 if(!sp.c)return null;var hd=/^[A-Za-z0-9]{3,24}$/.test(sp.c)?sp.c:'A friend';
-return{h:hd,k:sp.k||'forty',a:sp.a||''}}
+var og=/^[0-9a-fA-F-]{36}$/.test(String(sp.o||''))?sp.o:'';return{h:hd,k:sp.k||'forty',a:sp.a||'',o:og}}
 function showArrival(ar){var inv=ar.k==='invite';var forty=!inv&&ar.k!=='deed';
 $('#arriveH').textContent=inv?ar.h+' invited you.':forty?ar.h+' sent you the Forty.':ar.h+' sent you one deed.';
 $('#arriveP').textContent=inv?'Anonymous acts of kindness, person to person. Nothing assigned. Come see.':forty?'Forty deeds. One year. Their thought was of you.':(ar.a?'The act: '+ar.a:'One act. One person. Pass it on.');
@@ -1635,7 +1644,7 @@ var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='do
 /* bridge: the reader script lives in its own scope and reads these from window */
 try{Object.defineProperty(window,'PROFILE',{get:function(){return PROFILE}});Object.defineProperty(window,'sb',{get:function(){return sb}})}catch(e){}
 window.openJoin=openJoin;window.prependLive=prependLive;window.markKind=markKind;
-var DAILY=null,DAILYN=0,DAILYLOG=0,chainParentLive=null,chainLinkLive=0;
+var DAILY=null,DAILYN=0,DAILYLOG=0,chainParentLive=null,chainLinkLive=0,CAMPLOG=null,CAMPTITLE='';
 var LIVEPOSTS=[],SRES=[],NAMES={},feedEnd=false,feedBusy=true,pageFrom=0,feedFailMsg='',srvTimer=null;
 var BLK={};try{BLK=JSON.parse(safeGet('deeds_blk')||'{}')||{}}catch(e){BLK={}}
 var MONTHS=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
@@ -1648,6 +1657,7 @@ POSTS=POSTS.filter(function(p){return p.id!==1});
 
 /* keep the challenger handle for the follows pass */
 if(window.arrival&&arrival.h&&arrival.h!=='A friend')safeSet('deeds_challenger',arrival.h);
+if(window.arrival&&arrival.o)safeSet('deeds_orgjoin',arrival.o);
 
 function v(s){var el=$(s);return el?el.value.trim():''}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
@@ -1806,7 +1816,7 @@ DAILYN=(c.data&&c.data.n)||0;renderFeed()}).catch(function(){renderFeed()})
 }).catch(function(){})}
 function wireDaily(){var b=$('#dailyGo');if(!b)return;b.onclick=function(){
 if(!PROFILE){openJoin();return}
-DAILYLOG=DAILY?DAILY.day_no:0;chainParentLive=null;chainLinkLive=0;chainLink=0;
+DAILYLOG=DAILY?DAILY.day_no:0;chainParentLive=null;chainLinkLive=0;chainLink=0;CAMPLOG=null;var _cp1=$('#logcamp');if(_cp1)_cp1.style.display='none';
 openCompose('deed');
 var t=$('#logdaily');if(t){t.style.display='inline-flex';t.textContent='DAILY DEED \u00B7 No. '+DAILYLOG}
 var lc=$('#logchain');if(lc)lc.style.display='none'}}
@@ -2028,7 +2038,7 @@ var morePostLive=null;
 if(!PROFILE){morePostLive=null;closeSheets();openJoin();return}
 var r=findLive(morePostLive.id);morePostLive=null;closeSheets();
 if(!r||r._k==='post')return;
-chainParentLive=r.id;chainLinkLive=(r.chain_no||1)+1;DAILYLOG=0;chainLink=0;
+chainParentLive=r.id;chainLinkLive=(r.chain_no||1)+1;DAILYLOG=0;chainLink=0;CAMPLOG=null;var _cp2=$('#logcamp');if(_cp2)_cp2.style.display='none';
 openCompose('deed');
 var t=$('#logchain');if(t){t.style.display='inline-flex';t.textContent='CHAIN \u00B7 LINK '+chainLinkLive}
 var ld=$('#logdaily');if(ld)ld.style.display='none'}})();
@@ -2152,7 +2162,7 @@ if(LPHOTO){clearPhoto();return}
 ensureFileInput().click()};
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
-chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;
+chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;CAMPLOG=null;var _cp3=$('#logcamp');if(_cp3)_cp3.style.display='none';
 $('#logchain').style.display='none';var _ld3=$('#logdaily');if(_ld3)_ld3.style.display='none';openCompose('deed')}
 $('#tLog').onclick=wantLog;$('#pLog').onclick=wantLog;
 var lb2=$('#lLog');if(lb2)lb2.onclick=wantLog;
@@ -2188,6 +2198,7 @@ if(uerr2){b.textContent='Log It.';toast('The photo did not upload: '+uerr2);retu
 var dpay={profile_id:PROFILE.id,title:title,story:txt,is_private:logPriv,done_on:ymd(d)};
 if(DAILYLOG)dpay.daily_no=DAILYLOG;
 if(chainParentLive)dpay.chain_parent_id=chainParentLive;
+if(CAMPLOG)dpay.campaign_id=CAMPLOG;
 if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.media_h=mm.h}
 sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
@@ -2195,6 +2206,7 @@ if(r.error){toast('Could not log it: '+r.error.message);return}
 if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
 if(DAILYLOG){DAILYN++;DAILYLOG=0;var _ld=$('#logdaily');if(_ld)_ld.style.display='none'}
 if(chainParentLive){chainParentLive=null;chainLinkLive=0;var _lc=$('#logchain');if(_lc)_lc.style.display='none'}
+if(CAMPLOG){CAMPLOG=null;CAMPTITLE='';var _lp=$('#logcamp');if(_lp)_lp.style.display='none'}
 clearPhoto();
 if(!logPriv)prependLive(markKind(r.data,'deed'));
 closeSheets();renderProfile();renderRail();renderFeed();
@@ -2323,7 +2335,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimInviter();loadReach();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();loadReach();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -2646,8 +2658,84 @@ if(liveOn&&sb){sb.from('org_stats').select('member_count,total_deeds').eq('org_i
 var s=r&&r.data;if(!s)return;var b=$('#ovBody');if(!b)return;
 b.innerHTML+='<div class="ovrow"><div class="k">Impact</div><div>'+(s.member_count||0)+((s.member_count||0)===1?' member':' members')+' \u00B7 '+(s.total_deeds||0)+((s.total_deeds||0)===1?' deed':' deeds')+' and counting.</div></div>'
 }).catch(function(){})}
+if(liveOn&&sb)loadOrgPanel(id,o);
 sheet('#orgview')}
 
+function claimOrgJoin(){try{
+var o=safeGet('deeds_orgjoin');if(!o||!sb||!PROFILE)return;
+try{localStorage.removeItem('deeds_orgjoin')}catch(e){}
+var h=safeGet('deeds_challenger')||'';
+sb.rpc('claim_org_invite',{p_org:o,p_recruiter:h}).then(function(r){
+var d=r&&r.data;if(d&&d.length)d=d[0];
+var nm=d&&d.org_name,mc=d&&d.members;
+if(nm){toast('You joined '+nm+'. '+(mc||1)+' strong.');loadMemberships()}
+}).catch(function(){})}catch(e){}}
+function joinCampaign(cid,t){if(!PROFILE){openJoin();return}
+closeSheets();wantLog();CAMPLOG=cid;CAMPTITLE=String(t||'');
+var c=$('#logcamp');if(c){c.style.display='inline-flex';c.textContent='CAMPAIGN \u00B7 '+CAMPTITLE.toUpperCase().slice(0,40)}}
+function loadOrgPanel(id,o){
+var own=PROFILE&&o.owner_id===PROFILE.id;
+var pm=PROFILE?sb.from('org_members').select('org_id').eq('org_id',id).eq('profile_id',PROFILE.id).maybeSingle():Promise.resolve({data:null});
+Promise.all([sb.from('org_campaigns').select('*').eq('org_id',id).eq('status','open').order('created_at',{ascending:false}).limit(12),pm]).then(function(rr){
+var cams=(rr[0]&&!rr[0].error)?(rr[0].data||[]):[];
+var isMember=!!(rr[1]&&rr[1].data)||own;
+var b=$('#ovBody');if(!b)return;
+var ids=cams.map(function(c){return c.id});
+var sq=ids.length?sb.from('campaign_stats').select('*').in('campaign_id',ids):Promise.resolve({data:[]});
+sq.then(function(sr){
+var ST={};((sr&&sr.data)||[]).forEach(function(s){ST[s.campaign_id]=s});
+var h='';
+if(cams.length){
+h+='<div class="ovrow"><div class="k">Campaigns</div><div>';
+cams.forEach(function(c){var s=ST[c.id]||{};
+h+='<div style="margin:0 0 12px"><div style="font-weight:800">'+esc(c.title)+'</div>';
+if(c.description)h+='<div class="remnote" style="margin:2px 0 4px">'+esc(c.description)+'</div>';
+h+='<div class="remnote">'+(s.participants||0)+((s.participants||0)===1?' person':' people')+' \u00B7 '+(s.deed_count||0)+((s.deed_count||0)===1?' deed':' deeds')+'</div>';
+h+='<button class="fbtn" data-campjoin="'+c.id+'" data-campt="'+esc(c.title)+'" style="margin-top:6px">Join In.</button></div>'});
+h+='</div></div>'}
+if(own)h+='<div class="ovrow"><div class="k">Run It</div><div><button class="fbtn" id="ovNewCamp">New Campaign.</button><div id="ovCampForm"></div></div></div>';
+if(isMember){
+h+='<div class="ovrow"><div class="k">Grow It</div><div><div class="remnote" style="margin-bottom:6px">Emails, separated by commas or lines. Twenty a day.</div>';
+h+='<textarea class="logarea" id="growTa" style="min-height:64px" placeholder="one@company.com, two@company.com"></textarea>';
+h+='<button class="fbtn" id="growBtn" style="margin-top:6px">Send the Invitations.</button>';
+h+='<div class="remnote" id="growNote" style="margin-top:6px"></div></div></div>'}
+if(!h)return;
+b.innerHTML+=h;
+$$('#ovBody [data-campjoin]').forEach(function(btn){btn.onclick=function(){joinCampaign(btn.getAttribute('data-campjoin'),btn.getAttribute('data-campt'))}});
+var nb=$('#ovNewCamp');if(nb)nb.onclick=function(){
+var f=$('#ovCampForm');if(!f)return;
+f.innerHTML='<input class="oin" id="ncTitle" maxlength="80" placeholder="Canned Food Drive" style="margin:8px 0 6px"><textarea class="logarea" id="ncDesc" maxlength="500" style="min-height:52px" placeholder="What it is, where, when."></textarea><button class="fbtn" id="ncGo" style="margin-top:6px">Create It.</button>';
+$('#ncGo').onclick=function(){var t=($('#ncTitle').value||'').trim();if(t.length<3){toast('Give it a name.');return}
+sb.from('org_campaigns').insert({org_id:id,created_by:PROFILE.id,title:t,description:($('#ncDesc').value||'').trim()||null}).then(function(r){
+if(r.error){toast('Not saved: '+r.error.message);return}
+toast('Campaign is up.');openOrgView(id)}).catch(function(){})}};
+var gb2=$('#growBtn');if(gb2)gb2.onclick=function(){
+var raw=($('#growTa').value||'').split(/[\s,;]+/).filter(function(x){return x});
+if(!raw.length){toast('Add at least one email.');return}
+gb2.textContent='...';
+sb.rpc('send_org_invites',{p_org:id,p_emails:raw}).then(function(r){
+gb2.textContent='Send the Invitations.';
+if(r.error){toast('Not sent: '+r.error.message);return}
+var n=r.data||0;var gn=$('#growNote');
+if(gn)gn.textContent=n?(n+(n===1?' invitation':' invitations')+' on the way, from hello@deeds.fun.'):'None sent. Repeats, bad addresses, or the daily twenty is used.';
+if(n)$('#growTa').value=''}).catch(function(){gb2.textContent='Send the Invitations.'})}
+})}).catch(function(){})}
+function openGoodCompanies(){var el=$('#goodlist');if(el)el.innerHTML='<p class="remnote">Counting the good...</p>';
+sheet('#goodsheet');if(!sb)return;
+sb.rpc('good_companies').then(function(r){
+var el2=$('#goodlist');if(!el2)return;
+if(r.error){el2.innerHTML='<p class="remnote">The list could not load: '+esc(r.error.message)+'</p>';return}
+var rows=r.data||[];
+if(!rows.length){el2.innerHTML='<p class="remnote">No verified organizations yet. The list starts with one.</p>';return}
+var h='';rows.forEach(function(g,i){
+h+='<div class="rmeet" data-gcorg="'+g.org_id+'" style="cursor:pointer"><div style="font-weight:800;min-width:28px">'+(i+1)+'.</div><div class="in"><div class="mono">'+esc(g.display_name)+'</div><div class="remnote">'+esc(String(g.kind||'').toUpperCase())+' \u00B7 '+(g.member_count||0)+' MEMBERS \u00B7 '+(g.total_deeds||0)+' DEEDS'+((+g.open_campaigns)?' \u00B7 '+g.open_campaigns+' CAMPAIGN'+(+g.open_campaigns===1?'':'S'):'')+'</div></div></div>'});
+el2.innerHTML=h;
+$$('#goodlist [data-gcorg]').forEach(function(rw){rw.onclick=function(){
+var oid=rw.getAttribute('data-gcorg');
+sb.from('organizations').select('*').eq('id',oid).maybeSingle().then(function(orr){
+if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;openOrgView(orr.data.id)}}).catch(function(){})}})
+}).catch(function(){})}
+var _gbar=$('#goodbar');if(_gbar)_gbar.onclick=openGoodCompanies;
 /* ================= ALERTS: the activity, listed ================= */
 var ALERTS=[],ALSEEN=0,ALUNREAD=0,ALAB={};
 function alertsKey(){return 'deeds_alerts_'+(PROFILE?PROFILE.id:'x')}
