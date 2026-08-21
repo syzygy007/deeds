@@ -991,6 +991,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="sword">DEEDS<b>.</b></div>
   <h3>This Post.</h3>
   <button class="sheetrowbtn" id="moreedit" style="display:none">Edit It.<small>Fix your words. Redeeds keep the copy they carried.</small></button>
+  <button class="sheetrowbtn" id="moredelete" style="display:none">Delete It.<small>Gone from DEEDS for good.</small></button>
   <button class="sheetrowbtn" id="morechain" style="display:none">Continue the Chain.<small>Do the next act and log it as the next link.</small></button>
   <button class="sheetrowbtn" id="morereport">Report this deed.<small>It will be reviewed.</small></button>
   <button class="sheetrowbtn" id="moreblock">Block this member.<small>You will not see their deeds again.</small></button>
@@ -1500,7 +1501,7 @@ $('#passsecond').onclick=function(){closeSheets();openCompose('second',passPost.
 $('#passshare').onclick=function(){closeSheets();var txt='"'+passPost.body+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}};
 var morePost=null;
-function openMore(id){morePost=POSTS.filter(function(x){return x.id===id})[0];var _me=$('#moreedit');if(_me)_me.style.display='none';var _mr=$('#morereport');if(_mr)_mr.style.display='';var _mb=$('#moreblock');if(_mb)_mb.style.display='';sheet('#moresheet')}
+function openMore(id){morePost=POSTS.filter(function(x){return x.id===id})[0];var _me=$('#moreedit');if(_me)_me.style.display='none';var _md=$('#moredelete');if(_md)_md.style.display='none';var _mr=$('#morereport');if(_mr)_mr.style.display='';var _mb=$('#moreblock');if(_mb)_mb.style.display='';sheet('#moresheet')}
 $('#morereport').onclick=function(){closeSheets();toast('Reported. Thank you for guarding the feed.')};
 $('#moreblock').onclick=function(){var hd=morePost.who;my.blocked[hd]=1;closeSheets();renderFeed();toast('Blocked. Their deeds are gone from your feed.')};
 
@@ -1694,6 +1695,7 @@ var CMTSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 var REDEEDSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.5 21 6.5l-4 4"/><path d="M3 11V9a2.5 2.5 0 0 1 2.5-2.5H21"/><path d="M7 21.5 3 17.5l4-4"/><path d="M21 13v2a2.5 2.5 0 0 1-2.5 2.5H3"/></svg>';
 function livePostHTML(r){var nm=NAMES[r.profile_id]||{handle:'A Member',type:'doer',v:false};
 var mine=PROFILE&&r.profile_id===PROFILE.id;
+if(r.mod_status&&r.mod_status!=='live'&&!mine)return'';
 var isPost=r._k==='post';
 var body=isPost?(r.body||''):(r.story||r.title||'');
 var h='<article class="post" data-lid="'+esc(r.id)+'">';
@@ -1791,8 +1793,9 @@ $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribu
 var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
 $$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh'),own:b.hasAttribute('data-lown')};
-var _r=findLive(morePostLive.id),_mc=$('#morechain'),_me2=$('#moreedit'),_mr2=$('#morereport'),_mb2=$('#moreblock');
+var _r=findLive(morePostLive.id),_mc=$('#morechain'),_me2=$('#moreedit'),_mr2=$('#morereport'),_mb2=$('#moreblock'),_md2=$('#moredelete');
 if(_me2)_me2.style.display=morePostLive.own?'':'none';
+if(_md2){_md2.style.display=morePostLive.own?'':'none';_md2.setAttribute('data-armed','0');_md2.innerHTML='Delete It.<small>Gone from DEEDS for good.</small>'}
 if(_mr2)_mr2.style.display=morePostLive.own?'none':'';
 if(_mb2)_mb2.style.display=morePostLive.own?'none':'';
 if(_mc)_mc.style.display=(!morePostLive.own&&_r&&_r._k!=='post'&&!_r.is_private)?'':'none';
@@ -2231,6 +2234,22 @@ EDITCUR=r;closeSheets();
 $('#edittext').value=r._k==='post'?(r.body||''):(r.story||r.title||'');
 sheet('#editsheet');
 setTimeout(function(){var t=$('#edittext');t.focus();t.setSelectionRange(t.value.length,t.value.length)},80)};
+var _mdBtn=$('#moredelete');
+if(_mdBtn)_mdBtn.onclick=function(){
+if(!liveOn||!PROFILE||!sb){closeSheets();return}
+var r=morePostLive?findLive(morePostLive.id):null;
+if(!r){closeSheets();toast('Could not open it.');return}
+if(_mdBtn.getAttribute('data-armed')!=='1'){_mdBtn.setAttribute('data-armed','1');_mdBtn.innerHTML='Tap Again To Delete.<small>This cannot be undone.</small>';return}
+_mdBtn.setAttribute('data-armed','0');
+var tbl=r._k==='post'?'posts':'deeds',rid=r.id;
+sb.from(tbl).delete().eq('id',rid).eq('profile_id',PROFILE.id).select('id').then(function(res){
+if(res.error||!res.data||!res.data.length){toast('Not deleted: '+(res.error?res.error.message:'no permission'));return}
+LIVEPOSTS=LIVEPOSTS.filter(function(x){return x.id!==rid});
+SRES=SRES.filter(function(x){return x.id!==rid});
+if(window.my&&my.deeds)my.deeds=my.deeds.filter(function(x){return x.dbid!==rid});
+morePostLive=null;closeSheets();renderFeed();
+if(typeof renderProfile==='function'){try{renderProfile()}catch(e){}}
+toast('Deleted.')}).catch(function(){toast('Not deleted.')})};
 var _esBtn=$('#editsave');
 if(_esBtn)_esBtn.onclick=function(){
 if(!EDITCUR||!sb||!PROFILE)return;
@@ -2615,6 +2634,16 @@ function modAct(qid,action,btn){if(!PROFILE||!PROFILE.is_admin)return;
 var q=MODQ[String(qid)];if(!q){toast('That one is gone.');loadModQueue();return}
 var label=btn.textContent;btn.textContent='...';
 function done(err){btn.textContent=label;if(err){toast('Not saved: '+err);return}
+try{var st=null;
+if(action==='approve')st={mod_status:'live',media_status:(q.kind==='media'?'live':undefined)};
+else if(action==='remove')st={mod_status:'removed',media_status:'removed'};
+else if(action==='dismiss')st={mod_status:'live'};
+if(st){var syncRow=function(r){if(!r||r.id!==q.target_id)return;
+if(st.mod_status)r.mod_status=st.mod_status;
+if(st.media_status!==undefined&&r.media_path)r.media_status=st.media_status};
+LIVEPOSTS.forEach(syncRow);SRES.forEach(syncRow);
+if(action==='remove'){LIVEPOSTS=LIVEPOSTS.filter(function(r){return r.id!==q.target_id});SRES=SRES.filter(function(r){return r.id!==q.target_id})}
+renderFeed()}}catch(e){}
 toast(action==='approve'?'Approved. It is live.':action==='remove'?'Removed. The strike is logged.':action==='dismiss'?'Dismissed.':'Escalated and preserved.');
 loadModQueue()}
 if(q.kind==='media'){sb.functions.invoke('mod-media',{body:{action:(action==='remove'?'reject':action),kind:q.target_kind,id:q.target_id,queue_id:+qid}}).then(function(rr){
