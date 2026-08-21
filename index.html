@@ -2646,8 +2646,15 @@ if(action==='remove'){LIVEPOSTS=LIVEPOSTS.filter(function(r){return r.id!==q.tar
 renderFeed()}}catch(e){}
 toast(action==='approve'?'Approved. It is live.':action==='remove'?'Removed. The strike is logged.':action==='dismiss'?'Dismissed.':'Escalated and preserved.');
 loadModQueue()}
-if(q.kind==='media'){sb.functions.invoke('mod-media',{body:{action:(action==='remove'?'reject':action),kind:q.target_kind,id:q.target_id,queue_id:+qid}}).then(function(rr){
-done(rr&&rr.error?(rr.error.message||'edge error'):null)}).catch(function(e){done(String(e&&e.message||e))})}
+if(q.kind==='media'){var fin=false;
+var settle=function(err,note){if(fin)return;fin=true;done(err);if(!err&&note)setTimeout(function(){toast(note)},1500)};
+var direct=function(){sb.rpc('mod_resolve',{p_queue_id:+qid,p_action:(action==='remove'?'remove':action)}).then(function(rr){
+settle(rr&&rr.error?rr.error.message:null,(action==='approve'?'Saved directly. The photo file follows once the function heals.':null))
+}).catch(function(e){settle(String(e&&e.message||e))})};
+var tmo=setTimeout(function(){direct()},8000);
+sb.functions.invoke('mod-media',{body:{action:(action==='remove'?'reject':action),kind:q.target_kind,id:q.target_id,queue_id:+qid}}).then(function(rr){
+clearTimeout(tmo);if(rr&&rr.error){direct();return}
+settle(null)}).catch(function(e){clearTimeout(tmo);direct()})}
 else{sb.rpc('mod_resolve',{p_queue_id:+qid,p_action:action}).then(function(rr){done(rr&&rr.error?rr.error.message:null)}).catch(function(e){done(String(e&&e.message||e))})}}
 /* ================= SEARCH: people and organizations ================= */
 var OSTORE={};
