@@ -430,6 +430,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .rd-prog{height:2px;background:rgba(21,19,14,.08)}.rd-prog i{display:block;height:100%;width:0;background:var(--forest);transition:width .25s ease}
 .bk{position:relative}.bkbar{position:absolute;left:12px;right:12px;bottom:0;height:2px}.bkbar i{display:block;height:100%;background:var(--forest);border-radius:1px}
 .wpbar{height:3px;background:rgba(21,19,14,.08);border-radius:2px;margin:14px 0 10px;overflow:hidden}.wpbar i{display:block;height:100%;width:0;background:var(--forest);transition:width .4s ease}
+.biblecov{display:block;width:100%;text-align:left;border:0;cursor:pointer;font:inherit;background:var(--forest);color:var(--ivory);border-radius:16px;padding:22px 18px 18px;margin:2px 0 14px;box-shadow:inset 0 0 0 1px rgba(246,243,235,.14)}
+.biblecov .bc-mic{font-size:10px;letter-spacing:.22em;color:rgba(246,243,235,.72)}
+.biblecov .bc-title{font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.05;margin:8px 0 10px}
+.biblecov .bc-title b{color:var(--sage)}
+.biblecov .bc-line{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.14em;color:var(--sage)}
+.bibback{display:block;border:0;cursor:pointer;background:none;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.08em;color:var(--forest);padding:2px 0 12px}
+#pg-read.bib-on .lib-only{display:none}
 .fsrow{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 0}
 .fsref{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--forest)}
 .fstx{display:block;font-family:Georgia,"Times New Roman",serif;font-size:14px;line-height:1.45;color:var(--ink);margin-top:3px}
@@ -615,6 +622,16 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 <div class="page" id="pg-read">
       <div class="wd-title">The Word<b style="color:var(--forest)">.</b></div>
       <div class="wd-sub">Scripture, read like a book. Free forever.</div>
+      <div class="wd-sec lib-only"><div class="micro">The Library</div><div class="mono" style="color:var(--muted)">FREE</div></div>
+      <button class="biblecov lib-only" id="wdBible">
+        <div class="bc-mic">HOLY SCRIPTURE &#183; 66 BOOKS &#183; WEB &amp; KJV</div>
+        <div class="bc-title">The Holy Bible<b>.</b></div>
+        <div class="bc-line" id="wdBibleLine">OPEN THE BOOKS</div>
+      </button>
+      <div id="wdBWSec" style="display:none"></div>
+      <div class="lgrid lib-only" id="wdBookWorks" style="margin-bottom:6px"></div>
+      <div id="bibhome" style="display:none">
+      <button class="bibback" id="wdLibBack">&#8249; The Library.</button>
       <div class="wdcard" id="wdDaily">
         <div class="micro" id="wdDayL">Today&#8217;s Reading</div>
         <div class="wd-port" id="wdPort"></div>
@@ -625,15 +642,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="frail" id="wdRail"></div>
       <div class="wd-sec"><div class="micro">The Books</div><div class="mono" id="wdTrL">WEB</div></div>
       <div id="wdBooks"></div>
-      <div class="wd-sec" id="wdBWSec" style="display:none"><div class="micro">More Books</div><div class="mono" style="color:var(--muted)">FREE</div></div>
-      <div class="lgrid" id="wdBookWorks" style="margin-bottom:6px"></div>
-      <div class="wd-sec"><div class="micro">Editorial</div><div class="mono" style="color:var(--muted)">BY THE DOERS</div></div>
-      <div class="wd-sub" style="margin-bottom:8px">Written by the members. Free to read.</div>
-      <div class="logrow" id="wdCats" style="flex-wrap:wrap;margin-bottom:10px"></div>
-      <div class="lgrid" id="wdLib"></div>
       <div class="wpbar"><i id="wdBar"></i></div>
       <div class="wd-stat" id="wdStat"></div>
       <button class="wbtn ghost" id="wdShare" style="margin:6px 0 2px">Share the Progress.</button>
+      </div>
+      <div class="wd-sec lib-only"><div class="micro">Editorial</div><div class="mono" style="color:var(--muted)">BY THE DOERS</div></div>
+      <div class="wd-sub lib-only" style="margin-bottom:8px">Written by the members. Free to read.</div>
+      <div class="logrow lib-only" id="wdCats" style="flex-wrap:wrap;margin-bottom:10px"></div>
+      <div class="lgrid lib-only" id="wdLib"></div>
     </div>
     <div class="page" id="pg-meet">
       <div class="pghead"><h1>Meet<b>.</b></h1><div class="micro">Surfaced By Deeds, Not By You</div></div>
@@ -671,6 +687,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
       </div>
+      <div class="sect" id="deskrow" style="display:none"><button class="wbtn" id="deskgo" style="width:100%">The Desk. &#183; Admin</button></div>
       <div class="sect" id="advsect" style="display:none">
         <div class="micro">Organizations To Review</div>
         <div id="advlist"></div>
@@ -2561,6 +2578,7 @@ $('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preven
 
 /* ================= ADMIN: organization review ================= */
 function renderAdmin(){var s=$('#advsect'),ms=$('#modsect');if(!s)return;
+var dk=$('#deskrow');if(dk)dk.style.display=(window.PROFILE&&PROFILE.is_admin)?'':'none';
 if(!liveOn||!PROFILE||!PROFILE.is_admin){s.style.display='none';if(ms)ms.style.display='none';return}
 s.style.display='block';if(ms)ms.style.display='block';loadPending();loadModQueue()}
 
@@ -3201,11 +3219,15 @@ var bs=J('wdBooks').querySelectorAll('[data-wb]');for(var q3=0;q3<bs.length;q3++
 var n=rlCount();
 J('wdStat').textContent='DAY '+p.day+' OF 365 \u00B7 '+n+' OF '+TOTCH+' CHAPTERS \u00B7 THE FORTY '+forty40()+' OF 40 \u00B7 '+trUC();
 var _wb=J('wdBar');if(_wb)_wb.style.width=(Math.round(n*1000/TOTCH)/10)+'%';
+var _bl=J('wdBibleLine');if(_bl)_bl.textContent='DAY '+p.day+' OF 365 \u00B7 '+n+' OF '+TOTCH+' CHAPTERS \u00B7 '+trUC();
 var fl4=J('wd40L');if(fl4)fl4.textContent='The Forty \u00B7 '+forty40()+' of 40';
 var l=J('wdTrL');if(l)l.textContent=trUC();if(typeof renderNL==='function')renderNL()}
 J('wmOrder').onclick=function(){MODE='order';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wmShuffle').onclick=function(){MODE='shuffle';try{localStorage.setItem('deeds_rmode',MODE)}catch(e){}renderShelf()};
 J('wdFortyAll').onclick=openForty;
+var _bcv=J('wdBible');if(_bcv)_bcv.onclick=function(){var pg=J('pg-read');if(pg)pg.classList.add('bib-on');var bh=J('bibhome');if(bh)bh.style.display='';window.scrollTo(0,0)};
+var _bbk=J('wdLibBack');if(_bbk)_bbk.onclick=function(){var pg=J('pg-read');if(pg)pg.classList.remove('bib-on');var bh=J('bibhome');if(bh)bh.style.display='none';window.scrollTo(0,0)};
+var _dg=J('deskgo');if(_dg)_dg.onclick=function(){location.href='/admin/'};
 function openProgress(){CARD.kind='prog';CARD.day=planDay();CARD.f40=forty40();CARD.chs=rlCount();
 CARD.ref=(window.PROFILE&&PROFILE.handle?String(PROFILE.handle).toUpperCase():'THE WORD');
 CARD.body='The Word \u00B7 Day '+CARD.day+' of 365 \u00B7 The Forty '+CARD.f40+' of 40';
