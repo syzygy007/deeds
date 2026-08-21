@@ -154,6 +154,8 @@ input,textarea{font:inherit;color:var(--ink)}
 .trow .d{font-size:14.5px;line-height:1.5;flex:1}
 .privchip{font-size:8.5px;letter-spacing:.14em;font-weight:800;color:var(--muted);border:1px solid var(--line);padding:3px 8px;border-radius:999px}
 .folblock{display:flex;gap:10px;margin-top:16px}
+@keyframes deskwork{from{background-position:100% 0}to{background-position:0 0}}
+.fbtn.working,.blockb.working{background-image:linear-gradient(90deg,rgba(31,75,58,.28),rgba(31,75,58,.28));background-size:200% 100%;background-repeat:no-repeat;animation:deskwork 3s linear forwards;pointer-events:none}
 .blockb{color:var(--muted);border:1px solid var(--line);font-size:11px;font-weight:800;letter-spacing:.06em;padding:6px 16px;border-radius:999px}
 .statline{display:flex;gap:26px;margin-top:18px}
 .statline .n{font-size:22px;font-weight:800}
@@ -2632,8 +2634,8 @@ $$('#modlist [data-modact]').forEach(function(b){b.onclick=function(){modAct(b.g
 var MODQ={};
 function modAct(qid,action,btn){if(!PROFILE||!PROFILE.is_admin)return;
 var q=MODQ[String(qid)];if(!q){toast('That one is gone.');loadModQueue();return}
-var label=btn.textContent;btn.textContent='...';
-function done(err){btn.textContent=label;if(err){toast('Not saved: '+err);return}
+var label=btn.textContent;btn.textContent='...';btn.classList.add('working');
+function done(err){btn.textContent=label;btn.classList.remove('working');if(err){toast('Not saved: '+err);return}
 try{var st=null;
 if(action==='approve')st={mod_status:'live',media_status:(q.kind==='media'?'live':undefined)};
 else if(action==='remove')st={mod_status:'removed',media_status:'removed'};
@@ -2651,7 +2653,7 @@ var settle=function(err,note){if(fin)return;fin=true;done(err);if(!err&&note)set
 var direct=function(){sb.rpc('mod_resolve',{p_queue_id:+qid,p_action:(action==='remove'?'remove':action)}).then(function(rr){
 settle(rr&&rr.error?rr.error.message:null,(action==='approve'?'Saved directly. The photo file follows once the function heals.':null))
 }).catch(function(e){settle(String(e&&e.message||e))})};
-var tmo=setTimeout(function(){direct()},8000);
+var tmo=setTimeout(function(){direct()},3000);
 sb.functions.invoke('mod-media',{body:{action:(action==='remove'?'reject':action),kind:q.target_kind,id:q.target_id,queue_id:+qid}}).then(function(rr){
 clearTimeout(tmo);if(rr&&rr.error){direct();return}
 settle(null)}).catch(function(e){clearTimeout(tmo);direct()})}
