@@ -376,6 +376,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .lcov.iv .lm{color:var(--forest)}.lcov.fo .lm{color:#A0B0A4}
 .lcov .lt{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.25}
 .lcov.iv .lt{color:var(--ink)}.lcov.fo .lt{color:var(--ivory)}
+.lcbar{height:2px;background:rgba(21,19,14,.12);border-radius:1px;margin-top:8px;overflow:hidden}.lcov.fo .lcbar{background:rgba(246,243,235,.25)}.lcbar i{display:block;height:100%;width:0;background:var(--forest);transition:width .3s ease}.lcov.fo .lcbar i{background:var(--ivory)}.wk-chrow{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 16px}.wchip.rd{background:var(--forest);border-color:var(--forest);color:#fff}.wchip.cur{border-color:var(--ink)}
 .nrow{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 2px;border-bottom:1px solid var(--line);text-align:left}
 .nrow .nn{font-weight:800;font-size:14px;color:var(--ink)}
 .nrow .nc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);letter-spacing:.06em}
@@ -628,6 +629,8 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="bc-title">The Holy Bible<b>.</b></div>
         <div class="bc-line" id="wdBibleLine">OPEN THE BOOKS</div>
       </button>
+      <div class="wd-sec lib-only"><div class="micro">The Classics</div><div class="mono" style="color:var(--muted)">PUBLIC DOMAIN</div></div>
+      <div class="lgrid lib-only" id="wdClassics" style="margin-bottom:6px"></div>
       <div id="wdBWSec" style="display:none"></div>
       <div class="lgrid lib-only" id="wdBookWorks" style="margin-bottom:6px"></div>
       <div id="bibhome" style="display:none">
@@ -3605,9 +3608,81 @@ else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;i
 function route(){var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m)openWork(m[1])}
 window.addEventListener('hashchange',route);
 setTimeout(route,700);
+/* ---- the classics: public domain books with per book progress ---- */
+var CLASSICS=[
+{id:'greatest-thing-in-the-world',slug:'greatest-thing',t:'The Greatest Thing in the World',a:'Henry Drummond',ch:1,min:52},
+{id:'sermon-on-the-mount-practical-exposition',slug:'sermon-mount',t:'The Sermon on the Mount',a:'Charles Gore',ch:10,min:232},
+{id:'meditations-marcus-aurelius',slug:'meditations',t:'Meditations',a:'Marcus Aurelius',ch:12,min:287}];
+var CRL={},CRLK='deeds_crl',crlLs=false,crlDb=false,CVOL={},CVREQ={},CCUR=null;
+function crlKey(id,c){return id+':'+c}
+function crlCount(id){var n=0;for(var k in CRL){if(k.indexOf(id+':')===0)n++}return n}
+function loadCRL(){
+if(!crlLs){crlLs=true;try{var s=localStorage.getItem(CRLK);if(s){var o=JSON.parse(s);for(var k in o)CRL[k]=1}}catch(e){}}
+if(crlDb||!window.sb||!window.PROFILE)return;crlDb=true;
+sb.from('works_reading_log').select('work_id,chapter').then(function(r){if(r.error||!r.data)return;
+r.data.forEach(function(x){CRL[crlKey(x.work_id,x.chapter)]=1});renderClassics()}).catch(function(e){})}
+function markClassicRead(id,c){var kk=crlKey(id,c);if(CRL[kk])return false;
+CRL[kk]=1;
+if(window.sb&&window.PROFILE){sb.from('works_reading_log').upsert({profile_id:PROFILE.id,work_id:id,chapter:c},{ignoreDuplicates:true}).then(function(r){
+if(r.error&&window.toast)toast('Could not save it: '+r.error.message)}).catch(function(e){})}
+else{try{localStorage.setItem(CRLK,JSON.stringify(CRL))}catch(e){}}
+renderClassics();return true}
+function getClassicVol(slug,cb){if(CVOL[slug]){cb(CVOL[slug],null);return}
+if(CVREQ[slug]){CVREQ[slug].push(cb);return}
+CVREQ[slug]=[cb];
+fetch('deeds-work-'+slug+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+.then(function(j){CVOL[slug]=j;var q=CVREQ[slug];CVREQ[slug]=null;for(var i=0;i<q.length;i++)q[i](j,null)})
+.catch(function(e){var q=CVREQ[slug]||[];CVREQ[slug]=null;var m=String(e&&e.message||e);for(var i=0;i<q.length;i++)q[i](null,m)})}
+function renderClassics(){var el=J('wdClassics');if(!el)return;
+var h='';CLASSICS.forEach(function(w,i){var n=crlCount(w.id),pc=Math.round(n*100/w.ch),fo=i===1;
+h+='<button class="lcov '+(fo?'fo':'iv')+'" data-cl="'+i+'">'
++'<div><div class="lm">CLASSIC \u00B7 '+w.a.toUpperCase()+' \u00B7 ~'+w.min+' MIN</div>'
++'<div class="lt">'+w.t+'<b>.</b></div>'
++'<div class="lm" style="margin-top:8px">'+(n>=w.ch?'READ \u2713':n+' / '+w.ch+' CHAPTERS')+'</div>'
++'<div class="lcbar"><i style="width:'+pc+'%"></i></div></div></button>'});
+el.innerHTML=h;
+var bs=el.querySelectorAll('[data-cl]');
+for(var i=0;i<bs.length;i++)bs[i].onclick=(function(ci){return function(){var w=CLASSICS[ci],c=1;
+for(var k=1;k<=w.ch;k++){if(!CRL[crlKey(w.id,k)]){c=k;break}if(k===w.ch)c=w.ch}
+openClassic(ci,c)}})(+bs[i].getAttribute('data-cl'))}
+function openClassic(ci,ch){var w=CLASSICS[ci];if(!w)return;
+WMODE=true;document.body.classList.add('wk-on');
+J('reader').classList.add('on');lock(true);
+J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
+J('rdPill').textContent=w.t.toUpperCase().slice(0,26);
+CCUR={ci:ci,ch:ch};
+getClassicVol(w.slug,function(vol,err){
+if(!vol){J('rdLoad').style.display='none';if(window.toast)toast('That book could not open'+(err?': '+err:'.'));return}
+if(!CCUR||CCUR.ci!==ci||CCUR.ch!==ch)return;
+var peaks=ch===0,cd=peaks?null:vol.chapters[ch-1];
+var h='<div class="wk-cv"><div class="mc">THE CLASSICS \u00B7 '+esc(String(vol.author||w.a).toUpperCase())+' \u00B7 PUBLIC DOMAIN</div>'
++'<div class="tt">'+esc(vol.title||w.t)+'</div>'
++'<div class="by">'+(peaks?'THE PEAKS \u00B7 '+((vol.peaks||[]).length)+' PASSAGES':'~'+w.min+' MIN \u00B7 FREE ON DEEDS')+'</div></div>';
+h+='<div class="wk-chrow">';
+for(var c=1;c<=w.ch;c++){var rd=CRL[crlKey(w.id,c)]?' rd':'',cu=(!peaks&&c===ch)?' cur':'';
+h+='<button class="wchip'+rd+cu+'" data-cc="'+c+'">'+c+'</button>'}
+h+='<button class="wchip'+(peaks?' cur':'')+'" data-cc="0">Peaks.</button></div>';
+if(peaks){(vol.peaks||[]).forEach(function(p){
+h+='<div class="wk-v"><div class="t">'+esc(p.text)+'</div><div class="r">'+esc(String(p.location||'').toUpperCase())+'</div></div>'});
+h+='<div class="rd-end"><button class="wbtn ghost" id="clDone">Close the Book.</button></div>'}
+else{if(w.ch>1)h+='<div class="wk-q" style="font-style:normal;font-weight:700;font-size:19px">'+esc(cd.title)+'</div>';
+(cd.paras||[]).forEach(function(p){h+='<p class="wk-p">'+esc(p)+'</p>'});
+var done=!!CRL[crlKey(w.id,ch)];
+h+='<div class="rd-end">'
++(done?'<div class="lm" style="margin-bottom:10px">READ \u2713</div>':'<button class="wbtn" id="clMark">Mark It Read.</button>')
++(ch<w.ch?'<button class="wbtn ghost" id="clNext">Next Chapter.</button>':'')
++'<button class="wbtn ghost" id="clDone">Close the Book.</button></div>'}
+J('rdLoad').style.display='none';J('rdCols').innerHTML=h;
+var cs=J('rdCols').querySelectorAll('[data-cc]');
+for(var i=0;i<cs.length;i++)cs[i].onclick=(function(c){return function(){openClassic(ci,c)}})(+cs[i].getAttribute('data-cc'));
+var mb=J('clMark');if(mb)mb.onclick=function(){markClassicRead(w.id,ch);if(window.toast)toast(w.t.toUpperCase()+' \u00B7 CHAPTER '+ch+' \u00B7 READ.');
+if(ch<w.ch)openClassic(ci,ch+1);else openClassic(ci,ch)};
+var nb=J('clNext');if(nb)nb.onclick=function(){openClassic(ci,ch+1)};
+var db=J('clDone');if(db)db.onclick=function(){CCUR=null;closeReader()};
+layout(function(){gotoPage(0)})})}
 /* ---- nav hook ---- */
-if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){})}if(p==='profile'&&typeof renderNL==='function')renderNL()}}
-renderShelf();
+if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){});loadCRL();renderClassics()}if(p==='profile'&&typeof renderNL==='function')renderNL()}}
+renderShelf();loadCRL();renderClassics();
 })();
 </script>
 <script>
