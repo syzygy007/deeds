@@ -391,6 +391,8 @@ input,textarea{font:inherit;color:var(--ink)}
 .wk-cv .by{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.08em;color:var(--muted);margin-top:12px}
 .wk-cv img{width:100%;border-radius:12px;margin-bottom:16px}
 .wk-p{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.66;margin:0 0 16px;color:var(--ink)}
+.wk-h{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:17px;line-height:1.5;margin:20px 0 12px;color:var(--ink)}
+.wk-sn{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:11px;color:var(--forest);letter-spacing:.06em;padding-right:6px;vertical-align:.08em}
 .wk-v{border-left:3px solid var(--forest);padding:2px 0 2px 14px;margin:0 0 16px;break-inside:avoid}
 .wk-v .t{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.6;color:var(--ink)}
 .wk-v .r{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--forest);letter-spacing:.08em;margin-top:6px}
@@ -3067,18 +3069,18 @@ function clearSel(){SEL={};hlMode=null;var vs=J('rdCols').querySelectorAll('.vv.
 function selCount(){var n=0;for(var k in SEL)n++;return n}
 function vbarSync(){var bar=J('vbar');var on=selCount()>0||!!hlMode;bar.classList.toggle('on',on);
 if(!on)return;
-J('vbHl').textContent=hlMode?'Remove It.':'Study.';
+J('vbHl').textContent=hlMode?'Remove It.':(WMODE?'Keep It.':'Study.');
 J('vbClear').textContent=hlMode?'Close.':'Clear.'}
 J('rdCols').addEventListener('click',function(ev){var el=ev.target.closest?ev.target.closest('.vv'):null;if(!el)return;
 var v=+el.getAttribute('data-v');
-if(selCount()===0&&!hlMode&&el.classList.contains('hl')){var rows=hlFor(cur.b,cur.c);for(var i=0;i<rows.length;i++){if(v>=rows[i].v_start&&v<=rows[i].v_end){hlMode=rows[i];break}}
+if(selCount()===0&&!hlMode&&el.classList.contains('hl')){var rows=WMODE?whlCur():hlFor(cur.b,cur.c);for(var i=0;i<rows.length;i++){if(v>=rows[i].v_start&&v<=rows[i].v_end){hlMode=rows[i];break}}
 vbarSync();return}
 if(hlMode){hlMode=null}
 if(SEL[v]){delete SEL[v];el.classList.remove('sel')}else{SEL[v]=1;el.classList.add('sel')}
 vbarSync()});
 J('vbClear').onclick=function(){clearSel()};
-J('vbHl').onclick=function(){if(hlMode){removeHL(hlMode)}else{noteTap()}};
-J('vbCard').onclick=function(){var has=hlMode?[[hlMode.v_start,hlMode.v_end]]:runsOf(SEL);if(!has.length)return;openCard(has)};
+J('vbHl').onclick=function(){if(WMODE){if(hlMode)removeWHL(hlMode);else saveWHL();return}if(hlMode){removeHL(hlMode)}else{noteTap()}};
+J('vbCard').onclick=function(){var has=hlMode?[[hlMode.v_start,hlMode.v_end]]:runsOf(SEL);if(!has.length)return;if(WMODE)openWorkCard(has);else openCard(has)};
 /* ---- reader ---- */
 function lock(on){document.body.classList.toggle('rd-lock',on)}
 function openReader(b,c,anchor){cur.b=b;cur.c=c;clearSel();
@@ -3242,7 +3244,7 @@ function decode(s){var d=document.createElement('div');d.innerHTML=s;return d.te
 function openCard(runs){var kk=TR+':'+cur.b;var j=CACHE[kk];if(!j)return;
 var vs=j.c[cur.c-1]||[];var parts=[];
 runs.forEach(function(r){var seg=[];for(var v=r[0];v<=r[1];v++){if(vs[v-1])seg.push(vs[v-1])}parts.push(seg.join(' '))});
-CARD.kind='verse';CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
+CARD.kind='verse';CARD.micro='';CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
 var rt=runs.map(function(r){return r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]}).join(', ');
 CARD.ref=refCaps(cur.b,cur.c)+' : '+rt;
 CARD.body=disp(cur.b,cur.c)+':'+rt+' \u00B7 '+trUC();
@@ -3269,7 +3271,7 @@ var iv=CW==='ivory';
 var bg=iv?'#F6F3EB':'#1F4B3A',ink=iv?'#15130E':'#F6F3EB',ac=iv?'#1F4B3A':'#A0B0A4',ln=iv?'rgba(21,19,14,.2)':'rgba(246,243,235,.32)';
 ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 ctx.fillStyle=ac;ctx.font='800 25px "Helvetica Neue",Helvetica,Arial,sans-serif';
-spaced(ctx,CARD.kind==='prog'?'THE WORD \u00B7 PROGRESS':'THE WORD \u00B7 '+trUC(),M,152,8);
+spaced(ctx,CARD.kind==='prog'?'THE WORD \u00B7 PROGRESS':(CARD.micro||'THE WORD \u00B7 '+trUC()),M,152,8);
 if(CARD.kind==='prog'){
 ctx.fillStyle=ink;ctx.font='400 122px Georgia,"Times New Roman",serif';
 ctx.fillText('Day '+CARD.day+'.',M,566);
@@ -3610,12 +3612,12 @@ window.addEventListener('hashchange',route);
 setTimeout(route,700);
 /* ---- the classics: public domain books with per book progress ---- */
 var CLASSICS=[
-{id:'greatest-thing-in-the-world',slug:'greatest-thing',t:'The Greatest Thing in the World',a:'Henry Drummond',ch:1,min:52},
-{id:'sermon-on-the-mount-practical-exposition',slug:'sermon-mount',t:'The Sermon on the Mount',a:'Charles Gore',ch:10,min:232},
-{id:'meditations-marcus-aurelius',slug:'meditations',t:'Meditations',a:'Marcus Aurelius',ch:12,min:287},
-{id:'imitation-of-christ',slug:'imitation',t:'The Imitation of Christ',a:'Thomas \u00e0 Kempis',ch:4,min:305},
-{id:'dark-night-of-the-soul',slug:'dark-night',t:'The Dark Night of the Soul',a:'St. John of the Cross',ch:3,min:215},
-{id:'all-of-grace',slug:'all-of-grace',t:'All of Grace',a:'C. H. Spurgeon',ch:20,min:170}];
+{id:'greatest-thing-in-the-world',slug:'greatest-thing',t:'The Greatest Thing in the World',sr:'THE GREATEST THING',a:'Henry Drummond',ch:1,min:35},
+{id:'sermon-on-the-mount-practical-exposition',slug:'sermon-mount',t:'The Sermon on the Mount',sr:'SERMON ON THE MOUNT',a:'Charles Gore',ch:10,min:240},
+{id:'meditations-marcus-aurelius',slug:'meditations',t:'Meditations',sr:'MEDITATIONS',a:'Marcus Aurelius',ch:12,min:300},
+{id:'imitation-of-christ',slug:'imitation',t:'The Imitation of Christ',sr:'THE IMITATION',a:'Thomas \u00e0 Kempis',ch:114,min:297},
+{id:'dark-night-of-the-soul',slug:'dark-night',t:'The Dark Night of the Soul',sr:'THE DARK NIGHT',a:'St. John of the Cross',ch:3,min:215},
+{id:'all-of-grace',slug:'all-of-grace',t:'All of Grace',sr:'ALL OF GRACE',a:'C. H. Spurgeon',ch:20,min:170}];
 var CRL={},CRLK='deeds_crl',crlLs=false,crlDb=false,CVOL={},CVREQ={},CCUR=null;
 function crlKey(id,c){return id+':'+c}
 function crlCount(id){var n=0;for(var k in CRL){if(k.indexOf(id+':')===0)n++}return n}
@@ -3648,15 +3650,51 @@ var bs=el.querySelectorAll('[data-cl]');
 for(var i=0;i<bs.length;i++)bs[i].onclick=(function(ci){return function(){var w=CLASSICS[ci],c=1;
 for(var k=1;k<=w.ch;k++){if(!CRL[crlKey(w.id,k)]){c=k;break}if(k===w.ch)c=w.ch}
 openClassic(ci,c)}})(+bs[i].getAttribute('data-cl'))}
+var CVOL=null,WHLC={},CFLASH=null;
+function wkVerses(cd,vol){var mode=(vol&&vol.numeration&&vol.numeration.sections)||'para';var h='',open=false,lastP=null;
+cd.verses.forEach(function(e){
+if(e.k==='h'){if(open){h+='</p>';open=false}h+='<div class="wk-h">'+esc(e.t)+'</div>';return}
+if(e.b){if(open)h+='</p>';h+='<p class="wk-p">';open=true;
+if(mode!=='para'&&e.p!==lastP){h+='<span class="wk-sn">'+e.p+'</span>';lastP=e.p}}
+h+=vspan(e.v,esc(e.t))});
+if(open)h+='</p>';return h}
+function whlCur(){if(!CCUR)return[];var w=CLASSICS[CCUR.ci];var out=[];(WHLC[w.id]||[]).forEach(function(r){if(r.chapter===CCUR.ch)out.push(r)});return out}
+function loadWHL(wid){if(!window.sb||!window.PROFILE){WHLC[wid]=WHLC[wid]||[];return}
+sb.from('works_highlights').select('id,work_id,chapter,v_start,v_end').eq('work_id',wid).then(function(r){
+if(!r.error){WHLC[wid]=r.data||[];paintWHLs()}}).catch(function(e){})}
+function paintWHLs(){if(!WMODE)return;var rows=whlCur();var m={};rows.forEach(function(r){for(var v=r.v_start;v<=r.v_end;v++)m[v]=1});
+var vs=J('rdCols').querySelectorAll('.vv');for(var i=0;i<vs.length;i++){var v=+vs[i].getAttribute('data-v');vs[i].classList.toggle('hl',!!m[v])}}
+function saveWHL(){if(!window.sb||!window.PROFILE){if(window.openJoin)openJoin();else if(window.toast)toast('Create a profile first.');return}
+var runs=runsOf(SEL);if(!runs.length||!CCUR)return;var w=CLASSICS[CCUR.ci];
+var rows=runs.map(function(r){return{profile_id:PROFILE.id,work_id:w.id,chapter:CCUR.ch,v_start:r[0],v_end:r[1]}});
+sb.from('works_highlights').insert(rows).select().then(function(r){
+if(r.error){if(window.toast)toast('Could not keep it: '+r.error.message);return}
+WHLC[w.id]=(WHLC[w.id]||[]).concat(r.data||[]);clearSel();paintWHLs();if(window.toast)toast('KEPT.')}).catch(function(e){if(window.toast)toast('Could not keep it: '+String(e&&e.message||e))})}
+function removeWHL(row){if(!window.sb||!row||!CCUR)return;var w=CLASSICS[CCUR.ci];
+sb.from('works_highlights').delete().eq('id',row.id).then(function(r){
+if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
+WHLC[w.id]=(WHLC[w.id]||[]).filter(function(x){return x.id!==row.id});hlMode=null;vbarSync();paintWHLs();if(window.toast)toast('Removed.')}).catch(function(e){})}
+function openWorkCard(runs){if(!CVOL||!CCUR)return;var w=CLASSICS[CCUR.ci];var cd=CVOL.chapters[CCUR.ch-1];if(!cd||!cd.verses)return;
+var byv={};cd.verses.forEach(function(e){byv[e.v]=e});
+var parts=[];runs.forEach(function(r){var seg=[];for(var v=r[0];v<=r[1];v++){if(byv[v]&&byv[v].k!=='h')seg.push(byv[v].t)}if(seg.length)parts.push(seg.join(' '))});
+if(!parts.length)return;
+CARD.kind='verse';CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
+var rt=runs.map(function(r){return r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]}).join(', ');
+var mid='';if(cd.bkn&&cd.cn)mid=' \u00B7 BOOK '+String(cd.bkn).toUpperCase()+' '+cd.cn;else if(w.ch>1)mid=' \u00B7 CH '+CCUR.ch;
+CARD.ref=(w.sr||String(w.t).toUpperCase())+mid+' : '+rt;
+CARD.micro='THE CLASSICS \u00B7 '+String(CVOL.author||w.a).toUpperCase();
+CARD.body=(w.sr||String(w.t).toUpperCase())+mid+' : '+rt;
+drawCard();if(window.sheet)sheet('#cardsheet')}
 function openClassic(ci,ch){var w=CLASSICS[ci];if(!w)return;
 WMODE=true;document.body.classList.add('wk-on');
 J('reader').classList.add('on');lock(true);
 J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
 J('rdPill').textContent=w.t.toUpperCase().slice(0,26);
-CCUR={ci:ci,ch:ch};
+CCUR={ci:ci,ch:ch};CVOL=null;loadWHL(w.id);
 getClassicVol(w.slug,function(vol,err){
 if(!vol){J('rdLoad').style.display='none';if(window.toast)toast('That book could not open'+(err?': '+err:'.'));return}
 if(!CCUR||CCUR.ci!==ci||CCUR.ch!==ch)return;
+CVOL=vol;
 var peaks=ch===0,cd=peaks?null:vol.chapters[ch-1];
 var h='<div class="wk-cv"><div class="mc">THE CLASSICS \u00B7 '+esc(String(vol.author||w.a).toUpperCase())+' \u00B7 PUBLIC DOMAIN</div>'
 +'<div class="tt">'+esc(vol.title||w.t)+'</div>'
@@ -3665,24 +3703,27 @@ h+='<div class="wk-chrow">';
 for(var c=1;c<=w.ch;c++){var rd=CRL[crlKey(w.id,c)]?' rd':'',cu=(!peaks&&c===ch)?' cur':'';
 h+='<button class="wchip'+rd+cu+'" data-cc="'+c+'">'+c+'</button>'}
 h+='<button class="wchip'+(peaks?' cur':'')+'" data-cc="0">Peaks.</button></div>';
-if(peaks){(vol.peaks||[]).forEach(function(p){
-h+='<div class="wk-v"><div class="t">'+esc(p.text)+'</div><div class="r">'+esc(String(p.location||'').toUpperCase())+'</div></div>'});
+if(peaks){(vol.peaks||[]).forEach(function(p,pi){
+h+='<div class="wk-v"'+(p.ch?' data-pk="'+pi+'" style="cursor:pointer"':'')+'><div class="t">'+esc(p.text)+'</div><div class="r">'+esc(String(p.location||'').toUpperCase())+'</div></div>'});
 h+='<div class="rd-end"><button class="wbtn ghost" id="clDone">Close the Book.</button></div>'}
 else{if(w.ch>1)h+='<div class="wk-q" style="font-style:normal;font-weight:700;font-size:19px">'+esc(cd.title)+'</div>';
-(cd.paras||[]).forEach(function(p){h+='<p class="wk-p">'+esc(p)+'</p>'});
+if(cd.verses&&cd.verses.length)h+=wkVerses(cd,vol);
+else (cd.paras||[]).forEach(function(p){h+='<p class="wk-p">'+esc(p)+'</p>'});
 var done=!!CRL[crlKey(w.id,ch)];
 h+='<div class="rd-end">'
 +(done?'<div class="lm" style="margin-bottom:10px">READ \u2713</div>':'<button class="wbtn" id="clMark">Mark It Read.</button>')
 +(ch<w.ch?'<button class="wbtn ghost" id="clNext">Next Chapter.</button>':'')
 +'<button class="wbtn ghost" id="clDone">Close the Book.</button></div>'}
-J('rdLoad').style.display='none';J('rdCols').innerHTML=h;
+J('rdLoad').style.display='none';J('rdCols').innerHTML=h;clearSel();paintWHLs();
 var cs=J('rdCols').querySelectorAll('[data-cc]');
+var pks=J('rdCols').querySelectorAll('[data-pk]');
+for(var pi2=0;pi2<pks.length;pi2++)pks[pi2].onclick=(function(pk){return function(){if(!pk||!pk.ch)return;CFLASH=pk.v_start?{ch:pk.ch,v:pk.v_start}:null;openClassic(ci,pk.ch)}})((vol.peaks||[])[+pks[pi2].getAttribute('data-pk')]);
 for(var i=0;i<cs.length;i++)cs[i].onclick=(function(c){return function(){openClassic(ci,c)}})(+cs[i].getAttribute('data-cc'));
 var mb=J('clMark');if(mb)mb.onclick=function(){markClassicRead(w.id,ch);if(window.toast)toast(w.t.toUpperCase()+' \u00B7 CHAPTER '+ch+' \u00B7 READ.');
 if(ch<w.ch)openClassic(ci,ch+1);else openClassic(ci,ch)};
 var nb=J('clNext');if(nb)nb.onclick=function(){openClassic(ci,ch+1)};
 var db=J('clDone');if(db)db.onclick=function(){CCUR=null;closeReader()};
-layout(function(){gotoPage(0)})})}
+layout(function(){if(CFLASH&&CFLASH.ch===ch&&!peaks){var _fv=CFLASH.v;CFLASH=null;gotoVerse(_fv)}else{CFLASH=null;gotoPage(0)}})})}
 /* ---- nav hook ---- */
 if(typeof window.go==='function'){var _go=window.go;window.go=function(p){_go(p);if(p==='read'){renderShelf();getBook(TR,1,function(){});loadCRL();renderClassics()}if(p==='profile'&&typeof renderNL==='function')renderNL()}}
 renderShelf();loadCRL();renderClassics();
