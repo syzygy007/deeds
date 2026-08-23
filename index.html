@@ -3650,7 +3650,7 @@ var bs=el.querySelectorAll('[data-cl]');
 for(var i=0;i<bs.length;i++)bs[i].onclick=(function(ci){return function(){var w=CLASSICS[ci],c=1;
 for(var k=1;k<=w.ch;k++){if(!CRL[crlKey(w.id,k)]){c=k;break}if(k===w.ch)c=w.ch}
 openClassic(ci,c)}})(+bs[i].getAttribute('data-cl'))}
-var CVOL=null,WHLC={},CFLASH=null;
+var WCVOL=null,WHLC={},CFLASH=null;
 function wkVerses(cd,vol){var mode=(vol&&vol.numeration&&vol.numeration.sections)||'para';var h='',open=false,lastP=null;
 cd.verses.forEach(function(e){
 if(e.k==='h'){if(open){h+='</p>';open=false}h+='<div class="wk-h">'+esc(e.t)+'</div>';return}
@@ -3674,7 +3674,7 @@ function removeWHL(row){if(!window.sb||!row||!CCUR)return;var w=CLASSICS[CCUR.ci
 sb.from('works_highlights').delete().eq('id',row.id).then(function(r){
 if(r.error){if(window.toast)toast('Could not remove it: '+r.error.message);return}
 WHLC[w.id]=(WHLC[w.id]||[]).filter(function(x){return x.id!==row.id});hlMode=null;vbarSync();paintWHLs();if(window.toast)toast('Removed.')}).catch(function(e){})}
-function openWorkCard(runs){if(!CVOL||!CCUR)return;var w=CLASSICS[CCUR.ci];var cd=CVOL.chapters[CCUR.ch-1];if(!cd||!cd.verses)return;
+function openWorkCard(runs){if(!WCVOL||!CCUR)return;var w=CLASSICS[CCUR.ci];var cd=WCVOL.chapters[CCUR.ch-1];if(!cd||!cd.verses)return;
 var byv={};cd.verses.forEach(function(e){byv[e.v]=e});
 var parts=[];runs.forEach(function(r){var seg=[];for(var v=r[0];v<=r[1];v++){if(byv[v]&&byv[v].k!=='h')seg.push(byv[v].t)}if(seg.length)parts.push(seg.join(' '))});
 if(!parts.length)return;
@@ -3682,7 +3682,7 @@ CARD.kind='verse';CARD.runs=runs;CARD.text=parts.join(' \u2026 ');
 var rt=runs.map(function(r){return r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]}).join(', ');
 var mid='';if(cd.bkn&&cd.cn)mid=' \u00B7 BOOK '+String(cd.bkn).toUpperCase()+' '+cd.cn;else if(w.ch>1)mid=' \u00B7 CH '+CCUR.ch;
 CARD.ref=(w.sr||String(w.t).toUpperCase())+mid+' : '+rt;
-CARD.micro='THE CLASSICS \u00B7 '+String(CVOL.author||w.a).toUpperCase();
+CARD.micro='THE CLASSICS \u00B7 '+String(WCVOL.author||w.a).toUpperCase();
 CARD.body=(w.sr||String(w.t).toUpperCase())+mid+' : '+rt;
 drawCard();if(window.sheet)sheet('#cardsheet')}
 function openClassic(ci,ch){var w=CLASSICS[ci];if(!w)return;
@@ -3690,11 +3690,11 @@ WMODE=true;document.body.classList.add('wk-on');
 J('reader').classList.add('on');lock(true);
 J('rdLoad').style.display='flex';J('rdCols').innerHTML='';
 J('rdPill').textContent=w.t.toUpperCase().slice(0,26);
-CCUR={ci:ci,ch:ch};CVOL=null;loadWHL(w.id);
+CCUR={ci:ci,ch:ch};WCVOL=null;loadWHL(w.id);
 getClassicVol(w.slug,function(vol,err){
 if(!vol){J('rdLoad').style.display='none';if(window.toast)toast('That book could not open'+(err?': '+err:'.'));return}
 if(!CCUR||CCUR.ci!==ci||CCUR.ch!==ch)return;
-CVOL=vol;
+WCVOL=vol;
 var peaks=ch===0,cd=peaks?null:vol.chapters[ch-1];
 var h='<div class="wk-cv"><div class="mc">THE CLASSICS \u00B7 '+esc(String(vol.author||w.a).toUpperCase())+' \u00B7 PUBLIC DOMAIN</div>'
 +'<div class="tt">'+esc(vol.title||w.t)+'</div>'
