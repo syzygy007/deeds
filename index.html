@@ -260,7 +260,11 @@ input,textarea{font:inherit;color:var(--ink)}
  .llog{margin-top:26px;width:56px;height:56px;padding:0;background:var(--forest);color:var(--ivory);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(31,75,58,.30)}
  .llog svg{width:26px;height:26px}
  .llog:hover{transform:translateY(-1px)}
- .lfoot{margin-top:auto;font-size:8.5px;letter-spacing:.16em;color:#B3AEA0;font-weight:800;line-height:1.9;text-transform:uppercase;cursor:pointer}
+ .agreerow{display:flex;gap:11px;align-items:flex-start;margin:14px 0 4px;cursor:pointer;font-size:13px;line-height:1.5;color:var(--muted)}
+.agreerow input{flex:0 0 auto;width:19px;height:19px;margin:1px 0 0;accent-color:var(--forest);cursor:pointer}
+.agreerow a{border-bottom:1px solid rgba(31,75,58,.35)}
+.tosbody{font-size:15px;line-height:1.6;color:#4A463C;margin:10px 0 4px}
+.lfoot{margin-top:auto;font-size:8.5px;letter-spacing:.16em;color:#B3AEA0;font-weight:800;line-height:1.9;text-transform:uppercase;cursor:pointer}
 .whyline{background:none;border:0;padding:0;margin-top:12px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:inherit;text-align:left}
  .rblock{border-top:1px solid var(--ink);padding:18px 2px 22px;margin-bottom:10px}
  .rblock>.micro{color:var(--muted)}
@@ -1112,11 +1116,20 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="mrow"><button class="mbtn" id="arriveGo"></button><button class="mghost" id="arriveRead">Read First.</button></div>
 </div>
 
+<div class="sheet" id="tossheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Before you go on.</h3>
+  <p class="tosbody">We have published the rules of DEEDS. Nothing about how you use it changes. We need you to say you have seen them.</p>
+  <p class="tosbody">You must be 18 or older to hold an account.</p>
+  <div class="specrow"><span class="k">The Rules</span><span class="v"><a href="/terms/" style="color:var(--forest);text-decoration:none" target="_blank">Terms</a> &middot; <a href="/privacy/" style="color:var(--forest);text-decoration:none" target="_blank">Privacy</a> &middot; <a href="/guidelines/" style="color:var(--forest);text-decoration:none" target="_blank">Guidelines</a> &middot; <a href="/copyright/" style="color:var(--forest);text-decoration:none" target="_blank">Copyright</a></span></div>
+  <div class="logsub" style="margin-top:18px"><button class="logbtn" id="tosOk">I Agree.</button><button class="mghost" id="tosNo">Not Yet.</button></div>
+</div>
+
 <div class="sheet" id="joinsheet">
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Sign In or Join.</h3>
   <p class="remnote" style="margin:0 0 8px">Same door, one code. Known emails sign in. New emails join.</p>
-  <p class="remnote" style="margin:0 0 8px;color:var(--muted)">You must be 18 or older. Entering means you agree to the <a href="/terms/" style="color:var(--forest);text-decoration:none">Terms of Use</a> and the <a href="/privacy/" style="color:var(--forest);text-decoration:none">Privacy Policy</a>.</p>
+  <label class="agreerow" for="jagree"><input type="checkbox" id="jagree"><span>I am 18 or older and I agree to the <a href="/terms/" style="color:var(--forest);text-decoration:none" target="_blank">Terms of Use</a>, the <a href="/privacy/" style="color:var(--forest);text-decoration:none" target="_blank">Privacy Policy</a>, and the <a href="/guidelines/" style="color:var(--forest);text-decoration:none" target="_blank">Community Guidelines</a>.</span></label>
   <div id="jstep1">
     <input class="chfield" id="jemail" type="email" placeholder="Your email." autocomplete="email" style="margin-top:10px">
     <div class="logsub"><button class="logbtn" id="jsend">Send My Code.</button><button class="mghost" id="jskip">Look Around First.</button></div>
@@ -2784,10 +2797,14 @@ paintCad(cad);toast(cad==='none'?'Saved. No reminders. The door stays open.':'Sa
 function openJoin(){closeSheets();
 $('#jstep1').style.display='block';$('#jstep2').style.display='none';
 var jc=$('#jcode');if(jc)jc.value='';
+var ja=$('#jagree');if(ja)ja.checked=false;
 sheet('#joinsheet');setTimeout(function(){var je=$('#jemail');if(je)je.focus()},350)}
 function failAuth(m){closeSheets();$('#authfailP').textContent=m;
 $('#scrim').classList.add('on');$('#authfail').classList.add('on')}
 $('#authfailOk').onclick=function(){closeSheets();openJoin()};
+$('#tosOk').onclick=function(){var b=this;b.textContent='SAVING...';
+writeAccept(function(){b.textContent='I Agree.';closeSheets();toast('Thank you. Go do something small.')})};
+$('#tosNo').onclick=function(){closeSheets();toast('The rules stay in your profile. Read them any time.')};
 $('#jskip').onclick=closeSheets;
 function sendCode(){var b=$('#jsend');b.textContent='SENDING...';var done=false;
 var to=setTimeout(function(){if(done)return;done=true;b.textContent='Send My Code.';
@@ -2799,8 +2816,10 @@ $('#jstep1').style.display='none';$('#jstep2').style.display='block';
 setTimeout(function(){var jc=$('#jcode');if(jc)jc.focus()},250)}).catch(function(e){
 if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';failAuth(String(e&&e.message||e))})}
 $('#jsend').onclick=function(){var em=v('#jemail');
+var ag=$('#jagree');
+if(ag&&!ag.checked){toast('Tick the box first. It is the whole agreement.');return}
 if(!/^\S+@\S+\.\S+$/.test(em)){toast('A real email first.');return}
-JEMAIL=em;sendCode()};
+PENDACCEPT=true;JEMAIL=em;sendCode()};
 $('#jagain').onclick=function(){if(JEMAIL)sendCode()};
 $('#jverify').onclick=function(){var code=v('#jcode').replace(/\D/g,'');
 if(code.length<6){toast('Six digits.');return}
@@ -2846,13 +2865,24 @@ if(!s||!s.network_size){el.style.display='none';return}
 el.textContent=s.network_size+(s.network_size===1?' PERSON':' PEOPLE')+' \u00B7 '+s.network_deeds+(s.network_deeds===1?' DEED':' DEEDS')+' \u00B7 FROM YOUR INVITES';
 el.style.display='';
 }).catch(function(){})}
+var TOSVER='2026-08-24';var PENDACCEPT=false;
+function writeAccept(cb){if(!sb||!PROFILE){cb&&cb();return}
+var now=new Date().toISOString();
+sb.from('profiles').update({terms_accepted_at:now,terms_version:TOSVER}).eq('id',PROFILE.id).then(function(r){
+if(!r.error){PROFILE.terms_accepted_at=now;PROFILE.terms_version=TOSVER}
+cb&&cb()}).catch(function(){cb&&cb()})}
+function askAccept(){$('#scrim').classList.add('on');$('#tossheet').classList.add('on')}
+function checkAccept(){if(!PROFILE)return;
+if(PROFILE.terms_accepted_at)return;
+if(PENDACCEPT){PENDACCEPT=false;writeAccept();return}
+setTimeout(askAccept,600)}
 function applyProfile(){my.handle=PROFILE.handle;my.type=PROFILE.member_type||'doer';my.bio=PROFILE.bio||'';
 my.inspired={};my.following={};
 if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_verified_at,since:sinceStr(PROFILE.created_at),followers:0,following:[]};
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();loadReach();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();loadReach();checkAccept();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
