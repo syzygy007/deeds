@@ -194,6 +194,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .lpvmeta{color:var(--muted)}
 .lpvacts{display:flex;gap:16px;margin-top:8px}
 .lpvacts button{font-size:12.5px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.lpv.styled img{width:118px;height:148px;object-fit:contain;border-radius:6px}
 .lstyles{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
 .lstyles .lchip{padding:7px 13px;font-size:11.5px}
 .lstyles .lsnote{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--muted);width:100%;margin-top:2px}
@@ -974,7 +975,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <button class="lchip" id="logpriv">Keep This One Private.</button>
   </div>
   <div id="logprev" style="display:none">
-    <div class="lpv">
+    <div class="lpv" id="lpvwrap">
       <img id="lpvimg" alt="">
       <div class="lpvside">
         <div class="micro lpvmeta" id="lpvmeta">PHOTO ATTACHED</div>
@@ -2115,6 +2116,16 @@ memSpaced(ctx,MEM.spec,Math.round((W-sw)/2),ty+16,4);
 artGild(ctx,fx0,fy0,fx1,fy1,B,H);
 var py=fy1+46;ctx.fillStyle='#A8BAAC';ctx.font='800 17px '+MEMSANS;memSpaced(ctx,MEM.handle,MX+6,py,4);
 memMark(ctx,W-MX-6,py,26,'#E8ECE4','#A0B0A4')}
+/* the posted card. the same renderers the share sheet uses, driven from the composer */
+function artCard(img,style,text,handle,spec){
+var keep={img:MEM.img,text:MEM.text,handle:MEM.handle,spec:MEM.spec,card:MEM.card,styled:MEM.styled};
+MEM.img=img;MEM.text=text||'';MEM.handle=String(handle||'A MEMBER').toUpperCase();MEM.spec=spec||'';MEM.card=false;MEM.styled=false;
+var cv=document.createElement('canvas');cv.width=1080;cv.height=1350;
+try{if(style==='art'){memArt(cv)}
+else{var off=document.createElement('canvas');off.width=1080;off.height=1350;memPrint(off);
+if(style==='forest'){memForest(cv,off)}else{cv.getContext('2d').drawImage(off,0,0)}}}
+finally{MEM.img=keep.img;MEM.text=keep.text;MEM.handle=keep.handle;MEM.spec=keep.spec;MEM.card=keep.card;MEM.styled=keep.styled}
+return cv}
 /* ART:end */
 
 /* ---- the daily deed: one act, everyone, every day ---- */
@@ -2422,29 +2433,39 @@ function showPrev(bl,w,h){var p=$('#logprev'),im=$('#lpvimg');if(!p||!im)return;
 if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}}
 LPURL=URL.createObjectURL(bl);im.src=LPURL;
 var m=$('#lpvmeta');if(m)m.textContent='PHOTO ATTACHED'+((w&&h)?(' \u00B7 '+w+'\u00D7'+h):'');
-LSIMG=null;lsSet('plain');
+LSIMG=null;LSCACHE=null;lsSet('plain');
 p.style.display=''}
 var LSTYLE='plain',LSIMG=null;
 function lsNote(){var e=$('#lsnote');if(!e)return;
 e.textContent=LSTYLE==='memory'?'THE WHITE PRINT.':LSTYLE==='forest'?'LAID ON THE FOREST.':LSTYLE==='art'?'FRAMED AND GILDED.':'THE PHOTO AS IT IS.'}
 function lsLoad(cb){if(LSIMG){cb(LSIMG);return}if(!LPURL){cb(null);return}
 var im=new Image();im.onload=function(){LSIMG=im;cb(im)};im.onerror=function(){cb(null)};im.src=LPURL}
-function lsPreview(){var im=$('#lpvimg');if(!im||!LPHOTO)return;
+function lsWhen(){var b=$('#logdates .lchip.on'),t=b?b.textContent:'',d=new Date();
+if(t.indexOf('Yesterday')===0)d.setDate(d.getDate()-1);return d.toISOString()}
+function lsText(){var e=$('#logtext');return e?e.value.replace(/\s+/g,' ').trim():''}
+function lsSpec(){return(composeMode==='post'?'POST':'DEED')+' \u00B7 '+memDate(lsWhen())}
+function lsKey(){return LSTYLE+'|'+lsText()+'|'+lsSpec()}
+var LSCACHE=null,LSPEND=0;
+function lsBuild(cb){if(!LPHOTO||LSTYLE==='plain'){cb(null);return}
+var k=lsKey();if(LSCACHE&&LSCACHE.k===k){cb(LSCACHE);return}
+lsLoad(function(g){if(!g){cb(null);return}var cv;
+try{cv=artCard(g,LSTYLE,lsText(),(PROFILE&&PROFILE.handle)||'A MEMBER',lsSpec())}catch(e){cb(null);return}
+cv.toBlob(function(bl){if(!bl){cb(null);return}
+LSCACHE={k:k,blob:bl,w:cv.width,h:cv.height,url:cv.toDataURL('image/jpeg',.82)};cb(LSCACHE)},'image/jpeg',.9)})}
+function lsPreview(){var im=$('#lpvimg'),wrap=$('#lpvwrap');if(!im||!LPHOTO)return;
+if(wrap)wrap.classList.toggle('styled',LSTYLE!=='plain');
 if(LSTYLE==='plain'){im.src=LPURL;return}
-lsLoad(function(g){if(!g){im.src=LPURL;return}
-try{im.src=artTreat(g,LSTYLE,560).toDataURL('image/jpeg',.86)}catch(e){im.src=LPURL}})}
+var seq=++LSPEND;lsBuild(function(c){if(seq!==LSPEND)return;im.src=c?c.url:LPURL})}
 function lsSet(st){LSTYLE=st;$$('#lstyles [data-ls]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ls')===st)});lsNote();lsPreview()}
 function lsFinal(cb){if(!LPHOTO){cb(null);return}
 if(LSTYLE==='plain'){cb(LPHOTO.blob,LPHOTO.w,LPHOTO.h,'');return}
-function raw(){cb(LPHOTO.blob,LPHOTO.w,LPHOTO.h,'')}
-lsLoad(function(g){if(!g){raw();return}var cv;
-try{cv=artTreat(g,LSTYLE,1080)}catch(e){raw();return}
-cv.toBlob(function(bl){if(!bl){raw();return}
-cb(bl,cv.width,cv.height,LSTYLE==='art'?'art-':LSTYLE==='memory'?'mem-':'for-')},'image/jpeg',.9)})}
+lsBuild(function(c){if(!c){cb(LPHOTO.blob,LPHOTO.w,LPHOTO.h,'');return}
+cb(c.blob,c.w,c.h,LSTYLE==='art'?'art-':LSTYLE==='memory'?'mem-':'for-')})}
 function hidePrev(){var p=$('#logprev');if(p)p.style.display='none';
 var im=$('#lpvimg');if(im)im.removeAttribute('src');
 if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}LPURL=null}}
-function clearPhoto(){LPHOTO=null;LSIMG=null;LSTYLE='plain';
+function clearPhoto(){LPHOTO=null;LSIMG=null;LSTYLE='plain';LSCACHE=null;
+var _lw=$('#lpvwrap');if(_lw)_lw.classList.remove('styled');
 $$('#lstyles [data-ls]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ls')==='plain')});lsNote();
 var b=$('#logphoto');
 if(b){b.classList.remove('on');b.textContent='Add a Photo.'}
@@ -2513,11 +2534,17 @@ if(liveOn){$('#logvideo').style.display='none';clearPhoto();
 if(new Date().getDate()===1){$$('#logdates .lchip').forEach(function(b){if(b.textContent.indexOf('Yesterday')===0)b.style.display='none'})}}};
 $('#logphoto').onclick=function(){if(!liveOn){logPhoto=!logPhoto;if(logPhoto){logVideo=false;$('#logvideo').classList.remove('on')}$('#logphoto').classList.toggle('on',logPhoto);return}
 ensureFileInput().click()};
-function lpvBig(){if(LPURL)liveLightbox(LPURL)}
+function lpvBig(){if(LSTYLE!=='plain'&&LSCACHE&&LSCACHE.k===lsKey()){liveLightbox(LSCACHE.url);return}
+if(LSTYLE!=='plain'){lsBuild(function(c){liveLightbox(c?c.url:LPURL)});return}
+if(LPURL)liveLightbox(LPURL)}
 var _lpb=$('#lpvbig');if(_lpb)_lpb.onclick=lpvBig;
 var _lpi=$('#lpvimg');if(_lpi)_lpi.onclick=lpvBig;
 var _lpd=$('#lpvdel');if(_lpd)_lpd.onclick=function(){clearPhoto()};
 $$('#lstyles [data-ls]').forEach(function(b){b.onclick=function(){lsSet(b.getAttribute('data-ls'))}});
+var _lsT=0;function lsTouch(){if(LSTYLE==='plain'||!LPHOTO)return;
+clearTimeout(_lsT);_lsT=setTimeout(lsPreview,600)}
+var _lta=$('#logtext');if(_lta)_lta.addEventListener('input',lsTouch);
+$$('#logdates .lchip').forEach(function(b){b.addEventListener('click',function(){setTimeout(lsTouch,0)})});
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
 chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;CAMPLOG=null;var _cp3=$('#logcamp');if(_cp3)_cp3.style.display='none';
