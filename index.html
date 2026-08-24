@@ -485,6 +485,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .fo-r .ft{font-weight:800;font-size:14.5px;color:var(--ink)}
 .fo-r .fr{font-size:9.5px;letter-spacing:.13em;font-weight:800;color:var(--forest);text-transform:uppercase;margin-top:2px}
 #cardcv{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);display:block;margin:10px 0 12px}
+#memcv{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);display:block;margin:10px 0 12px}
 @media(min-width:1080px){
  .bgrid{grid-template-columns:1fr 1fr 1fr}
  .fcard{flex-basis:188px}
@@ -895,6 +896,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="ccSave">Save the Image.</button><button class="wbtn" id="ccPost">Post It.</button></div>
 </div>
 
+<div class="sheet" id="memsheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3 id="mmTitle">Share as a Memory.</h3>
+  <canvas id="memcv" width="1080" height="1350"></canvas>
+  <div class="logrow" id="mmChips" style="margin-top:0"></div>
+  <div class="micro" id="mmNote" style="color:var(--muted);margin-top:12px"></div>
+  <div class="logrow" style="margin-top:12px"><button class="wbtn" id="mmShare">Share It.</button></div>
+</div>
 <div class="sheet" id="redeedsheet">
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Redeed It.</h3>
@@ -1814,7 +1823,7 @@ $$('[data-linsp]').forEach(function(b){b.onclick=function(e){e.stopPropagation()
 $$('[data-lcmt]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openLiveCmts(b.getAttribute('data-lcmt'))}});
 $$('[data-redeed]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openRedeed(b.getAttribute('data-redeed'))}});
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
-var r=findLive(id);if(!r)return;var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
+var r=findLive(id);if(!r)return;if(r._k==='post'){openMemory(r);return}var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
 $$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh'),own:b.hasAttribute('data-lown')};
 var _r=findLive(morePostLive.id),_mc=$('#morechain'),_me2=$('#moreedit'),_mr2=$('#morereport'),_mb2=$('#moreblock'),_md2=$('#moredelete');
@@ -1826,7 +1835,94 @@ if(_mc)_mc.style.display=(!morePostLive.own&&_r&&_r._k!=='post'&&!_r.is_private)
 sheet('#moresheet')}});
 $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
 $$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
-function findLive(id){var all=LIVEPOSTS.concat(SRES);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
+function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
+/* MEM:begin ---- share a post as a memory: the white print, the print on the forest, or just the photo ---- */
+var MROWS=[],MEM={r:null,mode:'memory',img:null,blob:null,url:'',text:'',handle:'',spec:'',card:false};
+var MEMFAM='Georgia,"Times New Roman",serif',MEMSANS='"Helvetica Neue",Helvetica,Arial,sans-serif',MEMMONO='Menlo,Consolas,"Liberation Mono","Courier New",monospace';
+function memDate(iso){var d=iso?new Date(iso):new Date();if(isNaN(d.getTime()))d=new Date();
+var MU=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return d.getDate()+' '+MU[d.getMonth()]+' '+d.getFullYear()}
+function memSpaced(ctx,t,x,y,ls){var cx=x;for(var i=0;i<t.length;i++){ctx.fillText(t[i],cx,y);cx+=ctx.measureText(t[i]).width+ls}return cx-ls}
+function memWrap(ctx,text,maxW,maxH,start,min,lh,fam){var size=start,lines;
+function lay(sz){ctx.font='400 '+sz+'px '+fam;var words=text.split(/\s+/),L=[],line='';
+for(var i=0;i<words.length;i++){var t=line?line+' '+words[i]:words[i];if(ctx.measureText(t).width>maxW&&line){L.push(line);line=words[i]}else line=t}
+if(line)L.push(line);return L}
+while(size>=min){lines=lay(size);if(lines.length*size*lh<=maxH)return{size:size,lines:lines};size-=2}
+lines=lay(min);var maxL=Math.max(1,Math.floor(maxH/(min*lh)));
+if(lines.length>maxL){lines=lines.slice(0,maxL);lines[maxL-1]=lines[maxL-1].replace(/\s+\S*$/,'')+' \u2026'}
+return{size:min,lines:lines}}
+function memMark(ctx,rightX,base,px,ink,ac){ctx.font='800 '+px+'px '+MEMSANS;
+var w1=ctx.measureText('DEEDS').width,wp=ctx.measureText('.').width,w2=ctx.measureText('FUN').width;
+var x=rightX-(w1+wp+w2);ctx.fillStyle=ink;ctx.fillText('DEEDS',x,base);ctx.fillStyle=ac;ctx.fillText('.',x+w1,base);ctx.fillStyle=ink;ctx.fillText('FUN',x+w1+wp,base)}
+function memPrint(cv){var ctx=cv.getContext('2d'),W=1080,H=1350,B=54,WH='#FCFBF8',INK='#15130E',FOR='#1F4B3A';
+ctx.fillStyle=WH;ctx.fillRect(0,0,W,H);
+var img=MEM.img,bw=W-2*B,pb=B;
+if(img){var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+if(iw>=ih){var bh=Math.round(ih*bw/iw);ctx.drawImage(img,B,B,bw,bh);pb=B+bh}
+else{var sy=Math.round((ih-iw)*.2);ctx.drawImage(img,0,sy,iw,iw,B,B,bw,bw);pb=B+bw}
+ctx.strokeStyle='rgba(21,19,14,.16)';ctx.lineWidth=1;ctx.strokeRect(B+.5,B+.5,bw-1,pb-B-1)}
+else{ctx.fillStyle='#EDE8DC';ctx.fillRect(B,B,bw,730);pb=B+730}
+var band=H-pb,small=band<420,base=H-(small?72:90),pad=small?24:40,gapSpec=small?34:44,tail=small?126:166;
+var cap=(MEM.text||'').replace(/\s+/g,' ').trim(),capTop=pb+pad,capH=0;
+if(cap){var maxH=Math.max(70,band-pad-gapSpec-tail),fit=memWrap(ctx,cap,bw-8,maxH,64,34,1.22,MEMFAM);
+capH=fit.lines.length*fit.size*1.22;capTop=pb+pad+Math.max(0,(maxH-capH)/2);
+ctx.fillStyle=INK;ctx.font='400 '+fit.size+'px '+MEMFAM;
+fit.lines.forEach(function(L,i){ctx.fillText(L,B+2,capTop+fit.size*.92+i*fit.size*1.22)})}
+var specY=cap?capTop+capH+gapSpec:pb+Math.round((base-40-pb)/2)+8;
+ctx.fillStyle='rgba(21,19,14,.55)';ctx.font='400 21px '+MEMMONO;memSpaced(ctx,MEM.spec,B+4,specY,5);
+ctx.fillStyle=INK;ctx.font='800 22px '+MEMSANS;memSpaced(ctx,MEM.handle,B+4,base,6);
+memMark(ctx,W-B-2,base,40,INK,FOR);
+ctx.strokeStyle='rgba(21,19,14,.10)';ctx.lineWidth=2;ctx.strokeRect(1,1,W-2,H-2)}
+function memForest(cv,off){var ctx=cv.getContext('2d'),W=1080,H=1350;ctx.fillStyle='#1F4B3A';ctx.fillRect(0,0,W,H);
+var s=.86,cw=Math.round(W*s),ch=Math.round(H*s),x=Math.round((W-cw)/2),y=Math.round((H-ch)/2);
+ctx.save();ctx.shadowColor='rgba(0,0,0,.42)';ctx.shadowBlur=56;ctx.shadowOffsetY=18;ctx.fillStyle='#FCFBF8';ctx.fillRect(x,y,cw,ch);ctx.restore();
+ctx.drawImage(off,x,y,cw,ch)}
+function memType(cv,dark){var ctx=cv.getContext('2d'),W=1080,H=1350,M=96;
+var bg=dark?'#1F4B3A':'#F6F3EB',ink=dark?'#F6F3EB':'#15130E',ac=dark?'#A0B0A4':'#1F4B3A',ln=dark?'rgba(246,243,235,.32)':'rgba(21,19,14,.2)';
+ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ctx.fillStyle=ac;ctx.font='400 22px '+MEMMONO;memSpaced(ctx,MEM.spec,M,152,6);
+var fit=memWrap(ctx,(MEM.text||'').replace(/\s+/g,' ').trim()||' ',W-2*M,760,60,30,1.44,MEMFAM);
+ctx.fillStyle=ink;ctx.font='400 '+fit.size+'px '+MEMFAM;var bh=fit.lines.length*fit.size*1.44,y0=240+(800-bh)/2+fit.size;
+fit.lines.forEach(function(L,i){ctx.fillText(L,M,y0+i*fit.size*1.44)});
+ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
+ctx.fillStyle=ink;ctx.font='800 26px '+MEMSANS;memSpaced(ctx,MEM.handle,M,1216,6);
+memMark(ctx,W-M,1222,46,ink,ac)}
+function memPhoto(cv){var ctx=cv.getContext('2d'),W=1080,H=1350;ctx.fillStyle='#EDE8DC';ctx.fillRect(0,0,W,H);var img=MEM.img;if(!img)return;
+var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,sc=Math.min(W/iw,H/ih),dw=Math.round(iw*sc),dh=Math.round(ih*sc);
+ctx.drawImage(img,Math.round((W-dw)/2),Math.round((H-dh)/2),dw,dh)}
+function drawMem(){var cv=$('#memcv');if(!cv)return;var m=MEM.mode;
+if(m==='photo'){memPhoto(cv);return}
+if(m==='ivory'||m==='forest'){memType(cv,m==='forest');return}
+var off=document.createElement('canvas');off.width=1080;off.height=1350;memPrint(off);
+if(m==='onforest'){memForest(cv,off);return}
+var ctx=cv.getContext('2d');ctx.clearRect(0,0,1080,1350);ctx.drawImage(off,0,0)}
+function memNote(){var n=$('#mmNote');if(!n)return;var m=MEM.mode;
+n.textContent=m==='memory'?'The white print. Photo, your words, your handle.':m==='onforest'?'The print, laid on the forest.':m==='photo'?(MEM.card?'The card as it was posted.':'Just the photo. No frame, no type.'):'Your words on the card.'}
+function memSend(bl,nm,type){function dl(){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=nm;
+document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)}
+var fl=null;try{fl=new File([bl],nm,{type:type||'image/jpeg'})}catch(e){}
+if(fl&&navigator.share&&navigator.canShare&&navigator.canShare({files:[fl]})){navigator.share({files:[fl]}).catch(function(err){if(!err||err.name!=='AbortError')dl()});return}
+dl()}
+function memLoad(r){var url=MEM.url;if(!url)return;
+fetch(url,{mode:'cors'}).then(function(rs){if(!rs.ok)throw new Error('load');return rs.blob()}).then(function(bl){if(MEM.r!==r)return;
+MEM.blob=bl;var im=new Image();im.onload=function(){if(MEM.r!==r)return;MEM.img=im;drawMem()};im.onerror=function(){if(MEM.r===r)toast('The photo could not load for the card.')};
+im.src=URL.createObjectURL(bl)}).catch(function(){if(MEM.r===r)toast('The photo could not load for the card.')})}
+function openMemory(r){var nm=NAMES[r.profile_id]||{handle:'A Member'};
+MEM.r=r;MEM.img=null;MEM.blob=null;MEM.text=r.body||'';MEM.handle=String(nm.handle||'A MEMBER').toUpperCase();MEM.spec='POST \u00B7 '+memDate(r.created_at);
+var mlive=!r.media_status||r.media_status==='live';MEM.url=(r.media_path&&mlive)?mediaURL(r.media_path):'';
+var slug=MEM.handle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'deeds';
+var row=$('#mmChips'),tt=$('#mmTitle');MEM.card=!!(MEM.url&&/wcv-/.test(r.media_path));
+if(MEM.card){row.innerHTML='<button class="lchip on" data-mm="photo">The Card.</button>';MEM.mode='photo';if(tt)tt.textContent='Share the Card.'}
+else if(MEM.url){row.innerHTML='<button class="lchip on" data-mm="memory">Memory.</button><button class="lchip" data-mm="onforest">On Forest.</button><button class="lchip" data-mm="photo">Just the Photo.</button>';MEM.mode='memory';if(tt)tt.textContent='Share as a Memory.'}
+else{row.innerHTML='<button class="lchip on" data-mm="ivory">Ivory.</button><button class="lchip" data-mm="forest">Forest.</button>';MEM.mode='ivory';if(tt)tt.textContent='Share the Post.'}
+$$('#mmChips [data-mm]').forEach(function(b){b.onclick=function(){$$('#mmChips .lchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');MEM.mode=b.getAttribute('data-mm');memNote();drawMem()}});
+var sb2=$('#mmShare');if(sb2){var can=false;try{var _tf=new File([''],'t.jpg',{type:'image/jpeg'});can=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[_tf]}))}catch(e){}sb2.textContent=can?'Share It.':'Save the Image.'}
+memNote();drawMem();sheet('#memsheet');memLoad(r)}
+(function(){var b=$('#mmShare');if(!b)return;b.onclick=function(){var r=MEM.r;if(!r)return;
+var slug=MEM.handle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'deeds';
+if(MEM.mode==='photo'){if(MEM.blob){memSend(MEM.blob,(MEM.card?'deeds-card-':'deeds-photo-')+slug+'.jpg',MEM.blob.type);return}toast('The photo is still loading.');return}
+if(MEM.url&&!MEM.img&&MEM.mode!=='ivory'&&MEM.mode!=='forest'){toast('The photo is still loading.');return}
+var cv=$('#memcv');cv.toBlob(function(bl){if(!bl){toast('The card did not render.');return}memSend(bl,'deeds-memory-'+slug+'.jpg','image/jpeg')},'image/jpeg',.92)}})();
+/* MEM:end */
 
 /* ---- the daily deed: one act, everyone, every day ---- */
 function dailyCardHTML(){if(!DAILY)return'';
@@ -2044,7 +2140,7 @@ var dcnt=(res[3]&&typeof res[3].count==='number')?res[3].count:0;
 var rows=(dr.data||[]).map(function(x){return markKind(x,'deed')});
 var posts=(pr.error?[]:(pr.data||[])).map(function(x){return markKind(x,'post')});
 var anyPost=posts.length>0;
-rows=rows.concat(posts);rows.sort(byNew);
+rows=rows.concat(posts);rows.sort(byNew);MROWS=rows;
 loadCounts(rows).then(function(){
 var el=$('#memberbody');var nm=NAMES[p.id];
 var h='<div class="prof"><div class="prof-top"><div class="prof-av">'+DeedsTypes.svg(nm.type,88,{verified:nm.v})+'</div><div>';
