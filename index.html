@@ -257,7 +257,9 @@ input,textarea{font:inherit;color:var(--ink)}
  .lnav button:hover{background:#F0EDE3}
  .lnav button.on{color:var(--ink);font-weight:800}
  .lnav button.on svg{color:var(--forest)}
- .llog{margin-top:26px;background:var(--forest);color:var(--ivory);font-weight:800;font-size:15px;padding:14px 0;border-radius:999px;text-align:center}
+ .llog{margin-top:26px;width:56px;height:56px;padding:0;background:var(--forest);color:var(--ivory);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(31,75,58,.30)}
+ .llog svg{width:26px;height:26px}
+ .llog:hover{transform:translateY(-1px)}
  .lfoot{margin-top:auto;font-size:8.5px;letter-spacing:.16em;color:#B3AEA0;font-weight:800;line-height:1.9;text-transform:uppercase;cursor:pointer}
 .whyline{background:none;border:0;padding:0;margin-top:12px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:inherit;text-align:left}
  .rblock{border-top:1px solid var(--ink);padding:18px 2px 22px;margin-bottom:10px}
@@ -558,7 +560,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <button id="lBell" class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>Alerts.<span class="bdot"></span></button>
       <button data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
     </nav>
-    <button class="llog" id="lLog">Log a Deed.</button>
+    <button class="llog" id="lLog" aria-label="Log a Deed" title="Log a Deed."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
     <div class="lfoot" id="lWhy" role="button" tabindex="0">Not For Recognition.<br>Not For Followers.</div>
   </aside>
 
