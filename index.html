@@ -283,6 +283,13 @@ input,textarea{font:inherit;color:var(--ink)}
 .modetog{display:flex;gap:8px;margin:2px 0 14px}
 .modetog button{flex:1;border:1px solid var(--line);border-radius:999px;padding:10px 0;font-size:12.5px;font-weight:800;letter-spacing:.08em}
 .modetog button.on{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+#invpane{display:none}
+#logsheet.inv #invpane{display:block}
+#logsheet.inv #logtext,#logsheet.inv .logrow,#logsheet.inv #logprev,#logsheet.inv .logsub,#logsheet.inv #secondEmbed,#logsheet.inv #logchain,#logsheet.inv #logdaily,#logsheet.inv #logcamp{display:none!important}
+.ivpick{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 18px}
+.ivpick button{flex:1;min-width:98px;border:1px solid var(--line);border-radius:999px;padding:10px 0;font-size:12px;font-weight:800;letter-spacing:.05em}
+.ivpick button.on{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
+.ivlede{font-size:15px;color:#4A463C;line-height:1.5;margin:0 0 16px}
 .chip.pk{color:#8B867A;background:#F0EDE3}
 .embed{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#FBF9F3;cursor:pointer}
 .embed .eh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -546,7 +553,6 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <div class="lword" data-go="feed">DEEDS<b>.</b></div>
     <nav class="lnav">
       <button data-go="feed" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
-      <button data-go="challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>Challenge.</button>
       <button data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
       <button data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
       <button id="lBell" class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>Alerts.<span class="bdot"></span></button>
@@ -817,9 +823,8 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 <!-- TABS (mobile) -->
 <nav class="tabs">
   <button class="tab on" data-go="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
-  <button class="tab" data-go="challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>Challenge.</button>
-  <button class="tab tab-log" id="tLog" aria-label="Log a Deed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tab" data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
+  <button class="tab tab-log" id="tLog" aria-label="Log a Deed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="tab" data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
   <button class="tab" data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
 </nav>
@@ -957,12 +962,40 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 
 <div class="sheet" id="logsheet">
   <div class="sword">DEEDS<b>.</b></div>
-  <div class="modetog" id="modetog"><button id="modeDeed" class="on">DEED.</button><button id="modePost">POST.</button></div>
+  <div class="modetog" id="modetog"><button id="modeDeed" class="on">DEED.</button><button id="modePost">POST.</button><button id="modeInv">INVITE.</button></div>
   <h3 id="composeH">Log a Deed.</h3>
   <div class="chaintag" id="logchain" style="display:none"></div>
   <div class="chaintag" id="logdaily" style="display:none"></div>
   <div class="chaintag" id="logcamp" style="display:none"></div>
   <div id="secondEmbed"></div>
+  <div id="invpane">
+    <div class="ivpick" id="ivpick">
+      <button class="on" data-iv="deed">One Deed.</button>
+      <button data-iv="forty">The Forty.</button>
+      <button data-iv="invite">Just the Door.</button>
+    </div>
+    <div class="ivbody" id="ivb-deed">
+      <p class="ivlede">One act. One person. Pass it on.</p>
+      <div class="actchips" id="ivchips">
+        <button class="achip on">Pay for the next order.</button>
+        <button class="achip">Write the thank you note.</button>
+        <button class="achip">Carry it in for them.</button>
+      </div>
+      <input class="chfield" id="ivCustom" placeholder="Or write your own.">
+      <input class="chfield" id="ivNote" placeholder="A note to go with it. Optional.">
+      <p class="chnote">No deadline. They do the act, log it, and can pass one forward.</p>
+    </div>
+    <div class="ivbody" id="ivb-forty" style="display:none">
+      <p class="ivlede">Forty deeds. One year. See what it changes.</p>
+      <input class="chfield" id="ivFNote" placeholder="A note to go with it. Optional.">
+      <p class="chnote">Their year starts the day they accept. No weekly quota. Every deed counts toward everything at once.</p>
+    </div>
+    <div class="ivbody" id="ivb-invite" style="display:none">
+      <p class="ivlede">No deed attached. No clock. Just the door, held open.</p>
+      <p class="chnote">They arrive to DEEDS itself. Free, anonymous, nothing assigned.</p>
+    </div>
+    <div class="sendrow"><button class="sendb" data-ivsend="sms">Text It.</button><button class="sendb" data-ivsend="mail">Email It.</button><button class="sendb" data-ivsend="copy">Copy the Link.</button></div>
+  </div>
   <textarea class="logarea" id="logtext" placeholder="What did you do?"></textarea>
   <div class="logrow" id="logdates">
     <button class="lchip on">Today.</button>
@@ -1570,7 +1603,9 @@ var chainLink=0,logPriv=false,logPhoto=false,logVideo=false,composeMode='deed',s
 function switchMode(m){composeMode=m;
 $('#modeDeed').classList.toggle('on',m==='deed');
 $('#modePost').classList.toggle('on',m==='post');
-$('#composeH').textContent=m==='deed'?'Log a Deed.':(m==='post'?'Make a Post.':'Second It.');
+var _mi=$('#modeInv');if(_mi)_mi.classList.toggle('on',m==='invite');
+var _ls=$('#logsheet');if(_ls)_ls.classList.toggle('inv',m==='invite');
+$('#composeH').textContent=m==='deed'?'Log a Deed.':(m==='post'?'Make a Post.':(m==='invite'?'Send an Invite.':'Second It.'));
 $('#logtext').placeholder=m==='deed'?'What did you do?':(m==='post'?'Say something good.':'Say why it moved you.');
 $('#logdates').style.display=m==='deed'?'flex':'none';
 $('#logpriv').style.display=m==='deed'?'':'none';
@@ -1588,6 +1623,7 @@ switchMode(mode||'deed');
 sheet('#logsheet');setTimeout(function(){$('#logtext').focus()},350)}
 $('#modeDeed').onclick=function(){switchMode('deed')};
 $('#modePost').onclick=function(){switchMode('post')};
+var _miB=$('#modeInv');if(_miB)_miB.onclick=function(){switchMode('invite')};
 $$('#logdates .lchip').forEach(function(b){b.onclick=function(){$$('#logdates .lchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on')}});
 $('#logpriv').onclick=function(){logPriv=!logPriv;$('#logpriv').classList.toggle('on',logPriv)};
 $('#logphoto').onclick=function(){logPhoto=!logPhoto;if(logPhoto){logVideo=false;$('#logvideo').classList.remove('on')}$('#logphoto').classList.toggle('on',logPhoto)};
@@ -1634,6 +1670,29 @@ var s=buildSend(parts[0]);
 if(parts[1]==='sms'){location.href='sms:?&body='+encodeURIComponent(s.url)}
 else if(parts[1]==='mail'){location.href='mailto:?subject='+encodeURIComponent('Someone thought of you.')+'&body='+encodeURIComponent(s.msg)}
 else{try{navigator.clipboard.writeText(s.msg);toast('Link copied.')}catch(e){toast('Link copied.')}}}});
+/* ---- invite lane inside the composer ---- */
+var ivKind='deed';
+function ivSet(k){ivKind=k;
+$$('#ivpick button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-iv')===k)});
+$('#ivb-deed').style.display=k==='deed'?'':'none';
+$('#ivb-forty').style.display=k==='forty'?'':'none';
+$('#ivb-invite').style.display=k==='invite'?'':'none'}
+$$('#ivpick button').forEach(function(b){b.onclick=function(){ivSet(b.getAttribute('data-iv'))}});
+$$('#ivchips .achip').forEach(function(b){b.onclick=function(){$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');$('#ivCustom').value=''}});
+$('#ivCustom').addEventListener('input',function(){if(this.value.trim())$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')})});
+function ivBuild(){var h=my.handle||'A friend';
+if(ivKind==='deed'){var c=$('#ivCustom').value.trim();var on=$('#ivchips .achip.on');
+var act=c||(on?on.textContent:'One act of your choosing.');var note=$('#ivNote').value.trim();
+var u='https://deeds.fun/deed/?c='+h+'&k=deed&a='+actParam(act);
+return{url:u,msg:h+' challenged you to one deed: '+cleanAct(act)+(note?' \u00B7 '+note:'')+' \u00B7 See it: '+u}}
+if(ivKind==='forty'){var n2=$('#ivFNote').value.trim();var u2='https://deeds.fun/challenge/?c='+h;
+return{url:u2,msg:h+' sent you the Forty. Forty deeds. One year.'+(n2?' \u00B7 '+n2:'')+' \u00B7 See it: '+u2}}
+var u3='https://deeds.fun/invite/?c='+h+'&k=invite';
+return{url:u3,msg:h+' invited you to DEEDS. Anonymous acts of kindness, person to person. See it: '+u3}}
+$$('[data-ivsend]').forEach(function(b){b.onclick=function(){var ch=b.getAttribute('data-ivsend');var s=ivBuild();
+if(ch==='sms'){location.href='sms:?&body='+encodeURIComponent(s.url)}
+else if(ch==='mail'){location.href='mailto:?subject='+encodeURIComponent('Someone thought of you.')+'&body='+encodeURIComponent(s.msg)}
+else{try{var _cp=navigator.clipboard.writeText(s.msg);if(_cp&&_cp.catch)_cp.catch(function(){})}catch(e){}closeSheets();toast('Link copied.')}}});
 function openWhy(){sheet('#whysheet')}
 $('#lWhy').onclick=openWhy;$('#pWhy').onclick=openWhy;
 $('#lWhy').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openWhy()}};
