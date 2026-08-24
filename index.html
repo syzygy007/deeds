@@ -187,6 +187,13 @@ input,textarea{font:inherit;color:var(--ink)}
 .logrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
 .lchip{border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:800}
 .lchip.on{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+#logprev{margin-top:14px}
+.lpv{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}
+.lpv img{width:66px;height:66px;object-fit:cover;border-radius:9px;display:block;flex:0 0 auto;background:var(--bone);cursor:zoom-in}
+.lpvside{min-width:0}
+.lpvmeta{color:var(--muted)}
+.lpvacts{display:flex;gap:16px;margin-top:8px}
+.lpvacts button{font-size:12.5px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
 .logsub{margin-top:20px;display:flex;align-items:center;gap:14px}
 .logbtn{background:var(--forest);color:var(--ivory);font-weight:800;font-size:15px;padding:13px 28px;border-radius:999px}
 .cmt{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -962,6 +969,15 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <button class="lchip" id="logphoto">Add a Photo.</button>
     <button class="lchip" id="logvideo" style="display:none">Add a Video.</button>
     <button class="lchip" id="logpriv">Keep This One Private.</button>
+  </div>
+  <div id="logprev" style="display:none">
+    <div class="lpv">
+      <img id="lpvimg" alt="">
+      <div class="lpvside">
+        <div class="micro lpvmeta" id="lpvmeta">PHOTO ATTACHED</div>
+        <div class="lpvacts"><button id="lpvbig">Expand.</button><button id="lpvdel">Remove.</button></div>
+      </div>
+    </div>
   </div>
   <div class="logsub"><button class="logbtn" id="logsubmit">Log It.</button></div>
 </div>
@@ -2224,8 +2240,18 @@ basePassSecond&&basePassSecond()};
 var LPHOTO=null,LFILE=null;
 function mediaURL(p){try{return sb.storage.from('media').getPublicUrl(p).data.publicUrl}
 catch(e){return SB_URL+'/storage/v1/object/public/media/'+p}}
+var LPURL=null;
+function showPrev(bl,w,h){var p=$('#logprev'),im=$('#lpvimg');if(!p||!im)return;
+if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}}
+LPURL=URL.createObjectURL(bl);im.src=LPURL;
+var m=$('#lpvmeta');if(m)m.textContent='PHOTO ATTACHED'+((w&&h)?(' \u00B7 '+w+'\u00D7'+h):'');
+p.style.display=''}
+function hidePrev(){var p=$('#logprev');if(p)p.style.display='none';
+var im=$('#lpvimg');if(im)im.removeAttribute('src');
+if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}LPURL=null}}
 function clearPhoto(){LPHOTO=null;var b=$('#logphoto');
 if(b){b.classList.remove('on');b.textContent='Add a Photo.'}
+hidePrev();
 if(LFILE)LFILE.value=''}
 function shrinkImage(file,maxpx,cb){
 function paint(src,w,h){w=w||1;h=h||1;
@@ -2251,7 +2277,8 @@ var b=$('#logphoto');if(b)b.textContent='SIZING...';
 shrinkImage(f,1600,function(bl,w,h){
 if(!bl){clearPhoto();toast('That image could not be read.');return}
 LPHOTO={blob:bl,w:w,h:h};
-if(b){b.textContent='Photo Ready.';b.classList.add('on')}})});
+showPrev(bl,w,h);
+if(b){b.textContent='Change Photo.';b.classList.add('on')}})});
 document.body.appendChild(LFILE);return LFILE}
 function uploadPhoto(cb){if(!LPHOTO||!PROFILE){cb(null);return}
 var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
@@ -2278,6 +2305,7 @@ switchMode=function(m){baseSwitchMode(m);
 if(!liveOn)return;
 $('#logvideo').style.display='none';
 $('#logphoto').style.display=(m==='second')?'none':'';
+var _lp=$('#logprev');if(_lp)_lp.style.display=(m!=='second'&&LPHOTO)?'':'none';
 if(LPHOTO&&$('#logphoto'))$('#logphoto').classList.add('on')};
 
 /* ---- composer: real deeds into the database ---- */
@@ -2286,8 +2314,11 @@ openCompose=function(mode,ref){baseOpenCompose(mode,ref);
 if(liveOn){$('#logvideo').style.display='none';clearPhoto();
 if(new Date().getDate()===1){$$('#logdates .lchip').forEach(function(b){if(b.textContent.indexOf('Yesterday')===0)b.style.display='none'})}}};
 $('#logphoto').onclick=function(){if(!liveOn){logPhoto=!logPhoto;if(logPhoto){logVideo=false;$('#logvideo').classList.remove('on')}$('#logphoto').classList.toggle('on',logPhoto);return}
-if(LPHOTO){clearPhoto();return}
 ensureFileInput().click()};
+function lpvBig(){if(LPURL)liveLightbox(LPURL)}
+var _lpb=$('#lpvbig');if(_lpb)_lpb.onclick=lpvBig;
+var _lpi=$('#lpvimg');if(_lpi)_lpi.onclick=lpvBig;
+var _lpd=$('#lpvdel');if(_lpd)_lpd.onclick=function(){clearPhoto()};
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
 chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;CAMPLOG=null;var _cp3=$('#logcamp');if(_cp3)_cp3.style.display='none';
