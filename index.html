@@ -189,11 +189,14 @@ input,textarea{font:inherit;color:var(--ink)}
 .lchip.on{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
 #logprev{margin-top:14px}
 .lpv{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}
-.lpv img{width:66px;height:66px;object-fit:cover;border-radius:9px;display:block;flex:0 0 auto;background:var(--bone);cursor:zoom-in}
+.lpv img{width:92px;height:92px;object-fit:cover;border-radius:9px;display:block;flex:0 0 auto;background:var(--bone);cursor:zoom-in}
 .lpvside{min-width:0}
 .lpvmeta{color:var(--muted)}
 .lpvacts{display:flex;gap:16px;margin-top:8px}
 .lpvacts button{font-size:12.5px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.lstyles{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.lstyles .lchip{padding:7px 13px;font-size:11.5px}
+.lstyles .lsnote{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--muted);width:100%;margin-top:2px}
 .logsub{margin-top:20px;display:flex;align-items:center;gap:14px}
 .logbtn{background:var(--forest);color:var(--ivory);font-weight:800;font-size:15px;padding:13px 28px;border-radius:999px}
 .cmt{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -977,6 +980,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="micro lpvmeta" id="lpvmeta">PHOTO ATTACHED</div>
         <div class="lpvacts"><button id="lpvbig">Expand.</button><button id="lpvdel">Remove.</button></div>
       </div>
+    </div>
+    <div class="lstyles" id="lstyles">
+      <button class="lchip on" data-ls="plain">Plain.</button>
+      <button class="lchip" data-ls="memory">Memory.</button>
+      <button class="lchip" data-ls="forest">Forest.</button>
+      <button class="lchip" data-ls="art">Art.</button>
+      <div class="lsnote" id="lsnote">THE PHOTO AS IT IS.</div>
     </div>
   </div>
   <div class="logsub"><button class="logbtn" id="logsubmit">Log It.</button></div>
@@ -1853,7 +1863,7 @@ $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagati
 $$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
 function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
 /* MEM:begin ---- share a post as a memory: the white print, the print on the forest, or just the photo ---- */
-var MROWS=[],MEM={r:null,mode:'memory',img:null,blob:null,url:'',text:'',handle:'',spec:'',card:false};
+var MROWS=[],MEM={r:null,mode:'memory',img:null,blob:null,url:'',text:'',handle:'',spec:'',card:false,styled:false};
 var MEMFAM='Georgia,"Times New Roman",serif',MEMSANS='"Helvetica Neue",Helvetica,Arial,sans-serif',MEMMONO='Menlo,Consolas,"Liberation Mono","Courier New",monospace';
 function memDate(iso){var d=iso?new Date(iso):new Date();if(isNaN(d.getTime()))d=new Date();
 var MU=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return d.getDate()+' '+MU[d.getMonth()]+' '+d.getFullYear()}
@@ -1907,12 +1917,13 @@ var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,sc=Math.min(
 ctx.drawImage(img,Math.round((W-dw)/2),Math.round((H-dh)/2),dw,dh)}
 function drawMem(){var cv=$('#memcv');if(!cv)return;var m=MEM.mode;
 if(m==='photo'){memPhoto(cv);return}
+if(m==='art'){memArt(cv);return}
 if(m==='ivory'||m==='forest'){memType(cv,m==='forest');return}
 var off=document.createElement('canvas');off.width=1080;off.height=1350;memPrint(off);
 if(m==='onforest'){memForest(cv,off);return}
 var ctx=cv.getContext('2d');ctx.clearRect(0,0,1080,1350);ctx.drawImage(off,0,0)}
 function memNote(){var n=$('#mmNote');if(!n)return;var m=MEM.mode;
-n.textContent=m==='memory'?'The white print. Photo, your words, your handle.':m==='onforest'?'The print, laid on the forest.':m==='photo'?(MEM.card?'The card as it was posted.':'Just the photo. No frame, no type.'):'Your words on the card.'}
+n.textContent=m==='memory'?'The white print. Photo, your words, your handle.':m==='onforest'?'The print, laid on the forest.':m==='art'?'The deed, made art.':m==='photo'?(MEM.card?'The card as it was posted.':MEM.styled?'The image as it was posted.':'Just the photo. No frame, no type.'):'Your words on the card.'}
 function memSend(bl,nm,type){function dl(){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=nm;
 document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400)}
 var fl=null;try{fl=new File([bl],nm,{type:type||'image/jpeg'})}catch(e){}
@@ -1927,8 +1938,10 @@ MEM.r=r;MEM.img=null;MEM.blob=null;MEM.text=r.body||'';MEM.handle=String(nm.hand
 var mlive=!r.media_status||r.media_status==='live';MEM.url=(r.media_path&&mlive)?mediaURL(r.media_path):'';
 var slug=MEM.handle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'deeds';
 var row=$('#mmChips'),tt=$('#mmTitle');MEM.card=!!(MEM.url&&/wcv-/.test(r.media_path));
+MEM.styled=!!(MEM.url&&!MEM.card&&/\/(art|mem|for)-\d/.test(r.media_path));
 if(MEM.card){row.innerHTML='<button class="lchip on" data-mm="photo">The Card.</button>';MEM.mode='photo';if(tt)tt.textContent='Share the Card.'}
-else if(MEM.url){row.innerHTML='<button class="lchip on" data-mm="memory">Memory.</button><button class="lchip" data-mm="onforest">On Forest.</button><button class="lchip" data-mm="photo">Just the Photo.</button>';MEM.mode='memory';if(tt)tt.textContent='Share as a Memory.'}
+else if(MEM.styled){row.innerHTML='<button class="lchip on" data-mm="photo">'+(/\/art-\d/.test(r.media_path)?'The Artwork.':'The Photo.')+'</button>';MEM.mode='photo';if(tt)tt.textContent=/\/art-\d/.test(r.media_path)?'Share the Artwork.':'Share the Photo.'}
+else if(MEM.url){row.innerHTML='<button class="lchip on" data-mm="memory">Memory.</button><button class="lchip" data-mm="onforest">On Forest.</button><button class="lchip" data-mm="art">Art.</button><button class="lchip" data-mm="photo">Just the Photo.</button>';MEM.mode='memory';if(tt)tt.textContent='Share as a Memory.'}
 else{row.innerHTML='<button class="lchip on" data-mm="ivory">Ivory.</button><button class="lchip" data-mm="forest">Forest.</button>';MEM.mode='ivory';if(tt)tt.textContent='Share the Post.'}
 $$('#mmChips [data-mm]').forEach(function(b){b.onclick=function(){$$('#mmChips .lchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');MEM.mode=b.getAttribute('data-mm');memNote();drawMem()}});
 var sb2=$('#mmShare');if(sb2){var can=false;try{var _tf=new File([''],'t.jpg',{type:'image/jpeg'});can=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[_tf]}))}catch(e){}sb2.textContent=can?'Share It.':'Save the Image.'}
@@ -1937,8 +1950,172 @@ memNote();drawMem();sheet('#memsheet');memLoad(r)}
 var slug=MEM.handle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'deeds';
 if(MEM.mode==='photo'){if(MEM.blob){memSend(MEM.blob,(MEM.card?'deeds-card-':'deeds-photo-')+slug+'.jpg',MEM.blob.type);return}toast('The photo is still loading.');return}
 if(MEM.url&&!MEM.img&&MEM.mode!=='ivory'&&MEM.mode!=='forest'){toast('The photo is still loading.');return}
-var cv=$('#memcv');cv.toBlob(function(bl){if(!bl){toast('The card did not render.');return}memSend(bl,'deeds-memory-'+slug+'.jpg','image/jpeg')},'image/jpeg',.92)}})();
+var cv=$('#memcv');cv.toBlob(function(bl){if(!bl){toast('The card did not render.');return}memSend(bl,(MEM.mode==='art'?'deeds-art-':'deeds-memory-')+slug+'.jpg','image/jpeg')},'image/jpeg',.92)}})();
 /* MEM:end */
+/* ART:begin ---- the gilded treatment: a carved frame and a gallery plate, for the composer and the share sheet ---- */
+function artStep(a,b,x){var t=(x-a)/(b-a);t=t<0?0:t>1?1:t;return t*t*(3-2*t)}
+function artRnd(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function artNoise(w,h,cell,seed){var r=artRnd(seed),gw=Math.ceil(w/cell)+2,gh=Math.ceil(h/cell)+2,g=new Float32Array(gw*gh),i;
+for(i=0;i<g.length;i++)g[i]=r()*2-1;
+return function(x,y){var fx=x/cell,fy=y/cell,x0=fx|0,y0=fy|0,tx=fx-x0,ty=fy-y0;
+if(x0<0)x0=0;if(y0<0)y0=0;if(x0>gw-2)x0=gw-2;if(y0>gh-2)y0=gh-2;
+var a=g[y0*gw+x0],b=g[y0*gw+x0+1],c=g[(y0+1)*gw+x0],d=g[(y0+1)*gw+x0+1];
+tx=tx*tx*(3-2*tx);ty=ty*ty*(3-2*ty);
+return(a+(b-a)*tx)*(1-ty)+(c+(d-c)*tx)*ty}}
+/* the plate: a photo turned into a print. eight passes, because one ctx.filter cannot hold a highlight */
+function artPlate(ctx,x,y,w,h){if(w<2||h<2)return;var id;try{id=ctx.getImageData(x,y,w,h)}catch(e){return}
+var p=id.data,k=.72,lift=.055,sat=.83,shR=.880,shG=.845,shB=.725,hiR=1.055,hiG=1.005,hiB=.905;
+var r=artRnd(7),i,px,py,c0,c1,c2,v,lum,nx,ny,rr,vig,sheen,grain,weave;
+for(py=0;py<h;py++){ny=(py/h-.5)*2;
+for(px=0;px<w;px++){i=(py*w+px)*4;nx=(px/w-.5)*2;
+v=p[i]/255;if(v>k)v=k+(1-k)*Math.tanh((v-k)/(1-k));c0=lift+v*(1-lift);
+v=p[i+1]/255;if(v>k)v=k+(1-k)*Math.tanh((v-k)/(1-k));c1=lift+v*(1-lift);
+v=p[i+2]/255;if(v>k)v=k+(1-k)*Math.tanh((v-k)/(1-k));c2=lift+v*(1-lift);
+lum=c0*.2126+c1*.7152+c2*.0722;
+c0=lum+(c0-lum)*sat;c1=lum+(c1-lum)*sat;c2=lum+(c2-lum)*sat;
+c0*=shR+(hiR-shR)*lum;c1*=shG+(hiG-shG)*lum;c2*=shB+(hiB-shB)*lum;
+rr=Math.sqrt(nx*nx+ny*ny)/1.414;if(rr>1)rr=1;
+vig=1-.17*Math.pow(rr,1.8);
+weave=Math.sin(px*1.9)*Math.sin(py*1.9)*.010;
+grain=(r()-.5)*.022;
+sheen=Math.pow(Math.max(0,1-(nx*.6+ny*.8+1)/2),2)*.030;
+v=c0*vig+weave+grain+sheen;p[i]=v<0?0:v>1?255:v*255;
+v=c1*vig+weave+grain+sheen;p[i+1]=v<0?0:v>1?255:v*255;
+v=c2*vig+weave+grain+sheen;p[i+2]=v<0?0:v>1?255:v*255}}
+ctx.putImageData(id,x,y)}
+/* the moulding, as a cross section */
+function artSection(t){var h=.30*artStep(0,.05,t);
+h+=.42*Math.exp(-Math.pow(t-.135,2)/.0022);
+h-=.26*Math.exp(-Math.pow(t-.255,2)/.0030);
+h+=.50*Math.exp(-Math.pow(t-.475,2)/.0165);
+h-=.30*Math.exp(-Math.pow(t-.690,2)/.0020);
+h+=.46*Math.exp(-Math.pow(t-.790,2)/.0020);
+h-=.55*artStep(.90,1,t);return h}
+function artLeaf(s,v){var sv=Math.sin(Math.PI*(v<0?0:v>1?1:v));if(sv<0)sv=0;
+var b=.62*Math.exp(-Math.pow(s-.50,2)/.030)*Math.pow(sv,.65);
+b+=.30*Math.exp(-Math.pow(s-.19,2)/.0075)*Math.pow(sv,1.4);
+b+=.30*Math.exp(-Math.pow(s-.81,2)/.0075)*Math.pow(sv,1.4);
+b-=.16*Math.exp(-Math.pow(s-.50,2)/.0016)*sv;
+b-=.12*Math.exp(-Math.pow(s-.02,2)/.0018);
+b-=.12*Math.exp(-Math.pow(s-.98,2)/.0018);return b}
+function artHeight(x,y,x0,y0,x1,y1,b){var dl=x-x0,dr=x1-x,dt=y-y0,db=y1-y;
+var dmin=Math.min(Math.min(dl,dr),Math.min(dt,db)),t=dmin/b;if(t<0)t=0;if(t>1)t=1;
+var u=(Math.min(dl,dr)<Math.min(dt,db))?y:x,h=artSection(t),i,cx,cy,pxc,pyc,rrr,m,ang,petal,rose;
+var pitch=b*.86;
+if(t>.315&&t<.640){var vv=(t-.315)/.325,cell=u/pitch,s=cell-Math.floor(cell);
+if(Math.floor(cell)%2!==0)s=1-s;h+=artLeaf(s,vv)*.92}
+var bp=b*.175,c2=u/bp,s2=c2-Math.floor(c2),rad=(Math.floor(c2)%3!==0)?.40:.24;
+var q=1-Math.pow((s2-.5)/rad,2)-Math.pow((t-.135)/.062,2);
+if(q>0)h+=Math.sqrt(q)*.26;
+var cs=[[x0+b/2,y0+b/2],[x1-b/2,y0+b/2],[x0+b/2,y1-b/2],[x1-b/2,y1-b/2]];
+for(i=0;i<4;i++){pxc=x-cs[i][0];pyc=y-cs[i][1];rrr=Math.sqrt(pxc*pxc+pyc*pyc)/(b*.5);
+if(rrr>1.16)continue;m=1-artStep(.72,1.16,rrr);ang=Math.atan2(pyc,pxc);
+petal=Math.pow(Math.cos(ang*8)*.5+.5,1.6);
+rose=(.30+.62*petal)*Math.exp(-Math.pow(rrr-.56,2)/.075);
+rose+=.66*Math.exp(-rrr*rrr/.055);
+rose-=.20*Math.exp(-Math.pow(rrr-.90,2)/.012);
+h=h*(1-m)+(artSection(t)*.55+rose*1.05)*m}
+return h}
+/* light the height field. this is why the carving reads as carving */
+function artGild(ctx,x0,y0,x1,y1,b,CH){var w=x1-x0+1,h=y1-y0+1,id;
+try{id=ctx.getImageData(x0,y0,w,h)}catch(e){return}
+var p=id.data,hf=new Float32Array(w*h),x,y,i,j,gx,gy,dmin,lim=b+2;
+for(y=0;y<h;y++)for(x=0;x<w;x++){gx=x0+x;gy=y0+y;
+dmin=Math.min(Math.min(gx-x0,x1-gx),Math.min(gy-y0,y1-gy));
+hf[y*w+x]=(dmin<=lim)?artHeight(gx,gy,x0,y0,x1,y1,b):0}
+var pat=artNoise(w,h,5,19);
+var lx=-.50,ly=-.60,lz=.62,ll=Math.sqrt(lx*lx+ly*ly+lz*lz);lx/=ll;ly/=ll;lz/=ll;
+var hx=lx,hy=ly,hz=lz+1,hl=Math.sqrt(hx*hx+hy*hy+hz*hz);hx/=hl;hy/=hl;hz/=hl;
+var sc=26,deep=[.255,.132,.052],midc=[.640,.492,.212],high=[.870,.755,.470],bole=[.395,.238,.118],spc=[1,.94,.80];
+var dx,dy,nx,ny,nz,nl,dif,sp,n,wear,worn,rail,a,c;
+for(y=1;y<h-1;y++)for(x=1;x<w-1;x++){gx=x0+x;gy=y0+y;
+if(gx>x0+b&&gx<x1-b&&gy>y0+b&&gy<y1-b)continue;
+dx=(hf[y*w+x+1]-hf[y*w+x-1])*.5;dy=(hf[(y+1)*w+x]-hf[(y-1)*w+x])*.5;
+nx=-dx*sc;ny=-dy*sc;nl=Math.sqrt(nx*nx+ny*ny+1);nx/=nl;ny/=nl;nz=1/nl;
+dif=nx*lx+ny*ly+nz*lz;if(dif<0)dif=0;if(dif>1)dif=1;
+sp=nx*hx+ny*hy+nz*hz;sp=sp<0?0:Math.pow(sp,42);
+n=pat(x,y);wear=(hf[y*w+x]+.35)/1.05;if(wear<0)wear=0;if(wear>1)wear=1;
+worn=artStep(.62,.92,wear)*artStep(.22,.62,n*.5+.5);
+rail=.90+.16*artStep(1,0,gy/CH);
+i=(y*w+x)*4;
+for(j=0;j<3;j++){a=deep[j]+(midc[j]-deep[j])*Math.min(1,wear*2)+(high[j]-midc[j])*Math.min(1,Math.max(0,wear*2-1));
+a*=1+n*.075;a=a*(1-worn*.55)+bole[j]*worn*.55;
+c=(a*(.245+.90*dif)+sp*spc[j]*.62+a*Math.min(1,Math.max(0,-dy*sc))*.10)*rail;
+p[i+j]=c<0?0:c>1?255:c*255}
+p[i+3]=255}
+ctx.putImageData(id,x0,y0)}
+/* ---- the post treatments. an image treatment, not a card: the row already carries the words ---- */
+function artFitH(iw,ih,w,arMax){var ar=ih/iw;if(ar>arMax)ar=arMax;return Math.round(w*ar)}
+function artSrcBox(iw,ih,w,hh){var tar=w/hh,cur=iw/ih,sx=0,sy=0,sw=iw,sh=ih;
+if(cur>tar){sw=Math.round(ih*tar);sx=Math.round((iw-sw)/2)}
+else if(cur<tar){sh=Math.round(iw/tar);sy=Math.round((ih-sh)*.22)}
+return[sx,sy,sw,sh]}
+function artTreat(img,style,W){W=W||1080;
+var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+var cv=document.createElement('canvas'),ctx,ph,pw,box,x,y,pad,MX,B,PAD,fh,gr;
+if(style==='memory'){var b=Math.round(W*.05),bb=Math.round(W*.089);pw=W-2*b;
+ph=artFitH(iw,ih,pw,1.25);box=artSrcBox(iw,ih,pw,ph);
+cv.width=W;cv.height=ph+b+bb;ctx=cv.getContext('2d');
+ctx.fillStyle='#FCFBF8';ctx.fillRect(0,0,cv.width,cv.height);
+ctx.drawImage(img,box[0],box[1],box[2],box[3],b,b,pw,ph);
+ctx.strokeStyle='rgba(21,19,14,.16)';ctx.lineWidth=1;ctx.strokeRect(b+.5,b+.5,pw-1,ph-1);
+return cv}
+if(style==='forest'){pw=Math.round(W*.86);ph=artFitH(iw,ih,pw,1.25);box=artSrcBox(iw,ih,pw,ph);
+pad=Math.round((W-pw)/2);cv.width=W;cv.height=ph+pad*2;ctx=cv.getContext('2d');
+ctx.fillStyle='#1F4B3A';ctx.fillRect(0,0,cv.width,cv.height);
+ctx.save();ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=40;ctx.shadowOffsetY=16;
+ctx.fillStyle='#1F4B3A';ctx.fillRect(pad,pad,pw,ph);ctx.restore();
+ctx.drawImage(img,box[0],box[1],box[2],box[3],pad,pad,pw,ph);
+return cv}
+MX=Math.round(W*.024);B=Math.round(W*.0574);PAD=Math.round(W*.0315);
+pw=W-2*MX-2*B-2*PAD;ph=artFitH(iw,ih,pw,1.20);box=artSrcBox(iw,ih,pw,ph);
+fh=ph+2*PAD+2*B;cv.width=W;cv.height=fh+2*MX;ctx=cv.getContext('2d');
+gr=ctx.createRadialGradient(W/2,cv.height*.45,40,W/2,cv.height*.45,cv.height*.8);
+gr.addColorStop(0,'rgb(36,86,66)');gr.addColorStop(1,'rgb(22,54,42)');
+ctx.fillStyle=gr;ctx.fillRect(0,0,W,cv.height);
+ctx.save();ctx.shadowColor='rgba(0,0,0,.48)';ctx.shadowBlur=34;ctx.shadowOffsetX=8;ctx.shadowOffsetY=16;
+ctx.fillStyle='#000';ctx.fillRect(MX,MX,W-2*MX,fh);ctx.restore();
+ctx.fillStyle='#EFEAE0';ctx.fillRect(MX+B,MX+B,W-2*MX-2*B,fh-2*B);
+x=MX+B+PAD;y=MX+B+PAD;
+ctx.drawImage(img,box[0],box[1],box[2],box[3],x,y,pw,ph);
+artPlate(ctx,x,y,pw,ph);
+ctx.strokeStyle='rgba(198,190,176,1)';ctx.lineWidth=2;ctx.strokeRect(x-1,y-1,pw+2,ph+2);
+ctx.strokeStyle='rgba(120,112,100,.85)';ctx.beginPath();ctx.moveTo(x,y+1);ctx.lineTo(x+pw,y+1);ctx.stroke();
+artGild(ctx,MX,MX,W-MX,MX+fh,B,cv.height);
+return cv}
+/* ---- the share card. layout A: the print, matted, with the words on the mat ---- */
+function memArt(cv){var ctx=cv.getContext('2d'),W=1080,H=1350,B=74,MX=52,PAD=46;
+var gr=ctx.createRadialGradient(W/2,H*.42,60,W/2,H*.42,H*.78);
+gr.addColorStop(0,'rgb(36,86,66)');gr.addColorStop(1,'rgb(22,54,42)');
+ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+var img=MEM.img,fx0=MX,fx1=W-MX,pw=(fx1-fx0)-2*B-2*PAD;
+var iw=img?(img.naturalWidth||img.width):pw,ih=img?(img.naturalHeight||img.height):pw;
+var ph=artFitH(iw,ih,pw,1.16);if(ph<Math.round(pw*.62))ph=Math.round(pw*.62);
+var box=artSrcBox(iw,ih,pw,ph);
+var cap=(MEM.text||'').replace(/\s+/g,' ').trim(),fit=null,capH=0;
+if(cap){fit=memWrap(ctx,cap,pw-30,124,40,26,1.25,MEMFAM);capH=fit.lines.length*fit.size*1.25}
+var caph=(cap?18+capH:0)+38;
+var fy0=Math.round((H-(ph+caph+2*B+2*PAD))/2)-30;if(fy0<MX)fy0=MX;
+var fy1=fy0+ph+caph+2*B+2*PAD;if(fy1>H-104){var over=fy1-(H-104);fy0-=over;fy1-=over}
+ctx.save();ctx.shadowColor='rgba(0,0,0,.50)';ctx.shadowBlur=44;ctx.shadowOffsetX=10;ctx.shadowOffsetY=22;
+ctx.fillStyle='#000';ctx.fillRect(fx0,fy0,fx1-fx0,fy1-fy0);ctx.restore();
+ctx.fillStyle='#EFEAE0';ctx.fillRect(fx0+B,fy0+B,fx1-fx0-2*B,fy1-fy0-2*B);
+var px0=fx0+B+PAD,py0=fy0+B+PAD;
+if(img){ctx.drawImage(img,box[0],box[1],box[2],box[3],px0,py0,pw,ph);artPlate(ctx,px0,py0,pw,ph)}
+else{ctx.fillStyle='#EDE8DC';ctx.fillRect(px0,py0,pw,ph)}
+ctx.strokeStyle='rgba(198,190,176,1)';ctx.lineWidth=2;ctx.strokeRect(px0-1,py0-1,pw+2,ph+2);
+ctx.strokeStyle='rgba(120,112,100,.85)';ctx.beginPath();ctx.moveTo(px0,py0+1);ctx.lineTo(px0+pw,py0+1);ctx.stroke();
+var ty=py0+ph+30;
+if(fit){ctx.fillStyle='#262220';ctx.font='400 '+fit.size+'px '+MEMFAM;ctx.textAlign='center';
+fit.lines.forEach(function(L,i){ctx.fillText(L,W/2,ty+fit.size*.92+i*fit.size*1.25)});
+ctx.textAlign='left';ty+=capH+16}
+ctx.fillStyle='rgba(21,19,14,.48)';ctx.font='400 17px '+MEMMONO;
+var sw=0,k;for(k=0;k<MEM.spec.length;k++)sw+=ctx.measureText(MEM.spec[k]).width+4;sw-=4;
+memSpaced(ctx,MEM.spec,Math.round((W-sw)/2),ty+16,4);
+artGild(ctx,fx0,fy0,fx1,fy1,B,H);
+var py=fy1+46;ctx.fillStyle='#A8BAAC';ctx.font='800 17px '+MEMSANS;memSpaced(ctx,MEM.handle,MX+6,py,4);
+memMark(ctx,W-MX-6,py,26,'#E8ECE4','#A0B0A4')}
+/* ART:end */
 
 /* ---- the daily deed: one act, everyone, every day ---- */
 function dailyCardHTML(){if(!DAILY)return'';
@@ -2245,11 +2422,31 @@ function showPrev(bl,w,h){var p=$('#logprev'),im=$('#lpvimg');if(!p||!im)return;
 if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}}
 LPURL=URL.createObjectURL(bl);im.src=LPURL;
 var m=$('#lpvmeta');if(m)m.textContent='PHOTO ATTACHED'+((w&&h)?(' \u00B7 '+w+'\u00D7'+h):'');
+LSIMG=null;lsSet('plain');
 p.style.display=''}
+var LSTYLE='plain',LSIMG=null;
+function lsNote(){var e=$('#lsnote');if(!e)return;
+e.textContent=LSTYLE==='memory'?'THE WHITE PRINT.':LSTYLE==='forest'?'LAID ON THE FOREST.':LSTYLE==='art'?'FRAMED AND GILDED.':'THE PHOTO AS IT IS.'}
+function lsLoad(cb){if(LSIMG){cb(LSIMG);return}if(!LPURL){cb(null);return}
+var im=new Image();im.onload=function(){LSIMG=im;cb(im)};im.onerror=function(){cb(null)};im.src=LPURL}
+function lsPreview(){var im=$('#lpvimg');if(!im||!LPHOTO)return;
+if(LSTYLE==='plain'){im.src=LPURL;return}
+lsLoad(function(g){if(!g){im.src=LPURL;return}
+try{im.src=artTreat(g,LSTYLE,560).toDataURL('image/jpeg',.86)}catch(e){im.src=LPURL}})}
+function lsSet(st){LSTYLE=st;$$('#lstyles [data-ls]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ls')===st)});lsNote();lsPreview()}
+function lsFinal(cb){if(!LPHOTO){cb(null);return}
+if(LSTYLE==='plain'){cb(LPHOTO.blob,LPHOTO.w,LPHOTO.h,'');return}
+function raw(){cb(LPHOTO.blob,LPHOTO.w,LPHOTO.h,'')}
+lsLoad(function(g){if(!g){raw();return}var cv;
+try{cv=artTreat(g,LSTYLE,1080)}catch(e){raw();return}
+cv.toBlob(function(bl){if(!bl){raw();return}
+cb(bl,cv.width,cv.height,LSTYLE==='art'?'art-':LSTYLE==='memory'?'mem-':'for-')},'image/jpeg',.9)})}
 function hidePrev(){var p=$('#logprev');if(p)p.style.display='none';
 var im=$('#lpvimg');if(im)im.removeAttribute('src');
 if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}LPURL=null}}
-function clearPhoto(){LPHOTO=null;var b=$('#logphoto');
+function clearPhoto(){LPHOTO=null;LSIMG=null;LSTYLE='plain';
+$$('#lstyles [data-ls]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ls')==='plain')});lsNote();
+var b=$('#logphoto');
 if(b){b.classList.remove('on');b.textContent='Add a Photo.'}
 hidePrev();
 if(LFILE)LFILE.value=''}
@@ -2281,10 +2478,11 @@ showPrev(bl,w,h);
 if(b){b.textContent='Change Photo.';b.classList.add('on')}})});
 document.body.appendChild(LFILE);return LFILE}
 function uploadPhoto(cb){if(!LPHOTO||!PROFILE){cb(null);return}
-var path=PROFILE.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
-sb.storage.from('incoming').upload(path,LPHOTO.blob,{contentType:'image/jpeg',upsert:false}).then(function(r){
+lsFinal(function(bl,uw,uh,pre){if(!bl){cb(null);return}
+var path=PROFILE.id+'/'+pre+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+sb.storage.from('incoming').upload(path,bl,{contentType:'image/jpeg',upsert:false}).then(function(r){
 if(r&&r.error){cb(null,r.error.message);return}
-cb({path:path,w:LPHOTO.w,h:LPHOTO.h})}).catch(function(e){cb(null,String(e&&e.message||e))})}
+cb({path:path,w:uw,h:uh})}).catch(function(e){cb(null,String(e&&e.message||e))})})}
 function publishMedia(kind,id){if(!sb)return;
 try{sb.functions.invoke('mod-media',{body:{action:'publish',kind:kind,id:id}}).then(function(r){
 var st=r&&r.data&&r.data.status;
@@ -2319,6 +2517,7 @@ function lpvBig(){if(LPURL)liveLightbox(LPURL)}
 var _lpb=$('#lpvbig');if(_lpb)_lpb.onclick=lpvBig;
 var _lpi=$('#lpvimg');if(_lpi)_lpi.onclick=lpvBig;
 var _lpd=$('#lpvdel');if(_lpd)_lpd.onclick=function(){clearPhoto()};
+$$('#lstyles [data-ls]').forEach(function(b){b.onclick=function(){lsSet(b.getAttribute('data-ls'))}});
 function wantLog(){if(!liveOn){openCompose('deed');return}
 if(!PROFILE){openJoin();return}
 chainLink=0;DAILYLOG=0;chainParentLive=null;chainLinkLive=0;CAMPLOG=null;var _cp3=$('#logcamp');if(_cp3)_cp3.style.display='none';
