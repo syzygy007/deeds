@@ -196,7 +196,9 @@ input,textarea{font:inherit;color:var(--ink)}
 .jn-note{font-size:14px;color:var(--muted);text-align:center;margin:14px 0 0}
 .jn-legal{font-size:13.5px;line-height:1.7;color:#4A463C;margin:26px 0 0}
 .jn-legal a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-.jn-legal .row2{margin-top:6px}
+.jn-legal{text-wrap:pretty}
+.jn-legal a{white-space:nowrap}
+.jn-legal .row2{display:block;margin-top:8px}
 #jemail:-webkit-autofill,#jemail:-webkit-autofill:hover,#jemail:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--ivory) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink)}
 .sheet .sword b{color:var(--forest)}
 .sheet h3{font-size:22px;font-weight:800;margin:10px 0 14px}
@@ -311,6 +313,26 @@ input,textarea{font:inherit;color:var(--ink)}
 .ivpick button{flex:1;min-width:98px;border:1px solid var(--line);border-radius:999px;padding:10px 0;font-size:12px;font-weight:800;letter-spacing:.05em}
 .ivpick button.on{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
 .ivlede{font-size:15px;color:#4A463C;line-height:1.5;margin:0 0 16px}
+/* invite pane, simplified (Aug 24 mock) */
+#logsheet.inv #composeH{font-size:clamp(1.9rem,6vw,2.4rem);letter-spacing:-.02em;margin:16px 0 20px}
+#logsheet.inv .modetog button{padding:12px 0;font-size:13px}
+.ivpick button{padding:12px 0;font-size:13px}
+#ivchips{gap:10px;margin-bottom:6px}
+#ivchips .achip{flex:1 1 calc(33.33% - 7px);min-width:0;display:flex;align-items:center;gap:9px;padding:7px 10px 7px 7px;font-size:13px;line-height:1.2;background:#fff;text-align:left;white-space:normal}
+#ivchips .achip::before{content:'';flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--i) center/18px no-repeat}
+#ivchips .achip.on{background:#fff;color:var(--forest);border-color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest)}
+#ivchips .achip.on::before{background-color:var(--forest);border-color:var(--forest);background-image:var(--j)}
+#ivchips .achip:nth-child(1){--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F4B3A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='20' height='14' x='2' y='5' rx='2'/><path d='M2 10h20'/></svg>");--j:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F6F3EB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='20' height='14' x='2' y='5' rx='2'/><path d='M2 10h20'/></svg>")}
+#ivchips .achip:nth-child(2){--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F4B3A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z'/></svg>");--j:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F6F3EB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z'/></svg>")}
+#ivchips .achip:nth-child(3){--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F4B3A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z'/><path d='M3 6h18'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>");--j:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F6F3EB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z'/><path d='M3 6h18'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>")}
+.ivlink{display:flex;align-items:center;gap:6px;background:none;border:0;padding:12px 0 0;font:inherit;font-size:15px;font-weight:600;color:var(--forest);cursor:pointer}
+.ivlink svg{width:16px;height:16px;transition:transform .2s}
+.ivlink.open svg{transform:rotate(180deg)}
+#invpane .chfield{margin:10px 0 4px}
+#invpane .sendrow{border-top:1px solid var(--line);margin-top:24px;padding-top:20px;gap:10px}
+#invpane .sendb{flex:1;text-align:center;border-color:var(--forest);color:var(--forest);padding:13px 10px;font-size:14px}
+#invpane .sendb:hover{background:var(--forest);color:var(--ivory)}
+@media(max-width:599px){#ivchips .achip{flex-basis:100%}#invpane .sendb{padding:13px 4px;font-size:12.5px;white-space:nowrap}}
 .chip.pk{color:#8B867A;background:#F0EDE3}
 .embed{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#FBF9F3;cursor:pointer}
 .embed .eh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -682,6 +704,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  #memberbody>.post:last-child{border-bottom:1px solid var(--line);border-radius:0 0 18px 18px}
  /* sheets sit centered on a big screen instead of rising full width */
  .sheet{left:50%;right:auto;bottom:auto;top:50%;width:min(600px,92vw);border-radius:22px;padding:26px 28px 28px;max-height:86vh;opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,-46%) scale(.98);transition:transform .28s cubic-bezier(.32,.72,.3,1),opacity .22s,visibility 0s linear .28s}
+ #logsheet{width:min(760px,92vw)}
  .sheet.on{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,-50%) scale(1);transition:transform .28s cubic-bezier(.32,.72,.3,1),opacity .22s,visibility 0s}
  /* footer */
  .dfoot{display:flex;align-items:center;justify-content:space-between;gap:24px;max-width:1296px;margin:0 auto;padding:0 40px 44px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#B3AEA0;line-height:1.9}
@@ -1178,24 +1201,23 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <button data-iv="invite">Just the Door.</button>
     </div>
     <div class="ivbody" id="ivb-deed">
-      <p class="ivlede">One act. One person. Pass it on.</p>
       <div class="actchips" id="ivchips">
         <button class="achip on">Pay for the next order.</button>
         <button class="achip">Write the thank you note.</button>
         <button class="achip">Carry it in for them.</button>
       </div>
-      <input class="chfield" id="ivCustom" placeholder="Or write your own.">
-      <input class="chfield" id="ivNote" placeholder="A note to go with it. Optional.">
-      <p class="chnote">No deadline. They do the act, log it, and can pass one forward.</p>
+      <button class="ivlink" id="ivOwn" type="button">+ Write your own</button>
+      <input class="chfield" id="ivCustom" placeholder="Your own act." style="display:none">
+      <button class="ivlink ivdis" id="ivNoteT" type="button">Add note (optional)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <input class="chfield" id="ivNote" placeholder="A note to go with it." style="display:none">
     </div>
     <div class="ivbody" id="ivb-forty" style="display:none">
-      <p class="ivlede">Forty deeds. One year. See what it changes.</p>
-      <input class="chfield" id="ivFNote" placeholder="A note to go with it. Optional.">
-      <p class="chnote">Their year starts the day they accept. No weekly quota. Every deed counts toward everything at once.</p>
+      <p class="ivlede">Forty deeds. One year. Their year starts the day they accept.</p>
+      <button class="ivlink ivdis" id="ivFNoteT" type="button">Add note (optional)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <input class="chfield" id="ivFNote" placeholder="A note to go with it." style="display:none">
     </div>
     <div class="ivbody" id="ivb-invite" style="display:none">
       <p class="ivlede">No deed attached. No clock. Just the door, held open.</p>
-      <p class="chnote">They arrive to DEEDS itself. Free, anonymous, nothing assigned.</p>
     </div>
     <div class="sendrow"><button class="sendb" data-ivsend="sms">Text It.</button><button class="sendb" data-ivsend="mail">Email It.</button><button class="sendb" data-ivsend="copy">Copy the Link.</button></div>
   </div>
@@ -1330,7 +1352,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <input class="jn-in" id="jemail" type="email" placeholder="you@example.com" autocomplete="email">
     <button class="jn-btn" id="jsend">Send My Code.</button>
     <p class="jn-note">Already a member? The same code signs you in.</p>
-    <p class="jn-legal">By continuing, you confirm you are 18 or older and agree to the <a href="/terms/" target="_blank">Terms of Use</a>. See how we protect your information in our <a href="/privacy/" target="_blank">Privacy Policy</a>.<br><span class="row2"><a href="/guidelines/" target="_blank">Community Guidelines</a> &nbsp;&middot;&nbsp; <a href="/copyright/" target="_blank">Copyright</a></span></p>
+    <p class="jn-legal">By continuing, you confirm you are 18 or older and agree to the <a href="/terms/" target="_blank">Terms of Use</a>. See how we protect your information in our <a href="/privacy/" target="_blank">Privacy Policy</a>.<span class="row2"><a href="/guidelines/" target="_blank">Community Guidelines</a> &middot; <a href="/copyright/" target="_blank">Copyright</a></span></p>
     <button class="jn-ghost" id="jskip">Look Around First.</button>
   </div>
   <div id="jstep2" style="display:none">
@@ -1898,6 +1920,9 @@ $('#ivb-deed').style.display=k==='deed'?'':'none';
 $('#ivb-forty').style.display=k==='forty'?'':'none';
 $('#ivb-invite').style.display=k==='invite'?'':'none'}
 $$('#ivpick button').forEach(function(b){b.onclick=function(){ivSet(b.getAttribute('data-iv'))}});
+function ivDis(btn,inp){var b=$(btn),i=$(inp);if(!b||!i)return;b.onclick=function(){var open=i.style.display!=='none';i.style.display=open?'none':'';b.classList.toggle('open',!open);if(!open)i.focus()}}
+ivDis('#ivNoteT','#ivNote');ivDis('#ivFNoteT','#ivFNote');
+var _ivo=$('#ivOwn');if(_ivo)_ivo.onclick=function(){var c=$('#ivCustom');c.style.display='';c.focus();_ivo.style.display='none';$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')})};
 $$('#ivchips .achip').forEach(function(b){b.onclick=function(){$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');$('#ivCustom').value=''}});
 $('#ivCustom').addEventListener('input',function(){if(this.value.trim())$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')})});
 function ivBuild(){var h=my.handle||'A friend';
