@@ -52,6 +52,7 @@ section{padding-top:44px}
 .act{background:var(--forest);color:var(--ivory);border-radius:999px;padding:9px 16px;font-size:13px;letter-spacing:.02em}
 .ghost{border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-size:13px;color:var(--bone)}
 .ghost:hover,.act:hover{filter:brightness(1.12)}
+.ghost.on{background:var(--ivory);color:var(--ink);border-color:var(--ivory)}
 .working{opacity:.55;pointer-events:none}
 @media (prefers-reduced-motion: no-preference){.working{animation:pulse 1s ease-in-out infinite alternate}}
 @keyframes pulse{from{opacity:.35}to{opacity:.7}}
@@ -142,7 +143,13 @@ section{padding-top:44px}
   </section>
 
   <section id="orgs">
-    <div class="shead"><h2>Organizations<b>.</b></h2><span class="micro">In review</span></div>
+    <div class="shead"><h2>Organizations<b>.</b></h2><span class="micro" id="orgCount"></span></div>
+    <div class="acts" style="margin-bottom:14px">
+      <button class="ghost" data-of="all">All.</button>
+      <button class="ghost" data-of="review">In Review.</button>
+      <button class="ghost" data-of="verified">Verified.</button>
+      <button class="ghost" data-of="declined">Declined.</button>
+    </div>
     <div id="orgList"><div class="empty">Loading&#8230;</div></div>
   </section>
 </div>
@@ -332,31 +339,50 @@ el.innerHTML=h}).catch(function(){})
 $('#actReload').onclick=loadActivity;
 
 /* ---------- ORGANIZATIONS ---------- */
+var ORGS=[], OFILTER='all';
+document.querySelectorAll('[data-of]').forEach(function(bt){bt.onclick=function(){OFILTER=bt.getAttribute('data-of');paintOrgTabs();renderOrgs()}});
+function paintOrgTabs(){document.querySelectorAll('[data-of]').forEach(function(bt){bt.classList.toggle('on',bt.getAttribute('data-of')===OFILTER)})}
+function orgState(o){return o.verified_at?'verified':(o.declined_at?'declined':'review')}
 function loadOrgs(){var el=$('#orgList');
-sb.from('organizations').select('*').is('verified_at',null).is('declined_at',null).order('created_at',{ascending:true}).limit(30).then(function(r){
-if(r.error){el.innerHTML='<div class="empty">Review list could not load: '+esc(r.error.message)+'</div>';return}
-var rows=r.data||[];
-if(!rows.length){el.innerHTML='<div class="empty">Nothing in review.</div>';return}
-var h='';rows.forEach(function(o){
+sb.from('organizations').select('*').order('created_at',{ascending:false}).limit(100).then(function(r){
+if(r.error){el.innerHTML='<div class="empty">Organizations could not load: '+esc(r.error.message)+'</div>';return}
+ORGS=r.data||[];
+var nv=0,nr=0,nd=0;ORGS.forEach(function(o){var st=orgState(o);if(st==='verified')nv++;else if(st==='declined')nd++;else nr++});
+$('#orgCount').textContent=nv+' verified \u00B7 '+nr+' in review \u00B7 '+nd+' declined';
+paintOrgTabs();renderOrgs()}).catch(function(){})}
+function renderOrgs(){var el=$('#orgList');
+var rows=ORGS.filter(function(o){return OFILTER==='all'||orgState(o)===OFILTER});
+if(!rows.length){el.innerHTML='<div class="empty">'+(OFILTER==='review'?'Nothing in review.':OFILTER==='verified'?'None verified yet.':OFILTER==='declined'?'None declined.':'No organizations yet.')+'</div>';return}
+var h='';rows.forEach(function(o){var st=orgState(o);
+var chip=st==='verified'?'<span class="chip live">verified '+esc(dt(o.verified_at))+'</span>'
+:st==='declined'?'<span class="chip gone">declined '+esc(dt(o.declined_at))+'</span>'
+:'<span class="chip hold">in review</span>';
 h+='<div class="card"><div class="c-top"><div><div class="hname">'+esc(o.display_name||o.name)+'</div>';
-h+='<div class="sub">'+esc(String(o.kind||'organization'))+(o.address?(' \u00B7 '+esc(o.address)):'')+(o.website_url?(' \u00B7 '+esc(o.website_url)):'')+'</div></div></div>';
+h+='<div class="sub">'+esc(String(o.kind||'organization'))+(o.address?(' \u00B7 '+esc(o.address)):'')+(o.website_url?(' \u00B7 '+esc(o.website_url)):'')+'</div></div><div>'+chip+'</div></div>';
 if(o.description)h+='<div class="excerpt" style="font-size:13px">'+esc(o.description)+'</div>';
-h+='<input class="orgnote" id="on'+esc(o.id)+'" placeholder="Reason, required only to decline. The owner reads it.">';
-h+='<div class="acts"><button class="act" data-ov="'+esc(o.id)+'">Verify.</button><button class="ghost" data-od="'+esc(o.id)+'">Decline.</button></div></div>'});
+if(st==='declined'&&o.review_note)h+='<div class="sub">Your note: '+esc(o.review_note)+'</div>';
+if(st==='review')h+='<input class="orgnote" id="on'+esc(o.id)+'" placeholder="Reason, required only to decline. The owner reads it.">';
+h+='<div class="acts">';
+if(st==='review')h+='<button class="act" data-ov="'+esc(o.id)+'">Verify.</button><button class="ghost" data-od="'+esc(o.id)+'">Decline.</button>';
+else if(st==='verified')h+='<button class="ghost" data-orv="'+esc(o.id)+'">Revoke the Check.</button>';
+else h+='<button class="act" data-ov="'+esc(o.id)+'">Verify Anyway.</button>';
+h+='</div></div>'});
 el.innerHTML=h;
-el.querySelectorAll('[data-ov]').forEach(function(b){b.onclick=function(){orgRule(b.getAttribute('data-ov'),true,b)}});
-el.querySelectorAll('[data-od]').forEach(function(b){b.onclick=function(){orgRule(b.getAttribute('data-od'),false,b)}})
-}).catch(function(){})}
-function orgRule(id,ok,b){
-var note=($('#on'+id)?$('#on'+id).value:'').trim();
-if(!ok&&!note){toast('Give a reason. The owner sees it.');return}
-busy(b,true);
-var patch=ok?{verified_at:new Date().toISOString(),declined_at:null,review_note:null}
-:{declined_at:new Date().toISOString(),review_note:note.slice(0,300)};
-sb.from('organizations').update(patch).eq('id',id).then(function(r){busy(b,false);
+el.querySelectorAll('[data-ov]').forEach(function(bt){bt.onclick=function(){orgRule(bt.getAttribute('data-ov'),'verify',bt)}});
+el.querySelectorAll('[data-od]').forEach(function(bt){bt.onclick=function(){orgRule(bt.getAttribute('data-od'),'decline',bt)}});
+el.querySelectorAll('[data-orv]').forEach(function(bt){bt.onclick=function(){orgRule(bt.getAttribute('data-orv'),'revoke',bt)}})}
+function orgRule(id,mode,bt){
+var patch;
+if(mode==='verify')patch={verified_at:new Date().toISOString(),declined_at:null,review_note:null};
+else if(mode==='revoke')patch={verified_at:null};
+else{var note=($('#on'+id)?$('#on'+id).value:'').trim();
+if(!note){toast('Give a reason. The owner sees it.');return}
+patch={declined_at:new Date().toISOString(),verified_at:null,review_note:note.slice(0,300)}}
+busy(bt,true);
+sb.from('organizations').update(patch).eq('id',id).then(function(r){busy(bt,false);
 if(r&&r.error){toast('Not saved: '+r.error.message);return}
-toast(ok?'Verified. The check is live.':'Declined. They can fix it and resubmit.');loadOrgs()
-}).catch(function(){busy(b,false);toast('Not saved.')})}
+toast(mode==='verify'?'Verified. The check is live.':mode==='revoke'?'Check revoked. Back in review.':'Declined. They can fix it and resubmit.');
+loadOrgs()}).catch(function(){busy(bt,false);toast('Not saved.')})}
 
 /* ---------- MESSAGE ---------- */
 function openMsg(handle,pid){MSGTO={handle:handle,id:pid};$('#msTo').textContent='To '+handle;$('#msBody').value='';
