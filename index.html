@@ -4374,7 +4374,7 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
 renderFeed();
 
 /* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.6) ============ */
-var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},TDST={},TDSWAP={};
+var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
 try{INKSEEN=JSON.parse(localStorage.getItem('deeds_inks')||'{}')||{}}catch(e){}
@@ -4419,9 +4419,19 @@ else if(st==='completed_private')h+='<span class="tdmicro">DONE, PRIVATELY.</spa
 h+='</div><div class="tdmicro">YOURS TO TAKE OR LEAVE. NO SCOREBOARD.</div>'}
 h+='</div>';return h}
 function presInkHTML(r,body,mine){
-var h='<div class="inkzone" data-inkzone="'+esc(r.id)+'">';
-h+='<div class="inkcol"><div class="it"><div class="im">A NOTE IN DISAPPEARING INK</div><div class="il">Read it while it&#39;s here.</div></div><button class="inkopenb" type="button" data-inko="'+esc(r.id)+'">Open the Note.</button></div>';
-h+='</div>';return h}
+var inner=INKOPENST[r.id]?presInkCardHTML(r):'<div class="inkcol"><div class="it"><div class="im">DISAPPEARING INK</div><div class="il">Read it while it&#39;s here.</div></div><button class="inkopenb" type="button" data-inko="'+esc(r.id)+'">Unfold It.</button></div>';
+return '<div class="inkzone" data-inkzone="'+esc(r.id)+'">'+inner+'</div>'}
+function presInkCardHTML(r){
+var h='<div class="inkcard" data-inkarm data-inkcard="'+esc(r.id)+'">';
+h+='<div class="inkbeam"></div>';
+h+='<div class="inkwords">'+esc(r.body||'')+'</div>';
+h+='<div class="inkstate" data-inkstate>READ IT WHILE IT\u2019S HERE.</div>';
+h+='<div class="inkfoot">Some words are meant to be felt, not kept.</div>';
+h+='<button class="pblbar" type="button" data-blt="'+esc(r.id)+'" aria-pressed="false" style="display:none"><span>BLACK LIGHT</span><span class="tg" aria-hidden="true"></span></button>';
+h+='<div class="inkhelp" data-inkhelp style="display:none">Move the light to reveal.</div>';
+h+='<div class="inkacts"><button type="button" data-blall="'+esc(r.id)+'" style="display:none">Reveal every word.</button><button type="button" data-fold="'+esc(r.id)+'">Fold It.</button></div>';
+h+='</div>'
+return h}
 /* ---- egg crack ---- */
 function presFind(id){var r=findLive(id);if(r)return r;var a=(typeof SRES!=='undefined'&&SRES)||[];for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))return a[i];return null}
 function presRedraw(id){var r=presFind(id);if(!r)return;
@@ -4456,26 +4466,29 @@ TDSWAP[id]=presPick(pool).text;presRedraw(id)}
 /* ---- disappearing ink ---- */
 function inkOpen(id){var r=presFind(id);if(!r)return;var mine=PROFILE&&r.profile_id===PROFILE.id;
 var zone=document.querySelector('[data-inkzone="'+id+'"]');if(!zone)return;
-var seen=INKSEEN[id]&&!mine;
-var h='<div class="inkcard'+(seen?' faded':'')+'" data-inkcard="'+esc(id)+'">';
-h+='<div class="inkbeam"></div>';
-h+='<div class="inkwords">'+esc(r.body||'')+'</div>';
-h+='<div class="inkstate" data-inkstate>'+(seen?'FADED \u00B7 BLACK LIGHT BRINGS IT BACK':'READ IT WHILE IT\u2019S HERE.')+'</div>';
-h+='<div class="inkfoot">Some words are meant to be felt, not kept.</div>';
-h+='<button class="pblbar" type="button" data-blt="'+esc(id)+'" aria-pressed="false" style="'+(seen?'':'display:none')+'"><span>BLACK LIGHT</span><span class="tg" aria-hidden="true"></span></button>';
-h+='<div class="inkhelp" data-inkhelp style="display:none">Move the light to reveal.</div>';
-h+='<div class="inkacts"><button type="button" data-blall="'+esc(id)+'" style="display:none">Reveal the whole note.</button><button type="button" data-fold="'+esc(id)+'">Fold It.</button></div>';
-h+='</div>';
-zone.innerHTML=h;
+if(!INKOPENST[id])INKOPENST[id]=(INKSEEN[id]&&!mine)?1:Date.now();
+zone.innerHTML=presInkCardHTML(r);
 var card=zone.querySelector('.inkcard');
-inkWire(card);
-if(seen)return;
-var hold=presRM()?5900:4000;
-setTimeout(function(){if(!card.isConnected)return;if(presRM()){card.classList.add('faded')}else{card.classList.add('fading')}},hold);
-setTimeout(function(){if(!card.isConnected)return;card.classList.remove('fading');card.classList.add('faded');
+card.__armed=1;inkArm(card,id,mine)}
+function inkFade(card,id){card.classList.remove('fading');card.classList.add('faded');
 var st=card.querySelector('[data-inkstate]');if(st)st.textContent='FADED \u00B7 BLACK LIGHT BRINGS IT BACK';
 var b=card.querySelector('[data-blt]');if(b)b.style.display='';
-INKSEEN[id]=1;presSave()},6000)}
+INKSEEN[id]=1;presSave()}
+function inkArm(card,id,mine){
+inkWire(card);
+var el=Date.now()-(INKOPENST[id]||Date.now());
+var seen=INKSEEN[id]&&!mine;
+if(seen||el>=6000){inkFade(card,id);return}
+var rm=presRM();
+if(el>=4000&&!rm)card.classList.add('fading');
+setTimeout(function(){if(!card.isConnected)return;if(!presRM())card.classList.add('fading')},Math.max((rm?5900:4000)-el,0));
+setTimeout(function(){if(!card.isConnected)return;inkFade(card,id)},Math.max(6000-el,0))}
+function presInkResume(){$$('[data-inkarm]').forEach(function(card){if(card.__armed)return;card.__armed=1;
+var id=card.getAttribute('data-inkcard');var r=presFind(id);
+var mine=PROFILE&&r&&r.profile_id===PROFILE.id;
+inkArm(card,id,mine)})}
+var presBaseRF=renderFeed;
+renderFeed=function(){presBaseRF.apply(this,arguments);try{presInkResume()}catch(e){}};
 function inkWire(card){
 card.addEventListener('pointermove',function(e){if(!card.classList.contains('uv'))return;inkBeam(card,e)});
 card.addEventListener('pointerdown',function(e){if(!card.classList.contains('uv'))return;inkBeam(card,e)});
@@ -4489,7 +4502,7 @@ btn.setAttribute('aria-pressed',on?'true':'false');
 btn.classList.toggle('on',on);
 btn.querySelector('span').textContent=on?'BLACK LIGHT ON':'BLACK LIGHT';
 var hp=card.querySelector('[data-inkhelp]');if(hp)hp.style.display=on?'':'none';
-var al=card.querySelector('[data-blall]');if(al){al.style.display=on?'':'none';al.textContent='Reveal the whole note.'}
+var al=card.querySelector('[data-blall]');if(al){al.style.display=on?'':'none';al.textContent='Reveal every word.'}
 if(!on){card.style.setProperty('--lx','-999px');card.style.setProperty('--ly','-999px')}}
 /* ---- delegated clicks ---- */
 document.addEventListener('click',function(e){var t=e.target;var b;
@@ -4499,8 +4512,8 @@ if((b=t.closest&&t.closest('[data-tdo]'))){e.stopPropagation();tdSet(b.getAttrib
 if((b=t.closest&&t.closest('[data-tdd]'))){e.stopPropagation();tdSet(b.getAttribute('data-tdd'),'completed_private');return}
 if((b=t.closest&&t.closest('[data-tdn]'))){e.stopPropagation();tdSwapIt(b.getAttribute('data-tdn'));return}
 if((b=t.closest&&t.closest('[data-blt]'))){e.stopPropagation();inkToggle(b.getAttribute('data-blt'),b);return}
-if((b=t.closest&&t.closest('[data-blall]'))){e.stopPropagation();var card=t.closest('.inkcard');if(card){var on=!card.classList.contains('allrev');card.classList.toggle('allrev',on);b.textContent=on?'Return to the light.':'Reveal the whole note.'}return}
-if((b=t.closest&&t.closest('[data-fold]'))){e.stopPropagation();presRedraw(b.getAttribute('data-fold'));return}});
+if((b=t.closest&&t.closest('[data-blall]'))){e.stopPropagation();var card=t.closest('.inkcard');if(card){var on=!card.classList.contains('allrev');card.classList.toggle('allrev',on);b.textContent=on?'Return to the light.':'Reveal every word.'}return}
+if((b=t.closest&&t.closest('[data-fold]'))){e.stopPropagation();var fid=b.getAttribute('data-fold');delete INKOPENST[fid];presRedraw(fid);return}});
 /* ---- composer ---- */
 function presPaint(){var bi=$('#presInk'),be=$('#presEgg');
 if(bi){bi.classList.toggle('on',PRES==='disappearing_note');bi.setAttribute('aria-pressed',PRES==='disappearing_note'?'true':'false')}
