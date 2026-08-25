@@ -86,11 +86,11 @@ body{position:fixed;inset:0}
 <div class="copy" id="copy" data-depth="2">
   <div class="top">
     <div class="mark">DEEDS<i>.</i></div>
-    <div class="micro">Anonymous · Person to Person</div>
+    <div class="micro" id="eyebrow">Anonymous · Person to Person</div>
   </div>
   <div class="stack">
-    <h1 class="h1">The Art of Doing Good<i>.</i></h1>
-    <p class="line">Not for recognition. Not for followers. Simply because good deeds deserve to be seen.</p>
+    <h1 class="h1" id="h1">The Art of Doing Good<i>.</i></h1>
+    <p class="line" id="line">Not for recognition. Not for followers. Simply because good deeds deserve to be seen.</p>
     <div class="rows">
       <div class="row"><b>SEE IT</b><span>A feed of deeds, not faces.</span></div>
       <div class="row"><b>DO IT</b><span>Log one. It counts forever.</span></div>
@@ -98,8 +98,8 @@ body{position:fixed;inset:0}
       <div class="row"><b>WATCH IT MOVE</b><span>Redeeds show how far it travels.</span></div>
     </div>
     <div class="ctas">
-      <button class="btn p" onclick="location.href='/'">Enter DEEDS.</button>
-      <button class="btn g" onclick="location.href='/'">Look Around First.</button>
+      <button class="btn p" id="ctaEnter">Enter DEEDS.</button>
+      <button class="btn g" id="ctaLook">Look Around First.</button>
     </div>
     <div class="foot">
       <div class="micro">deeds.fun</div>
@@ -196,6 +196,22 @@ body{position:fixed;inset:0}
     if(!rm) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
+
+
+  // ARRIVAL: invite / one deed / the Forty links land here first, then continue into the app with the same query
+  var q={}; location.search.replace(/^\?/,'').split('&').forEach(function(kv){ if(!kv)return; var p=kv.split('='); q[p[0]]=decodeURIComponent(String(p[1]||'').replace(/\+/g,' ')); });
+  var hd=/^[A-Za-z0-9]{3,24}$/.test(q.c||'')?q.c:'', k=q.k||'', hasC=!!q.c;
+  function txt(id,t){document.getElementById(id).innerHTML=t}
+  if(hasC){
+    var who=hd||'A friend';
+    if(k==='invite'){ txt('eyebrow','An Invitation · From '+who); txt('h1',who+' invited you<i>.</i>'); txt('line','No deed attached. No clock. Just the door, held open.'); }
+    else if(k==='deed'){ txt('eyebrow','One Deed · From '+who); txt('h1','Someone thought of you<i>.</i>'); txt('line',(q.a?'"'+q.a+'" ':'One act. ')+'Sent person to person. No audience.'); }
+    else { txt('eyebrow','The Forty · From '+who); txt('h1',who+' sent you the Forty<i>.</i>'); txt('line','Forty acts of kindness. No clock. No order. No audience.'); }
+    document.getElementById('ctaEnter').textContent='Come In.';
+  }
+  function goApp(){ try{sessionStorage.setItem('deeds_welcomed','1')}catch(e){} location.href='/'+location.search; }
+  document.getElementById('ctaEnter').onclick=goApp;
+  document.getElementById('ctaLook').onclick=goApp;
 
   setTimeout(sheen,1800);
   if(desk) document.getElementById('tilt').textContent='Signed by no one';
