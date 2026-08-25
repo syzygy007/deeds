@@ -2450,9 +2450,9 @@ $('#mSearchT').onclick=function(){go('feed');window.scrollTo(0,0);$('#searchin')
 function enter(){safeSet('deeds_seen','1');var th=$('#threshold');th.classList.add('gone');
 $('#app').classList.add('on');setTimeout(function(){th.style.display='none'},750)}
 var arrival=parseArrival();
-/* WELCOME: first visits and invite arrivals see the sky at /welcome/ once; the landing sets deeds_welcomed before sending them back here */
+/* WELCOME: first visits and invite arrivals see the sky at /welcome.html once; the landing sets deeds_welcomed before sending them back here */
 var _welcomed=false;try{_welcomed=sessionStorage.getItem('deeds_welcomed')==='1'}catch(e){}
-if(!_welcomed&&(arrival||!safeGet('deeds_seen'))){safeSet('deeds_seen','1');location.replace('/welcome/'+location.search)}
+if(!_welcomed&&(arrival||!safeGet('deeds_seen'))){safeSet('deeds_seen','1');location.replace('/welcome.html'+location.search)}
 $('#threshold').style.display='none';$('#app').classList.add('on');
 $('#thEnter').onclick=enter;
 $('#thLog').onclick=function(){enter();setTimeout(function(){openCompose('deed')},420)};
