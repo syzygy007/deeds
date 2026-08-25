@@ -4392,13 +4392,13 @@ function presPick(a){return a[Math.floor(Math.random()*a.length)]}
 function presBodyHTML(r,body,mine,nm){
 if(r._k!=='post'||!r.presentation_type||r.presentation_type==='standard'||r.presentation_type==='photo')return '<p class="p-body">'+esc(body)+'</p>';
 if(r.presentation_type==='golden_egg'){preloadEgg();
-if(mine||EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
-return presEggSealedHTML(r,nm)}
+if(EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
+return presEggSealedHTML(r,nm,mine)}
 if(r.presentation_type==='disappearing_note')return presInkHTML(r,body,mine);
 return '<p class="p-body">'+esc(body)+'</p>'}
-function presEggSealedHTML(r,nm){
+function presEggSealedHTML(r,nm,mine){
 var h='<div class="eggzone" data-eggzone="'+esc(r.id)+'">';
-h+='<div class="egghl">'+esc(nm.handle)+' left a Golden Egg.</div>';
+h+='<div class="egghl">'+(mine?'You left a Golden Egg.':esc(nm.handle)+' left a Golden Egg.')+'</div>';
 h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" aria-label="Sealed Golden Egg. Activate to reveal the post."><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="egg-frame-sealed.webp" alt=""></button>';
 h+='<div class="eggline">Crack it to reveal the post.</div>';
 h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">GET CRACKIN&#39;</button>';
