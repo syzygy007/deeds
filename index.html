@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DEEDS. The Art of Doing Good</title>
-<!-- DEEDS v2.2 · live layer: sessions, profiles, organizations, deeds -->
+<!-- DEEDS v2.2 · live layer: sessions, profiles, organizations, deeds · sealed notes v4.3 -->
 <meta name="description" content="A living record of anonymous acts. Not for recognition.">
 <style>
 :root{--ivory:#F6F3EB;--ink:#15130E;--forest:#1F4B3A;--sage:#A0B0A4;--bone:#EDE8DC;--blue:#74A9D4;--gold:#BE9A4E;--gallery:#16130F;--muted:#6E6A5E;--line:rgba(21,19,14,.12)}
@@ -731,6 +731,217 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .dfoot a:hover,.dfoot button:hover{color:var(--forest)}
  .dfoot button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;padding:0;text-align:left}
 }
+/* ============ SEALED NOTES (Aug 24) · Notes. page, thread, envelope, paper, touches ============ */
+@font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:swap;src:url(font-playfair-700.woff2) format("woff2")}
+@font-face{font-family:"Special Elite";font-style:normal;font-weight:400;font-display:swap;src:url(font-special-elite.woff2) format("woff2")}
+@font-face{font-family:"Caveat";font-style:normal;font-weight:600;font-display:swap;src:url(font-caveat-600.woff2) format("woff2")}
+.nthead h1,#notesheet h3,#ntopick h3{font-family:"Playfair Display",Georgia,serif;font-weight:700;letter-spacing:0}
+.nthead h1{font-size:38px}
+#notesheet h3,#ntopick h3{font-size:26px}
+.tw{font-family:"Special Elite","Special Elite",Courier,"Courier New",monospace}
+.nbtn{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.nbtn .ndot{display:none;position:absolute;top:-1px;right:-4px;width:8px;height:8px;border-radius:50%;background:var(--forest)}
+.nbtn.newnotes .ndot{display:block}
+#mNotes svg{width:22px;height:22px}
+/* Notes. page */
+.nthead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.ncomp{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:1px solid var(--forest);color:var(--forest);display:flex;align-items:center;justify-content:center;margin-top:6px;background:var(--ivory)}
+.ncomp svg{width:19px;height:19px}
+.ncomp:hover{background:var(--forest);color:var(--ivory)}
+.nchips{display:flex;gap:8px;padding:12px 18px 6px}
+.nchips button{border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--muted)}
+.nchips button.on{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
+.ntrow{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.ntrow:last-child{border-bottom:0}
+.ntrow>div:first-child{flex:none;display:flex}
+.ntrow .in{flex:1;min-width:0}
+.ntrow .who{display:flex;align-items:center;gap:8px;min-width:0}
+.ntrow .who .mono{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ntrow .pv{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-top:3px;min-width:0}
+.ntrow .pv span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ntrow .pv.sealed{color:var(--forest);font-weight:700}
+.ntrow .pv svg{width:15px;height:15px;flex:none}
+.ntrow .rt{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none}
+.ntrow .rt .p-time{margin:0}
+.ntrow .rt .notedot{margin:0}
+.tg{width:16px;height:16px;flex:none;color:var(--forest)}
+.nempty{padding:38px 18px 44px;text-align:center;color:var(--muted);font-size:14px;line-height:1.65}
+.nempty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+/* thread page */
+.thbar{display:flex;align-items:center;gap:6px;padding:0 14px 0 0;border-bottom:1px solid var(--line)}
+.thbar .backbtn{padding:18px 14px 18px 18px;flex:none}
+.thbar .thwho{flex:1;min-width:0;text-align:center;font-size:15px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thbar .thwho:hover{color:var(--forest)}
+.thwrite{flex:none;color:var(--forest);font-size:11px;font-weight:800;letter-spacing:.06em;border:1px solid var(--forest);border-radius:999px;padding:7px 14px}
+.thwrite:hover{background:var(--forest);color:var(--ivory)}
+.thday{padding:22px 18px 4px;color:var(--muted)}
+.lrow{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.lrow:last-child{border-bottom:0}
+.lrow .env{width:44px;height:44px;border-radius:50%;background:var(--forest);color:var(--ivory);display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.lrow .env svg{width:20px;height:20px}
+.lrow .env.open{background:var(--bone);color:var(--ink)}
+.lrow .env.mine{background:var(--ivory);color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest)}
+.lrow .env.ink{background:var(--ink);color:var(--ivory)}
+.lrow .env.ink.open{background:var(--bone);color:var(--muted)}
+.lrow .env.pic{background:url(note-disc-sealed.webp) center/108% no-repeat;box-shadow:none}
+.lrow .env.pic.open{background-image:url(note-disc-open.webp)}
+.lrow .env.pic>svg{display:none}
+.lrow .env .ts{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:var(--ivory);box-shadow:0 0 0 1px var(--line);display:flex;align-items:center;justify-content:center;color:var(--forest)}
+.lrow .env .ts svg{width:12px;height:12px}
+.lrow .in{flex:1;min-width:0}
+.lrow .l{font-size:14.5px;font-weight:700}
+.lrow .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.lrow .p-time{margin:0;flex:none}
+.lrow.still{cursor:default}
+/* the letter sheet */
+#lettersheet{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+.lt-meta{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:10px 0 4px}
+.lt-meta .mono{font-size:15px;cursor:pointer}
+.lt-meta .micro{color:var(--muted);font-size:10px}
+.lt-kind{display:flex;align-items:center;gap:8px;color:var(--forest);font-size:10px;letter-spacing:.14em;font-weight:800;text-transform:uppercase;margin:0 0 14px}
+.lt-kind svg{width:15px;height:15px}
+.lt-stage{position:relative;display:flex;justify-content:center;padding:6px 0 6px;min-height:250px}
+/* envelope: the render, the wax seal laid over its own seal so it can crack */
+.envwrap{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.env3{position:relative;width:300px;max-width:100%;aspect-ratio:600/613;display:block;background:none;border:0;padding:0;cursor:pointer;margin:0}
+.env-pic{position:absolute;inset:0;background:url(note-envelope.webp) center/100% 100% no-repeat;transition:transform .5s ease,opacity .45s ease}
+.seal{position:absolute;left:34.77%;top:34.70%;width:32.55%;height:34.55%;transition:transform .12s ease}
+.seal .sh{position:absolute;inset:0;background:url(note-seal.webp) center/100% 100% no-repeat;transition:transform .48s cubic-bezier(.3,.6,.4,1),opacity .42s ease}
+.seal .sh.l{clip-path:polygon(0 0,52% 0,48% 100%,0 100%)}
+.seal .sh.r{clip-path:polygon(52% 0,100% 0,100% 100%,48% 100%)}
+.env3.ink .seal .sh{filter:brightness(.5) saturate(.35)}
+.env3.pressing .seal{transform:scale(.93)}
+.env3.open .seal .sh.l{transform:translate(-18px,12px) rotate(-24deg);opacity:0}
+.env3.open .seal .sh.r{transform:translate(18px,12px) rotate(24deg);opacity:0}
+.env3.open .env-pic{opacity:0;transform:translateY(28px) scale(.97);transition-delay:.14s}
+.env-cap{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:13.5px;color:#7A756A;text-align:center;transition:opacity .2s}
+.env-cap::after{content:'';display:block;width:34px;height:1px;background:rgba(21,19,14,.25);margin:7px auto 0}
+.env3.open+.env-cap{opacity:0}
+.lt-stage.opened .envwrap{display:none}
+/* paper: the torn render as a border image, so any length of note keeps a crisp torn edge and the D. */
+.paperwrap{position:relative;width:min(380px,100%);opacity:0;transform:translateY(22px) scale(.97);transition:opacity .5s ease,transform .55s cubic-bezier(.22,.9,.3,1)}
+.paperwrap.shown{opacity:1;transform:none}
+.lt-stage:not(.opened) .paperwrap{position:absolute;pointer-events:none}
+.paper{position:relative;background:none;border:1px solid transparent;border-image:url(note-paper.webp) 220 fill / 110px / 0 stretch;padding:40px 40px 58px;min-height:250px;z-index:1}
+.paper.tf{padding-right:78px}
+.pp-from{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:14.5px;color:#2A2620;letter-spacing:.01em}
+.pp-rule{display:flex;align-items:center;gap:8px;margin:12px 0 18px;color:#9A9384}
+.pp-rule::before,.pp-rule::after{content:'';flex:1;height:1px;background:rgba(21,19,14,.14)}
+.pp-rule i{width:6px;height:6px;border:1px solid #9A9384;transform:rotate(45deg);display:block}
+.pp-body{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:16px;line-height:1.72;color:#2A2620;white-space:pre-wrap;word-wrap:break-word;position:relative}
+.pp-body .w{display:inline-block;transition:opacity 1.2s ease,filter 1.2s ease}
+.pp-body.fading .w{opacity:0;filter:blur(2px)}
+.pp-body.inkf,.pp-sign.inkf{font-family:"Caveat","Special Elite",cursive;font-size:23px;line-height:1.42;color:#1F2A24}
+.pp-gone{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:14px;color:#8B8577;margin-top:14px;font-style:italic}
+.pp-sign{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:15.5px;color:#2A2620;margin-top:22px;position:relative}
+.touchlayer{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:2}
+.touchlayer img{position:absolute;display:block;max-width:none}
+.lt-state{color:var(--muted);text-align:center;margin:12px 0 0;font-size:10px}
+.lt-state.warm{color:var(--forest)}
+#ltReply{margin-top:16px}
+#ltReply input{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:14.5px}
+/* touches: the renders laid on the letter */
+.tch.flowers{right:-40px;top:-38px;height:210px;transform:rotate(-24deg);transform-origin:50% 60%;animation:tfin .8s cubic-bezier(.2,.8,.3,1) both}
+@keyframes tfin{from{opacity:0;transform:rotate(-36deg) translateY(-16px)}}
+.tch.balloon{transform-origin:50% 100%}
+.tch.b1{right:-16px;top:-98px;height:152px;animation:tbin 1.6s cubic-bezier(.2,.7,.3,1) both,tbob 3.6s ease-in-out 1.6s infinite alternate}
+.tch.b2{right:58px;top:-74px;height:126px;animation:tbin 1.9s cubic-bezier(.2,.7,.3,1) .15s both,tbob 3.1s ease-in-out 2.05s infinite alternate}
+@keyframes tbin{from{opacity:0;transform:translateY(280px) rotate(-7deg)}60%{opacity:1}}
+@keyframes tbob{to{transform:translateY(-7px) rotate(3deg)}}
+.tch.confetti{left:50%;top:-8%;height:116%;width:auto;margin-left:-58%;opacity:.88;mix-blend-mode:multiply;animation:tcin .9s cubic-bezier(.2,.8,.3,1) both}
+@supports (translate:0){.tch.confetti{margin-left:0;translate:-50% 0}}
+@keyframes tcin{from{opacity:0;transform:scale(1.1) translateY(-16px)}}
+/* disappearing ink: one card, three surfaces (ivory, faded, ultraviolet), the black light */
+.inkwrap{display:none}
+.lt-stage.inkmode .inkwrap{display:block}
+.lt-stage.inkmode #ltWrap{display:none}
+.inkcard{position:relative;width:100%;aspect-ratio:960/540;background:url(note-ink-ivory.webp) center/100% 100% no-repeat;padding:30px 34px 36px;filter:drop-shadow(0 12px 22px rgba(21,19,14,.16));overflow:hidden;border-radius:2.50%/4.44%}
+.inkcard::before,.inkcard::after{content:'';position:absolute;inset:0;background:center/100% 100% no-repeat;opacity:0;transition:opacity 1.4s ease;pointer-events:none}
+.inkcard::before{background-image:url(note-ink-faded.webp)}
+.inkcard::after{background-image:url(note-ink-uv.webp);transition-duration:.7s}
+.inkcard.faded::before{opacity:1}
+.inkcard.uv::after{opacity:1}
+.inkcard.uv{touch-action:none}
+.inkcard .ik{position:relative;z-index:2;font-family:"Caveat","Special Elite",cursive;color:#173F35;transition:opacity .5s}
+.ik-from{font-size:17px;opacity:.82}
+.ik-body{font-size:24px;line-height:1.42;white-space:pre-wrap;word-wrap:break-word;margin-top:8px}
+.ik-sign{font-size:22px;margin-top:14px}
+.ik .w{display:inline-block;transition:opacity 1.1s ease,color 1.1s ease}
+.ik.fading .w{opacity:.1;color:#B8B0B8;filter:url(#inkdust)}
+.ik-from,.ik-sign{transition:opacity 1.2s ease,color 1.2s ease}
+.ik.fading .ik-from,.ik.fading .ik-sign{opacity:.1;color:#B8B0B8}
+.inkcard.faded .ik{opacity:.9;filter:blur(1px)}
+.inkdust{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;display:none}
+.inkcard.uv .ik{opacity:1;filter:none;color:#F7F0FF;text-shadow:0 0 5px #C7A6FF,0 0 12px rgba(140,92,255,.72),0 0 26px rgba(140,92,255,.45);-webkit-mask-image:radial-gradient(circle var(--lr,125px) at var(--lx,-600px) var(--ly,-600px),#000 0,#000 42%,transparent 100%);mask-image:radial-gradient(circle var(--lr,125px) at var(--lx,-600px) var(--ly,-600px),#000 0,#000 42%,transparent 100%)}
+.inkcard.uv .ik .w{opacity:1;filter:none;color:#F7F0FF;transition-delay:0s}
+.inkcard.uv .ik-from,.inkcard.uv .ik-sign{opacity:1;color:#F7F0FF;transition-delay:0s}
+.inkcard.uv.full .ik{-webkit-mask-image:none;mask-image:none}
+.inkbeam{position:absolute;inset:0;z-index:1;opacity:0;transition:opacity .35s;pointer-events:none;background:radial-gradient(circle 150px at var(--lx,-600px) var(--ly,-600px),rgba(140,92,255,.5),rgba(140,92,255,.16) 55%,transparent 76%)}
+.inkcard.uv .inkbeam{opacity:1}
+.inkcard.uv.full .inkbeam{background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(140,92,255,.3),transparent 75%)}
+.blbar{margin-top:14px;display:none}
+.blbar.show{display:block;animation:blin .5s ease both}
+@keyframes blin{from{opacity:0;transform:translateY(8px)}}
+.bltog{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 18px;border-radius:999px;background:#EEE9F8;color:#3B2A6E;border:1px solid #D9C7FF;font-size:11.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;transition:background .3s,color .3s,box-shadow .3s}
+.bltog svg{width:20px;height:20px;flex:none}
+.bltog .blk{margin-left:auto;width:44px;height:24px;border-radius:999px;background:#D9C7FF;position:relative;flex:none;border:1px solid rgba(255,255,255,.7)}
+.bltog .blk i{position:absolute;top:1px;left:1px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .22s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bltog.on{background:linear-gradient(90deg,#2B1B62,#1B1040);color:#fff;border-color:#4C3990;box-shadow:0 8px 24px rgba(140,92,255,.35)}
+.bltog.on .blk i{left:21px}
+.bltog:focus-visible,.blfull:focus-visible{outline:2px solid #8C5CFF;outline-offset:3px}
+.blhelp{display:none;font-family:"Special Elite",Courier,"Courier New",monospace;font-size:13px;color:#6E5FA0;text-align:center;margin-top:10px}
+.blbar.on .blhelp{display:block}
+.blfull{display:none;margin:8px auto 0;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#6E5FA0;text-decoration:underline;text-underline-offset:3px;border-radius:4px}
+.blbar.on .blfull{display:block}
+/* compose sheet */
+.nkind{margin:2px 0 8px}
+.nkhint{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 14px}
+.nspaper{position:relative;background:none;border:1px solid transparent;border-image:url(note-paper.webp) 220 fill / 90px / 0 stretch;padding:22px 26px 26px}
+.nspaper.ink textarea{font-family:"Caveat","Special Elite",cursive;font-size:22px;line-height:1.42;color:#1F2A24}
+.nspaper textarea{width:100%;border:0;background:none;outline:none;resize:vertical;min-height:112px;font-family:"Special Elite",Courier,"Courier New",monospace;font-size:15px;line-height:1.7;color:#2A2620;position:relative;z-index:1}
+.nspaper textarea::placeholder{color:#A39D8F}
+.nsfoot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.nsfoot .p-time{margin:0}
+.ntouchl{color:var(--forest);margin:20px 0 10px}
+.ntouchl span{color:var(--muted);letter-spacing:.06em;text-transform:none;font-weight:600;margin-left:8px}
+.ntouch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ntouch button{border:1px solid var(--line);border-radius:14px;padding:14px 12px 13px;text-align:left;background:var(--ivory);display:grid;grid-template-columns:34px 1fr;column-gap:10px;align-items:center;position:relative;transition:border-color .15s,background .15s}
+.ntouch button .tg{grid-row:1/span 2;width:34px;height:34px;border-radius:50%;background:var(--bone);display:flex;align-items:center;justify-content:center;color:var(--forest)}
+.ntouch button .tg svg{width:19px;height:19px}
+.ntouch button .tg.pic{background:var(--bone) center/cover no-repeat}
+.ntouch button .tg.pic.flowers{background-image:url(note-flowers.webp);background-size:auto 150%;background-position:50% 30%}
+.ntouch button .tg.pic.balloons{background-image:url(note-balloon-sage.webp);background-size:auto 180%;background-position:50% 18%}
+.ntouch button .tg.pic.confetti{background-image:url(note-confetti.webp);background-size:210%}
+.ntouch button.on .tg.pic{background-color:var(--bone)}
+.ntouch button b{font-size:14px;font-weight:800;display:block}
+.ntouch button small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+.ntouch button.on{border-color:var(--forest);background:#F1F4F0}
+.ntouch button.on .tg{background:var(--forest);color:var(--ivory)}
+.ntouch button.on::after{content:'';position:absolute;top:10px;right:10px;width:16px;height:16px;border-radius:50%;background:var(--forest) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F6F3EB' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12.5l4.5 4.5L19 7.5'/></svg>") center/10px no-repeat}
+#ntNote{margin:14px 0 0}
+.nsend{width:100%;margin-top:18px}
+/* to whom */
+.ntorow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.ntorow:last-child{border-bottom:0}
+.ntorow .mono{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ntorow .p-time{margin:0}
+@media(min-width:1080px){
+ .nthead{padding:26px 32px 10px}
+ .nchips{padding:12px 32px 6px}
+ .ntrow{padding:16px 32px}
+ .thbar{padding-right:28px}
+ .thbar .backbtn{padding:20px 20px 20px 32px}
+ .thday{padding:22px 32px 4px}
+ .lrow{padding:14px 32px}
+ .dnotes{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;background:var(--card);transition:border-color .15s}
+ .dnotes svg{width:21px;height:21px}
+ .dnotes:hover{border-color:var(--forest);color:var(--forest)}
+ .dnotes .ndot{top:1px;right:1px}
+ .env3{width:320px}
+ .paperwrap{width:min(440px,100%)}
+ .paper{padding:44px 46px 64px}
+ .paper.tf{padding-right:88px}
+}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -770,6 +981,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <button data-go="profile">Profile.</button>
     </nav>
     <div class="dright">
+      <button class="dnotes nbtn" id="dNotes" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
       <button class="dlog" id="dLog" aria-label="Log a Deed" title="Log a Deed."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <span class="dsep"></span>
       <button class="dme" id="dMe" aria-haspopup="true" aria-expanded="false"><span class="dav" id="dAv"></span><span class="mono dhandle" id="dHandle"></span><svg class="dchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -804,6 +1016,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
     <div class="mtop">
       <div class="mword" data-go="feed">D<b>.</b></div>
       <div style="display:flex;align-items:center;gap:18px">
+        <button id="mNotes" class="nbtn" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
         <button id="mBell" class="bell" aria-label="Activity"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg><span class="bdot"></span></button>
         <button id="mSearchT" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/></svg></button>
       </div>
@@ -992,7 +1205,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div id="wdMine"></div>
       </div>
       <div class="sect" id="notesect" style="display:none">
-        <div class="micro">Notes</div>
+        <div class="wd-sec" style="margin-top:0"><div class="micro" style="margin:0">Notes</div><button class="mono" id="nSeeAll" style="color:var(--forest)">See all.</button></div>
         <div id="notelist"></div>
       </div>
       <div class="sect" id="viewpane">
@@ -1048,6 +1261,17 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div id="coinladder"></div>
         <p class="st-forever">Emerald is permanent. It can never be lost. After Emerald, every year adds its mark. Year Five. Year Six. The path never ends.</p>
       </div>
+    </div>
+
+    <div class="page" id="pg-notes">
+      <div class="pghead nthead"><div><h1>Notes<b>.</b></h1><div class="micro">Sealed letters. Only the two of you can read them.</div></div><button class="ncomp" id="nNew" aria-label="Write a note" title="Write a note."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7.4 18.6l-4 1 1-4z"/></svg></button></div>
+      <div class="nchips" id="nchips"><button class="on" data-nf="all">All</button><button data-nf="unread">Unread</button></div>
+      <div id="ntlist"></div>
+    </div>
+
+    <div class="page" id="pg-thread">
+      <div class="thbar"><button class="backbtn" id="thBack"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>BACK</button><div class="mono thwho" id="thWho" role="button" tabindex="0"></div><button class="thwrite" id="thWrite">Write.</button></div>
+      <div id="thlist"></div>
     </div>
   </main>
 
@@ -1326,12 +1550,59 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div id="cxlist"></div>
 </div>
 
+<div class="sheet" id="lettersheet">
+  <div class="sword">DEEDS<b>.</b></div>
+  <div class="lt-meta"><span class="mono" id="ltWho" role="button" tabindex="0"></span><span class="micro" id="ltWhen"></span></div>
+  <div class="lt-kind" id="ltKind"></div>
+  <div class="lt-stage" id="ltStage">
+    <div class="envwrap" id="ltEnvWrap">
+      <button class="env3" id="ltEnv" type="button" aria-label="Open the sealed note"><div class="env-pic"></div><div class="seal" id="ltSeal"><div class="sh l"></div><div class="sh r"></div></div></button>
+      <div class="env-cap">Tap to open</div>
+    </div>
+    <div class="paperwrap" id="ltWrap"><div class="paper" id="ltPaper">
+      <div class="pp-from" id="ltFrom"></div>
+      <div class="pp-rule"><i></i></div>
+      <div class="pp-body" id="ltBody"></div>
+      <div class="pp-sign" id="ltSign"></div>
+    </div><div class="touchlayer" id="ltTouch"></div></div>
+    <div class="paperwrap inkwrap" id="ltInkWrap">
+      <div class="inkcard" id="ltInk"><div class="inkbeam"></div><canvas class="inkdust" id="ltDust"></canvas><div class="ik" id="ltInkText"><div class="ik-from" id="ltInkFrom"></div><div class="ik-body" id="ltInkBody"></div><div class="ik-sign" id="ltInkSign"></div></div></div>
+      <div class="blbar" id="blBar">
+        <button class="bltog" id="blTog" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.6"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M5.6 18.4l1.7-1.7M16.7 7.3l1.7-1.7"/></svg><span id="blLabel">Black Light Off</span><span class="blk"><i></i></span></button>
+        <div class="blhelp">Move the light to reveal.</div>
+        <button class="blfull" id="blFull" type="button">Reveal the whole note.</button>
+      </div>
+    </div>
+  </div>
+  <div class="lt-state micro" id="ltState"></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="inkdust" x="-12%" y="-12%" width="124%" height="124%"><feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"><animate id="inkdustA" attributeName="scale" values="0;46;9" keyTimes="0;.72;1" dur="2.6s" begin="indefinite" fill="freeze"/></feDisplacementMap></filter></defs></svg>
+  <div class="cmtin" id="ltReply"><input id="ltIn" placeholder="Write a reply. It arrives sealed." maxlength="2000"><button class="chbtn" id="ltSend">Seal It.</button></div>
+</div>
+
 <div class="sheet" id="notesheet">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3>Notes.</h3>
-  <p class="remnote" style="margin:-8px 0 12px">With <span class="mono" id="notewho"></span>. Only the two of you can read this.</p>
-  <div class="notethread" id="notethread"></div>
-  <div class="cmtin"><input id="notein" placeholder="Say something true." maxlength="2000"><button class="chbtn" id="notesend">Send.</button></div>
+  <h3>Write a Note.</h3>
+  <p class="remnote" style="margin:-8px 0 14px">To <span class="mono" id="notewho"></span>. Only the two of you can read it.</p>
+  <div class="modetog nkind" id="nkind"><button class="on" data-nk="sealed">SEALED.</button><button data-nk="ink">DISAPPEARING INK.</button></div>
+  <p class="nkhint" id="nkHint">Delivered as a sealed letter. They open it when they are ready.</p>
+  <div class="nspaper" id="nspaper"><textarea id="notein" placeholder="Say something true." maxlength="2000" rows="5"></textarea></div>
+  <div class="nsfoot"><span class="p-time" id="nsSign"></span><span class="p-time" id="nsLeft">2000 LEFT</span></div>
+  <div class="micro ntouchl">Add a touch. <span>Small touches. Big meaning.</span></div>
+  <div class="ntouch" id="ntouch">
+    <button type="button" data-nt="flowers"><i class="tg pic flowers"></i><b>Flowers.</b><small>A little beauty.</small></button>
+    <button type="button" data-nt="balloons"><i class="tg pic balloons"></i><b>Balloons.</b><small>Lift their day.</small></button>
+    <button type="button" data-nt="confetti"><i class="tg pic confetti"></i><b>Confetti.</b><small>Celebrate softly.</small></button>
+    <button type="button" class="on" data-nt=""><i class="tg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></i><b>None.</b><small>Keep it simple.</small></button>
+  </div>
+  <p class="remnote" id="ntNote">Touches are added to your note and seen when it is opened.</p>
+  <button class="chbtn nsend" id="notesend">Seal It.</button>
+</div>
+
+<div class="sheet" id="ntopick">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>To Whom.</h3>
+  <input class="chfield" id="ntoQ" placeholder="Find a member." autocomplete="off" style="margin-bottom:6px">
+  <div id="ntoList"></div>
 </div>
 
 <div class="sheet" id="passsheet">
@@ -2809,7 +3080,7 @@ if(rows.length){h+='<div class="sect"><div class="micro">'+(anyPost?'Their Deeds
 rows.forEach(function(d){h+=livePostHTML(d)})}
 el.innerHTML=h;go('member');
 $('#lblk').onclick=function(){BLK[hd]=1;saveBlk();toast('Blocked. Their deeds are gone from your feed.');renderFeed();go('feed')};
-$('#lnote').onclick=function(){if(!PROFILE){openJoin();return}openNote(p.id)};
+$('#lnote').onclick=function(){if(!PROFILE){openJoin();return}writeNote(p.id)};
 $$('#memberbody [data-cx]').forEach(function(b){b.onclick=function(){openCx(p.id,hd,b.getAttribute('data-cx'))}});
 wireLive();wireCommon()})}).catch(function(){})}).catch(function(){})}
 
@@ -3341,18 +3612,51 @@ st.innerHTML='<button data-cxm="followers"><div class="n">'+fc.followers+'</div>
 $$('#cxstats [data-cxm]').forEach(function(b){b.onclick=function(){openCx(PROFILE.id,'',b.getAttribute('data-cxm'))}})})}
 function refreshCx(){if(curPage==='profile')renderCxMine()}
 
-/* ---- notes ---- */
+/* ---- notes: sealed letters, disappearing ink, touches (Aug 24) ---- */
+var NFILTER='all',THWITH=null,LT=null,INKLIGHT=false,NKIND='sealed',NTOUCH='',NOTECH=null,NOTECHID=null,LTTIMER=null,LTFADE=null;
+var NICO={
+sealed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg>',
+open:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6.5L21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10l9 6 9-6"/></svg>',
+ink:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg>',
+flowers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="1.8"/><path d="M12 2.5v2.2M16.8 5.2l-1.6 1.6M17.5 8h-2.2M16.8 10.8l-1.6-1.6M7.2 5.2l1.6 1.6M6.5 8h2.2M7.2 10.8l1.6-1.6M12 13.8v7.7"/><path d="M12 18.5c-1.6-.2-3-1.3-3.8-2.7M12 20.2c1.6-.2 3-1.3 3.8-2.7"/></svg>',
+balloons:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8.5" rx="5" ry="6"/><path d="M12 14.5l-1.1 1.7h2.2z"/><path d="M12 16.2c.2 2.4-2.2 2.6-2 5.3"/></svg>',
+confetti:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="17" cy="5" r="1.4"/><circle cx="12" cy="11" r="1.4"/><circle cx="5" cy="15" r="1.4"/><circle cx="18.5" cy="14" r="1.4"/><circle cx="11" cy="19" r="1.4"/></svg>'};
+function ico(k){return NICO[k]||''}
+function nkindOf(n){return n&&n.kind==='ink'?'ink':'sealed'}
+function nTouch(n){var t=n&&n.touch;return(t==='flowers'||t==='balloons'||t==='confetti')?t:''}
+function isMine(n){return!!(PROFILE&&n&&n.sender_id===PROFILE.id)}
+function nameOf(id){return NAMES[id]||{handle:'A Member',type:'doer',v:false}}
+function initialOf(h){var c=String(h||'').charAt(0);return c?c.toUpperCase():'D'}
+function clock(iso){var d=new Date(iso);var h=d.getHours(),m=d.getMinutes(),ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+(m<10?'0':'')+m+' '+ap}
+function dayKey(iso){var d=new Date(iso);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()}
+function dayLabel(iso){var d=new Date(iso),now=new Date();
+var a=new Date(d.getFullYear(),d.getMonth(),d.getDate()),b=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+var days=Math.round((b-a)/86400000);
+if(days<=0)return'Today';if(days===1)return'Yesterday';
+if(days<7)return['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()];
+return MOSH[d.getMonth()]+' '+d.getDate()+(d.getFullYear()!==now.getFullYear()?' '+d.getFullYear():'')}
+function whenLine(iso){return dayLabel(iso)+' '+clock(iso)}
 function paintNoteDot(){
-$$('.bell').forEach(function(b){b.classList.toggle('newalerts',ALUNREAD>0)})}
+$$('.bell').forEach(function(b){b.classList.toggle('newalerts',ALUNREAD>0)});
+$$('.nbtn').forEach(function(b){b.classList.toggle('newnotes',NOTEUNREAD>0)})}
 function countUnread(){NOTEUNREAD=NOTES.filter(function(n){return PROFILE&&n.recipient_id===PROFILE.id&&!n.read_at}).length}
+function repaintNotes(){if(curPage==='profile')renderNotes();if(curPage==='notes')renderNotesPage();if(curPage==='thread')renderThreadPage()}
 function loadNotes(){if(!sb||!PROFILE)return Promise.resolve();
 return sb.from('notes').select('*').or('sender_id.eq.'+PROFILE.id+',recipient_id.eq.'+PROFILE.id)
 .order('created_at',{ascending:false}).limit(300).then(function(r){
 if(r.error){NOTES=[];return Promise.resolve()}
 NOTES=r.data||[];countUnread();
 var need=[];NOTES.forEach(function(n){need.push({profile_id:n.sender_id});need.push({profile_id:n.recipient_id})});
-return fetchNames(need)}).then(function(){indexNames();paintNoteDot();
-if(curPage==='profile')renderNotes()}).catch(function(){})}
+return fetchNames(need)}).then(function(){indexNames();paintNoteDot();subNotes();repaintNotes()}).catch(function(){})}
+function subNotes(){if(!sb||!PROFILE||typeof sb.channel!=='function')return;
+if(NOTECH&&NOTECHID!==PROFILE.id){try{sb.removeChannel(NOTECH)}catch(e){}NOTECH=null}
+if(NOTECH)return;NOTECHID=PROFILE.id;
+try{NOTECH=sb.channel('notes-'+PROFILE.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'notes',filter:'recipient_id=eq.'+PROFILE.id},function(pl){noteArrived(pl&&pl.new)}).subscribe()}catch(e){NOTECH=null}}
+function noteArrived(n){if(!n||!PROFILE||n.recipient_id!==PROFILE.id)return;
+if(NOTES.some(function(x){return x.id===n.id}))return;
+NOTES.unshift(n);countUnread();
+fetchNames([{profile_id:n.sender_id}]).then(function(){indexNames();paintNoteDot();repaintNotes();
+toast(nkindOf(n)==='ink'?'Disappearing ink arrived.':'A sealed note arrived.')}).catch(function(){})}
 function threads(){var t={},order=[];
 NOTES.forEach(function(n){if(!PROFILE)return;
 var other=n.sender_id===PROFILE.id?n.recipient_id:n.sender_id;
@@ -3360,48 +3664,225 @@ if(!t[other]){t[other]={id:other,last:n,unread:0};order.push(other)}
 if(new Date(n.created_at)>new Date(t[other].last.created_at))t[other].last=n;
 if(n.recipient_id===PROFILE.id&&!n.read_at)t[other].unread++});
 return order.map(function(id){return t[id]})}
+/* one row grammar for the Profile section and the Notes. page */
+function previewOf(n){var mine=isMine(n),kind=nkindOf(n);
+if(mine)return{cls:'',ic:kind==='ink'?'ink':'sealed',txt:kind==='ink'?'You sent disappearing ink.':'You sent a sealed note.'};
+if(!n.read_at)return{cls:'sealed',ic:kind==='ink'?'ink':'sealed',txt:kind==='ink'?'Sent you disappearing ink.':'Sent you a sealed note.'};
+if(kind==='ink')return{cls:'',ic:'ink',txt:'The ink has faded.'};
+return{cls:'',ic:'',txt:String(n.body||'').replace(/\s+/g,' ').slice(0,90)}}
+function threadRows(list){var h='';
+list.forEach(function(t){var nm=nameOf(t.id),pv=previewOf(t.last),tc=nTouch(t.last);
+h+='<button class="ntrow" data-note="'+esc(t.id)+'"><div>'+DeedsTypes.svg(nm.type,44,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="who"><span class="mono">'+esc(nm.handle)+'</span>'+(tc?'<i class="tg">'+ico(tc)+'</i>':'')+'</div>';
+h+='<div class="pv '+pv.cls+'">'+(pv.ic?ico(pv.ic):'')+'<span>'+esc(pv.txt)+'</span></div></div>';
+h+='<div class="rt"><span class="p-time">'+relTime(t.last.created_at)+'</span>'+(t.unread?'<span class="notedot"></span>':'')+'</div></button>'});
+return h}
+function wireRows(root){$$(root+' [data-note]').forEach(function(rw){rw.onclick=function(){openNote(rw.getAttribute('data-note'))}})}
 function renderNotes(){var el=$('#notelist');if(!el)return;
 if(!PROFILE){el.innerHTML='';return}
-var th=threads();
-if(!th.length){el.innerHTML='<p class="remnote" style="margin-bottom:2px">No notes yet. Open any member and send one.</p>';return}
-var h='';th.forEach(function(t){var nm=NAMES[t.id]||{handle:'A Member',type:'doer',v:false};
-h+='<button class="noterow" data-note="'+esc(t.id)+'"><div>'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
-h+='<div class="in"><div class="mono">'+esc(nm.handle)+(t.unread?'<span class="notedot"></span>':'')+'</div>';
-h+='<div class="pv">'+esc(String(t.last.body||'').slice(0,90))+'</div></div>';
-h+='<span class="p-time">'+relTime(t.last.created_at)+'</span></button>'});
-el.innerHTML=h;
-$$('#notelist [data-note]').forEach(function(rw){rw.onclick=function(){openNote(rw.getAttribute('data-note'))}})}
+var th=threads().slice(0,4);
+if(!th.length){el.innerHTML='<p class="remnote" style="margin-bottom:2px">No notes yet. Open any member and send one, sealed.</p>';return}
+el.innerHTML=threadRows(th);wireRows('#notelist')}
+function renderNotesPage(){var el=$('#ntlist');if(!el)return;
+$$('#nchips [data-nf]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nf')===NFILTER)});
+if(!liveOn||!PROFILE){el.innerHTML='<div class="nempty"><b>Sign in to read your notes.</b>Sealed letters between members. Only the two of you can read them.</div>';return}
+var th=threads();if(NFILTER==='unread')th=th.filter(function(t){return t.unread>0});
+if(!th.length){el.innerHTML='<div class="nempty">'+(NFILTER==='unread'?'<b>Nothing sealed is waiting.</b>Every note has been opened.':'<b>No notes yet.</b>Open any member and send one. It arrives sealed, and they open it when they are ready.')+'</div>';return}
+el.innerHTML=threadRows(th);wireRows('#ntlist')}
+function openNotesPage(){if(!liveOn){toast('Notes need a connection.');return}
+if(!PROFILE){openJoin();return}go('notes');loadNotes()}
 function openNote(pid){if(!PROFILE){openJoin();return}
-NOTEWITH=pid;var nm=NAMES[pid]||{handle:'A Member'};
-$('#notewho').textContent=nm.handle;
-renderThread();sheet('#notesheet');markRead(pid)}
-function renderThread(){var el=$('#notethread');if(!el)return;
-var msgs=NOTES.filter(function(n){
-return (n.sender_id===PROFILE.id&&n.recipient_id===NOTEWITH)||(n.sender_id===NOTEWITH&&n.recipient_id===PROFILE.id)})
-.sort(function(a,b){return new Date(a.created_at)-new Date(b.created_at)});
-var h='';msgs.forEach(function(n){h+='<div class="nmsg '+(n.sender_id===PROFILE.id?'me':'them')+'">'+esc(n.body)+'</div>'});
-el.innerHTML=h||'<p class="remnote">No notes yet. Say something true.</p>';
-el.scrollTop=el.scrollHeight}
-function markRead(pid){if(!PROFILE)return;
-var un=NOTES.filter(function(n){return n.sender_id===pid&&n.recipient_id===PROFILE.id&&!n.read_at});
-if(!un.length)return;
+THWITH=pid;closeSheets();go('thread');loadNotes()}
+function envRow(n){var mine=isMine(n),kind=nkindOf(n),tc=nTouch(n),opened=!!n.read_at,burned=kind==='ink'&&opened;
+var cls='env'+(mine?' mine':'')+(kind==='ink'?' ink':'')+(opened&&!mine?' open':'')+(!mine&&kind!=='ink'?' pic':'');
+var l,s,still=false;
+if(mine){l=kind==='ink'?'Disappearing ink':'Sealed note';s=opened?(kind==='ink'?'Read. Faded.':'Opened '+whenLine(n.read_at)+'.'):(kind==='ink'?'Not read yet.':'Not opened yet.')}
+else{l=kind==='ink'?'Disappearing ink':'Sealed note';s=burned?'Faded. Black light reads it.':(opened?'Opened.':'Tap to open.')}
+var h='<button class="lrow'+(still?' still':'')+'" data-lt="'+esc(n.id)+'"'+(still?' disabled':'')+'>';
+var ic=kind==='ink'?'ink':((opened&&!mine)?'open':'sealed');
+h+='<div class="'+cls+'">'+ico(ic)+(tc?'<span class="ts">'+ico(tc)+'</span>':'')+'</div>';
+h+='<div class="in"><div class="l">'+l+'</div><div class="s">'+s+'</div></div>';
+h+='<span class="p-time">'+clock(n.created_at)+'</span></button>';return h}
+function renderThreadPage(){var el=$('#thlist');if(!el)return;
+if(!PROFILE||!THWITH){el.innerHTML='';return}
+var nm=nameOf(THWITH);$('#thWho').textContent=nm.handle;
+var msgs=NOTES.filter(function(n){return(n.sender_id===PROFILE.id&&n.recipient_id===THWITH)||(n.sender_id===THWITH&&n.recipient_id===PROFILE.id)})
+.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)});
+if(!msgs.length){el.innerHTML='<div class="nempty"><b>Nothing here yet.</b>Write the first one. It arrives sealed.</div>';return}
+var h='',lastDay='';msgs.forEach(function(n){var k=dayKey(n.created_at);
+if(k!==lastDay){lastDay=k;h+='<div class="micro thday">'+esc(dayLabel(n.created_at).toUpperCase())+'</div>'}
+h+=envRow(n)});
+el.innerHTML=h;
+$$('#thlist [data-lt]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lt'),n=null;
+NOTES.forEach(function(x){if(x.id===id)n=x});if(n)openLetter(n)}})}
+/* ---- the letter ---- */
+function resetLetter(){clearTimeout(LTTIMER);clearTimeout(LTFADE);
+var st=$('#ltStage'),env=$('#ltEnv'),wrap=$('#ltWrap'),body=$('#ltBody'),tl=$('#ltTouch');
+st.classList.remove('opened');env.classList.remove('open','gone','pressing','ink');env.style.display='';
+wrap.classList.remove('shown');body.classList.remove('fading','inkf');$('#ltSign').classList.remove('inkf');$('#ltPaper').classList.remove('tf');body.innerHTML='';tl.innerHTML='';
+var g=$('#ltPaper .pp-gone');if(g)g.parentNode.removeChild(g);
+st.classList.remove('inkmode');$('#ltInkWrap').classList.remove('shown');blSet(false);$('#ltInk').classList.remove('faded');$('#ltInkText').classList.remove('fading');$('#blBar').classList.remove('show');
+$('#ltInkFrom').style.transitionDelay='';$('#ltInkSign').style.transitionDelay='';var dc=$('#ltDust');if(dc)dc.style.display='none'}
+function fillPaper(n){var from=nameOf(n.sender_id);
+$('#ltFrom').textContent='From '+from.handle;
+$('#ltSign').textContent='- '+initialOf(from.handle);
+var body=$('#ltBody');body.classList.remove('fading');var ink=nkindOf(n)==='ink';
+body.classList.toggle('inkf',ink);$('#ltSign').classList.toggle('inkf',ink);$('#ltPaper').classList.toggle('tf',nTouch(n)==='flowers');
+if(ink){var words=String(n.body||'').split(/(\s+)/);var h='';
+var wi=0;words.forEach(function(w){if(!w)return;if(/^\s+$/.test(w)){h+=w}else{h+='<span class="w" style="transition-delay:'+Math.min(wi*45,2600)+'ms">'+esc(w)+'</span>';wi++}});
+body.innerHTML=h}else{body.textContent=n.body||''}}
+function fillInk(n){var from=nameOf(n.sender_id);
+$('#ltInkFrom').textContent='From '+from.handle;$('#ltInkSign').textContent='- '+initialOf(from.handle);
+var words=String(n.body||'').split(/(\s+)/),h='',wi=0;
+words.forEach(function(w){if(!w)return;if(/^\s+$/.test(w)){h+=w}else{h+='<span class="w" style="transition-delay:'+Math.min(wi*45,2600)+'ms">'+esc(w)+'</span>';wi++}});
+$('#ltInkBody').innerHTML=h;$('#ltInkText').classList.remove('fading')}
+function fadeInk(n){var body=$('#ltInkText'),ws=$$('#ltInkBody .w'),N=ws.length,last=Math.min(Math.max(N-1,0)*150,2600);
+ws.forEach(function(w,i){w.style.transitionDelay=Math.min((N-1-i)*150,2600)+'ms'});
+$('#ltInkSign').style.transitionDelay='0ms';$('#ltInkFrom').style.transitionDelay=(last+250)+'ms';
+try{var an=document.getElementById('inkdustA');if(an&&an.beginElement)an.beginElement()}catch(e){}
+body.classList.add('fading');dust(ws,N);
+LTFADE=setTimeout(function(){$('#ltInk').classList.add('faded');
+LTFADE=setTimeout(function(){$('#blBar').classList.add('show');stateLine(n)},1200)},last+1500)}
+function dust(ws,N){var cv=$('#ltDust'),card=$('#ltInk');if(!cv||!cv.getContext||!window.requestAnimationFrame)return;
+var r=card.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);if(!r.width)return;
+cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cv.style.display='block';
+var ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+var ps=[],t0=performance.now(),total=Math.min(Math.max(N-1,0)*150,2600)+2800;
+ws.forEach(function(w,i){var wr=w.getBoundingClientRect(),d=Math.min((N-1-i)*150,2600),k=8+Math.round(wr.width/9);
+for(var q=0;q<k;q++)ps.push({t:d+Math.random()*520,x:wr.left-r.left+Math.random()*wr.width,y:wr.top-r.top+Math.random()*wr.height,vx:18+Math.random()*62,vy:-28+Math.random()*32,life:1100+Math.random()*1300,s:.8+Math.random()*1.5})});
+function frame(now){var el=now-t0,alive=false;ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle='#173F35';
+ps.forEach(function(p){var a=el-p.t;if(a<0){alive=true;return}if(a>p.life)return;alive=true;
+var q=a/p.life,x=p.x+p.vx*a/1000+Math.sin(a/180+p.s)*3,y=p.y+p.vy*a/1000;
+ctx.globalAlpha=(1-q)*.72;ctx.beginPath();ctx.arc(x,y,p.s*(1-q*.4),0,6.2832);ctx.fill()});
+if(alive&&el<total)requestAnimationFrame(frame);else{ctx.clearRect(0,0,r.width,r.height);cv.style.display='none'}}
+requestAnimationFrame(frame)}
+function blSet(on){INKLIGHT=!!on;var card=$('#ltInk'),bar=$('#blBar'),tog=$('#blTog');if(!card)return;
+card.classList.toggle('uv',INKLIGHT);if(!INKLIGHT)card.classList.remove('full');bar.classList.toggle('on',INKLIGHT);tog.classList.toggle('on',INKLIGHT);
+tog.setAttribute('aria-pressed',INKLIGHT?'true':'false');$('#blLabel').textContent=INKLIGHT?'Black Light On':'Black Light Off';
+card.style.setProperty('--lx','-600px');card.style.setProperty('--ly','-600px')}
+function lightAt(e){var card=$('#ltInk');if(!card||!card.classList.contains('uv'))return;
+var r=card.getBoundingClientRect();card.style.setProperty('--lx',(e.clientX-r.left)+'px');card.style.setProperty('--ly',(e.clientY-r.top)+'px')}
+function showGone(){var body=$('#ltBody');body.innerHTML='';
+var g=document.createElement('div');g.className='pp-gone';g.textContent='The ink is gone. It was read once.';
+$('#ltPaper').insertBefore(g,$('#ltSign'));$('#ltSign').textContent=''}
+function stateLine(n,over){var mine=isMine(n),kind=nkindOf(n),s='',warm=false;
+if(over){var el0=$('#ltState');el0.textContent=over;el0.classList.add('warm');return}
+if(mine){s=kind==='ink'?(n.read_at?'FADED · BLACK LIGHT BRINGS IT BACK':'DISAPPEARING INK · NOT READ YET'):(n.read_at?'OPENED '+whenLine(n.read_at).toUpperCase():'SEALED · NOT OPENED YET');warm=!n.read_at}
+else{s=kind==='ink'?(n.read_at?'FADED · BLACK LIGHT BRINGS IT BACK':'DISAPPEARING INK · READ ONCE, THEN IT FADES'):(n.read_at?'OPENED '+whenLine(n.read_at).toUpperCase():'SEALED · ONLY THE TWO OF YOU CAN READ IT');warm=!n.read_at}
+var el=$('#ltState');el.textContent=s;el.classList.toggle('warm',warm)}
+function openLetter(n){if(!PROFILE||!n)return;LT=n;resetLetter();
+var mine=isMine(n),kind=nkindOf(n),other=nameOf(mine?n.recipient_id:n.sender_id),tc=nTouch(n);
+$('#ltWho').textContent=other.handle;$('#ltWhen').textContent=whenLine(n.created_at).toUpperCase();
+$('#ltKind').innerHTML=ico(kind==='ink'?'ink':'sealed')+'<span>'+(kind==='ink'?'Disappearing ink':'Sealed note')+'</span>'+(tc?'<i class="tg" style="margin-left:4px">'+ico(tc)+'</i>':'');
+stateLine(n);
+var env=$('#ltEnv');env.classList.toggle('ink',kind==='ink');
+var st=$('#ltStage'),wrap=kind==='ink'?$('#ltInkWrap'):$('#ltWrap');
+st.classList.toggle('inkmode',kind==='ink');
+if(!mine&&!n.read_at){sheet('#lettersheet');return}
+if(kind==='ink'){fillInk(n);if(n.read_at){$('#ltInk').classList.add('faded');$('#blBar').classList.add('show')}}else fillPaper(n);
+st.classList.add('opened');sheet('#lettersheet');
+LTTIMER=setTimeout(function(){wrap.classList.add('shown');if(tc&&kind!=='ink')playTouch(tc)},60)}
+function breakSeal(){var n=LT;if(!n||isMine(n)||n.read_at)return;
+var kind=nkindOf(n),env=$('#ltEnv'),st=$('#ltStage'),wrap=kind==='ink'?$('#ltInkWrap'):$('#ltWrap'),tc=nTouch(n);
+if(env.classList.contains('open'))return;
+env.classList.add('pressing');
+if(kind==='ink')fillInk(n);else fillPaper(n);
+markRead([n]);
+LTTIMER=setTimeout(function(){env.classList.remove('pressing');env.classList.add('open');
+LTTIMER=setTimeout(function(){st.classList.add('opened');
+LTTIMER=setTimeout(function(){wrap.classList.add('shown');stateLine(n,kind==='ink'?'DISAPPEARING INK \u00B7 READ ONCE, THEN IT FADES':null);
+if(tc&&kind!=='ink')setTimeout(function(){playTouch(tc)},380);
+if(kind==='ink'){LTFADE=setTimeout(function(){fadeInk(n)},9000)}},40)},640)},140)}
+function markRead(list){if(!PROFILE||!sb)return;
+var un=(list||[]).filter(function(n){return n.recipient_id===PROFILE.id&&!n.read_at});if(!un.length)return;
 var ids=un.map(function(n){return n.id}),stamp=new Date().toISOString();
-sb.from('notes').update({read_at:stamp}).in('id',ids).then(function(r){
-if(r&&r.error)return;
-un.forEach(function(n){n.read_at=stamp});
-countUnread();paintNoteDot();renderNotes()}).catch(function(){})}
-$('#notesend').onclick=function(){
-if(!PROFILE){closeSheets();openJoin();return}
-var val=$('#notein').value.trim();if(!val||!NOTEWITH)return;
-var b=this;b.textContent='Sending...';
-sb.from('notes').insert({sender_id:PROFILE.id,recipient_id:NOTEWITH,body:val.slice(0,2000)}).select().single()
-.then(function(r){b.textContent='Send.';
-if(r.error){toast(/row-level|policy/i.test(r.error.message)
-?'That is twenty notes today. The rest can wait.'
-:'Not sent: '+r.error.message);return}
-$('#notein').value='';NOTES.unshift(r.data);renderThread();renderNotes()})
-.catch(function(){b.textContent='Send.';toast('Not sent.')})};
-$('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#notesend').onclick()}});
+un.forEach(function(n){n.read_at=stamp});countUnread();paintNoteDot();repaintNotes();
+sb.from('notes').update({read_at:stamp}).in('id',ids).then(function(){}).catch(function(){})}
+/* ---- touches: the renders, laid on the letter ---- */
+function playTouch(kind){var tl=$('#ltTouch');if(!tl)return;tl.innerHTML='';
+if(kind==='flowers'){tl.innerHTML='<img class="tch flowers" src="note-flowers.webp" alt="">';return}
+if(kind==='balloons'){tl.innerHTML='<img class="tch balloon b1" src="note-balloon-cream.webp" alt=""><img class="tch balloon b2" src="note-balloon-sage.webp" alt="">';return}
+if(kind==='confetti'){tl.innerHTML='<img class="tch confetti" src="note-confetti.webp" alt="">';return}}
+/* ---- compose ---- */
+function setKind(k){NKIND=k==='ink'?'ink':'sealed';
+$$('#nkind [data-nk]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nk')===NKIND)});
+$('#nkHint').textContent=NKIND==='ink'?'Read once. Then the words fade away for good, for both of you.':'Delivered as a sealed letter. They open it when they are ready.';
+$('#notesend').textContent=NKIND==='ink'?'Send the Ink.':'Seal It.';$('#nspaper').classList.toggle('ink',NKIND==='ink')}
+function setTouch(t){NTOUCH=t||'';
+$$('#ntouch [data-nt]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nt')===NTOUCH)});
+$('#ntNote').textContent=NTOUCH?({flowers:'Flowers grow across the page when it is opened.',balloons:'Balloons lift off the page when it is opened.',confetti:'Confetti falls, softly, when it is opened.'})[NTOUCH]:'Touches are added to your note and seen when it is opened.'}
+function countLeft(){var v=$('#notein').value;$('#nsLeft').textContent=(2000-v.length)+' LEFT'}
+function writeNote(pid){if(!PROFILE){openJoin();return}
+THWITH=pid;var nm=nameOf(pid);
+$('#notewho').textContent=nm.handle;$('#nsSign').textContent='SIGNED - '+initialOf(PROFILE.handle);
+$('#notein').value='';countLeft();setKind('sealed');setTouch('');
+closeSheets();sheet('#notesheet');setTimeout(function(){try{$('#notein').focus()}catch(e){}},350)}
+function sendNote(body,kind,touch,btn,done){if(!PROFILE||!sb||!THWITH)return;
+var label=btn.textContent;btn.textContent='Sealing...';btn.disabled=true;
+var row={sender_id:PROFILE.id,recipient_id:THWITH,body:body.slice(0,2000)};
+var full={};for(var k in row)full[k]=row[k];full.kind=kind;if(touch)full.touch=touch;
+function fail(msg){btn.textContent=label;btn.disabled=false;
+toast(/row-level|policy/i.test(msg)?'That is twenty notes today. The rest can wait.':'Not sent: '+msg)}
+function landed(r,plain){btn.textContent=label;btn.disabled=false;
+if(r.error){fail(r.error.message);return}
+var n=r.data;if(!n.kind)n.kind=kind;NOTES.unshift(n);repaintNotes();
+toast(plain?'Sent plain. Run patch 36 to seal notes.':(kind==='ink'?'Sent. It disappears after they read it.':'Sealed and sent.'));
+done&&done(n)}
+sb.from('notes').insert(full).select().single().then(function(r){
+if(r.error&&/column|schema cache|kind|touch/i.test(r.error.message)){
+return sb.from('notes').insert(row).select().single().then(function(r2){landed(r2,true)})}
+landed(r,false)}).catch(function(){fail('the note did not send.')})}
+$$('#nkind [data-nk]').forEach(function(b){b.onclick=function(){setKind(b.getAttribute('data-nk'))}});
+$$('#ntouch [data-nt]').forEach(function(b){b.onclick=function(){setTouch(b.getAttribute('data-nt'))}});
+$('#notein').addEventListener('input',countLeft);
+$('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#notesend').onclick()}});
+$('#notesend').onclick=function(){if(!PROFILE){closeSheets();openJoin();return}
+var val=$('#notein').value.trim();if(!val){toast('Say something true first.');return}
+sendNote(val,NKIND,NTOUCH,this,function(){$('#notein').value='';countLeft();closeSheets();if(curPage!=='thread')openNote(THWITH)})};
+$('#ltSend').onclick=function(){if(!PROFILE||!LT){closeSheets();openJoin();return}
+var val=$('#ltIn').value.trim();if(!val)return;
+THWITH=isMine(LT)?LT.recipient_id:LT.sender_id;
+sendNote(val,'sealed','',this,function(){$('#ltIn').value=''})};
+$('#ltIn').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#ltSend').onclick()}});
+$('#ltEnv').onclick=breakSeal;
+$('#blTog').onclick=function(){blSet(!INKLIGHT)};
+$('#blFull').onclick=function(){if(INKLIGHT)$('#ltInk').classList.add('full')};
+(function(){var card=$('#ltInk');card.addEventListener('pointermove',lightAt);card.addEventListener('pointerdown',lightAt);
+card.addEventListener('pointerleave',function(){card.style.setProperty('--lx','-600px');card.style.setProperty('--ly','-600px')})})();
+$('#ltPaper').onclick=function(){if(LT&&!(nkindOf(LT)==='ink')){var tc=nTouch(LT);if(tc)playTouch(tc)}};
+$('#ltWho').onclick=function(){if(!LT)return;var nm=nameOf(isMine(LT)?LT.recipient_id:LT.sender_id);closeSheets();if(nm.handle&&nm.handle!=='A Member')openLiveMember(nm.handle)};
+/* ---- to whom ---- */
+function pickRows(list){var h='';list.forEach(function(id){var nm=nameOf(id);
+h+='<button class="ntorow" data-nto="'+esc(id)+'"><div>'+DeedsTypes.svg(nm.type,36,{verified:nm.v})+'</div><span class="mono">'+esc(nm.handle)+'</span></button>'});
+return h}
+function renderPick(q){var el=$('#ntoList');q=(q||'').trim().toLowerCase();
+var seen={},ids=[];threads().forEach(function(t){if(!seen[t.id]){seen[t.id]=1;ids.push(t.id)}});
+for(var id in MYFOLL){if(!seen[id]&&NAMES[id]){seen[id]=1;ids.push(id)}}
+if(q)ids=ids.filter(function(id){return nameOf(id).handle.toLowerCase().indexOf(q)>=0});
+if(ids.length){el.innerHTML=pickRows(ids)}
+else el.innerHTML='<p class="remnote">'+(q.length>=2?'Looking.':'People you have written to, and the ones you follow, show here. Or type a handle.')+'</p>';
+$$('#ntoList [data-nto]').forEach(function(b){b.onclick=function(){writeNote(b.getAttribute('data-nto'))}});
+if(q.length>=2&&sb){sb.from('profiles').select('id,handle,member_type,member_type_verified_at').ilike('handle','%'+q+'%').limit(8).then(function(r){
+if(r.error||$('#ntoQ').value.trim().toLowerCase()!==q)return;
+var more=[];(r.data||[]).forEach(function(p){if(p.id===PROFILE.id||seen[p.id])return;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};seen[p.id]=1;more.push(p.id)});
+if(more.length){el.innerHTML=(ids.length?pickRows(ids):'')+pickRows(more)}
+else if(!ids.length)el.innerHTML='<p class="remnote">Nobody by that handle yet.</p>';
+$$('#ntoList [data-nto]').forEach(function(b){b.onclick=function(){writeNote(b.getAttribute('data-nto'))}})}).catch(function(){})}}
+function openToPick(){if(!PROFILE){openJoin();return}
+var ids=[];threads().forEach(function(t){ids.push({profile_id:t.id})});for(var id in MYFOLL)ids.push({profile_id:id});
+$('#ntoQ').value='';renderPick('');sheet('#ntopick');
+fetchNames(ids).then(function(){indexNames();if(openSheet==='#ntopick')renderPick($('#ntoQ').value)}).catch(function(){})}
+$('#ntoQ').addEventListener('input',function(){renderPick(this.value)});
+/* ---- wiring: top bar envelopes, page buttons, router ---- */
+$$('.nbtn').forEach(function(b){b.onclick=openNotesPage});
+$('#nNew').onclick=openToPick;
+$('#nSeeAll').onclick=openNotesPage;
+$('#thBack').onclick=function(){go('notes')};
+$('#thWrite').onclick=function(){if(THWITH)writeNote(THWITH)};
+$('#thWho').onclick=function(){if(!THWITH)return;var nm=nameOf(THWITH);if(nm.handle&&nm.handle!=='A Member')openLiveMember(nm.handle)};
+$$('#nchips [data-nf]').forEach(function(b){b.onclick=function(){NFILTER=b.getAttribute('data-nf');renderNotesPage()}});
+(function(){var _goN=window.go;if(typeof _goN!=='function')return;
+window.go=function(p){_goN(p);if(p==='notes')renderNotesPage();if(p==='thread')renderThreadPage()}})();
 
 /* ================= ADMIN: organization review ================= */
 function renderAdmin(){var s=$('#advsect'),ms=$('#modsect');if(!s)return;
