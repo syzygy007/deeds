@@ -180,6 +180,24 @@ input,textarea{font:inherit;color:var(--ink)}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--ivory);border-radius:22px 22px 0 0;border-top:3px solid var(--forest);padding:22px 20px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.32,.72,.3,1);max-height:82vh;overflow-y:auto}
 .sheet.on{transform:none}
 .sheet .sword{font-weight:800;font-size:15px;margin-bottom:4px}
+.jn-x{position:absolute;top:16px;right:16px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--ink);border-radius:50%}
+.jn-h1{font-size:clamp(2rem,8vw,2.6rem);font-weight:800;letter-spacing:-.02em;line-height:1.04;margin:6px 0 10px}
+.jn-sub{font-size:16px;color:var(--muted);margin:0 0 6px}
+.jn-div{display:flex;align-items:center;gap:14px;margin:24px 0}
+.jn-div:before,.jn-div:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(190,154,78,.55))}
+.jn-div:after{background:linear-gradient(90deg,rgba(190,154,78,.55),transparent)}
+.jn-star{color:var(--gold);flex:0 0 auto;display:flex}
+.jn-lab{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--forest);margin:0 0 8px}
+.jn-in{width:100%;border:1px solid rgba(21,19,14,.22);border-radius:12px;background:var(--ivory);font-size:17px;padding:16px 16px;outline:none;color:var(--ink)}
+.jn-in:focus{border-color:var(--forest)}
+.jn-in::placeholder{color:#B3AEA0}
+.jn-btn{display:block;width:100%;background:var(--forest);color:var(--ivory);font-weight:800;font-size:17px;padding:17px 20px;border-radius:12px;margin:16px 0 0;text-align:center}
+.jn-ghost{display:block;width:100%;border:1px solid rgba(21,19,14,.25);color:var(--forest);font-weight:800;font-size:16px;padding:15px 20px;border-radius:12px;margin:22px 0 0;text-align:center;background:none}
+.jn-note{font-size:14px;color:var(--muted);text-align:center;margin:14px 0 0}
+.jn-legal{font-size:13.5px;line-height:1.7;color:#4A463C;margin:26px 0 0}
+.jn-legal a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.jn-legal .row2{margin-top:6px}
+#jemail:-webkit-autofill,#jemail:-webkit-autofill:hover,#jemail:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--ivory) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink)}
 .sheet .sword b{color:var(--forest)}
 .sheet h3{font-size:22px;font-weight:800;margin:10px 0 14px}
 .logarea{width:100%;border:0;border-bottom:1px solid var(--line);background:none;font-size:17px;line-height:1.5;padding:8px 2px;outline:none;resize:none;min-height:64px}
@@ -260,17 +278,7 @@ input,textarea{font:inherit;color:var(--ink)}
  .llog{margin-top:26px;width:56px;height:56px;padding:0;background:var(--forest);color:var(--ivory);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(31,75,58,.30)}
  .llog svg{width:26px;height:26px}
  .llog:hover{transform:translateY(-1px)}
- .rulespane{max-height:32vh;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:14px 0 2px;padding:2px 14px 0 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.rp-h{font-size:9.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin:15px 0 5px}
-.rp-p{font-size:13.5px;line-height:1.55;color:#4A463C;margin:0 0 4px}
-.rp-links{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
-.rp-links a{color:var(--forest);text-decoration:none;border-bottom:1px solid rgba(31,75,58,.35)}
-.agreerow{display:flex;gap:12px;align-items:center;margin:16px 0;cursor:pointer;font-size:14px;font-weight:700;line-height:1.45;color:var(--ink)}
-.agreerow input{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:22px;height:22px;margin:0;border:2px solid var(--forest);border-radius:5px;background:var(--ivory);cursor:pointer;position:relative}
-.agreerow input:checked{background:var(--forest)}
-.agreerow input:checked:after{content:'';position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid var(--ivory);border-width:0 2.5px 2.5px 0;transform:rotate(41deg)}
-#jemail:-webkit-autofill,#jemail:-webkit-autofill:hover,#jemail:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--ivory) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink)}
-.tosbody{font-size:15px;line-height:1.6;color:#4A463C;margin:10px 0 4px}
+ .tosbody{font-size:15px;line-height:1.6;color:#4A463C;margin:10px 0 4px}
 .lfoot{margin-top:auto;font-size:8.5px;letter-spacing:.16em;color:#B3AEA0;font-weight:800;line-height:1.9;text-transform:uppercase;cursor:pointer}
 .whyline{background:none;border:0;padding:0;margin-top:12px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:inherit;text-align:left}
  .rblock{border-top:1px solid var(--ink);padding:18px 2px 22px;margin-bottom:10px}
@@ -1132,34 +1140,26 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
   <div class="logsub" style="margin-top:18px"><button class="logbtn" id="tosOk">I Agree.</button><button class="mghost" id="tosNo">Not Yet.</button></div>
 </div>
 
-<div class="sheet" id="joinsheet">
-  <div class="sword">DEEDS<b>.</b></div>
-  <h3>Sign In or Join.</h3>
-  <p class="remnote" style="margin:0 0 8px">Same door, one code. Known emails sign in. New emails join.</p>
-  <div class="rulespane" id="rulespane">
-    <div class="rp-h">The Deal</div>
-    <p class="rp-p">You must be 18 or older. One person, one account. Log only deeds you actually did. The record is only worth what it is honest about.</p>
-    <div class="rp-h">Your Words</div>
-    <p class="rp-p">What you post stays yours. You give us permission to store and show it. When someone redeeds or seconds it, they keep the copy they carried, even if you later delete yours.</p>
-    <div class="rp-h">Never Here</div>
-    <p class="rp-p">Exposing another member. Threats or harassment. Sexual or violent content. Anything involving the exploitation of minors, which is reported, not just removed.</p>
-    <div class="rp-h">No Money</div>
-    <p class="rp-p">DEEDS is not a fundraising or payment platform. No solicitation, no payment links, no advertising dressed up as a deed.</p>
-    <div class="rp-h">Your Privacy</div>
-    <p class="rp-p">The community sees a handle, never your name. We hold your email to sign you in, and we do not sell your information or run ads.</p>
-    <div class="rp-h">If Rules Break</div>
-    <p class="rp-p">We remove content that crosses these lines, and accounts that keep crossing them.</p>
-    <div class="rp-links">Full text: <a href="/terms/" target="_blank">Terms</a> &middot; <a href="/privacy/" target="_blank">Privacy</a> &middot; <a href="/guidelines/" target="_blank">Guidelines</a> &middot; <a href="/copyright/" target="_blank">Copyright</a></div>
-    <label class="agreerow" for="jagree"><input type="checkbox" id="jagree"><span>I am 18 or older and I agree.</span></label>
-  </div>
+<div class="sheet" id="joinsheet" style="position:fixed">
+  <button class="jn-x" id="jx" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  <div class="sword" style="letter-spacing:.18em;color:var(--forest)">DEEDS<b style="color:var(--forest)">.</b></div>
+  <div class="jn-h1">Join DEEDS<b style="color:var(--forest)">.</b></div>
+  <p class="jn-sub">One email. One code. No password.</p>
+  <div class="jn-div"><svg class="jn-star" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c.5 4.5 3 7 8 8-5 1-7.5 3.5-8 8-.5-4.5-3-7-8-8 5-1 7.5-3.5 8-8z"/></svg></div>
   <div id="jstep1">
-    <input class="chfield" id="jemail" type="email" placeholder="Your email." autocomplete="email" style="margin-top:10px">
-    <div class="logsub"><button class="logbtn" id="jsend">Send My Code.</button><button class="mghost" id="jskip">Look Around First.</button></div>
+    <div class="jn-lab">Email</div>
+    <input class="jn-in" id="jemail" type="email" placeholder="you@example.com" autocomplete="email">
+    <button class="jn-btn" id="jsend">Send My Code.</button>
+    <p class="jn-note">Already a member? The same code signs you in.</p>
+    <p class="jn-legal">By continuing, you confirm you are 18 or older and agree to the <a href="/terms/" target="_blank">Terms of Use</a>. See how we protect your information in our <a href="/privacy/" target="_blank">Privacy Policy</a>.<br><span class="row2"><a href="/guidelines/" target="_blank">Community Guidelines</a> &nbsp;&middot;&nbsp; <a href="/copyright/" target="_blank">Copyright</a></span></p>
+    <button class="jn-ghost" id="jskip">Look Around First.</button>
   </div>
   <div id="jstep2" style="display:none">
-    <p class="remnote" style="margin:0">The code is in your email. It signs you in.</p>
+    <div class="jn-lab">The Code</div>
+    <p class="jn-sub" style="margin:0">It is in your email. It signs you in.</p>
     <input class="codein" id="jcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
-    <div class="logsub"><button class="logbtn" id="jverify">Enter DEEDS.</button><button class="mghost" id="jagain">Send Again.</button></div>
+    <button class="jn-btn" id="jverify">Enter DEEDS.</button>
+    <button class="jn-ghost" id="jagain">Send Again.</button>
   </div>
 </div>
 
@@ -2819,8 +2819,7 @@ paintCad(cad);toast(cad==='none'?'Saved. No reminders. The door stays open.':'Sa
 function openJoin(){closeSheets();
 $('#jstep1').style.display='block';$('#jstep2').style.display='none';
 var jc=$('#jcode');if(jc)jc.value='';
-var ja=$('#jagree');if(ja)ja.checked=false;
-var rp=$('#rulespane');if(rp)rp.scrollTop=0;
+
 sheet('#joinsheet');setTimeout(function(){var je=$('#jemail');if(je)je.focus()},350)}
 function failAuth(m){closeSheets();$('#authfailP').textContent=m;
 $('#scrim').classList.add('on');$('#authfail').classList.add('on')}
@@ -2828,7 +2827,7 @@ $('#authfailOk').onclick=function(){closeSheets();openJoin()};
 $('#tosOk').onclick=function(){var b=this;b.textContent='SAVING...';
 writeAccept(function(){b.textContent='I Agree.';closeSheets();toast('Thank you. Go do something small.')})};
 $('#tosNo').onclick=function(){closeSheets();toast('The rules stay in your profile. Read them any time.')};
-$('#jskip').onclick=closeSheets;
+$('#jskip').onclick=closeSheets;var JX=$('#jx');if(JX)JX.onclick=closeSheets;
 function sendCode(){var b=$('#jsend');b.textContent='SENDING...';var done=false;
 var to=setTimeout(function(){if(done)return;done=true;b.textContent='Send My Code.';
 failAuth('The mail service did not answer in time. If this keeps up, the sending domain is likely still being verified.')},15000);
@@ -2839,8 +2838,7 @@ $('#jstep1').style.display='none';$('#jstep2').style.display='block';
 setTimeout(function(){var jc=$('#jcode');if(jc)jc.focus()},250)}).catch(function(e){
 if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';failAuth(String(e&&e.message||e))})}
 $('#jsend').onclick=function(){var em=v('#jemail');
-var ag=$('#jagree');
-if(ag&&!ag.checked){toast('The box is at the end of the rules. Tick it first.');var rp=$('#rulespane');if(rp)rp.scrollTop=rp.scrollHeight;return}
+
 if(!/^\S+@\S+\.\S+$/.test(em)){toast('A real email first.');return}
 PENDACCEPT=true;JEMAIL=em;sendCode()};
 $('#jagain').onclick=function(){if(JEMAIL)sendCode()};
