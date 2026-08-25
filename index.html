@@ -942,7 +942,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .paper{padding:44px 46px 64px}
  .paper.tf{padding-right:88px}
 }
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.1 · egg contents art, blank eggs fill themselves) ============ */
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.2 · egg contents art, blank eggs fill themselves, treat style honored) ============ */
 #prow{align-items:center;flex-wrap:wrap;gap:10px}
 #prow .plab{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-right:2px}
 #prow .lchip .pico{width:22px;height:22px;vertical-align:-6px;margin-right:7px;display:inline-block}
@@ -4392,7 +4392,7 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    if the CDN never answers. ---- */
 renderFeed();
 
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.1 · egg contents art, blank eggs fill themselves) ============ */
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.2 · egg contents art, blank eggs fill themselves, treat style honored) ============ */
 var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
@@ -4567,7 +4567,7 @@ if(txt.length>320){toast('Keep it under 320 characters.');return null}
 if(PRES==='disappearing_note')return {body:txt,fields:{p:'disappearing_note'}};
 if(!EGGFILL){toast('Choose what goes inside.');return null}
 var fill=EGGFILL,style=null,body=txt;
-if(fill==='treat'){style=ESTYLE||'candy';if(!body){var s=presPick(EGGSEEDS.treat);body=s.text;style=s.style}}
+if(fill==='treat'){style=ESTYLE||'candy';if(!body){var sp=EGGSEEDS.treat.filter(function(x){return x.style===style});var s=presPick(sp.length?sp:EGGSEEDS.treat);body=s.text;style=s.style}}
 else if(fill==='surprise'){
 if(body){fill=presPick(['kind_words','wisdom'])}
 else{fill=presPick(['treat','kind_words','wisdom','tiny_deed']);
