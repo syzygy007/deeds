@@ -333,6 +333,13 @@ input,textarea{font:inherit;color:var(--ink)}
 #invpane .sendb{flex:1;text-align:center;border-color:var(--forest);color:var(--forest);padding:13px 10px;font-size:14px}
 #invpane .sendb:hover{background:var(--forest);color:var(--ivory)}
 @media(max-width:599px){#ivchips .achip{flex-basis:100%}#invpane .sendb{padding:13px 4px;font-size:12.5px;white-space:nowrap}}
+/* invitations v5: the email row + the sealed line */
+.ivmail{display:flex;gap:10px;align-items:stretch;margin-top:14px}
+.ivmail .chfield{flex:1;margin:0}
+.ivmail .sendb{flex:0 0 auto;border-color:var(--forest);background:var(--forest);color:var(--ivory);padding:13px 18px;font-size:14px;white-space:nowrap}
+.ivsealed{margin:12px 0 0;font-size:13px;color:var(--gray,#5F5C52)}
+.ivsealed a{color:var(--forest);font-weight:800;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:599px){.ivmail{flex-wrap:wrap}.ivmail .sendb{flex-basis:100%}}
 .chip.pk{color:#8B867A;background:#F0EDE3}
 .embed{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#FBF9F3;cursor:pointer}
 .embed .eh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -1578,6 +1585,8 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
       <p class="ivlede">No deed attached. No clock. Just the door, held open.</p>
     </div>
     <div class="sendrow"><button class="sendb" data-ivsend="sms">Text It.</button><button class="sendb" data-ivsend="mail">Email It.</button><button class="sendb" data-ivsend="copy">Copy the Link.</button></div>
+    <div class="ivmail" id="ivMail" style="display:none"><input class="chfield" id="ivEmail" type="email" inputmode="email" autocomplete="email" placeholder="Their email address."><button class="sendb" id="ivMailGo" type="button">Send the Letter.</button></div>
+    <p class="ivsealed" id="ivSealed" style="display:none"></p>
   </div>
   <textarea class="logarea" id="logtext" placeholder="What did you do?"></textarea>
   <div class="logrow" id="logdates">
@@ -2350,19 +2359,37 @@ ivDis('#ivNoteT','#ivNote');ivDis('#ivFNoteT','#ivFNote');
 var _ivo=$('#ivOwn');if(_ivo)_ivo.onclick=function(){var c=$('#ivCustom');c.style.display='';c.focus();_ivo.style.display='none';$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')})};
 $$('#ivchips .achip').forEach(function(b){b.onclick=function(){$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');$('#ivCustom').value=''}});
 $('#ivCustom').addEventListener('input',function(){if(this.value.trim())$$('#ivchips .achip').forEach(function(x){x.classList.remove('on')})});
-function ivBuild(){var h=my.handle||'A friend';
-if(ivKind==='deed'){var c=$('#ivCustom').value.trim();var on=$('#ivchips .achip.on');
-var act=c||(on?on.textContent:'One act of your choosing.');var note=$('#ivNote').value.trim();
-var u='https://deeds.fun/deed/?c='+h+'&k=deed&a='+actParam(act);
-return{url:u,msg:h+' challenged you to one deed: '+cleanAct(act)+(note?' \u00B7 '+note:'')+' \u00B7 See it: '+u}}
-if(ivKind==='forty'){var n2=$('#ivFNote').value.trim();var u2='https://deeds.fun/challenge/?c='+h;
-return{url:u2,msg:h+' sent you the Forty. Forty deeds. One year.'+(n2?' \u00B7 '+n2:'')+' \u00B7 See it: '+u2}}
-var u3='https://deeds.fun/invite/?c='+h+'&k=invite';
-return{url:u3,msg:h+' invited you to DEEDS. Anonymous acts of kindness, person to person. See it: '+u3}}
-$$('[data-ivsend]').forEach(function(b){b.onclick=function(){var ch=b.getAttribute('data-ivsend');var s=ivBuild();
-if(ch==='sms'){location.href='sms:?&body='+encodeURIComponent(s.url)}
-else if(ch==='mail'){location.href='mailto:?subject='+encodeURIComponent('Someone thought of you.')+'&body='+encodeURIComponent(s.msg)}
-else{try{var _cp=navigator.clipboard.writeText(s.msg);if(_cp&&_cp.catch)_cp.catch(function(){})}catch(e){}closeSheets();toast('Link copied.')}}});
+function ivParams(){var h=my.handle||'A friend',act='',note='';
+if(ivKind==='deed'){var c=$('#ivCustom').value.trim();var on=$('#ivchips .achip.on');act=cleanAct(c||(on?on.textContent:'One act of your choosing.'));note=$('#ivNote').value.trim()}
+else if(ivKind==='forty'){note=$('#ivFNote').value.trim()}
+return{h:h,kind:ivKind,act:act,note:note}}
+/* legacy word-shaped links, used only when the live layer is off */
+function ivLegacy(p){if(p.kind==='deed'){var u='https://deeds.fun/deed/?c='+p.h+'&k=deed&a='+actParam(p.act);return{url:u,msg:p.h+' challenged you to one deed: '+p.act+(p.note?' \u00B7 '+p.note:'')+' \u00B7 See it: '+u}}
+if(p.kind==='forty'){var u2='https://deeds.fun/challenge/?c='+p.h;return{url:u2,msg:p.h+' sent you the Forty. Forty deeds. One year.'+(p.note?' \u00B7 '+p.note:'')+' \u00B7 See it: '+u2}}
+var u3='https://deeds.fun/invite/?c='+p.h+'&k=invite';return{url:u3,msg:p.h+' invited you to DEEDS. Anonymous acts of kindness, person to person. See it: '+u3}}
+/* the sealed note: mint a token, hand off deeds.fun/i/?t= */
+var IVTOK=null,IVSIG='';
+function ivUrl(t){return 'https://deeds.fun/i/?t='+t}
+function ivCopy(u){return "You're invited to DEEDS.\nA sealed note is waiting for you.\nOpen it when you're ready.\n\n"+u}
+function ivLive(){return !!(window.liveOn&&window.sb)}
+function ivMint(ch,recip){var p=ivParams();var sig=[ch,p.kind,p.act,p.note,recip||''].join('|');
+if(IVTOK&&IVSIG===sig)return Promise.resolve(IVTOK);
+return sb.rpc('create_invitation',{p_kind:p.kind,p_channel:ch,p_recipient:recip||null,p_act:p.act||null,p_note:p.note||null}).then(function(r){if(r.error)throw r.error;IVTOK=String(r.data);IVSIG=sig;return IVTOK})}
+function ivSms(u){location.href='sms:?&body='+encodeURIComponent(u)}
+function ivAfterMint(ch,t){var u=ivUrl(t);
+if(ch==='sms'){var s=$('#ivSealed');s.innerHTML='Sealed. <a href="sms:?&body='+encodeURIComponent(u)+'">Text It.</a> again if Messages did not open.';s.style.display='';ivSms(u)}
+else{try{var _cp=navigator.clipboard.writeText(ivCopy(u));if(_cp&&_cp.catch)_cp.catch(function(){})}catch(e){}closeSheets();toast('Sealed and copied.')}}
+$$('[data-ivsend]').forEach(function(b){var lbl=b.textContent;b.onclick=function(){var ch=b.getAttribute('data-ivsend');
+if(ch==='mail'){var m=$('#ivMail');var on=m.style.display!=='none';m.style.display=on?'none':'';if(!on)setTimeout(function(){$('#ivEmail').focus()},60);return}
+if(!ivLive()){var L=ivLegacy(ivParams());if(ch==='sms')ivSms(L.url);else{try{var _c2=navigator.clipboard.writeText(L.msg);if(_c2&&_c2.catch)_c2.catch(function(){})}catch(e){}closeSheets();toast('Link copied.')}return}
+if(!window.PROFILE){openJoin();return}
+b.textContent='Sealing...';
+ivMint(ch==='copy'?'link':ch).then(function(t){b.textContent=lbl;ivAfterMint(ch,t)}).catch(function(e){b.textContent=lbl;toast('Could not seal it. '+((e&&e.message)||'Try again.'))})}});
+$('#ivMailGo').onclick=function(){var em=$('#ivEmail').value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)){toast('Add their email address.');$('#ivEmail').focus();return}
+if(!ivLive()){toast('Sign in to send the letter.');return}if(!window.PROFILE){openJoin();return}
+var g=$('#ivMailGo');g.textContent='Sealing...';
+ivMint('email',em).then(function(){g.textContent='Send the Letter.';$('#ivEmail').value='';IVTOK=null;IVSIG='';closeSheets();toast('The letter is on its way, from hello@deeds.fun.')}).catch(function(e){g.textContent='Send the Letter.';toast('Not sent. '+((e&&e.message)||'Try again.'))})};
+$('#ivEmail').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('#ivMailGo').click()}};
 function openWhy(){sheet('#whysheet')}
 $('#lWhy').onclick=openWhy;$('#pWhy').onclick=openWhy;
 $('#lWhy').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openWhy()}};
@@ -2371,8 +2398,13 @@ $('#lWhy').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefau
 function parseArrival(){var q=location.search;if(q.indexOf('c=')<0)return null;
 var sp={};q.replace(/^\?/,'').split('&').forEach(function(kv){var p=kv.split('=');sp[p[0]]=decodeURIComponent(String(p[1]||'').replace(/\+/g,' '))});
 if(!sp.c)return null;var hd=/^[A-Za-z0-9]{3,24}$/.test(sp.c)?sp.c:'A friend';
-var og=/^[0-9a-fA-F-]{36}$/.test(String(sp.o||''))?sp.o:'';return{h:hd,k:sp.k||'forty',a:sp.a||'',o:og}}
+var og=/^[0-9a-fA-F-]{36}$/.test(String(sp.o||''))?sp.o:'';var iv=/^[A-Za-z0-9]{4,40}$/.test(String(sp.inv||''))?sp.inv:'';return{h:hd,k:sp.k||'forty',a:sp.a||'',o:og,inv:iv,ok:sp.ok==='1'}}
 function showArrival(ar){var inv=ar.k==='invite';var forty=!inv&&ar.k!=='deed';
+if(ar.inv)safeSet('deeds_inv',ar.inv);
+/* opened on the sealed-note page already: no second sheet, straight to the accept branch */
+if(ar.ok){try{history.replaceState(null,'',location.pathname)}catch(e){}
+if(inv){toast('Welcome to DEEDS.');go('feed')}else if(forty){toast('Accepted. Your year starts today.');go('profile')}
+else{toast('Accepted. Do the act, then log it.');openCompose('deed');if(ar.a){var lt=$('#logtext');if(lt&&!lt.value)lt.placeholder='The act: '+ar.a+'. What did you do?'}}return}
 $('#arriveH').textContent=inv?ar.h+' invited you.':forty?ar.h+' sent you the Forty.':ar.h+' sent you one deed.';
 $('#arriveP').textContent=inv?'Anonymous acts of kindness, person to person. Nothing assigned. Come see.':forty?'Forty deeds. One year. Their thought was of you.':(ar.a?'The act: '+ar.a:'One act. One person. Pass it on.');
 var dots='';if(forty){for(var i=0;i<40;i++)dots+='<i class="'+(i===0?'f':'')+'"></i>'}
@@ -2491,7 +2523,7 @@ var SB_URL='https://helqqdygwaihrliglbvw.supabase.co';
 var SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
 var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='doer',JEMAIL='',justVerified=false;
 /* bridge: the reader script lives in its own scope and reads these from window */
-try{Object.defineProperty(window,'PROFILE',{get:function(){return PROFILE}});Object.defineProperty(window,'sb',{get:function(){return sb}})}catch(e){}
+try{Object.defineProperty(window,'PROFILE',{get:function(){return PROFILE}});Object.defineProperty(window,'sb',{get:function(){return sb}});Object.defineProperty(window,'liveOn',{get:function(){return liveOn}})}catch(e){}
 window.openJoin=openJoin;window.prependLive=prependLive;window.markKind=markKind;
 var DAILY=null,DAILYN=0,DAILYLOG=0,chainParentLive=null,chainLinkLive=0,CAMPLOG=null,CAMPTITLE='';
 var LIVEPOSTS=[],SRES=[],NAMES={},feedEnd=false,feedBusy=true,pageFrom=0,feedFailMsg='',srvTimer=null;
@@ -3560,6 +3592,9 @@ if(!r.error)my.deeds=(r.data||[]).map(function(d){return{body:d.story||d.title||
 cb&&cb()}).catch(function(){cb&&cb()})}
 /* ---- the invite line: claim once, then show the reach ---- */
 function clearChallenger(){try{localStorage.removeItem('deeds_challenger')}catch(e){}}
+/* the sealed-note token: mark it accepted once the member exists */
+function claimInvite(){try{var t=safeGet('deeds_inv');if(!t||!window.PROFILE||!sb)return;try{localStorage.removeItem('deeds_inv')}catch(e){}
+sb.rpc('accept_invitation',{p_token:t}).then(function(){}).catch(function(){})}catch(e){}}
 function claimInviter(){try{
 var h=safeGet('deeds_challenger');
 if(!h||!window.PROFILE)return;
@@ -3596,7 +3631,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();loadReach();checkAccept();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
