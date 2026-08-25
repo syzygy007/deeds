@@ -563,6 +563,24 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .appsteps li:last-child{border-bottom:0}
 .appsteps .n{flex:0 0 22px;height:22px;border-radius:50%;background:var(--forest);color:var(--ivory);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .shareglyph{display:inline-block;width:14px;height:14px;vertical-align:-2px}
+/* ---- scratch reveal: the daily deed on the feed, today's verse on The Word (Aug 24) ---- */
+.dd-wrap{position:relative;margin:12px 0 4px;border-radius:14px;overflow:hidden;background:var(--bone);min-height:112px}
+.dd-under{padding:20px 22px;min-height:112px;display:flex;flex-direction:column;justify-content:center}
+.dd-act{font-weight:800;font-size:19px;line-height:1.3}
+.dd-under .p-time{margin-top:8px}
+.dd-verse{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.5}
+.dd-ref{font-size:10px;letter-spacing:.14em;color:var(--forest);font-weight:800;margin-top:10px;text-transform:uppercase}
+.dd-line{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+.dd-cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
+.dd-wrap.done .dd-cv{opacity:0;transition:opacity .55s ease;pointer-events:none}
+.dd-wrap.seen .dd-cv{display:none}
+.dd-hint{position:absolute;left:0;right:0;bottom:11px;text-align:center;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:rgba(246,243,235,.7);pointer-events:none;transition:opacity .3s}
+.dd-wrap.touched .dd-hint,.dd-wrap.done .dd-hint{opacity:0}
+.dd-acts{display:flex;align-items:center;gap:22px;margin-top:10px;min-height:22px}
+.dd-acts .reveal{color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+#wdVerseCard{margin:14px 0 18px}
+#wdVerseCard .dd-wrap{margin-top:10px}
+@media(prefers-reduced-motion:reduce){.dd-wrap.done .dd-cv{transition:none}}
 /* ============ DESKTOP v4 · top bar, two columns, cards (Aug 24) ============ */
 .dtop,.dfoot{display:none}
 @media(min-width:1080px){
@@ -862,6 +880,11 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 <div class="page" id="pg-read">
       <div class="wd-title">The Word<b style="color:var(--forest)">.</b></div>
       <div class="wd-sub">Scripture, read like a book. Free forever.</div>
+      <div class="wdcard lib-only" id="wdVerseCard" style="display:none">
+        <div class="micro">Today&#8217;s Verse</div>
+        <div class="dd-wrap" id="vswrap"><div class="dd-under"><div class="dd-verse" id="vsText"></div><div class="dd-ref" id="vsRef"></div><div class="dd-line" id="vsLine"></div></div></div>
+        <div class="dd-acts"><button class="pa lit" id="vsRead" style="display:none">Read the Chapter.</button><button class="pa reveal" id="vsReveal">Reveal it.</button></div>
+      </div>
       <div class="wd-sec lib-only"><div class="micro">The Library</div><div class="mono" style="color:var(--muted)">FREE</div></div>
       <button class="biblecov lib-only" id="wdBible">
         <div class="bc-mic">HOLY SCRIPTURE &#183; 66 BOOKS &#183; WEB &amp; KJV</div>
@@ -974,7 +997,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       </div>
       <div class="sect" id="viewpane">
         <div class="specrow"><span class="k">Type</span><span class="v" id="vType">Doer.</span></div>
-        <div class="specrow"><span class="k">Reminders</span><span class="v" id="vRemind">Monthly.</span></div>
+        <div class="specrow"><span class="k">The Daily Dose</span><span class="v" id="vRemind">On.</span></div>
         <div class="specrow"><span class="k">The App</span><button class="applnk" id="vApp">Show Me How.</button></div>
         <div class="specrow"><span class="k">Alerts</span><button class="applnk" id="vAl">Turn On.</button></div>
         <div class="specrow"><span class="k">The Rules</span><span class="v"><a href="/terms/" style="color:var(--forest);text-decoration:none">Terms</a> &middot; <a href="/privacy/" style="color:var(--forest);text-decoration:none">Privacy</a> &middot; <a href="/guidelines/" style="color:var(--forest);text-decoration:none">Guidelines</a> &middot; <a href="/copyright/" style="color:var(--forest);text-decoration:none">Copyright</a></span></div>
@@ -990,13 +1013,12 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
         <div class="pickgrid" id="pickgrid"></div>
       </div>
       <div class="sect">
-        <div class="micro">Reminders</div>
+        <div class="micro">The Daily Dose</div>
         <div class="remrow">
-          <button class="remchip">Weekly.</button>
-          <button class="remchip on">Monthly.</button>
-          <button class="remchip">None.</button>
+          <button class="remchip on" data-dose="1">On.</button>
+          <button class="remchip" data-dose="0">Off.</button>
         </div>
-        <p class="remnote">A small deed still counts.</p>
+        <p class="remnote">One verse. One deed. Every morning at six. Off stops the email, nothing else changes.</p>
       </div>
       <div class="sect"><button class="chbtn" id="pDone">Done.</button></div>
       </div>
@@ -1611,7 +1633,7 @@ var VIDWHO=['HarborLight077','IvyGate303','OpenDoor117'];
 var MEET=['MapleWard212','SlateCreek969','GoldfinchRow512','IvyGate303','PaperCrane441','HarborLight077'];
 var COINS=[['Copper',1,'#B87345'],['Iron',5,'#8A8D93'],['Bronze',12,'#A97C50'],['Silver',25,'#C9CDD3'],['Gold',50,'#D4AF5E'],['Platinum',100,'#DCE3E6'],['Diamond',200,'#BFE3EE'],['Emerald',365,'#2E7D5B']];
 var my={handle:'TrueWren601',deeds:[{body:'Paid for someones groceries.',when:'Today',priv:false}],
-inspired:{},following:{},blocked:{},remind:'Monthly.',bio:''};
+inspired:{},following:{},blocked:{},remind:'On.',bio:''};
 MEMBERS[my.handle].following.forEach(function(h){my.following[h]=1});
 
 /* ============ HELPERS ============ */
@@ -1800,7 +1822,7 @@ $('#mytimeline').innerHTML=tl;
 $('#myCoin').onclick=function(){go('status')};renderProfMeta()}
 function renderProfMeta(){var t=my.type||'doer';var L=DeedsTypes.LABELS[t]||'Doer';
 var vt=$('#vType');if(vt)vt.textContent=L.slice(-1)==='.'?L:L+'.';
-var vr=$('#vRemind');if(vr)vr.textContent=my.remind||'Monthly.';
+var vr=$('#vRemind');if(vr)vr.textContent=my.remind||'On.';
 var b=$('#myBio');if(b){b.textContent=my.bio||'';b.style.display=my.bio?'block':'none'}
 var bi=$('#bioIn');if(bi&&document.activeElement!==bi)bi.value=my.bio||'';bioLeft()}
 function bioLeft(){var bi=$('#bioIn'),el=$('#bioLeft');if(!bi||!el)return;
@@ -1824,7 +1846,7 @@ var ep=$('#editpane');if(ep&&ep.style.display==='none')setEdit(true);else saveEd
 var db=$('#pDone');if(db)db.onclick=function(){saveEdit()};
 var bi=$('#bioIn');if(bi)bi.oninput=bioLeft})();
 $$('.remchip').forEach(function(b){b.onclick=function(){$$('.remchip').forEach(function(x){x.classList.remove('on')});
-b.classList.add('on');my.remind=b.textContent;renderProfMeta();toast(b.textContent==='None.'?'No reminders. The door stays open.':b.textContent+' A small deed still counts.')}});
+b.classList.add('on');my.remind=b.textContent;renderProfMeta();toast(b.textContent==='Off.'?'The Dose is off. The door stays open.':'The Dose is on. One verse, one deed, every morning.')}});
 function renderStatus(){var n=deedCount(),nx=nextCoin(n);
 $('#stNext').textContent=nx<0?'YEAR MARKS. THE PATH NEVER ENDS.':COINS[nx][0].toUpperCase()+' · '+(COINS[nx][1]-n)+(COINS[nx][1]-n===1?' DEED AWAY.':' DEEDS AWAY.');
 var h='';COINS.forEach(function(c,i){var held=n>=c[1];
@@ -2014,6 +2036,39 @@ $('#thEnter').onclick=enter;
 $('#thLog').onclick=function(){enter();setTimeout(function(){openCompose('deed')},420)};
 renderFeed();renderRail();renderProfile();
 if(arrival)showArrival(arrival);
+/* ---- SCRATCH: the daily reveal. Covered until you scratch, revealed for the day once you do. ---- */
+function scratchMount(wrap,o){if(!wrap)return;o=o||{};
+var old=wrap.querySelector('.dd-cv');if(old)old.remove();var oh=wrap.querySelector('.dd-hint');if(oh)oh.remove();
+wrap.classList.remove('done','touched','seen');
+var rv=o.reveal?$(o.reveal):null;
+function finish(){if(wrap.classList.contains('done'))return;wrap.classList.add('done');try{if(o.key)localStorage.setItem(o.key,'1')}catch(e){}if(rv)rv.style.display='none';if(o.onDone)o.onDone()}
+var seen=false;try{seen=!!(o.key&&localStorage.getItem(o.key))}catch(e){}
+if(seen){wrap.classList.add('done');wrap.classList.add('seen');if(rv)rv.style.display='none';if(o.onDone)o.onDone();return}
+var cv=document.createElement('canvas');cv.className='dd-cv';cv.setAttribute('aria-hidden','true');wrap.appendChild(cv);
+var hint=document.createElement('div');hint.className='dd-hint';hint.textContent='Scratch to reveal';wrap.appendChild(hint);
+var ctx=cv.getContext('2d'),W=0,H=0,down=false,last=null,checkAt=0;
+function spaced(t){return String(t).toUpperCase().split('').join(' ')}
+function paint(){var dpr=Math.min(window.devicePixelRatio||1,2);var r=wrap.getBoundingClientRect();W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
+cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';
+var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1F4B3A');g.addColorStop(.55,'#245741');g.addColorStop(1,'#183C2F');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+var sh=ctx.createLinearGradient(0,0,W,0);sh.addColorStop(0,'rgba(246,243,235,0)');sh.addColorStop(.45,'rgba(246,243,235,.10)');sh.addColorStop(.55,'rgba(246,243,235,.10)');sh.addColorStop(1,'rgba(246,243,235,0)');ctx.fillStyle=sh;ctx.fillRect(0,0,W,H);
+try{var img=ctx.getImageData(0,0,cv.width,cv.height),d=img.data,s=1234567;for(var i=0;i<d.length;i+=4){s=(s*16807)%2147483647;var n=((s/2147483647)-.5)*18;d[i]+=n;d[i+1]+=n;d[i+2]+=n}ctx.putImageData(img,0,0)}catch(e){}
+ctx.fillStyle='rgba(246,243,235,.92)';ctx.font='800 13px "Helvetica Neue",Helvetica,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText(spaced(o.label||'Today.'),W/2,H/2-(o.sub?4:0));
+if(o.sub){ctx.fillStyle='rgba(160,176,164,.9)';ctx.font='800 9px "Helvetica Neue",Helvetica,Arial,sans-serif';ctx.fillText(spaced(o.sub),W/2,H/2+16)}
+ctx.globalCompositeOperation='destination-out'}
+function gone(){return !document.body.contains(cv)}
+function pos(e){var r=cv.getBoundingClientRect();var p=e.touches?e.touches[0]:e;return{x:p.clientX-r.left,y:p.clientY-r.top}}
+function brush(a,b){ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=34;ctx.strokeStyle='rgba(0,0,0,1)';ctx.fillStyle='rgba(0,0,0,1)';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.beginPath();ctx.arc(b.x,b.y,17,0,Math.PI*2);ctx.fill()}
+function progress(){try{var d=ctx.getImageData(0,0,cv.width,cv.height).data,n=0,t=0;for(var i=3;i<d.length;i+=64){t++;if(d[i]<40)n++}return t?n/t:0}catch(e){return 1}}
+function start(e){down=true;last=pos(e);wrap.classList.add('touched');brush(last,last);e.preventDefault()}
+function move(e){if(gone()){document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',end);return}if(!down)return;var p=pos(e);brush(last,p);last=p;e.preventDefault();var now=Date.now();if(now-checkAt>120){checkAt=now;if(progress()>0.42)finish()}}
+function end(){if(!down)return;down=false;if(progress()>0.42)finish()}
+cv.addEventListener('mousedown',start);document.addEventListener('mousemove',move);document.addEventListener('mouseup',end);
+cv.addEventListener('touchstart',start,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
+if(rv){rv.style.display='';rv.onclick=finish}
+paint();
+if(window.ResizeObserver){try{var ro=new ResizeObserver(function(){if(wrap.classList.contains('done')||gone()){ro.disconnect();return}var r=wrap.getBoundingClientRect();if(r.width&&(Math.round(r.width)!==W||Math.round(r.height)!==H))paint()});ro.observe(wrap)}catch(e){}}}
 /* ---- DESKTOP TOP BAR v4: mirrors the profile header, proxies to the existing buttons ---- */
 (function(){var me=$('#dMe'),mn=$('#dmenu'),av=$('#dAv'),hd=$('#dHandle');if(!me||!mn)return;
 function syncTop(){var g=$('#profguest'),so=$('#pSignout'),guest=!!(g&&g.style.display==='block');
@@ -2526,9 +2581,8 @@ return cv}
 function dailyCardHTML(){if(!DAILY)return'';
 var done=DAILYN===1?'1 member did it today.':DAILYN>1?DAILYN+' members did it today.':'Be the first today.';
 return '<article class="post dailycard"><div class="micro" style="color:var(--forest)">Today\u2019s Deed \u00B7 No. '+DAILY.day_no+'</div>'+
-'<p class="p-body" style="font-weight:800;font-size:19px;margin:8px 0 6px">'+esc(DAILY.act)+'</p>'+
-'<div class="p-time">'+done+'</div>'+
-'<div class="p-acts" style="margin-top:10px"><button class="pa lit" id="dailyGo">Do It. Log It.</button></div></article>'}
+'<div class="dd-wrap" id="ddwrap"><div class="dd-under"><div class="dd-act">'+esc(DAILY.act)+'</div><div class="p-time">'+done+'</div></div></div>'+
+'<div class="dd-acts"><button class="pa lit" id="dailyGo" style="display:none">Do It. Log It.</button><button class="pa reveal" id="ddReveal">Reveal it.</button></div></article>'}
 function loadDaily(){if(!sb)return;
 sb.rpc('get_daily_deed',{p_date:ymd(new Date())}).then(function(r){
 if(r.error||!r.data||!r.data.length)return;
@@ -2536,7 +2590,8 @@ DAILY=r.data[0];
 sb.from('daily_counts').select('n').eq('daily_no',DAILY.day_no).maybeSingle().then(function(c){
 DAILYN=(c.data&&c.data.n)||0;renderFeed()}).catch(function(){renderFeed()})
 }).catch(function(){})}
-function wireDaily(){var b=$('#dailyGo');if(!b)return;b.onclick=function(){
+function wireDaily(){var w=$('#ddwrap');if(w&&typeof scratchMount==='function')scratchMount(w,{key:'dd-deed-'+ymd(new Date()),label:'Today\u2019s Deed.',sub:'No. '+(DAILY?DAILY.day_no:''),reveal:'#ddReveal',onDone:function(){var g=$('#dailyGo');if(g)g.style.display=''}});
+var b=$('#dailyGo');if(!b)return;b.onclick=function(){
 if(!PROFILE){openJoin();return}
 DAILYLOG=DAILY?DAILY.day_no:0;chainParentLive=null;chainLinkLive=0;chainLink=0;CAMPLOG=null;var _cp1=$('#logcamp');if(_cp1)_cp1.style.display='none';
 openCompose('deed');
@@ -3042,23 +3097,25 @@ EDITCUR=null;closeSheets();renderFeed();renderProfile();
 toast('SAVED.')
 }).catch(function(e){bb.textContent='Save It.';toast('Could not save it: '+String(e&&e.message||e))})};
 
-/* ---- reminders that save ---- */
-var CADMAP={'Weekly.':'weekly','Monthly.':'monthly','None.':'none'};
-function paintCad(cad){var t=cad==='weekly'?'Weekly.':cad==='monthly'?'Monthly.':'None.';
-$$('.remchip').forEach(function(x){x.classList.toggle('on',x.textContent===t)});
-my.remind=t;renderProfMeta()}
+/* ---- the Daily Dose: on or off, saved (the reminder mailer folded into it) ---- */
+function paintDose(on){var t=on?'On.':'Off.';$$('.remchip').forEach(function(x){x.classList.toggle('on',x.textContent===t)});my.remind=t;renderProfMeta()}
 function loadPrefs(){if(!sb||!PROFILE)return;
-sb.from('notification_prefs').select('reminder_cadence').eq('profile_id',PROFILE.id).maybeSingle().then(function(r){
-if(r.error||!r.data)return;
-var vv=r.data.reminder_cadence;paintCad(vv?String(vv).toLowerCase():'none')}).catch(function(){})}
+sb.from('notification_prefs').select('daily_dose').eq('profile_id',PROFILE.id).maybeSingle().then(function(r){
+if(r.error||!r.data)return;paintDose(r.data.daily_dose!==false)}).catch(function(){})}
 $$('.remchip').forEach(function(b){b.onclick=function(){
-var t=b.textContent,cad=CADMAP[t]||'none';
-if(!liveOn||!PROFILE){$$('.remchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');my.remind=t;renderProfMeta();toast(t==='None.'?'No reminders. The door stays open.':t+' A small deed still counts.');return}
+var t=b.textContent,on=b.getAttribute('data-dose')==='1';
+if(!liveOn||!PROFILE){$$('.remchip').forEach(function(x){x.classList.remove('on')});b.classList.add('on');my.remind=t;renderProfMeta();toast(on?'The Dose is on.':'The Dose is off.');return}
 b.textContent='...';
-sb.rpc('set_reminder_cadence',{p_cadence:cad}).then(function(r){b.textContent=t;
+sb.rpc('set_daily_dose',{p_on:on}).then(function(r){b.textContent=t;
 if(r.error){toast('Could not save: '+r.error.message);return}
-paintCad(cad);toast(cad==='none'?'Saved. No reminders. The door stays open.':'Saved. '+t+' A small deed still counts.')
+paintDose(on);toast(on?'Saved. One verse, one deed, every morning at six.':'Saved. The Dose is off. The door stays open.')
 }).catch(function(e){b.textContent=t;toast('Could not save: '+String(e&&e.message||e))})}});
+/* ---- the unsubscribe link in every Dose lands here ---- */
+function unsubArrival(){var m=location.search.match(/[?&]unsub=([0-9a-fA-F-]{36})/);if(!m||!sb)return;
+sb.rpc('unsubscribe_dose',{p_token:m[1]}).then(function(r){
+if(r.error){toast('That link did not work: '+r.error.message);return}
+toast(r.data===false?'That link was already used. The Dose is off.':'The Dose is stopped for this address. The door stays open.');
+try{history.replaceState(null,'',location.pathname)}catch(e){}}).catch(function(){})}
 
 /* ---- sign in or join: one door, one code ---- */
 function openJoin(){closeSheets();
@@ -3738,7 +3795,7 @@ renderFeed();
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
 var blk=$('#impblock');if(blk)blk.style.display='none';
-guestUI();loadStats();loadFeed();loadDaily();subRealtime();
+guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();
 sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;
 if(s){SESSION=s;loadProfile(0)}}).catch(function(){});
 sb.auth.onAuthStateChange(function(ev,s){
@@ -3961,7 +4018,23 @@ var rs=J('foList').querySelectorAll('[data-fj]');for(var q=0;q<rs.length;q++)rs[
 function openForty(){fortyList();if(window.sheet)sheet('#fortysheet')}
 J('rd40').onclick=openForty;
 /* ---- shelf ---- */
-function renderShelf(){var pg=J('pg-read');if(!pg)return;loadRL();
+/* ---- today's verse: the same draw the Daily Dose carries, scratched ---- */
+var VS=null,vsTries=0;
+function vsYmd(){var d=new Date();function p(n){return(n<10?'0':'')+n}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+function vsDay(){var d=new Date(),W=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'],M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return W[d.getDay()]+' \u00B7 '+d.getDate()+' '+M[d.getMonth()]}
+function parseRef(ref){var m=String(ref||'').match(/^(.+?)\s+(\d+):(\d+)/);if(!m)return null;var nm=m[1].toLowerCase();for(var i=0;i<BOOKS.length;i++){if(BOOKS[i][0].toLowerCase()===nm)return{b:i+1,c:+m[2],v:+m[3]}}return null}
+function loadVerse(){var card=J('wdVerseCard');if(!card||VS)return;
+if(!window.sb){if(vsTries++<40)setTimeout(loadVerse,500);return}
+window.sb.rpc('get_daily_verse',{p_date:vsYmd()}).then(function(r){if(r.error||!r.data||!r.data.length)return;VS=r.data[0];
+J('vsText').textContent=String(VS.verse_text||'');
+J('vsRef').textContent=(String(VS.ref||'')+' \u00B7 '+String(VS.tr||'WEB')).toUpperCase();
+var hl=J('vsLine');hl.textContent=String(VS.house_line||'');hl.style.display=VS.house_line?'':'none';
+var bc=parseRef(VS.ref),rb=J('vsRead');if(bc)rb.onclick=function(){openReader(bc.b,bc.c,bc.v)};
+card.style.display='';
+if(typeof window.scratchMount==='function')window.scratchMount(J('vswrap'),{key:'dd-verse-'+vsYmd(),label:'Today\u2019s Verse.',sub:vsDay(),reveal:'#vsReveal',onDone:function(){if(bc)rb.style.display=''}});
+else{J('vswrap').classList.add('done');if(bc)rb.style.display=''}
+}).catch(function(){})}
+function renderShelf(){var pg=J('pg-read');if(!pg)return;loadRL();loadVerse();
 var p=portion();
 J('wdDayL').textContent='Today\u2019s Reading \u00B7 Day '+p.day+' of 365';
 var h='';p.list.forEach(function(bc){var done=RL[rlKey(bc[0],bc[1])];
