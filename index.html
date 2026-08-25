@@ -942,6 +942,84 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .paper{padding:44px 46px 64px}
  .paper.tf{padding-right:88px}
 }
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.6) ============ */
+#prow{align-items:center;flex-wrap:wrap;gap:10px}
+#prow .plab{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-right:2px}
+#prow .lchip svg{vertical-align:-4px;margin-right:6px}
+#prow .lchip.on svg path,#prow .lchip.on svg circle{stroke:#F6F3EB}
+#eggpane{border:1px solid var(--line);border-radius:16px;padding:18px 16px 14px;margin-top:14px;background:var(--card)}
+#eggpane .ehead{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:1.45rem;color:var(--ink)}
+#eggpane .esub{font-size:13px;color:var(--muted);margin:4px 0 12px}
+.efills{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.efill{appearance:none;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 8px 10px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+.efill:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.efill svg{display:block;margin:0 auto 7px}
+.efill .fl{font-weight:700;font-size:13.5px}
+.efill .fs{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.35}
+.efill.on{border-color:var(--forest);box-shadow:inset 0 0 0 1.4px var(--forest)}
+#estyle,#eprompt{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#eprompt .epnote{font-size:11.5px;color:var(--muted)}
+#precount{margin-top:8px;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+#inknote{margin-top:12px;font-size:10.5px;letter-spacing:.13em;color:#6C5B93}
+/* egg feed card */
+.eggzone{text-align:center;padding:6px 0 2px}
+.egghl{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.4rem,4.6vw,1.9rem);line-height:1.12;color:var(--ink);margin:6px 0 2px}
+.eggart{position:relative;width:min(62vw,290px);margin:4px auto 0;border:0;background:transparent;padding:0;cursor:pointer;display:block}
+.eggart:focus-visible{outline:3px solid var(--forest);outline-offset:8px;border-radius:24px}
+.eggart .erip{position:absolute;left:50%;bottom:-4%;width:118%;transform:translateX(-50%);pointer-events:none}
+.eggart .espark{position:absolute;left:50%;top:-6%;width:96%;transform:translateX(-50%);opacity:0;transition:opacity .5s ease;pointer-events:none}
+.eggart .emain{position:relative;width:100%;height:auto;display:block;filter:drop-shadow(0 16px 20px rgba(105,68,4,.16))}
+.eggart:hover .emain{animation:eggready 900ms ease-in-out infinite alternate}
+.eggart.busy .emain{animation:eggshake 240ms ease-in-out infinite}
+.eggart.opened .espark{opacity:.9}
+@keyframes eggready{from{transform:rotate(-.55deg) translateY(0)}to{transform:rotate(.55deg) translateY(-3px)}}
+@keyframes eggshake{0%{transform:rotate(-1.1deg)}50%{transform:rotate(1.2deg)}100%{transform:rotate(-.6deg)}}
+.eggline{font-size:14.5px;color:var(--muted);margin:12px 0 12px}
+.eggbtn{letter-spacing:.12em}
+.eggfail{font-size:13px;color:#8A2F22;margin-top:10px}
+.eggin{animation:eggin .42s ease both}
+@keyframes eggin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fillchip{display:inline-block;font-size:10px;letter-spacing:.16em;color:var(--forest);border:1px solid var(--forest);border-radius:999px;padding:4px 10px;margin:2px 0 10px}
+.etreatwrap{margin:4px auto 10px;width:min(72%,300px)}
+.etreatart{width:100%;height:auto;display:block}
+.tdrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:6px 0 4px}
+.tdb{appearance:none;font:inherit;font-weight:700;font-size:13.5px;border-radius:999px;padding:9px 16px;cursor:pointer;border:1px solid var(--forest);background:var(--forest);color:#F6F3EB}
+.tdb.gh{background:transparent;color:var(--forest)}
+.tdb:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.tdmicro{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-top:6px}
+/* disappearing ink feed card */
+.inkcol{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:url(note-ink-ivory.webp) center/cover}
+.inkcol .it{flex:1;min-width:0}
+.inkcol .im{font-size:10px;letter-spacing:.16em;color:#6C5B93}
+.inkcol .il{font-size:14.5px;color:var(--ink);margin-top:3px}
+.inkopenb{appearance:none;font:inherit;font-weight:700;font-size:13px;border:1px solid var(--forest);background:var(--forest);color:#F6F3EB;border-radius:999px;padding:9px 15px;cursor:pointer;flex:0 0 auto}
+.inkopenb:focus-visible,.pblbar:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.inkcard{position:relative;border-radius:18px;padding:26px 22px 20px;background:url(note-ink-ivory.webp) center/cover;min-height:150px;overflow:hidden;touch-action:auto}
+.inkcard.faded{background-image:url(note-ink-faded.webp)}
+.inkcard.uv{background-image:url(note-ink-uv.webp);touch-action:none}
+.inkwords{font-family:"Caveat","Special Elite",cursive;font-size:1.6rem;line-height:1.38;color:#173F35;white-space:pre-wrap;word-wrap:break-word;transition:opacity 2s ease,filter 2s ease,color 2s ease}
+.inkcard.fading .inkwords{opacity:.12;filter:blur(1.2px);color:#B8B0B8}
+.inkcard.faded .inkwords{opacity:.1;filter:blur(1px);color:#B8B0B8;transition:none}
+.inkcard.uv .inkwords{opacity:1;filter:none;color:#F7F0FF;text-shadow:0 0 2px #C7A6FF,0 0 11px #8C5CFF;transition:none;
+-webkit-mask-image:radial-gradient(circle 130px at var(--lx,-999px) var(--ly,-999px),#000 0 52%,rgba(0,0,0,.28) 78%,transparent 100%);mask-image:radial-gradient(circle 130px at var(--lx,-999px) var(--ly,-999px),#000 0 52%,rgba(0,0,0,.28) 78%,transparent 100%)}
+.inkcard.uv.allrev .inkwords{-webkit-mask-image:none;mask-image:none}
+.inkbeam{position:absolute;left:0;top:0;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;pointer-events:none;opacity:0;
+background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 24%,rgba(155,104,255,.22) 53%,rgba(112,67,218,.10) 76%,rgba(112,67,218,0) 100%)}
+.inkcard.uv .inkbeam{opacity:1;transform:translate(var(--lx,-999px),var(--ly,-999px))}
+.inkcard.uv.allrev .inkbeam{opacity:0}
+.inkstate{font-size:10px;letter-spacing:.16em;color:#8C7FB0;margin:14px 0 0}
+.inkfoot{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px}
+.pblbar{appearance:none;font:inherit;display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;border-radius:999px;padding:12px 18px;cursor:pointer;font-weight:800;letter-spacing:.14em;font-size:12.5px;border:1px solid #C5BECC;background:#FBF7EF;color:#211B2D}
+.pblbar.on{background:linear-gradient(100deg,#2A1E4E,#1B1233);border-color:#4A3B78;color:#F4EFFF}
+.pblbar .tg{margin-left:auto;width:44px;height:24px;border-radius:999px;background:#D8D2DF;border:1px solid #C5BECC;position:relative;flex:0 0 auto}
+.pblbar .tg::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#FFF;transition:left .18s ease}
+.pblbar.on .tg{background:#D9C7FF;border-color:rgba(255,255,255,.7)}
+.pblbar.on .tg::after{left:22px}
+.inkhelp{font-size:12px;color:#8C7FB0;margin-top:9px}
+.inkacts{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.inkacts button{appearance:none;background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--forest);text-decoration:underline;cursor:pointer}
+@media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}}
+@media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.busy .emain{animation:none!important}.eggin{animation:none}.inkwords{transition:none}}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1509,6 +1587,26 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
       <div class="lsnote" id="lsnote">THE PHOTO AS IT IS.</div>
     </div>
   </div>
+  <div class="logrow" id="prow" style="display:none">
+    <span class="micro plab">MAKE IT SPECIAL.</span>
+    <button class="lchip" id="presInk" type="button" aria-pressed="false" aria-label="Write it in disappearing ink"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M5 19.2 6.1 15 16.4 4.7a2.2 2.2 0 0 1 3.1 0l.1.1a2.2 2.2 0 0 1 0 3.1L9.3 18.2 5 19.2Z" stroke="#1F4B3A" stroke-width="1.8" stroke-linejoin="round"/><path d="m15 6.1 3 3M6.2 15l3.1 3.2M4 21h16" stroke="#1F4B3A" stroke-width="1.8" stroke-linecap="round"/></svg>Disappearing Ink.</button>
+    <button class="lchip" id="presEgg" type="button" aria-pressed="false" aria-label="Hide this post in a Golden Egg"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g" x1="6" y1="4" x2="19" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#F6DA7C"/><stop offset=".5" stop-color="#C99B35"/><stop offset="1" stop-color="#8B5D17"/></linearGradient></defs><path d="M12 2.8c-3 0-7 6.5-7 11.6A7 7 0 0 0 19 14.4C19 9.3 15 2.8 12 2.8Z" fill="url(#g)" stroke="#8B5D17" stroke-width="1.2"/><path d="M9.1 7.5c.8-1.5 1.8-2.6 2.7-2.8" stroke="#FFF5C7" stroke-width="1.4" stroke-linecap="round" opacity=".8"/></svg>Golden Egg.</button>
+  </div>
+  <div id="eggpane" style="display:none">
+    <div class="ehead">What&#39;s inside?</div>
+    <div class="esub">The viewer won&#39;t know until the egg opens.</div>
+    <div class="efills">
+      <button class="efill" type="button" data-ef="treat"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="#F8F4EC"/><path d="m19 27 9-5h8l9 5-4 10-9 5-9-5-4-10Z" fill="#C79A37"/><path d="m19 27-8-5 3 10-3 8 12-3M45 27l8-5-3 10 3 8-12-3" fill="#1F4B3A"/><path d="M28 22h8M23 37l9 5 9-5" stroke="#8B5D17" stroke-width="2" stroke-linecap="round"/></svg><span class="fl">Treat</span><span class="fs">Candy or chocolate.</span></button>
+      <button class="efill" type="button" data-ef="kind_words"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="#F8F4EC"/><path d="M32 47S15 38 15 25.5C15 18 24 15 32 23c8-8 17-5 17 2.5C49 38 32 47 32 47Z" fill="#1F4B3A"/><path d="M22 27c1-4 5-5 8-2" stroke="#F8F4EC" stroke-width="2.5" stroke-linecap="round" opacity=".7"/></svg><span class="fl">Kind Words</span><span class="fs">Something they&#39;ll remember.</span></button>
+      <button class="efill" type="button" data-ef="wisdom"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="#F8F4EC"/><path d="M20 16h19a7 7 0 0 1 7 7v25H27a7 7 0 0 0-7 7V16Z" fill="#1F4B3A"/><path d="M20 16h19a7 7 0 0 1 7 7v25H27a7 7 0 0 0-7 7M27 24h12M27 31h12M27 38h8" stroke="#F8F4EC" stroke-width="2.2" stroke-linecap="round"/></svg><span class="fl">Wisdom</span><span class="fs">A thought worth keeping.</span></button>
+      <button class="efill" type="button" data-ef="tiny_deed"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="#F8F4EC"/><path d="M17 32c7-1 10 1 15 8 5-7 8-9 15-8-1 12-7 18-15 18s-14-6-15-18Z" fill="#1F4B3A"/><path d="M32 40c0-10 1-16 8-24M32 40c0-7-2-12-8-17M34 30l8-1M29 31l-7-2" stroke="#C79A37" stroke-width="2.4" stroke-linecap="round"/></svg><span class="fl">Tiny Deed</span><span class="fs">One small, genuine action.</span></button>
+      <button class="efill" type="button" data-ef="surprise"><svg width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="#F8F4EC"/><path d="m32 13 3.5 11.5L47 28l-11.5 3.5L32 43l-3.5-11.5L17 28l11.5-3.5L32 13Z" fill="#C79A37"/><path d="m48 39 1.8 5.2L55 46l-5.2 1.8L48 53l-1.8-5.2L41 46l5.2-1.8L48 39ZM17 39l1.2 3.8L22 44l-3.8 1.2L17 49l-1.2-3.8L12 44l3.8-1.2L17 39Z" fill="#1F4B3A"/></svg><span class="fl">Surprise Me</span><span class="fs">Let DEEDS. choose.</span></button>
+    </div>
+    <div id="estyle" style="display:none"><span class="micro plab">THE TREAT.</span><button class="lchip on" type="button" data-es="candy">Candy.</button><button class="lchip" type="button" data-es="chocolate">Chocolate.</button></div>
+    <div id="eprompt" style="display:none"><button class="lchip" type="button" id="epGive">Give Me a Prompt.</button><span class="epnote">Or invite one small, genuine thing in your own words.</span></div>
+  </div>
+  <div class="micro" id="inknote" style="display:none">THE INK FADES AFTER IT IS READ. BLACK LIGHT BRINGS IT BACK.</div>
+  <div id="precount" style="display:none"></div>
   <div class="logsub"><button class="logbtn" id="logsubmit">Log It.</button></div>
 </div>
 
@@ -2434,7 +2532,7 @@ h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
 if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
-h+='<p class="p-body">'+esc(body)+'</p>';
+h+=presBodyHTML(r,body,mine,nm);
 var mlive=!r.media_status||r.media_status==='live';
 if(r.media_path&&mlive){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
@@ -3282,15 +3380,18 @@ if(!liveOn){baseSubmit&&baseSubmit();return}
 if(!PROFILE){closeSheets();openJoin();return}
 var txt=$('#logtext').value.trim();if(!txt){toast(composeMode==='post'?'Say something first.':'Write it first.');return}
 if(composeMode==='second'){toast('Seconds go live in the next build.');return}
-if(composeMode==='post'){var pb=$('#logsubmit');pb.textContent='POSTING...';
+if(composeMode==='post'){var pb=$('#logsubmit');
+var EPOST=presPrepare(txt);if(!EPOST)return;txt=EPOST.body;
+pb.textContent='POSTING...';
 uploadPhoto(function(m,uerr){
 if(uerr){pb.textContent='Post It.';toast('The photo did not upload: '+uerr);return}
 var pay={profile_id:PROFILE.id,body:txt};
+if(EPOST.fields){pay.presentation_type=EPOST.fields.p;if(EPOST.fields.f)pay.egg_filling=EPOST.fields.f;if(EPOST.fields.s)pay.egg_treat_style=EPOST.fields.s}
 if(m){pay.media_path=m.path;pay.media_kind='photo';pay.media_w=m.w;pay.media_h=m.h}
 sb.from('posts').insert(pay).select().single().then(function(r){
 pb.textContent='Post It.';
-if(r.error){toast('Could not post it: '+r.error.message);return}
-clearPhoto();if(pay.media_path)publishMedia('post',r.data.id);prependLive(markKind(r.data,'post'));closeSheets();toast('POSTED.')
+if(r.error){if(EPOST.fields&&/presentation_type|egg_filling|egg_treat_style/i.test(r.error.message||'')){var plain={profile_id:PROFILE.id,body:txt};if(pay.media_path){plain.media_path=pay.media_path;plain.media_kind=pay.media_kind;plain.media_w=pay.media_w;plain.media_h=pay.media_h}sb.from('posts').insert(plain).select().single().then(function(r2){if(r2.error){toast('Could not post it: '+r2.error.message);return}clearPhoto();prependLive(markKind(r2.data,'post'));closeSheets();presReset();toast('Posted plain. Run patch 37 to unlock the egg and the ink.')}).catch(function(){toast('Could not post it.')});return}toast('Could not post it: '+r.error.message);return}
+clearPhoto();if(pay.media_path)publishMedia('post',r.data.id);prependLive(markKind(r.data,'post'));closeSheets();presReset();toast('POSTED.')
 }).catch(function(e){pb.textContent='Post It.';toast('Could not post it: '+String(e&&e.message||e))})});
 return}
 var chipEl=$('#logdates .lchip.on');var chipTxt=chipEl?chipEl.textContent:'Today.';
@@ -4272,6 +4373,191 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    if the CDN never answers. ---- */
 renderFeed();
 
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.6) ============ */
+var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},TDST={},TDSWAP={};
+var EGGSEEN={},INKSEEN={};
+try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
+try{INKSEEN=JSON.parse(localStorage.getItem('deeds_inks')||'{}')||{}}catch(e){}
+function presSave(){try{localStorage.setItem('deeds_eggs',JSON.stringify(EGGSEEN));localStorage.setItem('deeds_inks',JSON.stringify(INKSEEN))}catch(e){}}
+var EGGSEEDS={"version":1,"note":"Original seed copy for Surprise Me. Curate and rotate; do not show the category before reveal.","treat":[{"style":"candy","text":"A little sweetness for your scroll."},{"style":"chocolate","text":"You found the chocolate. Good choice."},{"style":"candy","text":"No reason. Just something good."},{"style":"chocolate","text":"Consider this your tiny reward for showing up."},{"style":"candy","text":"Life is serious enough. Take the candy."},{"style":"chocolate","text":"One small piece of good news: this is for you."}],"kind_words":["You make ordinary moments feel cared for.","Your steadiness matters more than you realize.","Someone is better because you showed up.","You have a way of making people feel seen.","The good you do quietly still counts.","Your effort is visible even when it is not celebrated.","You bring calm into rooms that need it.","You are allowed to be proud of how far you have come."],"wisdom":["A kind life is built in small rooms no one applauds.","The right thing rarely needs an audience.","Attention is one of the purest forms of generosity.","A sincere sentence can outlive a spectacular gesture.","Leave people lighter than you found them.","Rest is not quitting. It is part of returning well.","What you repeat becomes the atmosphere around you.","The smallest honest action can change the temperature of a room.","People remember how safe they felt around you.","Listening is often the most useful thing you can give."]};
+var DEEDPROMPTS=[{"category":"connection","text":"Call someone you love and name one specific thing you appreciate about them."},{"category":"connection","text":"Send a sincere voice note to someone you have not checked on lately."},{"category":"connection","text":"Ask an older relative or friend to tell you one of their favorite memories."},{"category":"connection","text":"Reach out to someone you miss without asking them for anything."},{"category":"connection","text":"Tell a friend exactly why their friendship matters to you."},{"category":"connection","text":"Invite someone who may feel left out to join you for something simple."},{"category":"connection","text":"Put your phone away and give someone ten uninterrupted minutes."},{"category":"connection","text":"Check in on someone who may be carrying more than they show."},{"category":"connection","text":"Send a photo that holds a good shared memory and say why you kept it."},{"category":"connection","text":"Ask someone how they are doing, then stay long enough to hear the real answer."},{"category":"gratitude","text":"Thank someone whose work usually goes unnoticed."},{"category":"gratitude","text":"Tell a coworker one thing they consistently do well."},{"category":"gratitude","text":"Write a short thank-you note to someone who taught you something useful."},{"category":"gratitude","text":"Leave a positive review for a small business that earned it."},{"category":"gratitude","text":"Thank a service worker by name and mean it."},{"category":"gratitude","text":"Tell a family member about a sacrifice of theirs you still remember."},{"category":"gratitude","text":"Send a former teacher or mentor one sentence about the difference they made."},{"category":"gratitude","text":"Name one ordinary thing someone does that makes your life better."},{"category":"gratitude","text":"Share credit with the person who helped you succeed."},{"category":"gratitude","text":"Give someone a genuine compliment that has nothing to do with appearance."},{"category":"care","text":"Check on someone who is sick, grieving, or having a difficult week."},{"category":"care","text":"Offer one specific kind of help instead of saying, ‘Let me know if you need anything.’"},{"category":"care","text":"Bring water or a snack to someone working hard nearby."},{"category":"care","text":"Give someone permission to rest without making them feel guilty."},{"category":"care","text":"Ask a caregiver how they are doing, not only how the person they care for is doing."},{"category":"care","text":"Leave an encouraging message for someone facing a hard decision."},{"category":"care","text":"Do one household task that usually falls to someone else."},{"category":"care","text":"Make space for someone who is quiet to speak."},{"category":"care","text":"Offer to listen without immediately trying to fix the problem."},{"category":"care","text":"Remind someone of a hard thing they already survived."},{"category":"service","text":"Pick up five pieces of litter on your next walk."},{"category":"service","text":"Return a shopping cart that is not yours."},{"category":"service","text":"Let someone go ahead of you when they clearly need the break."},{"category":"service","text":"Leave a shared space better than you found it."},{"category":"service","text":"Help someone carry something awkward or heavy if they welcome the help."},{"category":"service","text":"Give away one useful item you no longer need."},{"category":"service","text":"Take care of a small problem before someone else has to ask."},{"category":"service","text":"Hold the door and make eye contact instead of rushing through."},{"category":"service","text":"Share a useful introduction between two people who would genuinely benefit."},{"category":"service","text":"Make one part of tomorrow easier for someone else today."}];
+var EGGFRAMES=['egg-frame-sealed.webp','egg-frame-crack.webp','egg-frame-glow.webp','egg-frame-open.webp'];
+var EGGLOADED=false;function preloadEgg(){if(EGGLOADED)return;EGGLOADED=true;EGGFRAMES.forEach(function(s){var i=new Image();i.src=s})}
+function presRM(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+var FILLLABEL={treat:'A LITTLE TREAT',kind_words:'WORDS FOR YOU',wisdom:'A LITTLE WISDOM',tiny_deed:'A TINY DEED',surprise:'A LITTLE SURPRISE'};
+var TREATCANDY='<svg class="etreatart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 320" fill="none"><defs><linearGradient id="gold" x1="126" y1="60" x2="376" y2="260" gradientUnits="userSpaceOnUse"><stop stop-color="#F5DB80"/><stop offset=".48" stop-color="#C99A34"/><stop offset="1" stop-color="#8B5A14"/></linearGradient></defs><path d="m178 117 51-29h54l51 29-24 86-54 29-54-29-24-86Z" fill="url(#gold)" stroke="#815311" stroke-width="6"/><path d="m178 117-74-43 24 67-30 57 104 5-24-86ZM334 117l74-43-24 67 30 57-104 5 24-86Z" fill="#1F4B3A" stroke="#083D30" stroke-width="6" stroke-linejoin="round"/><path d="M229 88h54M202 203l54 29 54-29" stroke="#FFF2BB" stroke-width="8" stroke-linecap="round" opacity=".65"/><circle cx="256" cy="150" r="30" fill="#FFF4C7" opacity=".38"/></svg>';
+var TREATCHOC='<svg class="etreatart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 320" fill="none"><defs><linearGradient id="wrap" x1="110" y1="72" x2="412" y2="248" gradientUnits="userSpaceOnUse"><stop stop-color="#F3D675"/><stop offset=".5" stop-color="#C5942C"/><stop offset="1" stop-color="#7F500E"/></linearGradient></defs><path d="M106 90h300v140H106z" fill="url(#wrap)" stroke="#80520E" stroke-width="6"/><path d="m106 90-54 35 54 20M406 90l54 35-54 20M106 230l-54-35 54-20M406 230l54-35-54-20" fill="#1F4B3A" stroke="#083D30" stroke-width="6" stroke-linejoin="round"/><rect x="165" y="74" width="182" height="172" rx="10" fill="#4A291B" stroke="#2D1710" stroke-width="7"/><path d="M210 74v172M256 74v172M302 74v172M165 117h182M165 160h182M165 203h182" stroke="#2D1710" stroke-width="6"/><path d="M177 87h21v18h-21zM222 87h21v18h-21z" fill="#7D4A34" opacity=".65"/></svg>';
+function presPick(a){return a[Math.floor(Math.random()*a.length)]}
+/* ---- feed card bodies ---- */
+function presBodyHTML(r,body,mine,nm){
+if(r._k!=='post'||!r.presentation_type||r.presentation_type==='standard'||r.presentation_type==='photo')return '<p class="p-body">'+esc(body)+'</p>';
+if(r.presentation_type==='golden_egg'){preloadEgg();
+if(mine||EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
+return presEggSealedHTML(r,nm)}
+if(r.presentation_type==='disappearing_note')return presInkHTML(r,body,mine);
+return '<p class="p-body">'+esc(body)+'</p>'}
+function presEggSealedHTML(r,nm){
+var h='<div class="eggzone" data-eggzone="'+esc(r.id)+'">';
+h+='<div class="egghl">'+esc(nm.handle)+' left a Golden Egg.</div>';
+h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" aria-label="Sealed Golden Egg. Activate to reveal the post."><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="egg-frame-sealed.webp" alt=""></button>';
+h+='<div class="eggline">Crack it to reveal the post.</div>';
+h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">GET CRACKIN&#39;</button>';
+h+='</div>';return h}
+function presEggOpenHTML(r,body,mine){
+var h='<div class="eggin"><span class="fillchip">'+(FILLLABEL[r.egg_filling]||'A LITTLE SURPRISE')+'</span>';
+if(r.egg_filling==='treat')h+='<div class="etreatwrap">'+(r.egg_treat_style==='chocolate'?TREATCHOC:TREATCANDY)+'</div>';
+h+='<p class="p-body">'+esc(body)+'</p>';
+if(r.egg_filling==='tiny_deed'&&!mine){var st=TDST[r.id];var cur=TDSWAP[r.id]||body;
+if(TDSWAP[r.id])h+='<div class="tdmicro">ANOTHER FROM THE POOL.</div><p class="p-body">'+esc(cur)+'</p>';
+h+='<div class="tdrow">';
+if(!st)h+='<button class="tdb" type="button" data-tdo="'+esc(r.id)+'">I&#39;ll do it.</button><button class="tdb gh" type="button" data-tdn="'+esc(r.id)+'">Try another.</button>';
+else if(st==='accepted')h+='<button class="tdb" type="button" data-tdd="'+esc(r.id)+'">Done.</button><span class="tdmicro">ACCEPTED, PRIVATELY.</span>';
+else if(st==='completed_private')h+='<span class="tdmicro">DONE, PRIVATELY.</span>';
+h+='</div><div class="tdmicro">YOURS TO TAKE OR LEAVE. NO SCOREBOARD.</div>'}
+h+='</div>';return h}
+function presInkHTML(r,body,mine){
+var h='<div class="inkzone" data-inkzone="'+esc(r.id)+'">';
+h+='<div class="inkcol"><div class="it"><div class="im">A NOTE IN DISAPPEARING INK</div><div class="il">Read it while it&#39;s here.</div></div><button class="inkopenb" type="button" data-inko="'+esc(r.id)+'">Open the Note.</button></div>';
+h+='</div>';return h}
+/* ---- egg crack ---- */
+function presFind(id){var r=findLive(id);if(r)return r;var a=(typeof SRES!=='undefined'&&SRES)||[];for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))return a[i];return null}
+function presRedraw(id){var r=presFind(id);if(!r)return;
+$$('article[data-lid="'+id+'"]').forEach(function(a){var t=document.createElement('div');t.innerHTML=livePostHTML(r);var n=t.firstChild;if(n){a.parentNode.replaceChild(n,a)}});
+if(typeof wireLive==='function')wireLive()}
+function presServerReveal(id,st){if(!sb||!PROFILE)return;
+var row={post_id:id,viewer_id:PROFILE.id};if(st)row.deed_status=st;
+sb.from('post_reveals').upsert(row,{onConflict:'post_id,viewer_id'}).then(function(){}).catch(function(){})}
+function crackEgg(id){if(EGGBUSY[id])return;var r=presFind(id);if(!r)return;
+EGGBUSY[id]=1;
+var zone=document.querySelector('[data-eggzone="'+id+'"]');
+var img=zone?zone.querySelector('.emain'):null;
+var art=zone?zone.querySelector('.eggart'):null;
+function done(){EGGSEEN[id]=1;presSave();presServerReveal(id);delete EGGBUSY[id];presRedraw(id)}
+if(!img||presRM()){done();return}
+zone.querySelectorAll('[data-eggo]').forEach(function(b){b.disabled=true});
+if(art){art.classList.add('busy');art.setAttribute('aria-label','Opening Golden Egg')}
+var failed=false;img.onerror=function(){failed=true};
+img.src=EGGFRAMES[1];
+setTimeout(function(){img.src=EGGFRAMES[2];},150);
+setTimeout(function(){img.src=EGGFRAMES[3];if(art){art.classList.remove('busy');art.classList.add('opened');art.setAttribute('aria-label','Opened Golden Egg')}},360);
+setTimeout(function(){if(failed){delete EGGBUSY[id];if(art)art.classList.remove('busy');zone.querySelectorAll('[data-eggo]').forEach(function(b){b.disabled=false});var f=zone.querySelector('.eggfail');if(!f){f=document.createElement('div');f.className='eggfail';f.textContent='This surprise couldn\u2019t open. Try again.';zone.appendChild(f)}return}done()},760)}
+/* ---- tiny deed ---- */
+function tdSet(id,st){TDST[id]=st;presServerReveal(id,st);presRedraw(id)}
+function tdSwapIt(id){var r=presFind(id);if(!r)return;var base=(r.body||'').trim();
+var cat=null;for(var i=0;i<DEEDPROMPTS.length;i++)if(DEEDPROMPTS[i].text===base){cat=DEEDPROMPTS[i].category;break}
+var pool=DEEDPROMPTS.filter(function(p){return (!cat||p.category===cat)&&p.text!==(TDSWAP[id]||base)});
+if(!pool.length)pool=DEEDPROMPTS;
+TDSWAP[id]=presPick(pool).text;presRedraw(id)}
+/* ---- disappearing ink ---- */
+function inkOpen(id){var r=presFind(id);if(!r)return;var mine=PROFILE&&r.profile_id===PROFILE.id;
+var zone=document.querySelector('[data-inkzone="'+id+'"]');if(!zone)return;
+var seen=INKSEEN[id]&&!mine;
+var h='<div class="inkcard'+(seen?' faded':'')+'" data-inkcard="'+esc(id)+'">';
+h+='<div class="inkbeam"></div>';
+h+='<div class="inkwords">'+esc(r.body||'')+'</div>';
+h+='<div class="inkstate" data-inkstate>'+(seen?'FADED \u00B7 BLACK LIGHT BRINGS IT BACK':'READ IT WHILE IT\u2019S HERE.')+'</div>';
+h+='<div class="inkfoot">Some words are meant to be felt, not kept.</div>';
+h+='<button class="pblbar" type="button" data-blt="'+esc(id)+'" aria-pressed="false" style="'+(seen?'':'display:none')+'"><span>BLACK LIGHT</span><span class="tg" aria-hidden="true"></span></button>';
+h+='<div class="inkhelp" data-inkhelp style="display:none">Move the light to reveal.</div>';
+h+='<div class="inkacts"><button type="button" data-blall="'+esc(id)+'" style="display:none">Reveal the whole note.</button><button type="button" data-fold="'+esc(id)+'">Fold It.</button></div>';
+h+='</div>';
+zone.innerHTML=h;
+var card=zone.querySelector('.inkcard');
+inkWire(card);
+if(seen)return;
+var hold=presRM()?5900:4000;
+setTimeout(function(){if(!card.isConnected)return;if(presRM()){card.classList.add('faded')}else{card.classList.add('fading')}},hold);
+setTimeout(function(){if(!card.isConnected)return;card.classList.remove('fading');card.classList.add('faded');
+var st=card.querySelector('[data-inkstate]');if(st)st.textContent='FADED \u00B7 BLACK LIGHT BRINGS IT BACK';
+var b=card.querySelector('[data-blt]');if(b)b.style.display='';
+INKSEEN[id]=1;presSave()},6000)}
+function inkWire(card){
+card.addEventListener('pointermove',function(e){if(!card.classList.contains('uv'))return;inkBeam(card,e)});
+card.addEventListener('pointerdown',function(e){if(!card.classList.contains('uv'))return;inkBeam(card,e)});
+card.addEventListener('pointerleave',function(){card.style.setProperty('--lx','-999px');card.style.setProperty('--ly','-999px')})}
+function inkBeam(card,e){var b=card.getBoundingClientRect();
+card.style.setProperty('--lx',(e.clientX-b.left)+'px');card.style.setProperty('--ly',(e.clientY-b.top)+'px')}
+function inkToggle(id,btn){var card=document.querySelector('[data-inkcard="'+id+'"]');if(!card)return;
+var on=!card.classList.contains('uv');
+card.classList.toggle('uv',on);card.classList.remove('allrev');
+btn.setAttribute('aria-pressed',on?'true':'false');
+btn.classList.toggle('on',on);
+btn.querySelector('span').textContent=on?'BLACK LIGHT ON':'BLACK LIGHT';
+var hp=card.querySelector('[data-inkhelp]');if(hp)hp.style.display=on?'':'none';
+var al=card.querySelector('[data-blall]');if(al){al.style.display=on?'':'none';al.textContent='Reveal the whole note.'}
+if(!on){card.style.setProperty('--lx','-999px');card.style.setProperty('--ly','-999px')}}
+/* ---- delegated clicks ---- */
+document.addEventListener('click',function(e){var t=e.target;var b;
+if((b=t.closest&&t.closest('[data-eggo]'))){e.stopPropagation();crackEgg(b.getAttribute('data-eggo'));return}
+if((b=t.closest&&t.closest('[data-inko]'))){e.stopPropagation();inkOpen(b.getAttribute('data-inko'));return}
+if((b=t.closest&&t.closest('[data-tdo]'))){e.stopPropagation();tdSet(b.getAttribute('data-tdo'),'accepted');return}
+if((b=t.closest&&t.closest('[data-tdd]'))){e.stopPropagation();tdSet(b.getAttribute('data-tdd'),'completed_private');return}
+if((b=t.closest&&t.closest('[data-tdn]'))){e.stopPropagation();tdSwapIt(b.getAttribute('data-tdn'));return}
+if((b=t.closest&&t.closest('[data-blt]'))){e.stopPropagation();inkToggle(b.getAttribute('data-blt'),b);return}
+if((b=t.closest&&t.closest('[data-blall]'))){e.stopPropagation();var card=t.closest('.inkcard');if(card){var on=!card.classList.contains('allrev');card.classList.toggle('allrev',on);b.textContent=on?'Return to the light.':'Reveal the whole note.'}return}
+if((b=t.closest&&t.closest('[data-fold]'))){e.stopPropagation();presRedraw(b.getAttribute('data-fold'));return}});
+/* ---- composer ---- */
+function presPaint(){var bi=$('#presInk'),be=$('#presEgg');
+if(bi){bi.classList.toggle('on',PRES==='disappearing_note');bi.setAttribute('aria-pressed',PRES==='disappearing_note'?'true':'false')}
+if(be){be.classList.toggle('on',PRES==='golden_egg');be.setAttribute('aria-pressed',PRES==='golden_egg'?'true':'false')}
+var ep=$('#eggpane');if(ep)ep.style.display=PRES==='golden_egg'?'':'none';
+var inn=$('#inknote');if(inn)inn.style.display=PRES==='disappearing_note'?'':'none';
+var es=$('#estyle');if(es)es.style.display=(PRES==='golden_egg'&&EGGFILL==='treat')?'flex':'none';
+var epr=$('#eprompt');if(epr)epr.style.display=(PRES==='golden_egg'&&EGGFILL==='tiny_deed')?'flex':'none';
+$$('#eggpane .efill').forEach(function(f){f.classList.toggle('on',f.getAttribute('data-ef')===EGGFILL)});
+$$('#estyle .lchip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-es')===ESTYLE)});
+presCount()}
+function presCount(){var pc=$('#precount');if(!pc)return;
+if(PRES==='standard'){pc.style.display='none';return}
+var n=320-($('#logtext').value||'').length;
+pc.style.display='';pc.textContent=(n>=0?n:0)+' CHARACTERS LEFT'+(n<0?' \u00B7 TOO LONG':'')}
+function presSet(next){if(!liveOn)return;
+if(next===PRES)next='standard';
+if(next!=='standard'&&typeof LPHOTO!=='undefined'&&LPHOTO){
+if(!window.confirm('Switching removes the attached photo. Keep going?'))return;
+try{clearPhoto()}catch(e){}}
+PRES=next;presPaint()}
+function presReset(){PRES='standard';EGGFILL=null;ESTYLE='candy';presPaint()}
+function presPrepare(txt){
+if(!liveOn||composeMode!=='post'||PRES==='standard')return {body:txt,fields:null};
+if(txt.length>320){toast('Keep it under 320 characters.');return null}
+if(PRES==='disappearing_note')return {body:txt,fields:{p:'disappearing_note'}};
+if(!EGGFILL){toast('Choose what goes inside.');return null}
+var fill=EGGFILL,style=null,body=txt;
+if(fill==='treat'){style=ESTYLE||'candy';if(!body){var s=presPick(EGGSEEDS.treat);body=s.text;style=s.style}}
+else if(fill==='surprise'){
+if(body){fill=presPick(['kind_words','wisdom'])}
+else{fill=presPick(['treat','kind_words','wisdom','tiny_deed']);
+if(fill==='treat'){var s2=presPick(EGGSEEDS.treat);body=s2.text;style=s2.style}
+else if(fill==='tiny_deed')body=presPick(DEEDPROMPTS).text;
+else body=presPick(EGGSEEDS[fill])}}
+else if(!body&&(fill==='kind_words'||fill==='wisdom')){body=presPick(EGGSEEDS[fill])}
+if(!body){toast('Put something inside before posting your egg.');return null}
+if(body.length>320){toast('Keep it under 320 characters.');return null}
+return {body:body,fields:{p:'golden_egg',f:fill,s:style}}}
+function presWireComposer(){
+var bi=$('#presInk'),be=$('#presEgg');
+if(bi)bi.onclick=function(){presSet('disappearing_note')};
+if(be)be.onclick=function(){presSet('golden_egg')};
+$$('#eggpane .efill').forEach(function(f){f.onclick=function(){EGGFILL=f.getAttribute('data-ef');presPaint()}});
+$$('#estyle .lchip').forEach(function(c){c.onclick=function(){ESTYLE=c.getAttribute('data-es');presPaint()}});
+var eg=$('#epGive');if(eg)eg.onclick=function(){$('#logtext').value=presPick(DEEDPROMPTS).text;presCount()};
+var lt=$('#logtext');if(lt)lt.addEventListener('input',presCount);
+var pb=$('#logphoto');if(pb){var pold=pb.onclick;pb.onclick=function(ev){if(PRES!=='standard'){PRES='standard';presPaint()}if(pold)pold.call(this,ev)}}}
+presWireComposer();
+var presBaseSwitch=switchMode;
+switchMode=function(m){presBaseSwitch(m);
+var pr=$('#prow');if(pr)pr.style.display=(liveOn&&m==='post')?'flex':'none';
+if(m!=='post'&&PRES!=='standard')presReset();else presPaint()};
+/* ---- per viewer state from the server ---- */
+function presLoadReveals(){if(!sb||!PROFILE)return;
+sb.from('post_reveals').select('post_id,deed_status').eq('viewer_id',PROFILE.id).limit(1000).then(function(r){
+if(r.error||!r.data)return;var ch=false;
+r.data.forEach(function(x){if(!EGGSEEN[x.post_id]){EGGSEEN[x.post_id]=1;ch=true}
+if(x.deed_status&&TDST[x.post_id]!==x.deed_status){TDST[x.post_id]=x.deed_status;ch=true}});
+if(ch){presSave();renderFeed()}}).catch(function(){})}
+var presBaseApply=applyProfile;
+applyProfile=function(p){presBaseApply(p);try{presLoadReveals()}catch(e){}};
 /* ---- boot ---- */
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
