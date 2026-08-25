@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>You're invited to DEEDS.</title>
+<meta name="description" content="A sealed note is waiting for you. Open it when you're ready.">
+<meta name="theme-color" content="#1F4B3A">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DEEDS.">
+<meta property="og:title" content="You're invited to DEEDS.">
+<meta property="og:description" content="A sealed note is waiting for you. Open it when you're ready.">
+<meta property="og:image" content="https://deeds.fun/invite-note-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://deeds.fun/i/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="You're invited to DEEDS.">
+<meta name="twitter:description" content="A sealed note is waiting for you. Open it when you're ready.">
+<meta name="twitter:image" content="https://deeds.fun/invite-note-og.jpg">
+<link rel="icon" href="/icon-192.png">
+<style>
+:root{--forest:#1F4B3A;--forest2:#173F35;--ivory:#F6F3EB;--gold:#C9A55A;--gold2:#A6843E;--ink:#2B2A26;--mist:#B9C9BF;--pw:360px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--forest);color:var(--ivory);font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:max(18px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom))}
+.mast{margin:26px 0 22px;text-align:center}
+.mast .wm{font-size:22px;letter-spacing:.42em;color:var(--gold);text-indent:.42em;text-decoration:none}
+.mast .rule{width:120px;height:1px;background:rgba(201,165,90,.55);margin:14px auto 0;position:relative}
+.mast .rule:after{content:"";position:absolute;left:50%;top:-3px;width:7px;height:7px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}
+.stage{width:min(100%,520px);position:relative}
+.plate{position:relative;width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.25);background:#EEE0D1;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+.plate:focus-visible{box-shadow:0 0 0 3px var(--gold),0 30px 60px rgba(0,0,0,.35)}
+.plate img{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .7s ease;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.plate img.open{opacity:0}
+.plate.opened img.open{opacity:1}
+.plate.opened img.sealed{opacity:0}
+.plate.opened{cursor:default}
+.plate.tap img.sealed{animation:jolt .32s ease}
+@keyframes jolt{0%{transform:scale(1)}35%{transform:scale(.985)}70%{transform:scale(1.008)}100%{transform:scale(1)}}
+.plate.loading img{opacity:0}
+.plate .skel{position:absolute;inset:0;background:linear-gradient(110deg,#E9DBCC 30%,#F2E6D8 50%,#E9DBCC 70%);background-size:200% 100%;animation:sh 1.6s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.plate.ready .skel{display:none}
+/* the dynamic deed copy, positioned on the blanked card of the open render */
+.copy{position:absolute;left:51.1%;top:35.6%;width:46%;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity .5s ease .45s;pointer-events:none;color:var(--ink)}
+.plate.opened .copy{opacity:1}
+.copy .eye{font-size:calc(var(--pw)*.0108);letter-spacing:.24em;color:var(--gold2);text-transform:uppercase;text-indent:.24em}
+.copy .sub{font-size:calc(var(--pw)*.0142);margin-top:calc(var(--pw)*.012);letter-spacing:.02em}
+.copy .act{font-size:calc(var(--pw)*.041);line-height:1.12;color:var(--gold2);margin-top:calc(var(--pw)*.012);letter-spacing:-.005em;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.copy .act.long{font-size:calc(var(--pw)*.031)}
+.copy .foot{font-size:calc(var(--pw)*.0138);margin-top:calc(var(--pw)*.016);letter-spacing:.02em}
+.hint{margin-top:22px;text-align:center;font-size:17px;color:var(--ivory);opacity:.92;transition:opacity .4s}
+.hint .fing{display:block;width:26px;height:26px;margin:0 auto 10px;opacity:.75}
+.stage.opened .hint{opacity:0;pointer-events:none;position:absolute}
+.after{margin-top:26px;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .6s ease .7s,transform .6s ease .7s;pointer-events:none}
+.stage.opened .after{opacity:1;transform:none;pointer-events:auto}
+.from{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--mist);margin-bottom:16px}
+.note{font-style:italic;font-size:16px;line-height:1.5;color:var(--ivory);opacity:.9;max-width:34ch;margin:0 auto 18px}
+.cta{display:inline-block;border:1px solid var(--gold);color:var(--gold);background:transparent;padding:15px 30px;font-family:inherit;font-size:14px;letter-spacing:.24em;text-transform:uppercase;text-indent:.24em;text-decoration:none;border-radius:3px;cursor:pointer;transition:background .25s,color .25s}
+.cta:hover,.cta:focus-visible{background:var(--gold);color:var(--forest2);outline:none}
+.quiet{margin-top:16px;font-size:13px;color:var(--mist)}
+.quiet a{color:var(--mist)}
+.foot-wm{margin-top:auto;padding-top:40px;font-size:11px;letter-spacing:.3em;color:rgba(185,201,191,.7);text-transform:uppercase}
+.err .plate{cursor:default}
+@media(prefers-reduced-motion:reduce){.plate img,.copy,.after,.hint{transition:none!important}.plate.tap img.sealed{animation:none}}
+@media(min-width:700px){.mast{margin-top:40px}.mast .wm{font-size:26px}.hint{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="mast"><a class="wm" href="https://deeds.fun/">DEEDS</a><div class="rule"></div></header>
+
+<main class="stage" id="stage">
+  <div class="plate loading" id="plate" role="button" tabindex="0" aria-label="A sealed note. Tap to open.">
+    <div class="skel"></div>
+    <img class="sealed" id="imgSealed" alt="">
+    <img class="open" id="imgOpen" alt="">
+    <div class="copy" id="copy" style="display:none">
+      <div class="eye">A deed. was sent to you.</div>
+      <div class="sub">One act. One person. Pass it on.</div>
+      <div class="act" id="act"></div>
+      <div class="foot">Do it whenever you can. Then pass one forward.</div>
+    </div>
+  </div>
+  <div class="hint" id="hint"><svg class="fing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-3.5a1.5 1.5 0 0 1 3 0V11m0-2a1.5 1.5 0 0 1 3 0v6.5A5.5 5.5 0 0 1 12.5 21H12a5 5 0 0 1-4.3-2.4L5 14.2a1.4 1.4 0 0 1 2.2-1.7L9 14.5V11"/></svg>Tap to open.</div>
+  <div class="after" id="after">
+    <div class="from" id="from"></div>
+    <p class="note" id="note" style="display:none"></p>
+    <a class="cta" id="cta" href="https://deeds.fun/">Enter DEEDS</a>
+    <div class="quiet" id="quiet"></div>
+  </div>
+</main>
+
+<div class="foot-wm">deeds.fun</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+var SB_URL='https://helqqdygwaihrliglbvw.supabase.co';
+var SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
+var $=function(s){return document.querySelector(s)};
+var q=new URLSearchParams(location.search);var token=(q.get('t')||'').replace(/[^A-Za-z0-9]/g,'').slice(0,40);
+var ART={deed:{sealed:'/inv-sealed-cream.webp',open:'/inv-open-deed.webp'},forty:{sealed:'/inv-sealed-black.webp',open:'/inv-open-forty.webp'},invite:{sealed:'/inv-sealed-green.webp',open:'/inv-open-invite.webp'}};
+var CTA={deed:'Accept the Deed',forty:'Accept the Forty',invite:'Enter DEEDS'};
+var plate=$('#plate'),stage=$('#stage'),inv=null,opened=false,sb=null;
+function sizePw(){document.documentElement.style.setProperty('--pw',plate.clientWidth+'px')}
+addEventListener('resize',sizePw);sizePw();
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function clean(s){return String(s||'').replace(/\s+/g,' ').trim()}
+function paint(){
+  var k=inv.kind in ART?inv.kind:'invite';
+  var a=ART[k];var s=$('#imgSealed'),o=$('#imgOpen');var n=0;
+  function done(){if(++n>=2){plate.classList.remove('loading');plate.classList.add('ready');sizePw()}}
+  s.onload=done;o.onload=done;s.onerror=done;o.onerror=done;s.src=a.sealed;o.src=a.open;
+  plate.setAttribute('aria-label','A sealed note. Tap to open.');
+  if(k==='deed'){var act=clean(inv.act)||'One act of your choosing.';if(!/[.!?]$/.test(act))act+='.';
+    var el=$('#act');el.textContent=act;if(act.length>30)el.classList.add('long');$('#copy').style.display=''}
+  $('#from').textContent=inv.sender_handle?'From '+inv.sender_handle+'.':'From a friend.';
+  if(clean(inv.note)){$('#note').textContent=clean(inv.note);$('#note').style.display=''}
+  var cta=$('#cta');cta.textContent=CTA[k];
+  var p=new URLSearchParams();p.set('c',inv.sender_handle||'');p.set('k',k);if(k==='deed')p.set('a',clean(inv.act));if(token)p.set('inv',token);p.set('ok','1');
+  cta.href='https://deeds.fun/?'+p.toString().replace(/%20/g,'+');
+  cta.onclick=function(){if(inv.sender_handle)safeSet('deeds_challenger',inv.sender_handle);if(token)safeSet('deeds_inv',token)};
+  $('#quiet').innerHTML=k==='invite'?'Anonymous acts of kindness, person to person.':'<a href="https://deeds.fun/">Look around first.</a>';
+}
+function open(){if(opened||!plate.classList.contains('ready'))return;opened=true;
+  plate.classList.add('tap');setTimeout(function(){plate.classList.remove('tap');plate.classList.add('opened');stage.classList.add('opened')},matchMedia('(prefers-reduced-motion:reduce)').matches?0:260);
+  plate.setAttribute('aria-label','The note is open.');
+  if(sb&&token&&!inv.opened){try{sb.rpc('open_invitation',{p_token:token}).then(function(){}).catch(function(){})}catch(e){}}
+}
+plate.addEventListener('click',open);
+plate.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+function fallback(){inv={kind:'invite',act:'',note:'',sender_handle:'',opened:false};paint()}
+try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){sb=null}
+if(!sb||!token){fallback()}
+else{sb.rpc('get_invitation',{p_token:token}).then(function(r){
+  var d=r&&r.data;if(d&&d.length)d=d[0];
+  if(!d||r.error){fallback();return}
+  inv={kind:d.kind,act:d.act,note:d.note,sender_handle:d.sender_handle,opened:!!d.opened};paint()
+}).catch(fallback)}
+})();
+</script>
+</body>
+</html>
