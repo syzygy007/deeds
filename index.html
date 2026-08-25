@@ -970,10 +970,10 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .eggart .espark{position:absolute;left:50%;top:-6%;width:96%;transform:translateX(-50%);opacity:0;transition:opacity .5s ease;pointer-events:none}
 .eggart .emain{position:relative;width:100%;height:auto;display:block;filter:drop-shadow(0 16px 20px rgba(105,68,4,.16))}
 .eggart:hover .emain{animation:eggready 900ms ease-in-out infinite alternate}
-.eggart.busy .emain{animation:eggshake 240ms ease-in-out infinite}
+.eggart.tap .emain{animation:eggtap 190ms ease}
 .eggart.opened .espark{opacity:.9}
 @keyframes eggready{from{transform:rotate(-.55deg) translateY(0)}to{transform:rotate(.55deg) translateY(-3px)}}
-@keyframes eggshake{0%{transform:rotate(-1.1deg)}50%{transform:rotate(1.2deg)}100%{transform:rotate(-.6deg)}}
+@keyframes eggtap{0%{transform:rotate(-1.8deg) scale(.985)}55%{transform:rotate(2deg) scale(1.012)}100%{transform:none}}
 .eggline{font-size:14.5px;color:var(--muted);margin:12px 0 12px}
 .eggbtn{letter-spacing:.12em}
 .eggfail{font-size:13px;color:#8A2F22;margin-top:10px}
@@ -1019,7 +1019,7 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 .inkacts{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
 .inkacts button{appearance:none;background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--forest);text-decoration:underline;cursor:pointer}
 @media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}}
-@media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.busy .emain{animation:none!important}.eggin{animation:none}.inkwords{transition:none}}
+@media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.tap .emain{animation:none!important}.eggin{animation:none}.inkwords{transition:none}}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -4374,7 +4374,7 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
 renderFeed();
 
 /* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.6) ============ */
-var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},TDST={},TDSWAP={};
+var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
 try{INKSEEN=JSON.parse(localStorage.getItem('deeds_inks')||'{}')||{}}catch(e){}
@@ -4396,12 +4396,15 @@ if(EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
 return presEggSealedHTML(r,nm,mine)}
 if(r.presentation_type==='disappearing_note')return presInkHTML(r,body,mine);
 return '<p class="p-body">'+esc(body)+'</p>'}
+var EGGLBL=['GET CRACKIN&#39;','KEEP CRACKIN&#39;','ONE MORE TAP'];
+var EGGARIA=['Sealed Golden Egg. Tap to start cracking.','Cracking Golden Egg. Tap again.','Almost open. One more tap.'];
 function presEggSealedHTML(r,nm,mine){
+var st=EGGSTAGE[r.id]||0;
 var h='<div class="eggzone" data-eggzone="'+esc(r.id)+'">';
 h+='<div class="egghl">'+(mine?'You left a Golden Egg.':esc(nm.handle)+' left a Golden Egg.')+'</div>';
-h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" aria-label="Sealed Golden Egg. Activate to reveal the post."><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="egg-frame-sealed.webp" alt=""></button>';
+h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" aria-label="'+EGGARIA[st]+'"><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="'+EGGFRAMES[st]+'" alt=""></button>';
 h+='<div class="eggline">Crack it to reveal the post.</div>';
-h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">GET CRACKIN&#39;</button>';
+h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">'+EGGLBL[st]+'</button>';
 h+='</div>';return h}
 function presEggOpenHTML(r,body,mine){
 var h='<div class="eggin"><span class="fillchip">'+(FILLLABEL[r.egg_filling]||'A LITTLE SURPRISE')+'</span>';
@@ -4428,19 +4431,21 @@ function presServerReveal(id,st){if(!sb||!PROFILE)return;
 var row={post_id:id,viewer_id:PROFILE.id};if(st)row.deed_status=st;
 sb.from('post_reveals').upsert(row,{onConflict:'post_id,viewer_id'}).then(function(){}).catch(function(){})}
 function crackEgg(id){if(EGGBUSY[id])return;var r=presFind(id);if(!r)return;
+var zone=document.querySelector('[data-eggzone="'+id+'"]');if(!zone)return;
+var img=zone.querySelector('.emain'),art=zone.querySelector('.eggart'),btn=zone.querySelector('.eggbtn');
+var st=EGGSTAGE[id]||0,rm=presRM();
+if(img)img.onerror=function(){var f=zone.querySelector('.eggfail');if(!f){f=document.createElement('div');f.className='eggfail';f.textContent='This surprise couldn\u2019t open. Try again.';zone.appendChild(f)}};
+if(st<2){st++;EGGSTAGE[id]=st;
+if(img)img.src=EGGFRAMES[st];
+if(btn)btn.innerHTML=EGGLBL[st];
+if(art){art.setAttribute('aria-label',EGGARIA[st]);
+if(!rm){art.classList.remove('tap');void art.offsetWidth;art.classList.add('tap')}}
+return}
 EGGBUSY[id]=1;
-var zone=document.querySelector('[data-eggzone="'+id+'"]');
-var img=zone?zone.querySelector('.emain'):null;
-var art=zone?zone.querySelector('.eggart'):null;
-function done(){EGGSEEN[id]=1;presSave();presServerReveal(id);delete EGGBUSY[id];presRedraw(id)}
-if(!img||presRM()){done();return}
 zone.querySelectorAll('[data-eggo]').forEach(function(b){b.disabled=true});
-if(art){art.classList.add('busy');art.setAttribute('aria-label','Opening Golden Egg')}
-var failed=false;img.onerror=function(){failed=true};
-img.src=EGGFRAMES[1];
-setTimeout(function(){img.src=EGGFRAMES[2];},150);
-setTimeout(function(){img.src=EGGFRAMES[3];if(art){art.classList.remove('busy');art.classList.add('opened');art.setAttribute('aria-label','Opened Golden Egg')}},360);
-setTimeout(function(){if(failed){delete EGGBUSY[id];if(art)art.classList.remove('busy');zone.querySelectorAll('[data-eggo]').forEach(function(b){b.disabled=false});var f=zone.querySelector('.eggfail');if(!f){f=document.createElement('div');f.className='eggfail';f.textContent='This surprise couldn\u2019t open. Try again.';zone.appendChild(f)}return}done()},760)}
+if(art){art.classList.remove('tap');art.classList.add('opened');art.setAttribute('aria-label','Opened Golden Egg.')}
+if(img)img.src=EGGFRAMES[3];
+setTimeout(function(){EGGSEEN[id]=1;presSave();presServerReveal(id);delete EGGBUSY[id];delete EGGSTAGE[id];presRedraw(id)},rm?160:520)}
 /* ---- tiny deed ---- */
 function tdSet(id,st){TDST[id]=st;presServerReveal(id,st);presRedraw(id)}
 function tdSwapIt(id){var r=presFind(id);if(!r)return;var base=(r.body||'').trim();
