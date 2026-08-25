@@ -942,7 +942,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .paper{padding:44px 46px 64px}
  .paper.tf{padding-right:88px}
 }
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7 · egg contents art) ============ */
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.1 · egg contents art, blank eggs fill themselves) ============ */
 #prow{align-items:center;flex-wrap:wrap;gap:10px}
 #prow .plab{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-right:2px}
 #prow .lchip .pico{width:22px;height:22px;vertical-align:-6px;margin-right:7px;display:inline-block}
@@ -3397,7 +3397,7 @@ var baseSubmit=$('#logsubmit').onclick;
 $('#logsubmit').onclick=function(){
 if(!liveOn){baseSubmit&&baseSubmit();return}
 if(!PROFILE){closeSheets();openJoin();return}
-var txt=$('#logtext').value.trim();if(!txt){toast(composeMode==='post'?'Say something first.':'Write it first.');return}
+var txt=$('#logtext').value.trim();if(!txt&&!(composeMode==='post'&&typeof PRES!=='undefined'&&PRES==='golden_egg')){toast(composeMode==='post'?'Say something first.':'Write it first.');return}
 if(composeMode==='second'){toast('Seconds go live in the next build.');return}
 if(composeMode==='post'){var pb=$('#logsubmit');
 var EPOST=presPrepare(txt);if(!EPOST)return;txt=EPOST.body;
@@ -4392,7 +4392,7 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    if the CDN never answers. ---- */
 renderFeed();
 
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7 · egg contents art) ============ */
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.1 · egg contents art, blank eggs fill themselves) ============ */
 var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
@@ -4543,6 +4543,7 @@ function presPaint(){var bi=$('#presInk'),be=$('#presEgg');
 if(bi){bi.classList.toggle('on',PRES==='disappearing_note');bi.setAttribute('aria-pressed',PRES==='disappearing_note'?'true':'false')}
 if(be){be.classList.toggle('on',PRES==='golden_egg');be.setAttribute('aria-pressed',PRES==='golden_egg'?'true':'false')}
 var ep=$('#eggpane');if(ep)ep.style.display=PRES==='golden_egg'?'':'none';
+var lta=$('#logtext');if(lta&&composeMode==='post')lta.placeholder=PRES==='golden_egg'?'Optional. Leave it blank and DEEDS. fills the egg.':'Say something good.';
 var inn=$('#inknote');if(inn)inn.style.display=PRES==='disappearing_note'?'':'none';
 var es=$('#estyle');if(es)es.style.display=(PRES==='golden_egg'&&EGGFILL==='treat')?'flex':'none';
 var epr=$('#eprompt');if(epr)epr.style.display=(PRES==='golden_egg'&&EGGFILL==='tiny_deed')?'flex':'none';
@@ -4574,6 +4575,7 @@ if(fill==='treat'){var s2=presPick(EGGSEEDS.treat);body=s2.text;style=s2.style}
 else if(fill==='tiny_deed')body=presPick(DEEDPROMPTS).text;
 else body=presPick(EGGSEEDS[fill])}}
 else if(!body&&(fill==='kind_words'||fill==='wisdom')){body=presPick(EGGSEEDS[fill])}
+else if(!body&&fill==='tiny_deed'){body=presPick(DEEDPROMPTS).text}
 if(!body){toast('Put something inside before posting your egg.');return null}
 if(body.length>320){toast('Keep it under 320 characters.');return null}
 return {body:body,fields:{p:'golden_egg',f:fill,s:style}}}
