@@ -30,6 +30,9 @@ body{
 .layer{position:absolute; left:-7%; top:-7%; width:114%; height:114%; will-change:transform}
 .layer img{width:100%; height:100%; object-fit:cover; object-position:50% 50%; display:block}
 #stars{position:absolute; inset:0; width:100%; height:100%}
+#skyvid{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  object-position:50% 50%; opacity:0; transition:opacity 1.4s ease}
+#skyvid.on{opacity:1}
 .scrim{position:absolute; inset:0; pointer-events:none;
   background:
     linear-gradient(180deg, rgba(14,26,20,.50) 0%, rgba(14,26,20,0) 22%),
@@ -157,6 +160,7 @@ h1 i{font-style:normal; color:var(--gold)}
       <source media="(min-width:1024px)" srcset="/nebula-wide.webp">
       <img src="/nebula.webp" alt="" fetchpriority="high">
     </picture>
+    <video id="skyvid" muted loop playsinline preload="auto" aria-hidden="true"></video>
     <canvas id="stars"></canvas>
   </div>
   <div class="layer" id="lMoon">
@@ -425,6 +429,19 @@ h1 i{font-style:normal; color:var(--gold)}
 
   /* ---------- star field ---------- */
   var cv = document.getElementById("stars"), ctx = cv.getContext("2d"), stars = [], dpr = 1;
+  var VIDON = false, vid = document.getElementById("skyvid");
+  if (!reduce){
+    vid.src = wide() ? "/sky-wide.mp4" : "/sky.mp4";
+    vid.addEventListener("playing", function(){
+      VIDON = true;
+      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
+      vid.classList.add("on");
+    });
+    vid.addEventListener("error", function(){ VIDON = false; vid.classList.remove("on"); });
+    var kick = function(){ var p = vid.play(); if (p && p.catch) p.catch(function(){}); };
+    kick();
+    document.getElementById("hero").addEventListener("touchend", kick, {passive:true});
+  }
   function rng(seed){ return function(){ seed = (seed*1664525 + 1013904223) >>> 0; return seed/4294967296; }; }
   function seedStars(){
     var box = cv.getBoundingClientRect();
@@ -524,7 +541,7 @@ h1 i{font-style:normal; color:var(--gold)}
                            (-(cy + ay*aw)*d*0.62).toFixed(2) + "px,0)";
       }
     }
-    if (t - last > 24){ paint(t); last = t; }
+    if (t - last > 24 && !VIDON){ paint(t); last = t; }
     requestAnimationFrame(frame);
   }
   var rt;
