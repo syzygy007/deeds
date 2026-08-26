@@ -964,14 +964,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .paper{padding:44px 46px 64px}
  .paper.tf{padding-right:88px}
 }
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.2 · egg contents art, blank eggs fill themselves, treat style honored) ============ */
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.9 · six containers, photo filling) ============ */
 #prow{align-items:center;flex-wrap:wrap;gap:10px}
 #prow .plab{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-right:2px}
 #prow .lchip .pico{width:22px;height:22px;vertical-align:-6px;margin-right:7px;display:inline-block}
 #eggpane{border:1px solid var(--line);border-radius:16px;padding:18px 16px 14px;margin-top:14px;background:var(--card)}
 #eggpane .ehead{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:1.45rem;color:var(--ink)}
 #eggpane .esub{font-size:13px;color:var(--muted);margin:4px 0 12px}
-.efills{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.efills{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
 .efill{appearance:none;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 8px 10px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
 .efill:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
 .efill .efi{display:block;width:60px;height:60px;margin:0 auto 6px}
@@ -979,6 +979,16 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .efill .fl{font-weight:700;font-size:13.5px}
 .efill .fs{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.35}
 .efill.on{border-color:var(--forest);box-shadow:inset 0 0 0 1.4px var(--forest)}
+/* containers (v4.9) */
+.econts{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-bottom:18px}
+.econt{appearance:none;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:10px 6px 9px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+.econt:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.econt .eci{display:block;width:56px;height:56px;margin:0 auto 5px;object-fit:contain}
+.econt .cl{display:block;font-weight:700;font-size:12.5px;line-height:1.2}
+.econt.on{border-color:var(--forest);box-shadow:inset 0 0 0 1.4px var(--forest)}
+#eggpane .ehead2{margin-top:4px}
+#ephoto{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#ephoto .epnote{font-size:11.5px;color:var(--muted)}
 #estyle,#eprompt{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 #eprompt .epnote{font-size:11.5px;color:var(--muted)}
 #precount{margin-top:8px;font-size:11px;letter-spacing:.1em;color:var(--muted)}
@@ -1008,6 +1018,13 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .eo-treat .eosp{width:118%}
 .eoart{position:relative;width:100%;height:auto;display:block;filter:drop-shadow(0 16px 20px rgba(105,68,4,.16))}
 .eoseal{position:relative;width:clamp(104px,28vw,132px);height:auto;display:block;margin:4px auto;filter:drop-shadow(0 12px 16px rgba(105,68,4,.16))}
+/* photo filling (v4.9) */
+.eo-photo .eoplate{width:min(100%,440px)}
+.eo-photo .eosp{width:118%}
+.eophoto{position:relative;width:100%;height:auto;display:block;border-radius:14px;cursor:pointer;box-shadow:0 18px 30px rgba(105,68,4,.2)}
+.eo-photo .eomicro{margin-top:14px}
+/* container art sizing (v4.9): the new frames sit on square canvases like the egg; the piñata is a tall figure so it gets more room */
+.eggart[data-cont="pinata"]{width:min(72vw,330px)}
 .eomicro{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--forest);margin:12px 0 9px}
 .eo-treat .eomicro{margin-top:6px}
 .eowords{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.15rem,3.4vw,1.42rem);line-height:1.32;color:var(--ink);max-width:34ch;margin:0 auto;text-wrap:balance}
@@ -1059,7 +1076,7 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 .inkacts button{appearance:none;background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--forest);text-decoration:underline;cursor:pointer}
 .pikcard.uv .inkacts button{color:#C9B8F5}
 .pikcard.uv .inkhelp{color:#B9A8E8}
-@media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}}
+@media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}.eggart[data-cont="pinata"]{width:84vw}.econt .cl{font-size:11.5px}}
 @media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.tap .emain{animation:none!important}.eggin,.eggopen .eoplate,.eggopen .eomicro,.eggopen .eowords,.eggopen .tdrow,.eggopen .tdmicro{animation:none}.inkwords{transition:none}}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
@@ -1638,17 +1655,29 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
     <button class="lchip" id="presEgg" type="button" aria-pressed="false" aria-label="Hide this post in a Golden Egg"><img class="pico" src="composer-golden-egg-icon.webp" alt="" width="22" height="22">Golden Egg.</button>
   </div>
   <div id="eggpane" style="display:none">
-    <div class="ehead">What&#39;s inside?</div>
-    <div class="esub">The viewer won&#39;t know until the egg opens.</div>
+    <div class="ehead">What holds it?</div>
+    <div class="esub">Pick the surprise they open.</div>
+    <div class="econts" id="econts">
+      <button class="econt on" type="button" data-ec="golden_egg"><img class="eci" src="pres-pick-egg.webp" alt="" width="56" height="56"><span class="cl">Golden Egg</span></button>
+      <button class="econt" type="button" data-ec="pinata"><img class="eci" src="pres-pick-pinata.webp" alt="" width="56" height="56"><span class="cl">Pi&ntilde;ata</span></button>
+      <button class="econt" type="button" data-ec="fortune_cookie"><img class="eci" src="pres-pick-cookie.webp" alt="" width="56" height="56"><span class="cl">Fortune Cookie</span></button>
+      <button class="econt" type="button" data-ec="geode"><img class="eci" src="pres-pick-geode.webp" alt="" width="56" height="56"><span class="cl">Geode</span></button>
+      <button class="econt" type="button" data-ec="piggy_bank"><img class="eci" src="pres-pick-piggy.webp" alt="" width="56" height="56"><span class="cl">Piggy Bank</span></button>
+      <button class="econt" type="button" data-ec="treasure_chest"><img class="eci" src="pres-pick-chest.webp" alt="" width="56" height="56"><span class="cl">Treasure Chest</span></button>
+    </div>
+    <div class="ehead ehead2">What&#39;s inside?</div>
+    <div class="esub">The viewer won&#39;t know until it opens.</div>
     <div class="efills">
       <button class="efill" type="button" data-ef="treat"><img class="efi" src="egg-fill-treat.webp" alt="" width="60" height="60"><span class="fl">Treat</span><span class="fs">Candy or chocolate.</span></button>
       <button class="efill" type="button" data-ef="kind_words"><img class="efi" src="egg-fill-kind-words.webp" alt="" width="60" height="60"><span class="fl">Kind Words</span><span class="fs">Something they&#39;ll remember.</span></button>
       <button class="efill" type="button" data-ef="wisdom"><img class="efi" src="egg-fill-wisdom.webp" alt="" width="60" height="60"><span class="fl">Wisdom</span><span class="fs">A thought worth keeping.</span></button>
       <button class="efill" type="button" data-ef="tiny_deed"><img class="efi" src="egg-fill-tiny-deed.webp" alt="" width="60" height="60"><span class="fl">Tiny Deed</span><span class="fs">One small, genuine action.</span></button>
       <button class="efill" type="button" data-ef="surprise"><img class="efi" src="egg-fill-surprise.webp" alt="" width="60" height="60"><span class="fl">Surprise Me</span><span class="fs">Let DEEDS. choose.</span></button>
+      <button class="efill" type="button" data-ef="photo"><img class="efi" src="egg-fill-photo.webp" alt="" width="60" height="60"><span class="fl">Photo</span><span class="fs">A picture, hidden inside.</span></button>
     </div>
     <div id="estyle" style="display:none"><span class="micro plab">THE TREAT.</span><button class="lchip on" type="button" data-es="candy">Candy.</button><button class="lchip" type="button" data-es="chocolate">Chocolate.</button></div>
     <div id="eprompt" style="display:none"><button class="lchip" type="button" id="epGive">Give Me a Prompt.</button><span class="epnote">Or invite one small, genuine thing in your own words.</span></div>
+    <div id="ephoto" style="display:none"><button class="lchip" type="button" id="epAdd">Add the Photo.</button><span class="epnote" id="epNote">It stays hidden until they open it.</span></div>
   </div>
   <div class="micro" id="inknote" style="display:none">THE INK FADES AFTER IT IS READ. BLACK LIGHT BRINGS IT BACK.</div>
   <div id="precount" style="display:none"></div>
@@ -2625,9 +2654,10 @@ if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
 h+=presBodyHTML(r,body,mine,nm);
 var mlive=!r.media_status||r.media_status==='live';
-if(r.media_path&&mlive){var mu=esc(mediaURL(r.media_path));
+var eggPhoto=isPost&&r.presentation_type==='golden_egg'&&r.egg_filling==='photo';
+if(r.media_path&&mlive&&!eggPhoto){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
-else if(r.media_path&&r.media_status==='pending'&&mine){h+='<div class="chaintag">PHOTO IN REVIEW \u00B7 IT SHOWS WHEN IT CLEARS</div>'}
+else if(r.media_path&&r.media_status==='pending'&&mine&&!eggPhoto){h+='<div class="chaintag">PHOTO IN REVIEW \u00B7 IT SHOWS WHEN IT CLEARS</div>'}
 var tk=(isPost?'p:':'d:')+r.id;
 h+='<div class="p-acts">';
 h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSPSVG+'<span>'+(CINSP[tk]||0)+'</span></button>';
@@ -3509,12 +3539,17 @@ pb.textContent='POSTING...';
 uploadPhoto(function(m,uerr){
 if(uerr){pb.textContent='Post It.';toast('The photo did not upload: '+uerr);return}
 var pay={profile_id:PROFILE.id,body:txt};
-if(EPOST.fields){pay.presentation_type=EPOST.fields.p;if(EPOST.fields.f)pay.egg_filling=EPOST.fields.f;if(EPOST.fields.s)pay.egg_treat_style=EPOST.fields.s}
+if(EPOST.fields){pay.presentation_type=EPOST.fields.p;if(EPOST.fields.f)pay.egg_filling=EPOST.fields.f;if(EPOST.fields.s)pay.egg_treat_style=EPOST.fields.s;if(EPOST.fields.c&&EPOST.fields.c!=='golden_egg')pay.egg_container=EPOST.fields.c}
 if(m){pay.media_path=m.path;pay.media_kind='photo';pay.media_w=m.w;pay.media_h=m.h}
+var okPost=function(data,note){clearPhoto();if(pay.media_path)publishMedia('post',data.id);prependLive(markKind(data,'post'));closeSheets();presReset();toast(note||'POSTED.')};
+var plainPost=function(){var plain={profile_id:PROFILE.id,body:txt};if(pay.media_path){plain.media_path=pay.media_path;plain.media_kind=pay.media_kind;plain.media_w=pay.media_w;plain.media_h=pay.media_h}sb.from('posts').insert(plain).select().single().then(function(r2){if(r2.error){toast('Could not post it: '+r2.error.message);return}okPost(r2.data,'Posted plain. Run patch 39 to unlock the eggs and the ink.')}).catch(function(){toast('Could not post it.')})};
 sb.from('posts').insert(pay).select().single().then(function(r){
 pb.textContent='Post It.';
-if(r.error){if(EPOST.fields&&/presentation_type|egg_filling|egg_treat_style/i.test(r.error.message||'')){var plain={profile_id:PROFILE.id,body:txt};if(pay.media_path){plain.media_path=pay.media_path;plain.media_kind=pay.media_kind;plain.media_w=pay.media_w;plain.media_h=pay.media_h}sb.from('posts').insert(plain).select().single().then(function(r2){if(r2.error){toast('Could not post it: '+r2.error.message);return}clearPhoto();prependLive(markKind(r2.data,'post'));closeSheets();presReset();toast('Posted plain. Run patch 37 to unlock the egg and the ink.')}).catch(function(){toast('Could not post it.')});return}toast('Could not post it: '+r.error.message);return}
-clearPhoto();if(pay.media_path)publishMedia('post',r.data.id);prependLive(markKind(r.data,'post'));closeSheets();presReset();toast('POSTED.')
+if(r.error){var em=r.error.message||'';
+if(pay.egg_container&&/egg_container/i.test(em)){delete pay.egg_container;sb.from('posts').insert(pay).select().single().then(function(r3){if(r3.error){if(EPOST.fields&&/presentation_type|egg_filling|egg_treat_style/i.test(r3.error.message||'')){plainPost();return}toast('Could not post it: '+r3.error.message);return}okPost(r3.data,'Posted as a Golden Egg. Run patch 39 to unlock the other containers.')}).catch(function(){toast('Could not post it.')});return}
+if(EPOST.fields&&/presentation_type|egg_filling|egg_treat_style/i.test(em)){plainPost();return}
+toast('Could not post it: '+em);return}
+okPost(r.data)
 }).catch(function(e){pb.textContent='Post It.';toast('Could not post it: '+String(e&&e.message||e))})});
 return}
 var chipEl=$('#logdates .lchip.on');var chipTxt=chipEl?chipEl.textContent:'Today.';
@@ -4550,39 +4585,50 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    already gone. Clicking it threw. One render keeps the two in step even
    if the CDN never answers. ---- */
 
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.2 · egg contents art, blank eggs fill themselves, treat style honored) ============ */
-var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
+/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.9 · six containers, photo filling) ============ */
+var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGCONT='golden_egg',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
 try{INKSEEN=JSON.parse(localStorage.getItem('deeds_inks')||'{}')||{}}catch(e){}
 function presSave(){try{localStorage.setItem('deeds_eggs',JSON.stringify(EGGSEEN));localStorage.setItem('deeds_inks',JSON.stringify(INKSEEN))}catch(e){}}
 var EGGSEEDS={"version":1,"note":"Original seed copy for Surprise Me. Curate and rotate; do not show the category before reveal.","treat":[{"style":"candy","text":"A little sweetness for your scroll."},{"style":"chocolate","text":"You found the chocolate. Good choice."},{"style":"candy","text":"No reason. Just something good."},{"style":"chocolate","text":"Consider this your tiny reward for showing up."},{"style":"candy","text":"Life is serious enough. Take the candy."},{"style":"chocolate","text":"One small piece of good news: this is for you."}],"kind_words":["You make ordinary moments feel cared for.","Your steadiness matters more than you realize.","Someone is better because you showed up.","You have a way of making people feel seen.","The good you do quietly still counts.","Your effort is visible even when it is not celebrated.","You bring calm into rooms that need it.","You are allowed to be proud of how far you have come."],"wisdom":["A kind life is built in small rooms no one applauds.","The right thing rarely needs an audience.","Attention is one of the purest forms of generosity.","A sincere sentence can outlive a spectacular gesture.","Leave people lighter than you found them.","Rest is not quitting. It is part of returning well.","What you repeat becomes the atmosphere around you.","The smallest honest action can change the temperature of a room.","People remember how safe they felt around you.","Listening is often the most useful thing you can give."]};
+EGGSEEDS.photo=["Wanted you to see this.","Found this and thought of you.","A moment worth passing on.","Some things are better shown than said.","Here. This one is for you."];
 var DEEDPROMPTS=[{"category":"connection","text":"Call someone you love and name one specific thing you appreciate about them."},{"category":"connection","text":"Send a sincere voice note to someone you have not checked on lately."},{"category":"connection","text":"Ask an older relative or friend to tell you one of their favorite memories."},{"category":"connection","text":"Reach out to someone you miss without asking them for anything."},{"category":"connection","text":"Tell a friend exactly why their friendship matters to you."},{"category":"connection","text":"Invite someone who may feel left out to join you for something simple."},{"category":"connection","text":"Put your phone away and give someone ten uninterrupted minutes."},{"category":"connection","text":"Check in on someone who may be carrying more than they show."},{"category":"connection","text":"Send a photo that holds a good shared memory and say why you kept it."},{"category":"connection","text":"Ask someone how they are doing, then stay long enough to hear the real answer."},{"category":"gratitude","text":"Thank someone whose work usually goes unnoticed."},{"category":"gratitude","text":"Tell a coworker one thing they consistently do well."},{"category":"gratitude","text":"Write a short thank-you note to someone who taught you something useful."},{"category":"gratitude","text":"Leave a positive review for a small business that earned it."},{"category":"gratitude","text":"Thank a service worker by name and mean it."},{"category":"gratitude","text":"Tell a family member about a sacrifice of theirs you still remember."},{"category":"gratitude","text":"Send a former teacher or mentor one sentence about the difference they made."},{"category":"gratitude","text":"Name one ordinary thing someone does that makes your life better."},{"category":"gratitude","text":"Share credit with the person who helped you succeed."},{"category":"gratitude","text":"Give someone a genuine compliment that has nothing to do with appearance."},{"category":"care","text":"Check on someone who is sick, grieving, or having a difficult week."},{"category":"care","text":"Offer one specific kind of help instead of saying, ‘Let me know if you need anything.’"},{"category":"care","text":"Bring water or a snack to someone working hard nearby."},{"category":"care","text":"Give someone permission to rest without making them feel guilty."},{"category":"care","text":"Ask a caregiver how they are doing, not only how the person they care for is doing."},{"category":"care","text":"Leave an encouraging message for someone facing a hard decision."},{"category":"care","text":"Do one household task that usually falls to someone else."},{"category":"care","text":"Make space for someone who is quiet to speak."},{"category":"care","text":"Offer to listen without immediately trying to fix the problem."},{"category":"care","text":"Remind someone of a hard thing they already survived."},{"category":"service","text":"Pick up five pieces of litter on your next walk."},{"category":"service","text":"Return a shopping cart that is not yours."},{"category":"service","text":"Let someone go ahead of you when they clearly need the break."},{"category":"service","text":"Leave a shared space better than you found it."},{"category":"service","text":"Help someone carry something awkward or heavy if they welcome the help."},{"category":"service","text":"Give away one useful item you no longer need."},{"category":"service","text":"Take care of a small problem before someone else has to ask."},{"category":"service","text":"Hold the door and make eye contact instead of rushing through."},{"category":"service","text":"Share a useful introduction between two people who would genuinely benefit."},{"category":"service","text":"Make one part of tomorrow easier for someone else today."}];
 var EGGFRAMES=['egg-frame-sealed.webp','egg-frame-crack.webp','egg-frame-glow.webp','egg-frame-open.webp'];
-var EGGLOADED=false;function preloadEgg(){if(EGGLOADED)return;EGGLOADED=true;EGGFRAMES.forEach(function(s){var i=new Image();i.src=s})}
+/* containers (v4.9): frames[0] is the closed state, every tap advances one frame, the final tap reveals the contents; a container with one more frame than taps (the egg) shows that extra open frame first, then holds */
+var CONTS={
+golden_egg:{n:'Golden Egg',a:'a Golden Egg',taps:3,frames:EGGFRAMES,lbl:['GET CRACKIN&#39;','KEEP CRACKIN&#39;','ONE MORE TAP'],line:'Crack it to reveal the post.',hold:900},
+pinata:{n:'Pi\u00F1ata',a:'a Pi\u00F1ata',taps:5,frames:['pres-pinata-1.webp','pres-pinata-2.webp','pres-pinata-3.webp','pres-pinata-4.webp','pres-pinata-5.webp'],lbl:['START SWINGING','SWING AGAIN','SWING HARDER','ALMOST THERE','GRAB THE CANDY'],line:'Swing to reveal the post.',hold:560},
+fortune_cookie:{n:'Fortune Cookie',a:'a Fortune Cookie',taps:3,frames:['pres-cookie-1.webp','pres-cookie-2.webp','pres-cookie-3.webp'],lbl:['CRACK IT OPEN','KEEP CRACKIN&#39;','PULL THE SLIP'],line:'Crack it open to reveal the post.',hold:560},
+geode:{n:'Geode',a:'a Geode',taps:3,frames:['pres-geode-1.webp','pres-geode-2.webp','pres-geode-3.webp'],lbl:['STRIKE THE STONE','STRIKE AGAIN','TAKE A LOOK'],line:'Strike it to reveal the post.',hold:560},
+piggy_bank:{n:'Piggy Bank',a:'a Piggy Bank',taps:3,frames:['pres-piggy-1.webp','pres-piggy-2.webp','pres-piggy-3.webp'],lbl:['BREAK THE BANK','HIT IT AGAIN','TAKE THE COINS'],line:'Break it to reveal the post.',hold:560},
+treasure_chest:{n:'Treasure Chest',a:'a Treasure Chest',taps:3,frames:['pres-chest-1.webp','pres-chest-2.webp','pres-chest-3.webp'],lbl:['BREAK THE LOCK','KEEP AT IT','READ THE SCROLL'],line:'Break the lock to reveal the post.',hold:560}};
+function presContKey(r){return (r&&CONTS[r.egg_container])?r.egg_container:'golden_egg'}
+function presCont(r){return CONTS[presContKey(r)]}
+function presContFrame(c,st){return c.frames[Math.min(st,c.frames.length-1)]}
+function presAria(c,st){var left=c.taps-st;return (st?'':'Sealed ')+c.n+'. '+(left>1?left+' more taps to open.':'One more tap to open.')}
+var EGGLOADED={};function preloadEgg(c){c=c||CONTS.golden_egg;if(EGGLOADED[c.n])return;EGGLOADED[c.n]=true;c.frames.forEach(function(s){var i=new Image();i.src=s})}
 function presRM(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
-var FILLLABEL={treat:'A LITTLE TREAT',kind_words:'WORDS FOR YOU',wisdom:'A LITTLE WISDOM',tiny_deed:'A TINY DEED',surprise:'A LITTLE SURPRISE'};
-var EGGART={treat_candy:'egg-treat-candy.webp',treat_chocolate:'egg-treat-chocolate.webp',treat:'egg-fill-treat.webp',kind_words:'egg-fill-kind-words.webp',wisdom:'egg-fill-wisdom.webp',tiny_deed:'egg-fill-tiny-deed.webp',surprise:'egg-fill-surprise.webp'};
+var FILLLABEL={treat:'A LITTLE TREAT',kind_words:'WORDS FOR YOU',wisdom:'A LITTLE WISDOM',tiny_deed:'A TINY DEED',surprise:'A LITTLE SURPRISE',photo:'A PHOTO FOR YOU'};
+var EGGART={treat_candy:'egg-treat-candy.webp',treat_chocolate:'egg-treat-chocolate.webp',treat:'egg-fill-treat.webp',kind_words:'egg-fill-kind-words.webp',wisdom:'egg-fill-wisdom.webp',tiny_deed:'egg-fill-tiny-deed.webp',surprise:'egg-fill-surprise.webp',photo:'egg-fill-photo.webp'};
 function presEggArtSrc(r){if(r.egg_filling==='treat')return r.egg_treat_style==='chocolate'?EGGART.treat_chocolate:EGGART.treat_candy;return EGGART[r.egg_filling]||EGGART.surprise}
-var EGGARTLOADED={};function preloadEggArt(r){var src=presEggArtSrc(r);if(EGGARTLOADED[src])return;EGGARTLOADED[src]=1;var i=new Image();i.src=src}
+var EGGARTLOADED={};function preloadEggArt(r){var src=(r.egg_filling==='photo'&&r.media_path&&(!r.media_status||r.media_status==='live'))?mediaURL(r.media_path):presEggArtSrc(r);if(EGGARTLOADED[src])return;EGGARTLOADED[src]=1;var i=new Image();i.src=src}
 function presPick(a){return a[Math.floor(Math.random()*a.length)]}
 /* ---- feed card bodies ---- */
 function presBodyHTML(r,body,mine,nm){
 if(r._k!=='post'||!r.presentation_type||r.presentation_type==='standard'||r.presentation_type==='photo')return '<p class="p-body">'+esc(body)+'</p>';
-if(r.presentation_type==='golden_egg'){preloadEgg();
+if(r.presentation_type==='golden_egg'){preloadEgg(presCont(r));
 if(EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
 return presEggSealedHTML(r,nm,mine)}
 if(r.presentation_type==='disappearing_note')return presInkHTML(r,body,mine);
 return '<p class="p-body">'+esc(body)+'</p>'}
-var EGGLBL=['GET CRACKIN&#39;','KEEP CRACKIN&#39;','ONE MORE TAP'];
-var EGGARIA=['Sealed Golden Egg. Tap to start cracking.','Cracking Golden Egg. Tap again.','Almost open. One more tap.'];
 function presEggSealedHTML(r,nm,mine){
-var st=EGGSTAGE[r.id]||0;
+var c=presCont(r),ck=presContKey(r),st=EGGSTAGE[r.id]||0;if(st>c.taps-1)st=c.taps-1;
 var h='<div class="eggzone" data-eggzone="'+esc(r.id)+'">';
-h+='<div class="egghl">'+(mine?'You left a Golden Egg.':esc(nm.handle)+' left a Golden Egg.')+'</div>';
-h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" aria-label="'+EGGARIA[st]+'"><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="'+EGGFRAMES[st]+'" alt=""></button>';
-h+='<div class="eggline">Crack it to reveal the post.</div>';
-h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">'+EGGLBL[st]+'</button>';
+h+='<div class="egghl">'+(mine?'You left '+c.a+'.':esc(nm.handle)+' left '+c.a+'.')+'</div>';
+h+='<button class="eggart" type="button" data-eggo="'+esc(r.id)+'" data-cont="'+ck+'" aria-label="'+presAria(c,st)+'"><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" src="'+presContFrame(c,st)+'" alt=""></button>';
+h+='<div class="eggline">'+c.line+'</div>';
+h+='<button class="logbtn eggbtn" type="button" data-eggo="'+esc(r.id)+'">'+c.lbl[st]+'</button>';
 h+='</div>';return h}
 function presEggOpenHTML(r,body,mine){
 var f=FILLLABEL[r.egg_filling]?r.egg_filling:'surprise';
@@ -4591,8 +4637,14 @@ if(f==='tiny_deed'&&TDSWAP[r.id]){cur=TDSWAP[r.id];lbl='ANOTHER FROM THE POOL'}
 var words=esc(cur);
 if(f==='wisdom'&&!/^["\u201C\u2018']/.test(cur))words='\u201C'+words+'\u201D';
 var h='<div class="eggin eggopen eo-'+f+'">';
-h+='<div class="eoplate"><img class="eosp" src="egg-ripples.webp" alt="">'+(f==='treat'?'<img class="eoart" src="'+presEggArtSrc(r)+'" alt="">':'<img class="eoseal" src="'+presEggArtSrc(r)+'" alt="">')+'</div>';
+var plate;
+if(f==='photo'){var pl=!r.media_status||r.media_status==='live';
+if(r.media_path&&pl){var pmu=esc(mediaURL(r.media_path));plate='<img class="eophoto" src="'+pmu+'" alt="" data-limg="'+pmu+'"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'>'}
+else plate='<img class="eoseal" src="'+EGGART.photo+'" alt="">'}
+else plate=(f==='treat'?'<img class="eoart" src="'+presEggArtSrc(r)+'" alt="">':'<img class="eoseal" src="'+presEggArtSrc(r)+'" alt="">');
+h+='<div class="eoplate"><img class="eosp" src="egg-ripples.webp" alt="">'+plate+'</div>';
 h+='<div class="eomicro">'+lbl+'</div>';
+if(f==='photo'&&r.media_path&&r.media_status==='pending')h+='<div class="tdmicro">'+(mine?'PHOTO IN REVIEW \u00B7 IT SHOWS WHEN IT CLEARS':'THE PHOTO SHOWS WHEN IT CLEARS')+'</div>';
 h+='<p class="eowords">'+words+'</p>';
 if(f==='tiny_deed'&&!mine){var st=TDST[r.id];
 h+='<div class="tdrow">';
@@ -4625,20 +4677,20 @@ var row={post_id:id,viewer_id:PROFILE.id};if(st)row.deed_status=st;
 sb.from('post_reveals').upsert(row,{onConflict:'post_id,viewer_id'}).then(function(){}).catch(function(){})}
 function crackEgg(id){if(EGGBUSY[id])return;var r=presFind(id);if(!r)return;
 var zone=document.querySelector('[data-eggzone="'+id+'"]');if(!zone)return;
-var img=zone.querySelector('.emain'),art=zone.querySelector('.eggart'),btn=zone.querySelector('.eggbtn');
+var c=presCont(r),img=zone.querySelector('.emain'),art=zone.querySelector('.eggart'),btn=zone.querySelector('.eggbtn');
 var st=EGGSTAGE[id]||0,rm=presRM();
 if(img)img.onerror=function(){var f=zone.querySelector('.eggfail');if(!f){f=document.createElement('div');f.className='eggfail';f.textContent='This surprise couldn\u2019t open. Try again.';zone.appendChild(f)}};
-if(st<2){st++;EGGSTAGE[id]=st;preloadEggArt(r);
-if(img)img.src=EGGFRAMES[st];
-if(btn)btn.innerHTML=EGGLBL[st];
-if(art){art.setAttribute('aria-label',EGGARIA[st]);
+if(st<c.taps-1){st++;EGGSTAGE[id]=st;preloadEggArt(r);
+if(img)img.src=presContFrame(c,st);
+if(btn)btn.innerHTML=c.lbl[st];
+if(art){art.setAttribute('aria-label',presAria(c,st));
 if(!rm){art.classList.remove('tap');void art.offsetWidth;art.classList.add('tap')}}
 return}
 EGGBUSY[id]=1;
 zone.querySelectorAll('[data-eggo]').forEach(function(b){b.disabled=true});
-if(art){art.classList.remove('tap');art.classList.add('opened');art.setAttribute('aria-label','Opened Golden Egg.')}
-if(img)img.src=EGGFRAMES[3];
-setTimeout(function(){EGGSEEN[id]=1;presSave();presServerReveal(id);delete EGGBUSY[id];delete EGGSTAGE[id];presRedraw(id)},rm?160:900)}
+if(art){art.classList.remove('tap');art.classList.add('opened');art.setAttribute('aria-label','Opened '+c.n+'.')}
+if(img&&c.frames.length>c.taps)img.src=c.frames[c.taps];
+setTimeout(function(){EGGSEEN[id]=1;presSave();presServerReveal(id);delete EGGBUSY[id];delete EGGSTAGE[id];presRedraw(id)},rm?160:c.hold)}
 /* ---- tiny deed ---- */
 function tdSet(id,st){TDST[id]=st;presServerReveal(id,st);presRedraw(id)}
 function tdSwapIt(id){var r=presFind(id);if(!r)return;var base=(r.body||'').trim();
@@ -4701,31 +4753,41 @@ function presPaint(){var bi=$('#presInk'),be=$('#presEgg');
 if(bi){bi.classList.toggle('on',PRES==='disappearing_note');bi.setAttribute('aria-pressed',PRES==='disappearing_note'?'true':'false')}
 if(be){be.classList.toggle('on',PRES==='golden_egg');be.setAttribute('aria-pressed',PRES==='golden_egg'?'true':'false')}
 var ep=$('#eggpane');if(ep)ep.style.display=PRES==='golden_egg'?'':'none';
-var lta=$('#logtext');if(lta&&composeMode==='post')lta.placeholder=PRES==='golden_egg'?'Optional. Leave it blank and DEEDS. fills the egg.':'Say something good.';
+var lta=$('#logtext');if(lta&&composeMode==='post')lta.placeholder=PRES==='golden_egg'?(EGGFILL==='photo'?'Optional. A few words to go with it.':'Optional. Leave it blank and DEEDS. fills the '+(EGGCONT==='golden_egg'?'egg':CONTS[EGGCONT].n.toLowerCase())+'.'):'Say something good.';
 var inn=$('#inknote');if(inn)inn.style.display=PRES==='disappearing_note'?'':'none';
 var es=$('#estyle');if(es)es.style.display=(PRES==='golden_egg'&&EGGFILL==='treat')?'flex':'none';
 var epr=$('#eprompt');if(epr)epr.style.display=(PRES==='golden_egg'&&EGGFILL==='tiny_deed')?'flex':'none';
 $$('#eggpane .efill').forEach(function(f){f.classList.toggle('on',f.getAttribute('data-ef')===EGGFILL)});
 $$('#estyle .lchip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-es')===ESTYLE)});
+$$('#econts .econt').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-ec')===EGGCONT)});
+var eph=$('#ephoto');if(eph){eph.style.display=(PRES==='golden_egg'&&EGGFILL==='photo')?'flex':'none';var has=presHasPhoto();var ea=$('#epAdd');if(ea)ea.textContent=has?'Change the Photo.':'Add the Photo.';var en=$('#epNote');if(en)en.textContent=has?'Attached. It stays hidden until they open it.':'It stays hidden until they open it.'}
 presCount()}
+function presHasPhoto(){return !!(typeof LPHOTO!=='undefined'&&LPHOTO)}
 function presCount(){var pc=$('#precount');if(!pc)return;
 if(PRES==='standard'){pc.style.display='none';return}
 var n=320-($('#logtext').value||'').length;
 pc.style.display='';pc.textContent=(n>=0?n:0)+' CHARACTERS LEFT'+(n<0?' \u00B7 TOO LONG':'')}
 function presSet(next){if(!liveOn)return;
 if(next===PRES)next='standard';
-if(next!=='standard'&&typeof LPHOTO!=='undefined'&&LPHOTO){
+var has=presHasPhoto();
+if(next==='disappearing_note'&&has){
 if(!window.confirm('Switching removes the attached photo. Keep going?'))return;
 try{clearPhoto()}catch(e){}}
-PRES=next;presPaint()}
-function presReset(){PRES='standard';EGGFILL=null;ESTYLE='candy';presPaint()}
+PRES=next;
+if(next==='golden_egg'&&has)EGGFILL='photo';
+presPaint()}
+function presReset(){PRES='standard';EGGFILL=null;ESTYLE='candy';EGGCONT='golden_egg';presPaint()}
 function presPrepare(txt){
 if(!liveOn||composeMode!=='post'||PRES==='standard')return {body:txt,fields:null};
 if(txt.length>320){toast('Keep it under 320 characters.');return null}
 if(PRES==='disappearing_note')return {body:txt,fields:{p:'disappearing_note'}};
 if(!EGGFILL){toast('Choose what goes inside.');return null}
+var hasP=presHasPhoto(),cname=(CONTS[EGGCONT]||CONTS.golden_egg).n.toLowerCase();
+if(EGGFILL==='photo'&&!hasP){toast('Add the photo that goes inside.');return null}
+if(EGGFILL!=='photo'&&hasP){toast('With a photo attached, the '+cname+' holds the photo. Pick Photo or remove it.');return null}
 var fill=EGGFILL,style=null,body=txt;
-if(fill==='treat'){style=ESTYLE||'candy';if(!body){var sp=EGGSEEDS.treat.filter(function(x){return x.style===style});var s=presPick(sp.length?sp:EGGSEEDS.treat);body=s.text;style=s.style}}
+if(fill==='photo'){if(!body)body=presPick(EGGSEEDS.photo)}
+else if(fill==='treat'){style=ESTYLE||'candy';if(!body){var sp=EGGSEEDS.treat.filter(function(x){return x.style===style});var s=presPick(sp.length?sp:EGGSEEDS.treat);body=s.text;style=s.style}}
 else if(fill==='surprise'){
 if(body){fill=presPick(['kind_words','wisdom'])}
 else{fill=presPick(['treat','kind_words','wisdom','tiny_deed']);
@@ -4734,19 +4796,24 @@ else if(fill==='tiny_deed')body=presPick(DEEDPROMPTS).text;
 else body=presPick(EGGSEEDS[fill])}}
 else if(!body&&(fill==='kind_words'||fill==='wisdom')){body=presPick(EGGSEEDS[fill])}
 else if(!body&&fill==='tiny_deed'){body=presPick(DEEDPROMPTS).text}
-if(!body){toast('Put something inside before posting your egg.');return null}
+if(!body){toast('Put something inside before posting your '+cname+'.');return null}
 if(body.length>320){toast('Keep it under 320 characters.');return null}
-return {body:body,fields:{p:'golden_egg',f:fill,s:style}}}
+return {body:body,fields:{p:'golden_egg',f:fill,s:style,c:(CONTS[EGGCONT]?EGGCONT:'golden_egg')}}}
 function presWireComposer(){
 var bi=$('#presInk'),be=$('#presEgg');
 if(bi)bi.onclick=function(){presSet('disappearing_note')};
 if(be)be.onclick=function(){presSet('golden_egg')};
-$$('#eggpane .efill').forEach(function(f){f.onclick=function(){EGGFILL=f.getAttribute('data-ef');presPaint()}});
+$$('#eggpane .efill').forEach(function(f){f.onclick=function(){EGGFILL=f.getAttribute('data-ef');presPaint();if(EGGFILL==='photo'&&!presHasPhoto()){var pb3=$('#logphoto');if(pb3)pb3.click()}}});
+$$('#econts .econt').forEach(function(b){b.onclick=function(){EGGCONT=b.getAttribute('data-ec');if(!CONTS[EGGCONT])EGGCONT='golden_egg';preloadEgg(CONTS[EGGCONT]);presPaint()}});
+var ea=$('#epAdd');if(ea)ea.onclick=function(){var pb4=$('#logphoto');if(pb4)pb4.click()};
 $$('#estyle .lchip').forEach(function(c){c.onclick=function(){ESTYLE=c.getAttribute('data-es');presPaint()}});
 var eg=$('#epGive');if(eg)eg.onclick=function(){$('#logtext').value=presPick(DEEDPROMPTS).text;presCount()};
 var lt=$('#logtext');if(lt)lt.addEventListener('input',presCount);
-var pb=$('#logphoto');if(pb){var pold=pb.onclick;pb.onclick=function(ev){if(PRES!=='standard'){PRES='standard';presPaint()}if(pold)pold.call(this,ev)}}}
+var pb=$('#logphoto');if(pb){var pold=pb.onclick;pb.onclick=function(ev){if(PRES==='disappearing_note'){PRES='standard';presPaint()}if(pold)pold.call(this,ev)}}}
 presWireComposer();
+/* a photo that lands while a container is on becomes its filling; a photo removed keeps the Photo pane honest */
+var presBaseShow=showPrev;showPrev=function(){presBaseShow.apply(this,arguments);if(PRES==='golden_egg'){EGGFILL='photo';presPaint()}};
+var presBaseClear=clearPhoto;clearPhoto=function(){presBaseClear.apply(this,arguments);if(PRES==='golden_egg'&&EGGFILL==='photo')presPaint()};
 var presBaseSwitch=switchMode;
 switchMode=function(m){presBaseSwitch(m);
 var pr=$('#prow');if(pr)pr.style.display=(liveOn&&m==='post')?'flex':'none';
