@@ -7,8 +7,8 @@
 <meta name="theme-color" content="#0E1A14">
 <meta property="og:title" content="The Art of Doing Good.">
 <meta property="og:description" content="Not for recognition.">
-<meta property="og:image" content="/icon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://deeds.fun/deeds-og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <link rel="preload" as="image" href="/nebula.webp">
@@ -18,34 +18,30 @@
   --pad: clamp(22px, 6vw, 84px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html{scroll-behavior:smooth}
 body{
-  background:var(--ink); color:var(--ivory); overflow:hidden;
+  background:var(--ink); color:var(--ivory);
   font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
-#stage{position:fixed; inset:0; overflow:hidden}
 
-/* every layer is oversized so it can pan without ever showing an edge */
+/* ---------- act one: the sky ---------- */
+#hero{position:relative; height:100svh; min-height:620px; overflow:hidden}
 .layer{position:absolute; left:-7%; top:-7%; width:114%; height:114%; will-change:transform}
 .layer img{width:100%; height:100%; object-fit:cover; object-position:50% 50%; display:block}
 #stars{position:absolute; inset:0; width:100%; height:100%}
-
-/* legibility floor for the copy column */
 .scrim{position:absolute; inset:0; pointer-events:none;
   background:
     linear-gradient(180deg, rgba(14,26,20,.50) 0%, rgba(14,26,20,0) 22%),
     linear-gradient(0deg,   rgba(14,26,20,.70) 0%, rgba(14,26,20,.10) 52%);
 }
 @media (min-width:1024px){
-  .layer img{object-position:50% 50%}
   .scrim{background:
     linear-gradient(90deg, rgba(14,26,20,.80) 0%, rgba(14,26,20,.46) 38%, rgba(14,26,20,0) 64%),
     linear-gradient(180deg, rgba(14,26,20,.42) 0%, rgba(14,26,20,0) 26%),
     linear-gradient(0deg, rgba(14,26,20,.34) 0%, rgba(14,26,20,0) 26%);}
 }
 
-/* copy */
 .copy{position:absolute; inset:0; display:flex; flex-direction:column;
   padding:calc(var(--pad) + env(safe-area-inset-top)) var(--pad)
           calc(var(--pad) + env(safe-area-inset-bottom));
@@ -60,7 +56,7 @@ h1{font-weight:700; letter-spacing:-.037em; line-height:.92;
 h1 i{font-style:normal; color:var(--gold)}
 .deck{margin-top:clamp(16px,3.6vw,22px); max-width:34ch; line-height:1.5;
   font-size:clamp(.92rem,3.7vw,1.02rem); color:rgba(246,243,235,.78)}
-.deck q{quotes:"“" "”"; font-style:italic; color:var(--ivory)}
+.deck q{quotes:"\201C" "\201D"; font-style:italic; color:var(--ivory)}
 
 .spec{margin-top:clamp(26px,6vw,40px); display:grid; grid-template-columns:1fr 1fr;
   border-top:1px solid rgba(246,243,235,.20)}
@@ -80,28 +76,82 @@ h1 i{font-style:normal; color:var(--gold)}
 .btn.ghost:hover{background:rgba(246,243,235,.10)}
 .btn:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
 
-footer{margin-top:clamp(24px,6vw,38px); display:flex; justify-content:space-between;
-  align-items:baseline; font-size:.58rem; letter-spacing:.2em; font-weight:700;
-  color:rgba(246,243,235,.52)}
-footer b{font-weight:700; color:rgba(246,243,235,.72)}
-
 @media (min-width:1024px){
-  .body{max-width:600px}
+  .body{max-width:600px; margin-bottom:6px}
   h1{font-size:clamp(4rem, 5.6vw, 7.4rem)}
   .spec{grid-template-columns:repeat(4,1fr)}
-  .spec div{border-right:1px solid rgba(246,243,235,.20); padding:12px 0 11px}
-  .spec div:nth-child(even){padding-left:0}
-  .spec div:nth-child(n){padding-left:0}
+  .spec div{border-right:1px solid rgba(246,243,235,.20); padding:12px 16px 11px 0}
   .spec div+div{padding-left:16px}
+  .spec div:nth-child(even){padding-left:16px}
   .spec div:last-child{border-right:0}
-  .body{margin-bottom:6px}
 }
-@media (prefers-reduced-motion:reduce){ .layer,.copy{transform:none !important} }
+
+.herofoot{margin-top:clamp(24px,6vw,38px); display:flex; justify-content:space-between;
+  align-items:baseline; font-size:.58rem; letter-spacing:.2em; font-weight:700;
+  color:rgba(246,243,235,.52)}
+.herofoot b{font-weight:700; color:rgba(246,243,235,.72)}
+
+.cue{position:absolute; left:50%; transform:translateX(-50%);
+  bottom:calc(14px + env(safe-area-inset-bottom));
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  text-decoration:none; color:rgba(246,243,235,.62); z-index:3}
+.cue span{font-size:.56rem; letter-spacing:.26em; font-weight:700}
+.cue svg{animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ---------- act two: the note ---------- */
+#note{background:var(--ink); padding:clamp(56px,10vw,120px) var(--pad) clamp(64px,10vw,120px);
+  display:flex; flex-direction:column; align-items:center}
+.notelabel{font-size:.62rem; letter-spacing:.26em; font-weight:700; color:var(--sage);
+  text-transform:uppercase; margin-bottom:clamp(26px,5vw,44px); text-align:center}
+.paper{width:min(620px, 92vw); transform:rotate(-.55deg);
+  filter:drop-shadow(0 26px 50px rgba(0,0,0,.55)); display:block}
+.notecta{margin-top:clamp(36px,7vw,60px); display:flex; gap:12px; width:min(620px,92vw)}
+@media (max-width:1023px){.notecta{flex-direction:column}}
+.notecta .btn{flex:1; text-align:center}
+.noteline{margin-top:clamp(20px,4vw,28px); font-size:.58rem; letter-spacing:.2em;
+  font-weight:700; color:rgba(246,243,235,.45); text-align:center}
+
+/* ---------- the join sheet ---------- */
+#veil{position:fixed; inset:0; background:rgba(10,17,13,.72); backdrop-filter:blur(3px);
+  display:none; align-items:center; justify-content:center; padding:20px; z-index:20}
+#veil.on{display:flex}
+#sheet{background:var(--ivory); color:#15130E; width:min(440px, 100%);
+  border-top:3px solid var(--forest); border-radius:2px; padding:26px 26px 24px;
+  box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#sheet .mark{color:#15130E; font-size:1rem; margin-bottom:18px}
+#sheet .mark i{color:var(--forest)}
+#sheet h2{font-weight:700; letter-spacing:-.03em; font-size:1.7rem; line-height:1.04}
+#sheet h2 i{font-style:normal; color:var(--forest)}
+.sub{margin-top:8px; font-weight:700; font-size:.66rem; letter-spacing:.18em;
+  color:var(--forest); text-transform:uppercase}
+.expl{margin-top:14px; font-size:.9rem; line-height:1.55; color:rgba(21,19,14,.78)}
+.field{margin-top:20px}
+.field label{display:block; font-size:.6rem; letter-spacing:.2em; font-weight:700;
+  color:rgba(21,19,14,.55); text-transform:uppercase; margin-bottom:6px}
+.field input{width:100%; border:0; border-bottom:1px solid rgba(21,19,14,.32);
+  background:transparent; font:inherit; font-size:1.15rem; padding:8px 2px 10px; border-radius:0}
+.field input:focus{outline:none; border-bottom-color:var(--forest)}
+#code{font-size:1.9rem; letter-spacing:.42em; text-align:center; font-weight:700}
+.sbtn{margin-top:20px; width:100%; appearance:none; border:0; cursor:pointer; font:inherit;
+  font-weight:700; font-size:.9rem; padding:15px 20px; border-radius:2px;
+  background:var(--forest); color:var(--ivory)}
+.sbtn[disabled]{opacity:.55; cursor:default}
+.sbtn.ghost{background:transparent; color:rgba(21,19,14,.72); padding:12px 20px; margin-top:8px}
+.err{margin-top:14px; font-size:.84rem; line-height:1.5; color:#7A2E1F; display:none}
+.err.on{display:block}
+.jview{display:none}
+.jview.on{display:block}
+.sentto{margin-top:14px; font-size:.9rem; color:rgba(21,19,14,.78); line-height:1.5}
+.sentto b{color:#15130E}
+#doneName{color:var(--forest)}
+
+@media (prefers-reduced-motion:reduce){ .layer,.copy{transform:none !important} .cue svg{animation:none} html{scroll-behavior:auto} }
 </style>
 </head>
 <body>
-<div id="stage">
 
+<section id="hero">
   <div class="layer" id="lSky">
     <picture>
       <source media="(min-width:1024px)" srcset="/nebula-wide.webp">
@@ -109,44 +159,98 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
     </picture>
     <canvas id="stars"></canvas>
   </div>
-
   <div class="layer" id="lMoon">
     <picture>
       <source media="(min-width:1024px)" srcset="/moon-wide.webp">
       <img src="/moon.webp" alt="">
     </picture>
   </div>
-
   <div class="layer" id="lFol">
     <picture>
       <source media="(min-width:1024px)" srcset="/foliage-wide.webp">
       <img src="/foliage.webp" alt="">
     </picture>
   </div>
-
   <div class="scrim"></div>
 
   <div class="copy" id="lCopy">
     <div class="mark">DEEDS<i>.</i></div>
-
     <div class="body">
       <div class="eyebrow" id="eyebrow">Anonymous · Person to person</div>
       <h1 id="head">The Art of Doing Good<i>.</i></h1>
       <p class="deck" id="deck">Not for recognition. Not for followers. Simply because good deeds deserve to be seen.</p>
-
       <div class="spec">
         <div>SEE IT</div><div>DO IT</div><div>PASS IT</div><div>WATCH IT MOVE</div>
       </div>
-
       <div class="cta">
-        <a class="btn" id="ctaMain" href="/">Join DEEDS.</a>
+        <button class="btn" id="ctaMain" type="button">Join DEEDS.</button>
         <a class="btn ghost" id="ctaAlt" href="/">Explore.</a>
       </div>
-
-      <footer>
+      <div class="herofoot">
         <b>deeds.fun</b>
         <span id="foot">TILT THE SKY</span>
-      </footer>
+      </div>
+    </div>
+  </div>
+
+  <a class="cue" href="#note" aria-label="Read the note">
+    <span>THE NOTE</span>
+    <svg width="16" height="9" viewBox="0 0 16 9" fill="none" aria-hidden="true">
+      <path d="M1 1l7 6 7-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </a>
+</section>
+
+<section id="note">
+  <div class="notelabel">A note, before you come in</div>
+  <img class="paper" src="/note.webp" alt="A typewritten note explaining DEEDS: an anonymous record of good deeds, and Matthew 5:16." loading="lazy" width="1100" height="1600">
+  <div class="notecta">
+    <button class="btn" id="ctaJoin2" type="button">Join DEEDS.</button>
+    <a class="btn ghost" href="/" id="ctaAlt2">Explore.</a>
+  </div>
+  <div class="noteline">ANONYMOUS · PERSON TO PERSON · DEEDS.FUN</div>
+</section>
+
+<div id="veil" role="dialog" aria-modal="true" aria-labelledby="jTitle">
+  <div id="sheet">
+    <div class="mark">DEEDS<i>.</i></div>
+
+    <div class="jview on" id="jsEmail">
+      <h2 id="jTitle">Join DEEDS<i>.</i></h2>
+      <div class="sub">One email · One code · No password</div>
+      <p class="expl">DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.</p>
+      <div class="field">
+        <label for="email">Your email</label>
+        <input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="err" id="errEmail"></div>
+      <button class="sbtn" id="btnSend" type="button">Send the Code.</button>
+      <button class="sbtn ghost" id="btnClose1" type="button">Back.</button>
+    </div>
+
+    <div class="jview" id="jsCode">
+      <h2>Check your email<i>.</i></h2>
+      <p class="sentto">A six digit code is on its way to <b id="sentAddr"></b>. Enter it here. Only the newest code works.</p>
+      <div class="field">
+        <label for="code">Your code</label>
+        <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*">
+      </div>
+      <div class="err" id="errCode"></div>
+      <button class="sbtn" id="btnVerify" type="button">Verify.</button>
+      <button class="sbtn ghost" id="btnAgain" type="button">Send Again.</button>
+    </div>
+
+    <div class="jview" id="jsDone">
+      <h2 id="doneTitle">You're in<i>.</i></h2>
+      <p class="expl" id="doneCopy">Your profile is ready. From here on you are <b id="doneName"></b>, and that is all anyone will ever know.</p>
+      <button class="sbtn" id="btnEnter" type="button">Enter DEEDS.</button>
+    </div>
+
+    <div class="jview" id="jsDead">
+      <h2>The door stuck<i>.</i></h2>
+      <p class="expl">The sign in service could not load from here. Open DEEDS and join from inside, the same one code door is there too.</p>
+      <button class="sbtn" id="btnDead" type="button">Open DEEDS.</button>
+      <button class="sbtn ghost" id="btnClose2" type="button">Back.</button>
     </div>
   </div>
 </div>
@@ -169,8 +273,7 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
     eb.textContent = "An invitation · from " + who;
     if (act){
       hd.innerHTML = 'Someone thought of you<i>.</i>';
-      dk.innerHTML = 'They logged a deed and put your name on it. <q>' +
-        act.replace(/[<>&]/g,"") + '</q>';
+      dk.innerHTML = 'They logged a deed and put your name on it. <q>' + act.replace(/[<>&]/g,"") + '</q>';
     } else if (k){
       hd.innerHTML = who + ' sent you the Forty<i>.</i>';
       dk.textContent = "Forty acts of kindness. No clock. No order. No audience.";
@@ -179,23 +282,148 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
       dk.textContent = "No deed attached. No clock. Just the door, held open.";
     }
   }
-  ["ctaMain","ctaAlt"].forEach(function(id){
-    var a = document.getElementById(id);
-    a.addEventListener("click", function(){
-      try { sessionStorage.setItem("deeds_welcomed","1"); } catch(e){}
-      a.href = "/" + location.search;
-    });
+
+  function passed(){ try { sessionStorage.setItem("deeds_welcomed","1"); } catch(e){} }
+  function intoApp(){ passed(); location.href = "/" + location.search; }
+  ["ctaAlt","ctaAlt2"].forEach(function(id){
+    document.getElementById(id).addEventListener("click", passed);
   });
   if (wide()) document.getElementById("foot").textContent = "SIGNED BY NO ONE";
   window.addEventListener("resize", function(){
     document.getElementById("foot").textContent = wide() ? "SIGNED BY NO ONE" : "TILT THE SKY";
   });
 
-  /* ---------- star field: seeded, procedural, drawn over the nebula ---------- */
+  /* ---------- the join sheet ---------- */
+  var SB_URL = "https://helqqdygwaihrliglbvw.supabase.co";
+  var SB_KEY = "sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA";
+  var _sb = null, sbLoad = null;
+  function loadSB(){
+    if (sbLoad) return sbLoad;
+    sbLoad = new Promise(function(res){
+      if (window.supabase) return res(true);
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+      s.onload = function(){ res(!!window.supabase); };
+      s.onerror = function(){ res(false); };
+      document.head.appendChild(s);
+      setTimeout(function(){ res(!!window.supabase); }, 9000);
+    });
+    return sbLoad;
+  }
+  function sb(){
+    if (!_sb && window.supabase) _sb = window.supabase.createClient(SB_URL, SB_KEY);
+    return _sb;
+  }
+  function timeout(p, ms){
+    return Promise.race([p, new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("timeout")); }, ms); })]);
+  }
+
+  var veil = document.getElementById("veil");
+  var views = ["jsEmail","jsCode","jsDone","jsDead"];
+  function show(v){
+    views.forEach(function(x){ document.getElementById(x).classList.toggle("on", x===v); });
+    var f = v==="jsEmail" ? "email" : v==="jsCode" ? "code" : null;
+    if (f) setTimeout(function(){ document.getElementById(f).focus(); }, 60);
+  }
+  function err(id, msg){
+    var e = document.getElementById(id);
+    e.textContent = msg || ""; e.classList.toggle("on", !!msg);
+  }
+  function openJoin(){
+    veil.classList.add("on");
+    err("errEmail"); err("errCode");
+    show("jsEmail");
+    loadSB().then(function(ok){
+      if (!ok) return;
+      var cl = sb(); if (!cl) return;
+      cl.auth.getSession().then(function(r){
+        if (r && r.data && r.data.session){
+          document.getElementById("doneTitle").innerHTML = "You're already in<i>.</i>";
+          document.getElementById("doneCopy").innerHTML = "This device is signed in. Walk through.";
+          show("jsDone");
+        }
+      }).catch(function(){});
+    });
+  }
+  function closeJoin(){ veil.classList.remove("on"); }
+  document.getElementById("ctaMain").addEventListener("click", openJoin);
+  document.getElementById("ctaJoin2").addEventListener("click", openJoin);
+  document.getElementById("btnClose1").addEventListener("click", closeJoin);
+  document.getElementById("btnClose2").addEventListener("click", closeJoin);
+  veil.addEventListener("click", function(e){ if (e.target === veil) closeJoin(); });
+  window.addEventListener("keydown", function(e){ if (e.key === "Escape") closeJoin(); });
+  document.getElementById("btnDead").addEventListener("click", intoApp);
+
+  var EMAIL = "";
+  function sendCode(again){
+    var box = again ? "errCode" : "errEmail";
+    err(box);
+    if (!again){
+      EMAIL = (document.getElementById("email").value || "").trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){ err("errEmail", "That does not look like an email address."); return; }
+    }
+    var b = again ? document.getElementById("btnAgain") : document.getElementById("btnSend");
+    b.disabled = true; var was = b.textContent; b.textContent = "Sending\u2026";
+    loadSB().then(function(ok){
+      if (!ok){ show("jsDead"); return Promise.reject("dead"); }
+      return timeout(sb().auth.signInWithOtp({ email: EMAIL, options: { shouldCreateUser: true } }), 15000);
+    }).then(function(r){
+      if (r && r.error){
+        var m = (r.error.message || "").trim();
+        err(box, m ? "The code did not send. " + m : "The code did not send. The mail service gave no reason. Try again in a minute.");
+        return;
+      }
+      document.getElementById("sentAddr").textContent = EMAIL;
+      document.getElementById("code").value = "";
+      show("jsCode");
+    }).catch(function(e){
+      if (e === "dead") return;
+      err(box, e && e.message === "timeout"
+        ? "The mail service did not answer in fifteen seconds. Try again in a minute."
+        : "The code did not send. Check the connection and try again.");
+    }).finally(function(){ b.disabled = false; b.textContent = was; });
+  }
+  document.getElementById("btnSend").addEventListener("click", function(){ sendCode(false); });
+  document.getElementById("btnAgain").addEventListener("click", function(){ sendCode(true); });
+  document.getElementById("email").addEventListener("keydown", function(e){ if (e.key==="Enter") sendCode(false); });
+
+  function fetchHandle(uid, tries){
+    if (tries <= 0) return Promise.resolve("");
+    return sb().from("profiles").select("handle").eq("id", uid).maybeSingle().then(function(r){
+      if (r && r.data && r.data.handle) return r.data.handle;
+      return new Promise(function(res){ setTimeout(res, 900); }).then(function(){ return fetchHandle(uid, tries-1); });
+    }).catch(function(){ return ""; });
+  }
+  function verify(){
+    err("errCode");
+    var code = (document.getElementById("code").value || "").replace(/\D/g,"");
+    if (code.length !== 6){ err("errCode", "The code is six digits."); return; }
+    var b = document.getElementById("btnVerify");
+    b.disabled = true; b.textContent = "Verifying\u2026";
+    timeout(sb().auth.verifyOtp({ email: EMAIL, token: code, type: "email" }), 15000)
+    .then(function(r){
+      if (r && r.error){
+        err("errCode", "That code did not work. Codes expire, and only the newest one counts. Send Again for a fresh one.");
+        return;
+      }
+      var uid = r && r.data && r.data.user ? r.data.user.id : "";
+      show("jsDone");
+      document.getElementById("doneName").textContent = "your made name";
+      if (uid) fetchHandle(uid, 5).then(function(h){
+        if (h) document.getElementById("doneName").textContent = h;
+      });
+    }).catch(function(){
+      err("errCode", "Verification did not answer. Try once more.");
+    }).finally(function(){ b.disabled = false; b.textContent = "Verify."; });
+  }
+  document.getElementById("btnVerify").addEventListener("click", verify);
+  document.getElementById("code").addEventListener("keydown", function(e){ if (e.key==="Enter") verify(); });
+  document.getElementById("btnEnter").addEventListener("click", intoApp);
+
+  /* ---------- star field ---------- */
   var cv = document.getElementById("stars"), ctx = cv.getContext("2d"), stars = [], dpr = 1;
   function rng(seed){ return function(){ seed = (seed*1664525 + 1013904223) >>> 0; return seed/4294967296; }; }
-
-  function seed(){
+  function seedStars(){
     var box = cv.getBoundingClientRect();
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     cv.width = Math.max(1, Math.round(box.width*dpr));
@@ -204,22 +432,20 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
     var big = wide() ? 1.25 : 1;
     stars = [];
     for (var i=0;i<n;i++){
-      var y = Math.pow(r(), 1.45);                 // crowd the upper sky, thin toward the treeline
-      if (y > 0.70 && r() > 0.22) continue;        // the fog band swallows most low stars
-      var sharp = r() < 0.38;                    // blinkers vs slow breathers
+      var y = Math.pow(r(), 1.45);
+      if (y > 0.70 && r() > 0.22) continue;
+      var sharp = r() < 0.38;
       stars.push({
-        x: r()*box.width,
-        y: y*box.height,
+        x: r()*box.width, y: y*box.height,
         r: (0.75 + r()*1.5) * big,
         p: r()*Math.PI*2,
         s: sharp ? (0.0016 + r()*0.0013) : (0.00075 + r()*0.00085),
-        k: sharp ? (4.6 + r()*2.4) : (2.2 + r()*1.1),   // curve: how long it sits dim
-        f: r() < 0.10,                             // a few carry four point flares
+        k: sharp ? (4.6 + r()*2.4) : (2.2 + r()*1.1),
+        f: r() < 0.10,
         a: 0.38 + r()*0.62
       });
     }
   }
-
   function paint(t){
     var w = cv.width, h = cv.height;
     ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -239,8 +465,8 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
       ctx.fillStyle = "rgba(250,247,240," + al.toFixed(3) + ")";
       ctx.beginPath(); ctx.arc(s.x, s.y, rr, 0, 6.2832); ctx.fill();
       if (s.f && v > 0.30){
-        var L = rr * (5 + 11*v), aw = al*0.5;
-        ctx.strokeStyle = "rgba(238,226,190," + aw.toFixed(3) + ")";
+        var L = rr * (5 + 11*v);
+        ctx.strokeStyle = "rgba(238,226,190," + (al*0.5).toFixed(3) + ")";
         ctx.lineWidth = Math.max(0.5, rr*0.34);
         ctx.beginPath();
         ctx.moveTo(s.x-L, s.y); ctx.lineTo(s.x+L, s.y);
@@ -250,7 +476,7 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
     }
   }
 
-  /* ---------- motion: pointer or tilt, plus an ambient drift that never stops ---------- */
+  /* ---------- motion: pointer or tilt, plus ambient drift; scroll owns touch ---------- */
   var L = {
     sky:  {el: document.getElementById("lSky"),  d: 5},
     moon: {el: document.getElementById("lMoon"), d: 8},
@@ -259,34 +485,23 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
   };
   var tx=0, ty=0, cx=0, cy=0;
   function clamp(v){ return v < -1 ? -1 : v > 1 ? 1 : v; }
-
   window.addEventListener("mousemove", function(e){
     tx = clamp((e.clientX/window.innerWidth  - 0.5) * 2);
     ty = clamp((e.clientY/window.innerHeight - 0.5) * 2);
   }, {passive:true});
-
-  var dragging=false, sx=0, sy=0, bx=0, by=0;
-  window.addEventListener("touchstart", function(e){
-    dragging=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; bx=tx; by=ty;
-  }, {passive:true});
-  window.addEventListener("touchmove", function(e){
-    if(!dragging) return;
-    tx = clamp(bx + (e.touches[0].clientX - sx)/ (window.innerWidth*0.42));
-    ty = clamp(by + (e.touches[0].clientY - sy)/ (window.innerHeight*0.42));
-  }, {passive:true});
-  window.addEventListener("touchend", function(){
-    dragging=false;
+  var hero = document.getElementById("hero");
+  hero.addEventListener("touchend", function(){
     if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function"){
       DeviceOrientationEvent.requestPermission().then(function(r){
         if (r === "granted") window.addEventListener("deviceorientation", tilt);
       }).catch(function(){});
     }
-  }, {passive:true});
+  }, {passive:true, once:true});
   if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== "function"){
     window.addEventListener("deviceorientation", tilt);
   }
   function tilt(e){
-    if (dragging || e.gamma == null) return;
+    if (e.gamma == null) return;
     tx = clamp(e.gamma/12);
     ty = clamp((e.beta - 45)/12);
   }
@@ -295,25 +510,23 @@ footer b{font-weight:700; color:rgba(246,243,235,.72)}
   function frame(t){
     cx += (tx - cx) * 0.075;
     cy += (ty - cy) * 0.075;
-    // ambient: two out of phase oscillators, so the sky never sits perfectly still
     var ax = Math.sin(t/9700)*0.56 + Math.sin(t/23100)*0.44;
     var ay = Math.sin(t/13300)*0.58 + Math.cos(t/31700)*0.42;
-    var w = wide(), mul = w ? 1.6 : 1, pw = w ? 1 : 1, aw = w ? 0.62 : 0.34;
+    var w = wide(), mul = w ? 1.6 : 1, aw = w ? 0.62 : 0.34;
     if (!reduce){
       for (var kk in L){
         var d = L[kk].d * mul;
         L[kk].el.style.transform =
-          "translate3d(" + (-(cx*pw + ax*aw)*d).toFixed(2) + "px," +
-                           (-(cy*pw + ay*aw)*d*0.62).toFixed(2) + "px,0)";
+          "translate3d(" + (-(cx + ax*aw)*d).toFixed(2) + "px," +
+                           (-(cy + ay*aw)*d*0.62).toFixed(2) + "px,0)";
       }
     }
     if (t - last > 24){ paint(t); last = t; }
     requestAnimationFrame(frame);
   }
-
   var rt;
-  window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(seed, 160); });
-  seed();
+  window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(seedStars, 160); });
+  seedStars();
   if (reduce){ paint(0); } else { requestAnimationFrame(frame); }
 })();
 </script>
