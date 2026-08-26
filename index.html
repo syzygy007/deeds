@@ -964,7 +964,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .paper{padding:44px 46px 64px}
  .paper.tf{padding-right:88px}
 }
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.9 · six containers, photo filling) ============ */
+/* ============ POST PRESENTATIONS · ARTIFACTS + DISAPPEARING INK (v4.9.2 · Artifacts chip with his medallion mark, six containers, photo filling) ============ */
 #prow{align-items:center;flex-wrap:wrap;gap:10px}
 #prow .plab{font-size:10.5px;letter-spacing:.14em;color:var(--muted);margin-right:2px}
 #prow .lchip .pico{width:22px;height:22px;vertical-align:-6px;margin-right:7px;display:inline-block}
@@ -1652,11 +1652,11 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
   <div class="logrow" id="prow" style="display:none">
     <span class="micro plab">MAKE IT SPECIAL.</span>
     <button class="lchip" id="presInk" type="button" aria-pressed="false" aria-label="Write it in disappearing ink"><img class="pico" src="composer-note-icon.webp" alt="" width="22" height="22">Disappearing Ink.</button>
-    <button class="lchip" id="presEgg" type="button" aria-pressed="false" aria-label="Hide this post in a Golden Egg"><img class="pico" src="composer-golden-egg-icon.webp" alt="" width="22" height="22">Golden Egg.</button>
+    <button class="lchip" id="presEgg" type="button" aria-pressed="false" aria-label="Hide this post inside an Artifact"><img class="pico" src="composer-artifact-mark.webp" alt="" width="22" height="22">Artifacts.</button>
   </div>
   <div id="eggpane" style="display:none">
-    <div class="ehead">What holds it?</div>
-    <div class="esub">Pick the surprise they open.</div>
+    <div class="ehead">Pick the Artifact.</div>
+    <div class="esub">It hides the post until someone opens it.</div>
     <div class="econts" id="econts">
       <button class="econt on" type="button" data-ec="golden_egg"><img class="eci" src="pres-pick-egg.webp" alt="" width="56" height="56"><span class="cl">Golden Egg</span></button>
       <button class="econt" type="button" data-ec="pinata"><img class="eci" src="pres-pick-pinata.webp" alt="" width="56" height="56"><span class="cl">Pi&ntilde;ata</span></button>
@@ -4585,7 +4585,7 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    already gone. Clicking it threw. One render keeps the two in step even
    if the CDN never answers. ---- */
 
-/* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.9 · six containers, photo filling) ============ */
+/* ============ POST PRESENTATIONS · ARTIFACTS + DISAPPEARING INK (v4.9.2 · Artifacts chip with his medallion mark, six containers, photo filling) ============ */
 var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGCONT='golden_egg',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
 var EGGSEEN={},INKSEEN={};
 try{EGGSEEN=JSON.parse(localStorage.getItem('deeds_eggs')||'{}')||{}}catch(e){}
