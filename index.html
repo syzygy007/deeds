@@ -200,6 +200,10 @@ input,textarea{font:inherit;color:var(--ink)}
 .jn-legal{text-wrap:pretty}
 .jn-legal a{white-space:nowrap}
 .jn-legal .row2{display:block;margin-top:8px}
+.jn-labrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 8px}
+.jn-labrow .jn-lab{margin:0}
+.jn-swap{background:none;border:0;padding:0;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--forest);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;cursor:pointer}
+#atIn:-webkit-autofill,#atIn:-webkit-autofill:hover,#atIn:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--ivory) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink)}
 #jemail:-webkit-autofill,#jemail:-webkit-autofill:hover,#jemail:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--ivory) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink)}
 .sheet .sword b{color:var(--forest)}
 .sheet h3{font-size:22px;font-weight:800;margin:10px 0 14px}
@@ -1318,6 +1322,8 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
         <div class="specrow"><span class="k">The Daily Dose</span><span class="v" id="vRemind">On.</span></div>
         <div class="specrow"><span class="k">The App</span><button class="applnk" id="vApp">Show Me How.</button></div>
         <div class="specrow"><span class="k">Alerts</span><button class="applnk" id="vAl">Turn On.</button></div>
+        <div class="specrow"><span class="k">Phone</span><button class="applnk" id="vPhone">Add Your Phone.</button></div>
+        <div class="specrow"><span class="k">Email</span><button class="applnk" id="vEmail">Add Your Email.</button></div>
         <div class="specrow"><span class="k">The Rules</span><span class="v"><a href="/terms/" style="color:var(--forest);text-decoration:none">Terms</a> &middot; <a href="/privacy/" style="color:var(--forest);text-decoration:none">Privacy</a> &middot; <a href="/guidelines/" style="color:var(--forest);text-decoration:none">Guidelines</a> &middot; <a href="/copyright/" style="color:var(--forest);text-decoration:none">Copyright</a></span></div>
       </div>
       <div id="editpane" style="display:none">
@@ -1780,11 +1786,11 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
   <button class="jn-x" id="jx" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
   <div class="sword" style="letter-spacing:.18em;color:var(--forest)">DEEDS<b style="color:var(--forest)">.</b></div>
   <div class="jn-h1">Join DEEDS<b style="color:var(--forest)">.</b></div>
-  <p class="jn-sub">One email. One code. No password.</p>
+  <p class="jn-sub" id="jsub">One text. One code. No password.</p>
   <div class="jn-div"><svg class="jn-star" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c.5 4.5 3 7 8 8-5 1-7.5 3.5-8 8-.5-4.5-3-7-8-8 5-1 7.5-3.5 8-8z"/></svg></div>
   <div id="jstep1">
-    <div class="jn-lab">Email</div>
-    <input class="jn-in" id="jemail" type="email" placeholder="you@example.com" autocomplete="email">
+    <div class="jn-labrow"><div class="jn-lab" id="jlab">Phone</div><button class="jn-swap" id="jswap" type="button">Use email instead.</button></div>
+    <input class="jn-in" id="jemail" type="tel" inputmode="tel" placeholder="(310) 555 0123" autocomplete="tel">
     <button class="jn-btn" id="jsend">Send My Code.</button>
     <p class="jn-note">Already a member? The same code signs you in.</p>
     <p class="jn-legal">By continuing, you confirm you are 18 or older and agree to the <a href="/terms/" target="_blank">Terms of Use</a>. See how we protect your information in our <a href="/privacy/" target="_blank">Privacy Policy</a>.<span class="row2"><a href="/guidelines/" target="_blank">Community Guidelines</a> &middot; <a href="/copyright/" target="_blank">Copyright</a></span></p>
@@ -1792,10 +1798,31 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
   </div>
   <div id="jstep2" style="display:none">
     <div class="jn-lab">The Code</div>
-    <p class="jn-sub" style="margin:0">It is in your email. It signs you in.</p>
+    <p class="jn-sub" style="margin:0" id="jsub2">It is in your texts. It signs you in.</p>
     <input class="codein" id="jcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
     <button class="jn-btn" id="jverify">Enter DEEDS.</button>
     <button class="jn-ghost" id="jagain">Send Again.</button>
+  </div>
+</div>
+
+<div class="sheet" id="attachsheet" style="position:fixed">
+  <button class="jn-x" id="atx" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  <div class="sword" style="letter-spacing:.18em;color:var(--forest)">DEEDS<b style="color:var(--forest)">.</b></div>
+  <div class="jn-h1" id="atH">Add your phone<b style="color:var(--forest)">.</b></div>
+  <p class="jn-sub" id="atSub">A second door to the same profile. Nothing else changes.</p>
+  <div class="jn-div"><svg class="jn-star" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c.5 4.5 3 7 8 8-5 1-7.5 3.5-8 8-.5-4.5-3-7-8-8 5-1 7.5-3.5 8-8z"/></svg></div>
+  <div id="atstep1">
+    <div class="jn-lab" id="atLab">Phone</div>
+    <input class="jn-in" id="atIn" type="tel" inputmode="tel" placeholder="(310) 555 0123" autocomplete="tel">
+    <button class="jn-btn" id="atSend">Send My Code.</button>
+    <p class="jn-note" id="atNote">We text a code to prove it is yours. Then your number opens the same door your email does.</p>
+  </div>
+  <div id="atstep2" style="display:none">
+    <div class="jn-lab">The Code</div>
+    <p class="jn-sub" style="margin:0" id="atSub2">It is in your texts.</p>
+    <input class="codein" id="atCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
+    <button class="jn-btn" id="atVerify">Attach It.</button>
+    <button class="jn-ghost" id="atAgain">Send Again.</button>
   </div>
 </div>
 
@@ -2524,7 +2551,7 @@ var dw=$('#dWhy');if(dw)dw.onclick=function(){var w=$('#lWhy');if(w)w.click()}})
 (function(){
 var SB_URL='https://helqqdygwaihrliglbvw.supabase.co';
 var SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
-var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='doer',JEMAIL='',justVerified=false;
+var sb=null,liveOn=false,SESSION=null,PROFILE=null,MYORGS=[],MYMEMB=[],WTYPE='doer',JEMAIL='',JPHONE='',JMODE='phone',justVerified=false;
 /* bridge: the reader script lives in its own scope and reads these from window */
 try{Object.defineProperty(window,'PROFILE',{get:function(){return PROFILE}});Object.defineProperty(window,'sb',{get:function(){return sb}});Object.defineProperty(window,'liveOn',{get:function(){return liveOn}})}catch(e){}
 window.openJoin=openJoin;window.prependLive=prependLive;window.markKind=markKind;
@@ -3547,8 +3574,20 @@ try{history.replaceState(null,'',location.pathname)}catch(e){}}).catch(function(
 function openJoin(){closeSheets();
 $('#jstep1').style.display='block';$('#jstep2').style.display='none';
 var jc=$('#jcode');if(jc)jc.value='';
-
+setJoinMode(safeGet('deeds_door')==='email'?'email':'phone');
 sheet('#joinsheet');setTimeout(function(){var je=$('#jemail');if(je)je.focus()},350)}
+/* phone first: a US number gets +1, anything starting with + is taken as typed */
+function normPhone(s){s=String(s||'').trim();var plus=s.charAt(0)==='+';var d=s.replace(/\D/g,'');
+if(plus)return(d.length>=8&&d.length<=15)?'+'+d:'';
+if(d.length===10)return'+1'+d;if(d.length===11&&d.charAt(0)==='1')return'+'+d;return''}
+function prettyPhone(p){var m=/^\+1(\d{3})(\d{3})(\d{4})$/.exec(p||'');return m?'('+m[1]+') '+m[2]+' '+m[3]:(p||'')}
+function setJoinMode(m){JMODE=m==='email'?'email':'phone';var je=$('#jemail'),lab=$('#jlab'),sw=$('#jswap'),sub=$('#jsub'),s2=$('#jsub2');if(!je)return;var cur=je.value;
+if(JMODE==='phone'){je.setAttribute('type','tel');je.setAttribute('inputmode','tel');je.setAttribute('autocomplete','tel');je.placeholder='(310) 555 0123';
+if(lab)lab.textContent='Phone';if(sw)sw.textContent='Use email instead.';if(sub)sub.textContent='One text. One code. No password.';if(s2)s2.textContent='It is in your texts. It signs you in.';if(/@/.test(cur))je.value=''}
+else{je.setAttribute('type','email');je.setAttribute('inputmode','email');je.setAttribute('autocomplete','email');je.placeholder='you@example.com';
+if(lab)lab.textContent='Email';if(sw)sw.textContent='Use my phone instead.';if(sub)sub.textContent='One email. One code. No password.';if(s2)s2.textContent='It is in your email. It signs you in.';if(cur&&!/@/.test(cur))je.value=''}}
+var JSW=$('#jswap');if(JSW)JSW.onclick=function(){setJoinMode(JMODE==='phone'?'email':'phone');var je=$('#jemail');if(je)je.focus()};
+var JIN=$('#jemail');if(JIN)JIN.oninput=function(){if(JMODE==='phone'&&/@/.test(this.value))setJoinMode('email')};
 function failAuth(m){closeSheets();$('#authfailP').textContent=m;
 $('#scrim').classList.add('on');$('#authfail').classList.add('on')}
 $('#authfailOk').onclick=function(){closeSheets();openJoin()};
@@ -3556,33 +3595,70 @@ $('#tosOk').onclick=function(){var b=this;b.textContent='SAVING...';
 writeAccept(function(){b.textContent='I Agree.';closeSheets();toast('Thank you. Go do something small.')})};
 $('#tosNo').onclick=function(){closeSheets();toast('The rules stay in your profile. Read them any time.')};
 $('#jskip').onclick=closeSheets;var JX=$('#jx');if(JX)JX.onclick=closeSheets;
-function sendCode(){var b=$('#jsend');b.textContent='SENDING...';var done=false;
+function sendCode(){var b=$('#jsend');b.textContent='SENDING...';var done=false;var ph=JMODE==='phone';
 var to=setTimeout(function(){if(done)return;done=true;b.textContent='Send My Code.';
-failAuth('The mail service did not answer in time. If this keeps up, the sending domain is likely still being verified.')},15000);
-sb.auth.signInWithOtp({email:JEMAIL,options:{shouldCreateUser:true}}).then(function(r){
+failAuth(ph?'The text service did not answer in time. Try again in a minute.':'The mail service did not answer in time. If this keeps up, the sending domain is likely still being verified.')},15000);
+sb.auth.signInWithOtp(ph?{phone:JPHONE,options:{shouldCreateUser:true}}:{email:JEMAIL,options:{shouldCreateUser:true}}).then(function(r){
 if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';
-if(r.error){failAuth(r.error.message||'The mail service returned no detail. The sending domain is likely still being verified.');return}
+if(r.error){failAuth(r.error.message||(ph?'The text service returned no detail. Check the number and try again.':'The mail service returned no detail. The sending domain is likely still being verified.'));return}
 $('#jstep1').style.display='none';$('#jstep2').style.display='block';
 setTimeout(function(){var jc=$('#jcode');if(jc)jc.focus()},250)}).catch(function(e){
 if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';failAuth(String(e&&e.message||e))})}
-$('#jsend').onclick=function(){var em=v('#jemail');
-
-if(!/^\S+@\S+\.\S+$/.test(em)){toast('A real email first.');return}
-PENDACCEPT=true;JEMAIL=em;sendCode()};
-$('#jagain').onclick=function(){if(JEMAIL)sendCode()};
+$('#jsend').onclick=function(){var raw=v('#jemail');
+if(JMODE==='phone'){var p=normPhone(raw);if(!p){toast('A full number with area code. Outside the US, start with +.');return}JPHONE=p;JEMAIL=''}
+else{if(!/^\S+@\S+\.\S+$/.test(raw)){toast('A real email first.');return}JEMAIL=raw;JPHONE=''}
+safeSet('deeds_door',JMODE);PENDACCEPT=true;sendCode()};
+$('#jagain').onclick=function(){if(JEMAIL||JPHONE)sendCode()};
 $('#jverify').onclick=function(){var code=v('#jcode').replace(/\D/g,'');
 if(code.length<6){toast('Six digits.');return}
 var b=$('#jverify');b.textContent='CHECKING...';
-sb.auth.verifyOtp({email:JEMAIL,token:code,type:'email'}).then(function(r){
+sb.auth.verifyOtp(JMODE==='phone'?{phone:JPHONE,token:code,type:'sms'}:{email:JEMAIL,token:code,type:'email'}).then(function(r){
 b.textContent='Enter DEEDS.';
 if(r.error){toast('That code did not take: '+r.error.message);return}
 justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.';toast('That code did not take: '+String(e&&e.message||e))})};
+
+/* ---- the second door: put a phone or an email on this profile ---- */
+var AT={mode:'phone',val:''};
+function doorUser(){return(SESSION&&SESSION.user)?SESSION.user:null}
+function paintDoors(){var u=doorUser(),vp=$('#vPhone'),ve=$('#vEmail');if(!vp||!ve)return;
+if(!u||!PROFILE){vp.textContent='Sign In First.';ve.textContent='Sign In First.';vp.onclick=openJoin;ve.onclick=openJoin;vp.classList.add('mut');ve.classList.add('mut');return}
+if(u.phone){vp.textContent='On. Ends in '+String(u.phone).slice(-4)+'.';vp.onclick=null;vp.classList.add('mut')}
+else{vp.textContent='Add Your Phone.';vp.onclick=function(){openAttach('phone')};vp.classList.remove('mut')}
+if(u.email){ve.textContent=u.email;ve.onclick=null;ve.classList.add('mut')}
+else{ve.textContent='Add Your Email.';ve.onclick=function(){openAttach('email')};ve.classList.remove('mut')}}
+function openAttach(m){if(!PROFILE){openJoin();return}AT.mode=m==='email'?'email':'phone';AT.val='';closeSheets();
+var ph=AT.mode==='phone',inp=$('#atIn');if(!inp)return;
+$('#atH').innerHTML=(ph?'Add your phone':'Add your email')+'<b style="color:var(--forest)">.</b>';
+$('#atLab').textContent=ph?'Phone':'Email';
+inp.value='';inp.setAttribute('type',ph?'tel':'email');inp.setAttribute('inputmode',ph?'tel':'email');inp.setAttribute('autocomplete',ph?'tel':'email');inp.placeholder=ph?'(310) 555 0123':'you@example.com';
+$('#atNote').textContent=ph?'We text a code to prove it is yours. Then your number opens the same door your email does.':'We email a code to prove it is yours. Then the Daily Dose and your alerts have somewhere to go.';
+$('#atSub2').textContent=ph?'It is in your texts.':'It is in your email. The link in it works too.';
+$('#atstep1').style.display='block';$('#atstep2').style.display='none';var ac=$('#atCode');if(ac)ac.value='';
+sheet('#attachsheet');setTimeout(function(){inp.focus()},350)}
+function atSend(){var b=$('#atSend'),ph=AT.mode==='phone';b.textContent='SENDING...';var done=false;
+var to=setTimeout(function(){if(done)return;done=true;b.textContent='Send My Code.';toast(ph?'The text service did not answer in time. Try again in a minute.':'The mail service did not answer in time. Try again in a minute.')},15000);
+sb.auth.updateUser(ph?{phone:AT.val}:{email:AT.val}).then(function(r){if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';
+if(r.error){toast('That did not send: '+(r.error.message||'no detail'));return}
+$('#atstep1').style.display='none';$('#atstep2').style.display='block';setTimeout(function(){var c=$('#atCode');if(c)c.focus()},250)}).catch(function(e){
+if(done)return;done=true;clearTimeout(to);b.textContent='Send My Code.';toast('That did not send: '+String(e&&e.message||e))})}
+var ATS=$('#atSend');if(ATS)ATS.onclick=function(){var raw=v('#atIn');
+if(AT.mode==='phone'){var p=normPhone(raw);if(!p){toast('A full number with area code. Outside the US, start with +.');return}AT.val=p}
+else{if(!/^\S+@\S+\.\S+$/.test(raw)){toast('A real email first.');return}AT.val=raw}
+atSend()};
+var ATA=$('#atAgain');if(ATA)ATA.onclick=function(){if(AT.val)atSend()};
+var ATV=$('#atVerify');if(ATV)ATV.onclick=function(){var code=v('#atCode').replace(/\D/g,'');if(code.length<6){toast('Six digits.');return}
+var b=$('#atVerify'),ph=AT.mode==='phone';b.textContent='CHECKING...';
+sb.auth.verifyOtp(ph?{phone:AT.val,token:code,type:'phone_change'}:{email:AT.val,token:code,type:'email_change'}).then(function(r){b.textContent='Attach It.';
+if(r.error){toast('That code did not take: '+r.error.message);return}
+closeSheets();return sb.auth.getUser().then(function(g){if(g&&g.data&&g.data.user&&SESSION)SESSION.user=g.data.user;paintDoors();
+toast(ph?'Your phone is on this profile. It opens the same door.':'Your email is on this profile. The Dose and your alerts can reach you.')}).catch(function(){paintDoors()})}).catch(function(e){b.textContent='Attach It.';toast('That code did not take: '+String(e&&e.message||e))})};
+var ATX=$('#atx');if(ATX)ATX.onclick=closeSheets;
 
 /* ---- session, profile, welcome ---- */
 function guestUI(){PROFILE=null;MYORGS=[];
 MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();var av=$('#advsect');if(av)av.style.display='none';var mv2=$('#modsect');if(mv2)mv2.style.display='none';
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
-renderProfile();renderRail();renderFeed()}
+renderProfile();renderRail();renderFeed();paintDoors()}
 function authProblem(m){failAuth(m)}
 function loadProfile(tries){if(!sb||!SESSION)return;
 sb.from('profiles').select('*').eq('id',SESSION.user.id).maybeSingle().then(function(r){
@@ -3634,7 +3710,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();paintDoors();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;

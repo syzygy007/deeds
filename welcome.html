@@ -135,6 +135,11 @@ h1 i{font-style:normal; color:var(--gold)}
 .field input{width:100%; border:0; border-bottom:1px solid rgba(21,19,14,.32);
   background:transparent; font:inherit; font-size:1.15rem; padding:8px 2px 10px; border-radius:0}
 .field input:focus{outline:none; border-bottom-color:var(--forest)}
+.fhead{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
+.fhead label{margin-bottom:6px}
+.swap{appearance:none; border:0; background:none; font:inherit; font-size:.6rem; letter-spacing:.16em; font-weight:700;
+  color:var(--forest); text-transform:uppercase; cursor:pointer; padding:0; text-decoration:underline; text-underline-offset:3px}
+.field input::placeholder{color:rgba(21,19,14,.32)}
 #code{font-size:1.9rem; letter-spacing:.42em; text-align:center; font-weight:700}
 .sbtn{margin-top:20px; width:100%; appearance:none; border:0; cursor:pointer; font:inherit;
   font-weight:700; font-size:.9rem; padding:15px 20px; border-radius:2px;
@@ -224,11 +229,11 @@ h1 i{font-style:normal; color:var(--gold)}
 
     <div class="jview on" id="jsEmail">
       <h2 id="jTitle">Join DEEDS<i>.</i></h2>
-      <div class="sub">One email · One code · No password</div>
-      <p class="expl">DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.</p>
+      <div class="sub" id="jSub">One text · One code · No password</div>
+      <p class="expl" id="jExpl">DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in.</p>
       <div class="field">
-        <label for="email">Your email</label>
-        <input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false">
+        <div class="fhead"><label for="email" id="jLab">Your phone</label><button class="swap" id="btnSwap" type="button">Use email instead</button></div>
+        <input id="email" type="tel" inputmode="tel" autocomplete="tel" autocapitalize="off" spellcheck="false" placeholder="(310) 555 0123">
       </div>
       <div class="err" id="errEmail"></div>
       <button class="sbtn" id="btnSend" type="button">Send the Code.</button>
@@ -236,7 +241,7 @@ h1 i{font-style:normal; color:var(--gold)}
     </div>
 
     <div class="jview" id="jsCode">
-      <h2>Check your email<i>.</i></h2>
+      <h2 id="codeTitle">Check your texts<i>.</i></h2>
       <p class="sentto">A six digit code is on its way to <b id="sentAddr"></b>. Enter it here. Only the newest code works.</p>
       <div class="field">
         <label for="code">Your code</label>
@@ -339,6 +344,8 @@ h1 i{font-style:normal; color:var(--gold)}
   function openJoin(){
     veil.classList.add("on");
     err("errEmail"); err("errCode");
+    var door = "phone"; try { if (localStorage.getItem("deeds_door") === "email") door = "email"; } catch(e){}
+    setMode(door);
     show("jsEmail");
     loadSB().then(function(ok){
       if (!ok) return;
@@ -361,32 +368,65 @@ h1 i{font-style:normal; color:var(--gold)}
   window.addEventListener("keydown", function(e){ if (e.key === "Escape") closeJoin(); });
   document.getElementById("btnDead").addEventListener("click", intoApp);
 
-  var EMAIL = "";
+  var EMAIL = "", PHONE = "", MODE = "phone";
+  /* phone first: a US number gets +1, anything starting with + is taken as typed */
+  function normPhone(s){
+    s = String(s||"").trim(); var plus = s.charAt(0) === "+"; var d = s.replace(/\D/g,"");
+    if (plus) return (d.length >= 8 && d.length <= 15) ? "+" + d : "";
+    if (d.length === 10) return "+1" + d;
+    if (d.length === 11 && d.charAt(0) === "1") return "+" + d;
+    return "";
+  }
+  function prettyPhone(p){ var m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(p||""); return m ? "(" + m[1] + ") " + m[2] + " " + m[3] : (p||""); }
+  function setMode(m){
+    MODE = m === "email" ? "email" : "phone"; var ph = MODE === "phone";
+    var i = document.getElementById("email"); i.value = "";
+    i.setAttribute("type", ph ? "tel" : "email"); i.setAttribute("inputmode", ph ? "tel" : "email"); i.setAttribute("autocomplete", ph ? "tel" : "email");
+    i.placeholder = ph ? "(310) 555 0123" : "";
+    document.getElementById("jLab").textContent = ph ? "Your phone" : "Your email";
+    document.getElementById("btnSwap").textContent = ph ? "Use email instead" : "Use my phone instead";
+    document.getElementById("jSub").textContent = ph ? "One text \u00B7 One code \u00B7 No password" : "One email \u00B7 One code \u00B7 No password";
+    document.getElementById("jExpl").textContent = ph
+      ? "DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in."
+      : "DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.";
+    try { localStorage.setItem("deeds_door", MODE); } catch(e){}
+  }
+  document.getElementById("btnSwap").addEventListener("click", function(){ setMode(MODE === "phone" ? "email" : "phone"); document.getElementById("email").focus(); });
+  document.getElementById("email").addEventListener("input", function(){ if (MODE === "phone" && /@/.test(this.value)) { var keep = this.value; setMode("email"); this.value = keep; } });
   function sendCode(again){
     var box = again ? "errCode" : "errEmail";
     err(box);
     if (!again){
-      EMAIL = (document.getElementById("email").value || "").trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){ err("errEmail", "That does not look like an email address."); return; }
+      var raw = (document.getElementById("email").value || "").trim();
+      if (MODE === "phone"){
+        PHONE = normPhone(raw); EMAIL = "";
+        if (!PHONE){ err("errEmail", "A full number with area code. Outside the US, start with +."); return; }
+      } else {
+        EMAIL = raw; PHONE = "";
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){ err("errEmail", "That does not look like an email address."); return; }
+      }
     }
     var b = again ? document.getElementById("btnAgain") : document.getElementById("btnSend");
     b.disabled = true; var was = b.textContent; b.textContent = "Sending\u2026";
     loadSB().then(function(ok){
       if (!ok){ show("jsDead"); return Promise.reject("dead"); }
-      return timeout(sb().auth.signInWithOtp({ email: EMAIL, options: { shouldCreateUser: true } }), 15000);
+      return timeout(sb().auth.signInWithOtp(MODE === "phone"
+        ? { phone: PHONE, options: { shouldCreateUser: true } }
+        : { email: EMAIL, options: { shouldCreateUser: true } }), 15000);
     }).then(function(r){
       if (r && r.error){
         var m = (r.error.message || "").trim();
-        err(box, m ? "The code did not send. " + m : "The code did not send. The mail service gave no reason. Try again in a minute.");
+        err(box, m ? "The code did not send. " + m : "The code did not send. The service gave no reason. Try again in a minute.");
         return;
       }
-      document.getElementById("sentAddr").textContent = EMAIL;
+      document.getElementById("sentAddr").textContent = MODE === "phone" ? prettyPhone(PHONE) : EMAIL;
+      document.getElementById("codeTitle").innerHTML = MODE === "phone" ? "Check your texts<i>.</i>" : "Check your email<i>.</i>";
       document.getElementById("code").value = "";
       show("jsCode");
     }).catch(function(e){
       if (e === "dead") return;
       err(box, e && e.message === "timeout"
-        ? "The mail service did not answer in fifteen seconds. Try again in a minute."
+        ? "The code service did not answer in fifteen seconds. Try again in a minute."
         : "The code did not send. Check the connection and try again.");
     }).finally(function(){ b.disabled = false; b.textContent = was; });
   }
@@ -407,7 +447,9 @@ h1 i{font-style:normal; color:var(--gold)}
     if (code.length !== 6){ err("errCode", "The code is six digits."); return; }
     var b = document.getElementById("btnVerify");
     b.disabled = true; b.textContent = "Verifying\u2026";
-    timeout(sb().auth.verifyOtp({ email: EMAIL, token: code, type: "email" }), 15000)
+    timeout(sb().auth.verifyOtp(MODE === "phone"
+      ? { phone: PHONE, token: code, type: "sms" }
+      : { email: EMAIL, token: code, type: "email" }), 15000)
     .then(function(r){
       if (r && r.error){
         err("errCode", "That code did not work. Codes expire, and only the newest one counts. Send Again for a fresh one.");
