@@ -359,6 +359,8 @@ input,textarea{font:inherit;color:var(--ink)}
 .chip.ex{color:#8B867A;background:#EFECE2}
 .expost{opacity:.74}
 .expost .pa.inert{pointer-events:none}
+.expost.exlive{opacity:1}
+.expost.exlive .pa[data-exnudge]{color:var(--muted)}
 .orgrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .orgrow:last-child{border-bottom:0}
 .orgrow .in{flex:1;min-width:0}
@@ -2651,6 +2653,40 @@ var postBaseHTML=postHTML;
 function meetRailHTML(){var h='<div class="meetrail"><div class="micro">Meet.</div><div class="sub">Surfaced By Deeds, Not By You</div><div class="mr-scroll">';
 MEET.slice(0,4).forEach(function(m){h+=meetCard(m)});return h+'</div></div>'}
 
+/* ---- the guest wall: curated examples, row-shaped, through the real renderer ---- */
+var EXNAMES={'exp-harbor':{handle:'HarborLight077',type:'nurse',v:false},'exp-ivy':{handle:'IvyGate303',type:'coach',v:false},'exp-lowtide':{handle:'LowTideRun228',type:'volunteer',v:false},'exp-goldfinch':{handle:'GoldfinchRow512',type:'deedhand',v:false},'exp-cedar':{handle:'CedarPost615',type:'neighbor',v:false},'exp-paper':{handle:'PaperCrane441',type:'student',v:false},'exp-maple':{handle:'MapleWard212',type:'teacher',v:false},'exp-slate':{handle:'SlateCreek969',type:'responder',v:false}};
+Object.keys(EXNAMES).forEach(function(k){if(!NAMES[k])NAMES[k]=EXNAMES[k]});
+function exAgo(h){return new Date(Date.now()-h*3600e3).toISOString()}
+var EXPOSTS=[
+{id:'ex-01',_k:'deed',profile_id:'exp-paper',story:'Where I go to call my dad. Same spot every Sunday, before the light goes.',media_path:'/ex-cliff.jpg',media_kind:'image',media_w:960,media_h:1200,h:2},
+{id:'ex-02',_k:'post',profile_id:'exp-ivy',body:'You found it. Now go be somebody\u2019s good day.',presentation_type:'golden_egg',egg_filling:'treat',egg_treat_style:'chocolate',h:3},
+{id:'ex-03',_k:'post',profile_id:'exp-lowtide',body:'Someone reading this is trying really hard and thinks nobody notices. I notice. Keep going.',presentation_type:'disappearing_note',h:4},
+{id:'ex-04',_k:'post',profile_id:'exp-goldfinch',body:'Matthew 5:16. The Word.',media_path:'/ex-verse-light.jpg',media_kind:'photo',media_w:900,media_h:1125,h:5},
+{id:'ex-05',_k:'deed',profile_id:'exp-harbor',story:'For my mom. No occasion. That was the point.',media_path:'/ex-mem-bouquet.jpg',media_kind:'photo',media_w:900,media_h:1125,h:6},
+{id:'ex-06',_k:'post',profile_id:'exp-paper',body:'Held the door for eleven people. The twelfth held it for me. The system works.',h:7},
+{id:'ex-07',_k:'deed',profile_id:'exp-maple',story:'Coffee for a friend who has gone quiet. Drove it over and waited in the car until she was ready.',media_path:'/ex-coffee.jpg',media_kind:'image',media_w:768,media_h:1200,h:9},
+{id:'ex-08',_k:'post',profile_id:'exp-maple',body:'Text the person who taught you something and tell them it stuck.',presentation_type:'golden_egg',egg_filling:'tiny_deed',h:11},
+{id:'ex-09',_k:'deed',profile_id:'exp-cedar',story:'Fixed the neighbor\u2019s fence while they were at work. They think the wind stood it back up.',h:13},
+{id:'ex-10',_k:'post',profile_id:'exp-goldfinch',body:'DEEDS <3',media_path:'/ex-art-billboard.jpg',media_kind:'photo',media_w:900,media_h:1125,h:15},
+{id:'ex-11',_k:'post',profile_id:'exp-ivy',body:'Coached the kid who never gets picked. He got picked. I was not the one who picked him.',h:17},
+{id:'ex-12',_k:'deed',profile_id:'exp-lowtide',story:'First hike with my friend since the accident. Slow. We made the ridge anyway.',media_path:'/ex-trail.jpg',media_kind:'image',media_w:960,media_h:1200,h:20},
+{id:'ex-13',_k:'post',profile_id:'exp-harbor',body:'Galatians 6:9. The Word.',media_path:'/ex-verse-weary.jpg',media_kind:'photo',media_w:900,media_h:1125,h:22},
+{id:'ex-14',_k:'deed',profile_id:'exp-slate',story:'For the wedding gift. Picked it in person instead of sending a link.',media_path:'/ex-flowershop.jpg',media_kind:'image',media_w:960,media_h:1200,h:24},
+{id:'ex-15',_k:'post',profile_id:'exp-slate',body:'Somebody thought of you today. That was me. Pass it on.',presentation_type:'golden_egg',egg_filling:'kind_words',h:26},
+{id:'ex-16',_k:'deed',profile_id:'exp-paper',story:'Paid for the groceries of the person behind me. She had exact change ready and a kid on her hip.',origin_id:'ex-00',h:28},
+{id:'ex-17',_k:'post',profile_id:'exp-cedar',body:'Nobody knows which neighbor shovels the three driveways. Keep it that way.',h:31},
+{id:'ex-18',_k:'deed',profile_id:'exp-slate',story:'Off shift. Changed a tire for a stranger in the rain. He tried to pay me. I told him to get someone else\u2019s tire.',h:34}
+].map(function(r){r._ex=true;r.created_at=exAgo(r.h);return r});
+function exLiveHTML(r){var t=document.createElement('div');t.innerHTML=livePostHTML(r);var a=t.firstChild;if(!a)return'';
+a.classList.add('expost');a.classList.add('exlive');
+var hd=a.querySelector('.p-handle');if(hd){var c=document.createElement('span');c.className='chip ex';c.textContent='EXAMPLE';hd.appendChild(c)}
+var ms=a.querySelectorAll('[data-lmember]');for(var i=0;i<ms.length;i++){ms[i].removeAttribute('data-lmember');ms[i].style.cursor='default'}
+var acts=a.querySelectorAll('.p-acts .pa');for(var j=0;j<acts.length;j++){var b=acts[j];
+if(b.hasAttribute('data-lmore')){b.parentNode.removeChild(b);continue}
+b.removeAttribute('data-linsp');b.removeAttribute('data-lcmt');b.removeAttribute('data-redeed');b.removeAttribute('data-lshare');b.setAttribute('data-exnudge','1')}
+return a.outerHTML}
+function exNudge(){toast('Examples are for looking. Log one of your own.');if(!PROFILE)setTimeout(openJoin,900)}
+
 /* ---- feed engine: real first, examples beneath until eight real deeds ---- */
 function mergeSearch(){var seen={},out=[];
 LIVEPOSTS.concat(SRES).forEach(function(r){if(!seen[r.id]){seen[r.id]=1;out.push(r)}});
@@ -2663,12 +2699,9 @@ var body=(r.story||r.title||'');
 if(q&&body.toLowerCase().indexOf(q)<0&&String(nm.handle||'').toLowerCase().indexOf(q)<0)return;
 h+=livePostHTML(r);shown++;real++;
 if(!q&&shown===3)h+=meetRailHTML()});
-if(real<8){POSTS.forEach(function(p){if(my.blocked[p.who])return;
-var refP=p.ref?byId(p.ref):null;if(p.kind==='second'&&(!refP||my.blocked[refP.who]))return;
-if(q){var lab=(MEMBERS[p.who]?DeedsTypes.LABELS[MEMBERS[p.who].type]:'')||'';
-var hay=p.body+' '+p.who+' '+lab+(refP?' '+refP.body+' '+refP.who:'');
-if(hay.toLowerCase().indexOf(q)<0)return}
-h+=exHTML(p);shown++;
+if(real<8){EXPOSTS.forEach(function(r){var xn=NAMES[r.profile_id]||{};
+if(q){var hay=(r.body||r.story||'')+' '+(xn.handle||'');if(hay.toLowerCase().indexOf(q)<0)return}
+h+=exLiveHTML(r);shown++;
 if(!q&&shown===3)h+=meetRailHTML()})}
 el.innerHTML=h;
 $('#endnote').textContent=feedFailMsg?feedFailMsg:(shown?'That is every deed. Go make the next one.':'No deeds match. Go make the first one.');
@@ -2718,8 +2751,9 @@ if(_mb2)_mb2.style.display=morePostLive.own?'none':'';
 if(_mc)_mc.style.display=(!morePostLive.own&&_r&&_r._k!=='post'&&!_r.is_private)?'':'none';
 sheet('#moresheet')}});
 $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
-$$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}})}
-function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
+$$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}});
+$$('[data-exnudge]').forEach(function(b){b.onclick=function(e){e.stopPropagation();exNudge()}})}
+function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS,(typeof EXPOSTS!=='undefined'&&EXPOSTS)||[]);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
 /* MEM:begin ---- share a post as a memory: the white print, the print on the forest, or just the photo ---- */
 var MROWS=[],MEM={r:null,mode:'memory',img:null,blob:null,url:'',text:'',handle:'',spec:'',card:false,styled:false};
 var MEMFAM='Georgia,"Times New Roman",serif',MEMSANS='"Helvetica Neue",Helvetica,Arial,sans-serif',MEMMONO='Menlo,Consolas,"Liberation Mono","Courier New",monospace';
@@ -3333,7 +3367,7 @@ basePassSecond&&basePassSecond()};
 
 /* ---- photo: pick, shrink in the browser, upload to storage ---- */
 var LPHOTO=null,LFILE=null;
-function mediaURL(p){try{return sb.storage.from('media').getPublicUrl(p).data.publicUrl}
+function mediaURL(p){if(/^(https?:)?\//.test(String(p||'')))return p;try{return sb.storage.from('media').getPublicUrl(p).data.publicUrl}
 catch(e){return SB_URL+'/storage/v1/object/public/media/'+p}}
 var LPURL=null;
 function showPrev(bl,w,h){var p=$('#logprev'),im=$('#lpvimg');if(!p||!im)return;
@@ -4515,7 +4549,6 @@ $$('.bell').forEach(function(b){b.onclick=openAlerts});
    filtered the seeded rows, so the DOM could hold a card whose data was
    already gone. Clicking it threw. One render keeps the two in step even
    if the CDN never answers. ---- */
-renderFeed();
 
 /* ============ POST PRESENTATIONS · GOLDEN EGG + DISAPPEARING INK (v4.7.2 · egg contents art, blank eggs fill themselves, treat style honored) ============ */
 var PRES='standard',EGGFILL=null,ESTYLE='candy',EGGBUSY={},EGGSTAGE={},INKOPENST={},TDST={},TDSWAP={};
@@ -4585,9 +4618,9 @@ return h}
 /* ---- egg crack ---- */
 function presFind(id){var r=findLive(id);if(r)return r;var a=(typeof SRES!=='undefined'&&SRES)||[];for(var i=0;i<a.length;i++)if(String(a[i].id)===String(id))return a[i];return null}
 function presRedraw(id){var r=presFind(id);if(!r)return;
-$$('article[data-lid="'+id+'"]').forEach(function(a){var t=document.createElement('div');t.innerHTML=livePostHTML(r);var n=t.firstChild;if(n){a.parentNode.replaceChild(n,a)}});
+$$('article[data-lid="'+id+'"]').forEach(function(a){var t=document.createElement('div');t.innerHTML=(r._ex&&typeof exLiveHTML==='function')?exLiveHTML(r):livePostHTML(r);var n=t.firstChild;if(n){a.parentNode.replaceChild(n,a)}});
 if(typeof wireLive==='function')wireLive()}
-function presServerReveal(id,st){if(!sb||!PROFILE)return;
+function presServerReveal(id,st){if(!sb||!PROFILE||String(id).indexOf('ex-')===0)return;
 var row={post_id:id,viewer_id:PROFILE.id};if(st)row.deed_status=st;
 sb.from('post_reveals').upsert(row,{onConflict:'post_id,viewer_id'}).then(function(){}).catch(function(){})}
 function crackEgg(id){if(EGGBUSY[id])return;var r=presFind(id);if(!r)return;
@@ -4727,6 +4760,8 @@ if(x.deed_status&&TDST[x.post_id]!==x.deed_status){TDST[x.post_id]=x.deed_status
 if(ch){presSave();renderFeed()}}).catch(function(){})}
 var presBaseApply=applyProfile;
 applyProfile=function(p){presBaseApply(p);try{presLoadReveals()}catch(e){}};
+/* one synchronous render so the DOM and the row data start in step, now that the presentation layer above is defined */
+renderFeed();
 /* ---- boot ---- */
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
