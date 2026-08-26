@@ -721,6 +721,14 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  #viewpane .specrow:nth-child(3)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='14' height='20' x='5' y='2' rx='2' ry='2'/><path d='M12 18h.01'/></svg>")}
  #viewpane .specrow:nth-child(4)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6'/><path d='M10.4 20a2 2 0 0 0 3.2 0'/><path d='M4 2C2.8 3.7 2 5.7 2 8'/><path d='M22 8c0-2.3-.8-4.3-2-6'/></svg>")}
  #viewpane .specrow:nth-child(5)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/></svg>")}
+ /* seven settings, two rows: doors on the second line with the rules spanning */
+ #viewpane:not([style]),#viewpane[style*="block"]{grid-template-columns:1fr 1fr 1fr 1fr;row-gap:16px}
+ #viewpane .specrow:nth-child(5){border-left:0}
+ #viewpane .specrow:nth-child(7){grid-column:span 2}
+ #viewpane .specrow:nth-child(5)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6.2 6.2l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.7a2 2 0 0 1 1.7 2z'/></svg>")}
+ #viewpane .specrow:nth-child(6)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3 7l9 6 9-6'/></svg>")}
+ #viewpane .specrow:nth-child(7)::before{--i:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/></svg>")}
+ #viewpane .specrow .applnk{white-space:normal;overflow-wrap:anywhere}
  #editpane>.sect{margin-bottom:22px}
  #editpane>.sect:last-child{margin-bottom:0}
  /* member page */
@@ -3620,11 +3628,13 @@ justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.'
 /* ---- the second door: put a phone or an email on this profile ---- */
 var AT={mode:'phone',val:'',chg:false};
 function doorUser(){return(SESSION&&SESSION.user)?SESSION.user:null}
+/* the stored session can lag a door added on another device; ask the server once */
+function freshDoors(){if(!sb||!SESSION)return;sb.auth.getUser().then(function(g){if(g&&g.data&&g.data.user&&SESSION){SESSION.user=g.data.user;paintDoors()}}).catch(function(){})}
 function paintDoors(){var u=doorUser(),vp=$('#vPhone'),ve=$('#vEmail');if(!vp||!ve)return;
 if(!u||!PROFILE){vp.textContent='Sign In First.';ve.textContent='Sign In First.';vp.onclick=openJoin;ve.onclick=openJoin;vp.classList.add('mut');ve.classList.add('mut');return}
-if(u.phone){vp.textContent='On. Ends in '+String(u.phone).slice(-4)+'. Change.';vp.onclick=function(){openAttach('phone',true)};vp.classList.remove('mut')}
+if(u.phone){vp.innerHTML='On. Ends in '+String(u.phone).slice(-4)+'.<br>Change.';vp.onclick=function(){openAttach('phone',true)};vp.classList.remove('mut')}
 else{vp.textContent='Add Your Phone.';vp.onclick=function(){openAttach('phone')};vp.classList.remove('mut')}
-if(u.email){ve.textContent=u.email+' Change.';ve.onclick=function(){openAttach('email',true)};ve.classList.remove('mut')}
+if(u.email){ve.innerHTML=esc(u.email)+'<br>Change.';ve.onclick=function(){openAttach('email',true)};ve.classList.remove('mut')}
 else{ve.textContent='Add Your Email.';ve.onclick=function(){openAttach('email')};ve.classList.remove('mut')}}
 function openAttach(m,chg){if(!PROFILE){openJoin();return}AT.mode=m==='email'?'email':'phone';AT.val='';AT.chg=!!chg;closeSheets();
 var ph=AT.mode==='phone',inp=$('#atIn');if(!inp)return;
@@ -3711,7 +3721,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();paintDoors();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();paintDoors();freshDoors();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
