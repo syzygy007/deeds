@@ -104,8 +104,8 @@ h1 i{font-style:normal; color:var(--gold)}
   display:flex; flex-direction:column; align-items:center}
 .notelabel{font-size:.62rem; letter-spacing:.26em; font-weight:700; color:var(--sage);
   text-transform:uppercase; margin-bottom:clamp(26px,5vw,44px); text-align:center}
-.paper{width:min(620px, 92vw); transform:rotate(-.55deg);
-  filter:drop-shadow(0 26px 50px rgba(0,0,0,.55)); display:block}
+.paper{width:min(400px, 94vw); filter:drop-shadow(0 26px 50px rgba(0,0,0,.55)); display:block}
+@media (min-width:1024px){.paper{width:620px; transform:rotate(-.55deg)}}
 .notecta{margin-top:clamp(36px,7vw,60px); display:flex; gap:12px; width:min(620px,92vw)}
 @media (max-width:1023px){.notecta{flex-direction:column}}
 .notecta .btn{flex:1; text-align:center}
@@ -203,7 +203,10 @@ h1 i{font-style:normal; color:var(--gold)}
 
 <section id="note">
   <div class="notelabel">A note, before you come in</div>
-  <img class="paper" src="/note.webp" alt="A typewritten note explaining DEEDS: an anonymous record of good deeds, and Matthew 5:16." loading="lazy" width="1100" height="1600">
+  <picture>
+    <source media="(min-width:1024px)" srcset="/note.webp">
+    <img class="paper" src="/note-m.webp" alt="A typewritten note explaining DEEDS: an anonymous record of good deeds, and Matthew 5:16." loading="lazy">
+  </picture>
   <div class="notecta">
     <button class="btn" id="ctaJoin2" type="button">Join DEEDS.</button>
     <a class="btn ghost" href="/" id="ctaAlt2">Explore.</a>
