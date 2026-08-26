@@ -3618,21 +3618,22 @@ if(r.error){toast('That code did not take: '+r.error.message);return}
 justVerified=true;closeSheets()}).catch(function(e){b.textContent='Enter DEEDS.';toast('That code did not take: '+String(e&&e.message||e))})};
 
 /* ---- the second door: put a phone or an email on this profile ---- */
-var AT={mode:'phone',val:''};
+var AT={mode:'phone',val:'',chg:false};
 function doorUser(){return(SESSION&&SESSION.user)?SESSION.user:null}
 function paintDoors(){var u=doorUser(),vp=$('#vPhone'),ve=$('#vEmail');if(!vp||!ve)return;
 if(!u||!PROFILE){vp.textContent='Sign In First.';ve.textContent='Sign In First.';vp.onclick=openJoin;ve.onclick=openJoin;vp.classList.add('mut');ve.classList.add('mut');return}
-if(u.phone){vp.textContent='On. Ends in '+String(u.phone).slice(-4)+'.';vp.onclick=null;vp.classList.add('mut')}
+if(u.phone){vp.textContent='On. Ends in '+String(u.phone).slice(-4)+'. Change.';vp.onclick=function(){openAttach('phone',true)};vp.classList.remove('mut')}
 else{vp.textContent='Add Your Phone.';vp.onclick=function(){openAttach('phone')};vp.classList.remove('mut')}
-if(u.email){ve.textContent=u.email;ve.onclick=null;ve.classList.add('mut')}
+if(u.email){ve.textContent=u.email+' Change.';ve.onclick=function(){openAttach('email',true)};ve.classList.remove('mut')}
 else{ve.textContent='Add Your Email.';ve.onclick=function(){openAttach('email')};ve.classList.remove('mut')}}
-function openAttach(m){if(!PROFILE){openJoin();return}AT.mode=m==='email'?'email':'phone';AT.val='';closeSheets();
+function openAttach(m,chg){if(!PROFILE){openJoin();return}AT.mode=m==='email'?'email':'phone';AT.val='';AT.chg=!!chg;closeSheets();
 var ph=AT.mode==='phone',inp=$('#atIn');if(!inp)return;
-$('#atH').innerHTML=(ph?'Add your phone':'Add your email')+'<b style="color:var(--forest)">.</b>';
+$('#atH').innerHTML=(chg?(ph?'Change your phone':'Change your email'):(ph?'Add your phone':'Add your email'))+'<b style="color:var(--forest)">.</b>';
+$('#atSub').textContent=chg?'Same profile, new door. Nothing moves until the code takes.':'A second door to the same profile. Nothing else changes.';
 $('#atLab').textContent=ph?'Phone':'Email';
 inp.value='';inp.setAttribute('type',ph?'tel':'email');inp.setAttribute('inputmode',ph?'tel':'email');inp.setAttribute('autocomplete',ph?'tel':'email');inp.placeholder=ph?'(310) 555 0123':'you@example.com';
-$('#atNote').textContent=ph?'We text a code to prove it is yours. Then your number opens the same door your email does.':'We email a code to prove it is yours. Then the Daily Dose and your alerts have somewhere to go.';
-$('#atSub2').textContent=ph?'It is in your texts.':'It is in your email. The link in it works too.';
+$('#atNote').textContent=chg?(ph?'We text the new number a code. Your old number stops working the moment it takes.':'We email the new address a code. The Daily Dose and your alerts move with it.'):(ph?'We text a code to prove it is yours. Then your number opens the same door your email does.':'We email a code to prove it is yours. Then the Daily Dose and your alerts have somewhere to go.');
+$('#atSub2').textContent=ph?(chg?'It is in the new phone\u2019s texts.':'It is in your texts.'):(chg?'It is in the new inbox. The link in it works too.':'It is in your email. The link in it works too.');
 $('#atstep1').style.display='block';$('#atstep2').style.display='none';var ac=$('#atCode');if(ac)ac.value='';
 sheet('#attachsheet');setTimeout(function(){inp.focus()},350)}
 function atSend(){var b=$('#atSend'),ph=AT.mode==='phone';b.textContent='SENDING...';var done=false;
@@ -3647,11 +3648,11 @@ else{if(!/^\S+@\S+\.\S+$/.test(raw)){toast('A real email first.');return}AT.val=
 atSend()};
 var ATA=$('#atAgain');if(ATA)ATA.onclick=function(){if(AT.val)atSend()};
 var ATV=$('#atVerify');if(ATV)ATV.onclick=function(){var code=v('#atCode').replace(/\D/g,'');if(code.length<6){toast('Six digits.');return}
-var b=$('#atVerify'),ph=AT.mode==='phone';b.textContent='CHECKING...';
+var b=$('#atVerify'),ph=AT.mode==='phone',chg=AT.chg;b.textContent='CHECKING...';
 sb.auth.verifyOtp(ph?{phone:AT.val,token:code,type:'phone_change'}:{email:AT.val,token:code,type:'email_change'}).then(function(r){b.textContent='Attach It.';
 if(r.error){toast('That code did not take: '+r.error.message);return}
 closeSheets();return sb.auth.getUser().then(function(g){if(g&&g.data&&g.data.user&&SESSION)SESSION.user=g.data.user;paintDoors();
-toast(ph?'Your phone is on this profile. It opens the same door.':'Your email is on this profile. The Dose and your alerts can reach you.')}).catch(function(){paintDoors()})}).catch(function(e){b.textContent='Attach It.';toast('That code did not take: '+String(e&&e.message||e))})};
+toast(chg?(ph?'Your number is changed. It opens the same door.':'Your email is changed. The Dose and your alerts follow it.'):(ph?'Your phone is on this profile. It opens the same door.':'Your email is on this profile. The Dose and your alerts can reach you.'))}).catch(function(){paintDoors()})}).catch(function(e){b.textContent='Attach It.';toast('That code did not take: '+String(e&&e.message||e))})};
 var ATX=$('#atx');if(ATX)ATX.onclick=closeSheets;
 
 /* ---- session, profile, welcome ---- */
