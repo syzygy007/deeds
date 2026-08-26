@@ -171,6 +171,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .coinrow{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
 .coinrow:last-child{border-bottom:0}
 .coinrow.dim{opacity:.38}
+.coinimg{display:block;object-fit:contain;flex:none;border-radius:0}
 .coinrow .nm{font-weight:800;font-size:16px}
 .coinrow .rq{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-left:auto;text-transform:uppercase}
 .st-forever{font-size:13px;color:var(--muted);line-height:1.6;margin-top:22px}
@@ -631,7 +632,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
  .rblock+.rblock{border-top:1px solid var(--line);padding-top:22px}
  #impblock+.rblock{border-top:0;padding-top:0}
  .rnext{margin-top:14px;gap:16px}
- .rnext>svg{width:60px;height:60px}
+ .rnext>svg,.rnext>.coinimg{width:60px;height:60px}
  .rnext .big{font-size:22px}
  .rnext .sm{font-size:12.5px}
  .rmotto{font-size:13px;line-height:1.7;color:#4A463C;margin-top:14px}
@@ -2041,8 +2042,8 @@ function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 var toastT;function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on')},2600)}
 function avatarOf(h,px){var m=MEMBERS[h];if(m)return DeedsTypes.svg(m.type,px,{verified:m.v});return DeedsTypes.orgSvg(h,px)}
 function chipOf(h){var m=MEMBERS[h];if(m)return DeedsTypes.chip(m.type,m.v);var o=ORGS[h];return DeedsTypes.orgChip(o?o.kind:'')}
-function coinSvg(i,px){var col=COINS[i][2];
-return '<svg viewBox="0 0 40 40" width="'+px+'" height="'+px+'" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="'+col+'"/><circle cx="20" cy="20" r="18" fill="none" stroke="rgba(21,19,14,.35)" stroke-width="1.6"/><circle cx="20" cy="20" r="13" fill="none" stroke="rgba(21,19,14,.28)" stroke-width="1.2"/><path d="M8 12a14 14 0 0 1 12-6" fill="none" stroke="rgba(246,243,235,.75)" stroke-width="2.4" stroke-linecap="round"/><path d="M32 28a14 14 0 0 1-12 6" fill="none" stroke="rgba(21,19,14,.3)" stroke-width="2.4" stroke-linecap="round"/></svg>'}
+function coinSvg(i,px){/* STATUS COINS v4.8: his 512px PNG plaques (coin-<name>.png at the repo root), shown as supplied at one size per list, no filters */
+return '<img class="coinimg" src="coin-'+COINS[i][0].toLowerCase()+'.png" width="'+px+'" height="'+px+'" alt="" aria-hidden="true" decoding="async">'}
 function deedCount(){return my.deeds.length}
 function monthCount(){return my.deeds.length}
 function coinIdx(n){var i=-1;for(var k=0;k<COINS.length;k++){if(n>=COINS[k][1])i=k}return i}
@@ -2203,7 +2204,7 @@ wireFeed()}
 /* ============ PROFILE + STATUS ============ */
 function renderProfile(){$('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:false});
 var n=deedCount(),m=monthCount(),ci=coinIdx(n);
-$('#myCoin').innerHTML=ci<0?'':coinSvg(ci,26);
+$('#myCoin').innerHTML=ci<0?'':coinSvg(ci,36);
 $('#rMonth').textContent=m>=4?'RHYTHM BUILT. KEEP GOING.':'JULY · '+m+(m===1?' DEED':' DEEDS')+'. KEEP BUILDING.';
 $('#rForty').textContent=Math.min(n,40)+' / 40 DEEDS. KEEP BUILDING.';
 var _re=$('#rRe');if(_re)_re.textContent=n+(n===1?' DEED':' DEEDS')+' \u00B7 '+((window.PROFILE&&window.PROFILE.redeeds)||0)+' REDEEDS \u00B7 PUBLIC';
@@ -2247,7 +2248,7 @@ b.classList.add('on');my.remind=b.textContent;renderProfMeta();toast(b.textConte
 function renderStatus(){var n=deedCount(),nx=nextCoin(n);
 $('#stNext').textContent=nx<0?'YEAR MARKS. THE PATH NEVER ENDS.':COINS[nx][0].toUpperCase()+' · '+(COINS[nx][1]-n)+(COINS[nx][1]-n===1?' DEED AWAY.':' DEEDS AWAY.');
 var h='';COINS.forEach(function(c,i){var held=n>=c[1];
-h+='<div class="coinrow'+(held?'':' dim')+'">'+coinSvg(i,40)+'<span class="nm">'+c[0]+'.</span><span class="rq">'+c[1]+(c[1]===1?' Deed':' Deeds')+(i===7?' · Permanent':'')+'</span></div>'});
+h+='<div class="coinrow'+(held?'':' dim')+'">'+coinSvg(i,48)+'<span class="nm">'+c[0]+'.</span><span class="rq">'+c[1]+(c[1]===1?' Deed':' Deeds')+(i===7?' · Permanent':'')+'</span></div>'});
 $('#coinladder').innerHTML=h}
 
 /* ============ SHEETS ============ */
