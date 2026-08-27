@@ -1017,6 +1017,16 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .gc-stats{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);line-height:1.75;white-space:nowrap}
 .gc-stats b{color:var(--ink);font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .gc-mini{width:46px;height:46px;filter:drop-shadow(0 4px 6px rgba(105,68,4,.22))}
+.gc-mini img{width:100%;height:100%;display:block}
+.gc-logo img{padding:5%}
+/* company marks + the Follow / Associate bar (v4.11) */
+.orgimg{display:block;object-fit:contain;background:var(--card);border:1.5px solid var(--ink);padding:7%;flex:none}
+#ovMark{margin:0 0 12px}
+.ovacts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 14px}
+.ovacts .cnt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.lnkb{background:none;border:0;padding:0;font:inherit;color:var(--forest);font-weight:700;text-decoration:underline;text-decoration-color:var(--sage);text-underline-offset:3px;cursor:pointer;letter-spacing:inherit;text-transform:inherit}
+.logo-pick{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo-pick .orgimg{width:64px;height:64px}
 .gc-arrow{color:var(--ink);font-size:22px;line-height:1;text-align:right}
 .gc-foot{text-align:center;padding:26px 0 6px}
 .gc-foot .big{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.35rem,5vw,2rem);color:var(--forest);letter-spacing:.01em;line-height:1.1}
@@ -1735,8 +1745,10 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 
 <div class="sheet" id="orgview">
   <div class="sword">DEEDS<b>.</b></div>
+  <div id="ovMark"></div>
   <h3 id="ovName">Organization.</h3>
   <p class="remnote" style="margin:-8px 0 14px" id="ovMeta"></p>
+  <div class="ovacts" id="ovActs"></div>
   <div id="ovBody"></div>
 </div>
 
@@ -1771,7 +1783,7 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 
 <div class="sheet" id="cxsheet">
   <div class="sword">DEEDS<b>.</b></div>
-  <h3>Connections.</h3>
+  <h3 id="cxTitle">Connections.</h3>
   <p class="remnote" style="margin:-8px 0 12px" id="cxwho"></p>
   <div class="cxtabs" id="cxtabs">
     <button class="cxtab on" data-cx="followers">Followers</button>
@@ -2377,8 +2389,8 @@ $('#coinladder').innerHTML=h}
 
 /* ============ SHEETS ============ */
 var openSheet=null;
-function sheet(id){$('#scrim').classList.add('on');$(id).classList.add('on');openSheet=id}
-function closeSheets(){$('#scrim').classList.remove('on');$$('.sheet').forEach(function(s){s.classList.remove('on')});$$('.modal').forEach(function(m){m.classList.remove('on')});openSheet=null}
+function sheet(id){$('#scrim').classList.add('on');var el=$(id);$$('.sheet').forEach(function(s){s.style.zIndex=''});el.classList.add('on');var z=parseInt(getComputedStyle(el).zIndex,10);el.style.zIndex=String((isNaN(z)?90:z)+1);openSheet=id}
+function closeSheets(){$('#scrim').classList.remove('on');$$('.sheet').forEach(function(s){s.classList.remove('on');s.style.zIndex=''});$$('.modal').forEach(function(m){m.classList.remove('on')});openSheet=null}
 $('#scrim').onclick=closeSheets;
 var cmtPost=null;
 function openCmts(id){cmtPost=POSTS.filter(function(x){return x.id===id})[0];
@@ -3279,14 +3291,14 @@ function doSignOut(){if(!sb)return;sb.auth.signOut().catch(function(){});toast('
 /* ---- organizations ---- */
 function renderOrgs(){var el=$('#orglist');if(!el)return;var h='';
 MYORGS.concat(MYMEMB).forEach(function(o){OSTORE[o.id]=o});
-MYORGS.forEach(function(o){var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
+MYORGS.forEach(function(o){var vv=!!o.verified_at;var mark=orgMarkHTML(o,44);
 var state=vv?' · VERIFIED':(o.declined_at?' · NOT VERIFIED':' · IN REVIEW');
 h+='<div class="orgrow" data-orgopen="'+esc(o.id)+'" style="cursor:pointer"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+state+'</div>';
 if(!vv&&o.declined_at&&o.review_note)h+='<div class="p-time" style="text-transform:none;letter-spacing:0;margin-top:4px">'+esc(o.review_note)+'</div>';
 h+='</div></div>'});
 MYMEMB.forEach(function(o){if(MYORGS.some(function(x){return x.id===o.id}))return;
-var vv=!!o.verified_at;var mark=vv?DeedsTypes.orgSvg(o.display_name,44,true):pendSvg(o.display_name,44);
+var vv=!!o.verified_at;var mark=orgMarkHTML(o,44);
 h+='<div class="orgrow" data-orgopen="'+esc(o.id)+'" style="cursor:pointer"><div>'+mark+'</div><div class="in"><div style="font-weight:800;font-size:15px">'+esc(o.display_name)+(vv?DeedsTypes.chk(15):'')+'</div>';
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+' \u00B7 MEMBER'+(vv?'':' \u00B7 IN REVIEW')+' \u00B7 <button class="leaveorg" data-leave="'+esc(o.id)+'">LEAVE.</button></div>';
 h+='</div></div>'});
@@ -3951,6 +3963,7 @@ return{followers:(r[0]&&r[0].count)||0,following:(r[1]&&r[1].count)||0}}).catch(
 /* ---- connections sheet ---- */
 function openCx(pid,hd,tab){if(!sb)return;
 CXPID=pid;CXHD=hd||'';CXTAB=tab||'followers';
+var ct=$('#cxTitle');if(ct)ct.textContent='Connections.';var tb=$('#cxtabs');if(tb)tb.style.display='';
 $('#cxwho').textContent=hd?hd+'.':'Yours.';
 sheet('#cxsheet');renderCx()}
 function renderCx(){
@@ -4273,7 +4286,7 @@ var h='';
 rows.forEach(function(o){OSTORE[o.id]=o;
 var own=NAMES[o.owner_id]||{handle:'A Member'};
 h+='<div class="advrow">';
-h+='<div class="hd"><div>'+pendSvg(o.display_name,44)+'</div><div class="in">';
+h+='<div class="hd"><div>'+orgMarkHTML(o,44)+'</div><div class="in">';
 h+='<div style="font-weight:800;font-size:15px">'+esc(o.display_name)+'</div>';
 var age=relTime(o.created_at);
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+' · SUBMITTED '+(age==='NOW'?'JUST NOW':age+' AGO')+'</div></div></div>';
@@ -4285,11 +4298,13 @@ d('Where',esc(o.address||''));
 if(o.website_url)d('Site','<a href="'+esc(o.website_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700">'+esc(String(o.website_url).replace(/^https?:\/\//,''))+'</a>');
 h+='<input class="advnote" id="advnote-'+esc(o.id)+'" placeholder="Reason, if you are declining.">';
 h+='<div class="advacts"><button class="fbtn" data-verify="'+esc(o.id)+'">Verify.</button>';
+if(o.logo_url)h+='<button class="fbtn" data-logoclear="'+esc(o.id)+'">Remove the logo.</button>';
 h+='<button class="blockb" data-decline="'+esc(o.id)+'">Decline.</button></div>';
 h+='</div>'});
 el.innerHTML=h;
 $$('#advlist [data-verify]').forEach(function(b){b.onclick=function(){reviewOrg(b.getAttribute('data-verify'),true,b)}});
 $$('#advlist [data-decline]').forEach(function(b){b.onclick=function(){reviewOrg(b.getAttribute('data-decline'),false,b)}});
+$$('#advlist [data-logoclear]').forEach(function(b){b.onclick=function(){clearOrgLogo(b.getAttribute('data-logoclear'),function(){loadPending()})}});
 wireLive()})}).catch(function(){})}
 
 function reviewOrg(id,ok,btn){
@@ -4370,7 +4385,7 @@ var orgs=(r[1]&&!r[1].error)?(r[1].data||[]):[];
 if(!ppl.length&&!orgs.length){el.innerHTML='';el.style.display='none';return}
 var h='<div class="micro" style="color:var(--muted);margin-bottom:8px">People And Organizations</div>';
 orgs.forEach(function(o){OSTORE[o.id]=o;var vv=!!o.verified_at;
-h+='<div class="cxrow" data-org="'+esc(o.id)+'"><div>'+(vv?DeedsTypes.orgSvg(o.display_name,40,true):pendSvg(o.display_name,40))+'</div>';
+h+='<div class="cxrow" data-org="'+esc(o.id)+'"><div>'+orgMarkHTML(o,40)+'</div>';
 h+='<div class="in"><div class="mono">'+esc(o.display_name)+(vv?DeedsTypes.chk(14):'')+'</div>';
 h+='<div class="p-time">'+(KINDL[o.kind]||'ORGANIZATION')+(vv?' · VERIFIED':' · IN REVIEW')+'</div></div></div>'});
 ppl.forEach(function(p){
@@ -4385,8 +4400,11 @@ $$('#pplres [data-org]').forEach(function(rw){rw.onclick=function(){openOrgView(
 wireLive();wireCommon()}).catch(function(){})}
 
 function openOrgView(id){var o=OSTORE[id];if(!o)return;
+var own=!!(PROFILE&&o.owner_id===PROFILE.id);
+var mk=$('#ovMark');if(mk)mk.innerHTML=orgMarkHTML(o,56);
 $('#ovName').textContent=o.display_name;
 $('#ovMeta').innerHTML=(KINDL[o.kind]||'ORGANIZATION')+(o.verified_at?' · VERIFIED BY DEEDS.':' · IN REVIEW');
+var ac=$('#ovActs');if(ac)ac.innerHTML='';
 var h='';
 function row(k,val){if(!val)return;h+='<div class="ovrow"><div class="k">'+k+'</div><div>'+val+'</div></div>'}
 row('Name',esc(o.name||o.display_name));
@@ -4394,13 +4412,110 @@ row('Status',o.verified_at?('Verified '+DeedsTypes.chk(14)):'In review. DEEDS. h
 row('About',esc(o.description||''));
 row('Where',esc(o.address||''));
 if(o.website_url)row('Site','<a href="'+esc(o.website_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700">'+esc(String(o.website_url).replace(/^https?:\/\//,''))+'</a>');
+if(own&&liveOn&&sb)row('Logo','<div class="logo-pick">'+orgMarkHTML(o,64)+'<div><button class="fbtn" data-orglogo="'+esc(o.id)+'">'+(o.logo_url?'Replace the logo.':'Add a logo.')+'</button>'+(o.logo_url?' <button class="lnkb" data-orglogoclear="'+esc(o.id)+'">Remove it.</button>':'')+'<div class="remnote" id="logoNote" style="margin-top:6px">PNG, JPG or SVG. It shows on the list, the search and your profile.</div></div></div>');
 $('#ovBody').innerHTML=h;
 if(liveOn&&sb){sb.from('org_stats').select('member_count,total_deeds').eq('org_id',id).maybeSingle().then(function(r){
 var s=r&&r.data;if(!s)return;var b=$('#ovBody');if(!b)return;
-b.innerHTML+='<div class="ovrow"><div class="k">Impact</div><div>'+(s.member_count||0)+((s.member_count||0)===1?' member':' members')+' \u00B7 '+(s.total_deeds||0)+((s.total_deeds||0)===1?' deed':' deeds')+' and counting.</div></div>'
+b.insertAdjacentHTML('beforeend','<div class="ovrow"><div class="k">Impact</div><div>'+(s.member_count||0)+((s.member_count||0)===1?' member':' members')+' \u00B7 '+(s.total_deeds||0)+((s.total_deeds||0)===1?' deed':' deeds')+' and counting.</div></div>')
 }).catch(function(){})}
-if(liveOn&&sb)loadOrgPanel(id,o);
+if(liveOn&&sb){loadOrgActs(id,o);loadOrgPanel(id,o)}
 sheet('#orgview')}
+
+/* ---- v4.11: company marks, Follow / Associate, followers, logos ---- */
+var OFOLL={};
+/* the logo controls live in #ovBody, which other loaders append to; delegate once so no repaint can drop the handler */
+(function(){var ob=$('#ovBody');if(!ob)return;ob.addEventListener('click',function(e){var t=e.target&&e.target.closest?e.target.closest('[data-orglogo],[data-orglogoclear]'):null;if(!t)return;e.preventDefault();e.stopPropagation();
+if(t.hasAttribute('data-orglogo')){pickOrgLogo(t.getAttribute('data-orglogo'));return}
+var id=t.getAttribute('data-orglogoclear');clearOrgLogo(id,function(){openOrgView(id);loadOrgs()})})})();
+function orgMarkHTML(o,px){if(o&&o.logo_url)return '<img class="orgimg" src="'+esc(o.logo_url)+'" width="'+px+'" height="'+px+'" alt="" decoding="async">';
+return (o&&o.verified_at)?DeedsTypes.orgSvg(o.display_name,px,true):pendSvg((o&&o.display_name)||'',px)}
+function loadOrgActs(id,o){var a=$('#ovActs');if(!a||!sb)return;
+var own=!!(PROFILE&&o.owner_id===PROFILE.id);
+var none=Promise.resolve({data:null});
+Promise.all([
+sb.from('org_follow_counts').select('followers').eq('org_id',id).maybeSingle(),
+sb.from('org_stats').select('member_count').eq('org_id',id).maybeSingle(),
+PROFILE?sb.from('org_follows').select('org_id').eq('org_id',id).eq('profile_id',PROFILE.id).maybeSingle():none,
+PROFILE?sb.from('org_members').select('org_id').eq('org_id',id).eq('profile_id',PROFILE.id).maybeSingle():none
+]).then(function(r){
+var fol=(r[0]&&r[0].data&&+r[0].data.followers)||0,mem=(r[1]&&r[1].data&&+r[1].data.member_count)||0;
+var isF=!!(r[2]&&r[2].data),isM=!!(r[3]&&r[3].data)||own;
+OFOLL[id]=isF?1:0;
+paintOrgActs(id,o,{fol:fol,mem:mem,isM:isM,own:own})}).catch(function(){})}
+function paintOrgActs(id,o,s){var a=$('#ovActs');if(!a)return;var isF=!!OFOLL[id];
+var h='<button class="fbtn'+(isF?' on':'')+'" data-orgfollow="'+esc(id)+'">'+(isF?'Following':'Follow')+'</button>';
+if(s.own)h+='<span class="cnt">YOURS</span>';
+else if(s.isM)h+='<span class="cnt">ASSOCIATED \u00B7 <button class="lnkb" data-orgleave="'+esc(id)+'">Leave.</button></span>';
+else h+='<button class="fbtn" data-orgjoin="'+esc(id)+'">Associate.</button>';
+h+='<span class="cnt"><button class="lnkb" data-orgpeople="'+esc(id)+'">'+gcNum(s.fol)+(s.fol===1?' FOLLOWER':' FOLLOWERS')+'</button> \u00B7 '+gcNum(s.mem)+(s.mem===1?' MEMBER':' MEMBERS')+'</span>';
+a.innerHTML=h;
+$$('#ovActs [data-orgfollow]').forEach(function(b){b.onclick=function(){followOrgToggle(id,o,s)}});
+$$('#ovActs [data-orgpeople]').forEach(function(b){b.onclick=function(){openOrgPeople(id,o.display_name)}});
+$$('#ovActs [data-orgjoin]').forEach(function(b){b.onclick=function(){if(!PROFILE){closeSheets();openJoin();return}b.textContent='...';
+sb.from('org_members').insert({org_id:id,profile_id:PROFILE.id}).then(function(r){
+if(r.error&&String(r.error.code)!=='23505'){b.textContent='Associate.';toast('Not saved: '+r.error.message);return}
+toast('Associated. It shows on your profile, and your deeds count for it.');OFOLL[id]=1;loadMemberships();openOrgView(id)}).catch(function(){b.textContent='Associate.'})}});
+$$('#ovActs [data-orgleave]').forEach(function(b){b.onclick=function(){if(!PROFILE)return;
+sb.from('org_members').delete().match({org_id:id,profile_id:PROFILE.id}).then(function(r){
+if(r.error){toast('Could not leave: '+r.error.message);return}
+toast('Left. You still follow it.');loadMemberships();openOrgView(id)}).catch(function(){})}})}
+function followOrgToggle(id,o,s){if(!sb)return;if(!PROFILE){closeSheets();openJoin();return}
+var on=!!OFOLL[id];OFOLL[id]=on?0:1;s.fol=Math.max(0,(s.fol||0)+(on?-1:1));paintOrgActs(id,o,s);
+var q=on?sb.from('org_follows').delete().match({org_id:id,profile_id:PROFILE.id}):sb.from('org_follows').insert({org_id:id,profile_id:PROFILE.id});
+q.then(function(r){
+if(r&&r.error&&String(r.error.code)!=='23505'){OFOLL[id]=on?1:0;s.fol=Math.max(0,(s.fol||0)+(on?1:-1));paintOrgActs(id,o,s);toast('Not saved: '+r.error.message);return}
+if(!on)toast('You follow '+o.display_name+' now.')}).catch(function(){})}
+function openOrgPeople(oid,name){if(!sb)return;
+var ct=$('#cxTitle');if(ct)ct.textContent='Followers.';
+var tb=$('#cxtabs');if(tb)tb.style.display='none';
+$('#cxwho').textContent=(name||'This organization')+'.';
+var el=$('#cxlist');el.innerHTML='<p class="remnote">Loading.</p>';
+sheet('#cxsheet');
+sb.from('org_follows').select('profile_id').eq('org_id',oid).order('created_at',{ascending:false}).limit(200).then(function(r){
+if(r.error){el.innerHTML='<p class="remnote">That list could not load: '+esc(r.error.message)+'</p>';return}
+var ids=(r.data||[]).map(function(x){return x.profile_id});
+if(!ids.length){el.innerHTML='<p class="remnote">No followers yet. Be the first.</p>';return}
+fetchNames(ids.map(function(id){return{profile_id:id}})).then(function(){indexNames();
+var h='';ids.forEach(function(id){var nm=NAMES[id];if(!nm)return;
+h+='<div class="cxrow"><div data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
+h+='<div class="in"><div class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</div>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
+if(!PROFILE||id!==PROFILE.id)h+='<button class="fbtn'+(MYFOLL[id]?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(MYFOLL[id]?'Following':'Follow')+'</button>';
+h+='</div>'});
+el.innerHTML=h||'<p class="remnote">No followers yet. Be the first.</p>';wireLive();wireCommon()})}).catch(function(){})}
+function logoToPng(file,max){return new Promise(function(res,rej){
+var url=URL.createObjectURL(file);var im=new Image();
+im.onload=function(){URL.revokeObjectURL(url);var w=im.naturalWidth,h=im.naturalHeight;
+if(!w||!h){rej(new Error('That image could not be read. Try a PNG or JPG.'));return}
+var sc=Math.min(1,max/Math.max(w,h));var cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));
+var c=document.createElement('canvas');c.width=cw;c.height=ch;var g=c.getContext('2d');g.drawImage(im,0,0,cw,ch);
+c.toBlob(function(b){if(!b){rej(new Error('That image could not be converted.'));return}
+if(b.size>2000000){rej(new Error('That logo is too heavy even at 512px. Try a simpler file.'));return}res(b)},'image/png')};
+im.onerror=function(){URL.revokeObjectURL(url);rej(new Error('That file is not an image DEEDS. can read.'))};
+im.src=url})}
+function logoPathOf(url){var m=/\/storage\/v1\/object\/public\/logos\/(.+)$/.exec(String(url||''));return m?decodeURIComponent(m[1]):null}
+function pickOrgLogo(id){var o=OSTORE[id];if(!o||!PROFILE||!sb)return;
+var inp=document.createElement('input');inp.type='file';inp.accept='image/png,image/jpeg,image/webp,image/gif,image/svg+xml';
+inp.onchange=function(){var f=inp.files&&inp.files[0];if(!f)return;
+var note=$('#logoNote');if(note)note.textContent='Preparing it...';
+var old=o.logo_url||null;
+logoToPng(f,512).then(function(blob){
+var path=id+'/logo-'+Date.now()+'.png';if(note)note.textContent='Uploading...';
+return sb.storage.from('logos').upload(path,blob,{contentType:'image/png',upsert:false,cacheControl:'31536000'}).then(function(r){
+if(r.error)throw r.error;
+var url=sb.storage.from('logos').getPublicUrl(path).data.publicUrl;
+return sb.rpc('set_org_logo',{p_org:id,p_url:url}).then(function(r2){if(r2.error)throw r2.error;
+o.logo_url=url;OSTORE[id]=o;MYORGS.forEach(function(x){if(x.id===id)x.logo_url=url});MYMEMB.forEach(function(x){if(x.id===id)x.logo_url=url});
+toast('Logo is up.');openOrgView(id);loadOrgs();
+var op=logoPathOf(old);if(op&&op.indexOf(id+'/')===0)sb.storage.from('logos').remove([op]).catch(function(){})})})})
+.catch(function(e){toast('Not saved: '+String(e&&e.message||e));if(note)note.textContent='PNG, JPG or SVG. It shows on the list, the search and your profile.'})};
+inp.click()}
+function clearOrgLogo(id,done){if(!sb||!PROFILE)return;var o=OSTORE[id]||{};var old=o.logo_url||null;
+sb.rpc('set_org_logo',{p_org:id,p_url:null}).then(function(r){
+if(r.error){toast('Not removed: '+r.error.message);return}
+o.logo_url=null;MYORGS.forEach(function(x){if(x.id===id)x.logo_url=null});MYMEMB.forEach(function(x){if(x.id===id)x.logo_url=null});
+toast('Logo removed. The monogram is back.');
+var op=logoPathOf(old);if(op&&op.indexOf(id+'/')===0)sb.storage.from('logos').remove([op]).catch(function(){});
+if(done)done()}).catch(function(){toast('Not removed.')})}
 
 function claimOrgJoin(){try{
 var o=safeGet('deeds_orgjoin');if(!o||!sb||!PROFILE)return;
@@ -4496,7 +4611,7 @@ h+='<textarea class="logarea" id="growTa" style="min-height:64px" placeholder="o
 h+='<button class="fbtn" id="growBtn" style="margin-top:6px">Send the Invitations.</button>';
 h+='<div class="remnote" id="growNote" style="margin-top:6px"></div></div></div>'}
 if(!h)return;
-b.innerHTML+=h;
+b.insertAdjacentHTML('beforeend',h);
 $$('#ovBody [data-campjoin]').forEach(function(btn){btn.onclick=function(){joinCampaign(btn.getAttribute('data-campjoin'),btn.getAttribute('data-campt'))}});
 $$('#ovBody [data-campclose]').forEach(function(btn){btn.onclick=function(){
 sb.from('org_campaigns').update({status:'closed'}).eq('id',btn.getAttribute('data-campclose')).then(function(r){
@@ -4544,7 +4659,7 @@ var n=r.data||0;var gn=$('#growNote');
 if(gn)gn.textContent=n?(n+(n===1?' invitation':' invitations')+' on the way, from hello@deeds.fun.'):'None sent. Repeats, bad addresses, or the daily twenty is used.';
 if(n)$('#growTa').value=''}).catch(function(){gb2.textContent='Send the Invitations.'})}
 })})})}).catch(function(){})}
-/* GOOD COMPANIES · THE LIST (v4.10): the gold seal is drawn, not shipped, so it is crisp at any size and reads the program year */
+/* GOOD COMPANIES · THE LIST (v4.11): the seal is his shipped art, gc-seal-2027.webp at the repo root; the drawn SVG below stays as the fallback if the file ever fails to load. Rows carry follower counts and real logos (patch 41) */
 function gcSealSVG(id,year,size){var R=100,pts=[],N=96;for(var i=0;i<N;i++){var a=i/N*Math.PI*2,r=(i%2?R:R-4.5);pts.push((110+r*Math.cos(a)).toFixed(2)+','+(110+r*Math.sin(a)).toFixed(2))}
 var arcTop='M 32 110 A 78 78 0 0 1 188 110',arcBot='M 44 128 A 66 66 0 0 0 176 128';
 return '<svg class="gc-sealsvg" viewBox="0 0 220 220" width="'+size+'" height="'+size+'" role="img" aria-label="GOOD COMPANIES seal, certified '+esc(String(year))+' by DEEDS."><defs>'+
@@ -4559,7 +4674,10 @@ return '<svg class="gc-sealsvg" viewBox="0 0 220 220" width="'+size+'" height="'
 '<text x="110" y="131" text-anchor="middle" font-family="\'Playfair Display\',Georgia,serif" font-weight="700" font-size="72" fill="#F6E4AE" opacity=".55">G</text>'+
 '<text x="110" y="160" text-anchor="middle" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" letter-spacing="2.4" fill="#6E4F12">CERTIFIED '+esc(String(year))+'</text>'+
 '<text font-family="Inter,Helvetica,Arial,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#6E4F12"><textPath href="#'+id+'b" startOffset="50%" text-anchor="middle">BY DEEDS.</textPath></text></svg>'}
-var GCROWS=[],GCYEAR=2027;
+var GCROWS=[],GCYEAR=2027,GCSEAL='gc-seal-2027.webp?v=4.11';
+function gcSealImg(px,cls){return '<img class="gcsealimg '+(cls||'')+'" data-sealpx="'+px+'" src="'+GCSEAL+'" width="'+px+'" height="'+px+'" alt="GOOD COMPANIES seal, certified '+esc(String(GCYEAR))+' by DEEDS." decoding="async">'}
+function gcSealGuard(root){$$((root||'')+' img.gcsealimg').forEach(function(im){if(im._sg)return;im._sg=1;var px=+im.getAttribute('data-sealpx')||46;im.onerror=function(){gcSealFallback(im,px)};if(im.complete&&im.naturalWidth===0)gcSealFallback(im,px)})}
+function gcSealFallback(img,px){try{var w=document.createElement('span');w.innerHTML=gcSealSVG('gcf'+Math.floor(Math.random()*1e6),GCYEAR,px);var s=w.firstChild;if(!s)return;s.setAttribute('class',(img.className||'')+' gc-sealsvg');if(px>=100){s.removeAttribute('width');s.removeAttribute('height')}img.parentNode.replaceChild(s,img)}catch(e){}}
 function gcHost(u){if(!u)return'';try{return new URL(/^https?:/i.test(u)?u:'https://'+u).hostname.replace(/^www\./,'')}catch(e){return''}}
 function gcNum(x){x=+x||0;return x.toLocaleString('en-US')}
 function gcRender(){var el=$('#goodlist');if(!el)return;
@@ -4570,20 +4688,31 @@ var gc=$('#gcCount');if(gc)gc.textContent=rows.length?(gcNum(rows.length)+(rows.
 if(!rows.length){el.innerHTML='<div class="gc-empty">'+(GCROWS.length?'No company matches that. Try another name.':'No verified organizations yet. The list starts with one.')+'</div>';return}
 var h='';rows.forEach(function(g,i){var host=gcHost(g.website_url),meta=(KINDL[g.kind]||'ORGANIZATION');meta=meta.charAt(0)+meta.slice(1).toLowerCase();if(host)meta+=' \u00B7 '+host;
 var logo=g.logo_url?'<img src="'+esc(g.logo_url)+'" alt="">':esc(String(g.display_name||'?').trim().charAt(0).toUpperCase());
+var mc=+g.member_count||0,fc=+g.followers||0;
 h+='<div class="gc-row" data-gcorg="'+esc(g.org_id)+'" role="button" tabindex="0">'+
 '<div class="gc-n">'+(i<9?'0':'')+(i+1)+'</div>'+
 '<div class="gc-logo">'+logo+'</div>'+
 '<div class="gc-main"><div class="gc-name">'+esc(g.display_name)+'</div><div class="gc-meta">'+esc(meta)+'</div></div>'+
-'<div class="gc-stats"><b>'+gcNum(g.member_count)+'</b> PARTICIPANTS<br><b>'+gcNum(g.total_deeds)+'</b> VERIFIED DEEDS</div>'+
-'<div class="gc-mini">'+gcSealSVG('gcm'+i,GCYEAR,46)+'</div>'+
+'<div class="gc-stats"><b>'+gcNum(mc)+'</b> '+(mc===1?'PARTICIPANT':'PARTICIPANTS')+'<br><b>'+gcNum(g.total_deeds)+'</b> VERIFIED DEEDS<br><b>'+gcNum(fc)+'</b> '+(fc===1?'FOLLOWER':'FOLLOWERS')+'</div>'+
+'<div class="gc-mini">'+gcSealImg(46,'')+'</div>'+
 '<div class="gc-arrow">\u2192</div></div>'});
-el.innerHTML=h;
+el.innerHTML=h;gcSealGuard('#goodlist');
 $$('#goodlist [data-gcorg]').forEach(function(rw){var open=function(){var oid=rw.getAttribute('data-gcorg');if(!sb)return;
 sb.from('organizations').select('*').eq('id',oid).maybeSingle().then(function(orr){if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;openOrgView(orr.data.id)}}).catch(function(){})};
 rw.onclick=open;rw.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}})}
+function gcEnrich(){/* v4.11: logos and follower counts ride alongside the ranked rows, two reads, then one repaint */
+var ids=GCROWS.map(function(g){return g.org_id}).filter(function(x){return x});if(!ids.length||!sb)return;
+Promise.all([
+sb.from('organizations').select('id,logo_url').in('id',ids),
+sb.from('org_follow_counts').select('org_id,followers').in('org_id',ids)
+]).then(function(r){
+var L={},F={};
+if(r[0]&&!r[0].error)(r[0].data||[]).forEach(function(x){L[x.id]=x.logo_url||null});
+if(r[1]&&!r[1].error)(r[1].data||[]).forEach(function(x){F[x.org_id]=+x.followers||0});
+GCROWS.forEach(function(g){if(L.hasOwnProperty(g.org_id))g.logo_url=L[g.org_id];g.followers=F[g.org_id]||0});
+gcRender()}).catch(function(){})}
 function openGoodCompanies(){var el=$('#goodlist');if(el)el.innerHTML='<div class="gc-empty">Counting the good...</div>';
-var sl=$('#gcSeal');if(sl&&!sl.innerHTML)sl.innerHTML=gcSealSVG('gcbig',GCYEAR,168);
-var sv=$('#gcSeal svg');if(sv){sv.setAttribute('class','gc-seal gc-sealsvg');sv.removeAttribute('width');sv.removeAttribute('height')}
+var sl=$('#gcSeal');if(sl&&!sl.innerHTML){sl.innerHTML=gcSealImg(168,'gc-seal');gcSealGuard('#gcSeal')}
 var mc=$('#gcMicro');if(mc)mc.textContent='The '+GCYEAR+' List';
 var st=$('#gcStd');if(st)st.classList.remove('on');
 sheet('#goodsheet');if(!sb)return;
@@ -4591,7 +4720,7 @@ sb.rpc('good_companies').then(function(r){
 var el2=$('#goodlist');if(!el2)return;
 if(r.error){GCROWS=[];el2.innerHTML='<div class="gc-empty">The list could not load: '+esc(r.error.message)+'</div>';var gc=$('#gcCount');if(gc)gc.textContent='THE LIST DID NOT LOAD';return}
 GCROWS=(r.data||[]).slice().sort(function(a,b){return (+b.total_deeds||0)-(+a.total_deeds||0)||String(a.display_name||'').localeCompare(String(b.display_name||''))});
-gcRender()}).catch(function(){})}
+gcRender();gcEnrich()}).catch(function(){})}
 (function(){var s2=$('#gcSearch');if(s2)s2.oninput=gcRender;var k2=$('#gcKind');if(k2)k2.onchange=gcRender;
 var tog=function(){var st=$('#gcStd');if(!st)return;st.classList.toggle('on');if(st.classList.contains('on'))st.scrollIntoView({block:'nearest',behavior:'smooth'})};
 var hw=$('#gcHow');if(hw)hw.onclick=tog;var ex=$('#gcExplore');if(ex)ex.onclick=function(){var st=$('#gcStd');if(st){st.classList.add('on');st.scrollIntoView({block:'nearest',behavior:'smooth'})}}})();
