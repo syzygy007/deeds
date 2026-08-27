@@ -987,6 +987,44 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .econt .cl{display:block;font-weight:700;font-size:12.5px;line-height:1.2}
 .econt.on{border-color:var(--forest);box-shadow:inset 0 0 0 1.4px var(--forest)}
 #eggpane .ehead2{margin-top:4px}
+/* ================= COMPANY PAGE (v4.12 · the company profile, surfaced by DEEDS, not the company) ================= */
+#pg-company .cobar{display:flex;align-items:center;justify-content:space-between;padding-right:14px}
+.coshare{background:none;border:0;color:var(--ink);cursor:pointer;padding:16px 4px 0;display:inline-flex}
+.coshare svg{width:22px;height:22px}
+.cowrap{padding:8px 18px 40px}
+.cohead{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.comono{width:64px;height:64px;font-size:30px;margin-bottom:4px}
+.coname{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.65rem,7vw,2.5rem);letter-spacing:.01em;text-transform:uppercase;line-height:1.05;margin:10px 0 6px;overflow-wrap:anywhere}
+.cometa{font-family:Georgia,"Times New Roman",serif;font-size:15.5px;color:var(--ink)}
+.costatus{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--forest);margin-top:6px}
+.cosurf{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px}
+.coseal{text-align:center;min-width:104px;padding-top:8px}
+.coseal .rk{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(2rem,9vw,3rem);line-height:1;color:var(--ink);white-space:nowrap}
+.coseal .rk b{color:var(--forest)}
+.coseal .m{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px;line-height:1.5}
+.corec{padding:16px 0 4px;border-bottom:1px solid var(--line)}
+.corec .micro{color:var(--forest);letter-spacing:.2em}
+.corow{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:12px}
+.corow>div{padding:2px 8px 12px 12px;border-left:1px solid var(--line)}
+.corow>div:first-child{border-left:0;padding-left:0}
+.corow .n{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(1.55rem,6.5vw,2.3rem);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.corow .l{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px}
+.coline{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.05rem,4vw,1.3rem);line-height:1.35;color:var(--ink);padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
+.cofeedhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:22px 0 6px;border-top:1px solid var(--line);margin-top:10px}
+.cofeedhead .micro{color:var(--forest);letter-spacing:.2em}
+#coFeed .post{padding-left:0;padding-right:0}
+.cohow{display:block;width:100%;text-align:center;margin-top:22px;padding:14px 0;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:none;font:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--forest);cursor:pointer}
+.codet{display:flex;gap:8px;flex-wrap:wrap}
+.codet .oin{flex:1;min-width:150px;border:0;border-bottom:1px solid var(--line);background:none;font-size:15px;padding:8px 2px;outline:none}
+.codet .oin:focus{border-color:var(--forest)}
+.drivehead{position:relative;height:0;padding-bottom:33.34%;border-radius:10px;overflow:hidden;margin:0 0 8px;background:linear-gradient(120deg,#EDE8DC,#D9E2DB)}
+.drivehead img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.drivehead .dt{position:absolute;left:10px;bottom:8px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.drivehead.nopic .dt{color:var(--forest);text-shadow:none}
+.dtypes{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.dtypes button{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ink);cursor:pointer}
+.dtypes button.on{border-color:var(--forest);background:var(--forest);color:var(--ivory)}
+@media(min-width:1080px){.cowrap{padding:8px 32px 48px}#pg-company .backbtn{padding-left:32px}#pg-company .cobar{padding-right:28px}.coseal{min-width:128px}}
 /* ================= GOOD COMPANIES · THE LIST (v4.10 · editorial list page) ================= */
 .gc-head{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin:2px 0 14px}
 .gc-micro{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
@@ -1006,7 +1044,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .gc-std .q{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:1.15rem;line-height:1.2;color:var(--ink);margin-bottom:8px}
 .gc-std p{font-size:13.5px;color:var(--ink);margin:0 0 6px;line-height:1.45}
 .gc-std .k{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:8px}
-.gc-row{display:grid;grid-template-columns:36px 100px 1fr auto 46px 24px;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.gc-row{display:grid;grid-template-columns:36px 100px 1fr auto 24px;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .gc-row:last-child{border-bottom:0}
 .gc-n{font-size:22px;color:var(--muted);font-weight:300;border-right:1px solid var(--line);padding-right:10px;line-height:1;font-variant-numeric:tabular-nums}
 .gc-logo{width:54px;height:54px;border:1.5px solid var(--ink);display:grid;place-items:center;font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:26px;color:var(--ink);background:var(--card);overflow:hidden}
@@ -1449,6 +1487,31 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
       </div>
     </div>
 
+    <div class="page" id="pg-company">
+      <div class="cobar"><button class="backbtn" id="coBack"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg><span id="coBackLab">BACK</span></button><button class="coshare" id="coShare" aria-label="Share this company" title="Share this company."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
+      <div class="cowrap">
+        <div class="cohead">
+          <div class="coid">
+            <div id="ovMark"></div>
+            <h1 class="coname" id="ovName">Organization.</h1>
+            <div class="cometa" id="ovMeta"></div>
+            <div class="costatus" id="coStatus"></div>
+            <div class="cosurf">Surfaced by DEEDS, not the company.</div>
+          </div>
+          <div class="coseal" id="coSeal"></div>
+        </div>
+        <div class="corec" id="coRecord"></div>
+        <div class="coline">Recognition is earned by the measurable actions of people, not purchased by the company.</div>
+        <div class="ovacts" id="ovActs"></div>
+        <div id="ovBody"></div>
+        <div class="cofeedhead"><div class="micro">Recent deeds from their people</div><div class="cmicro" id="coFeedSub"></div></div>
+        <div id="coFeed"></div>
+        <p class="remnote" id="coFeedNote" style="margin-top:8px"></p>
+        <button class="fbtn" id="coMore" style="display:none;margin-top:10px">More.</button>
+        <button class="cohow" id="coHow">How certification works &#8594;</button>
+      </div>
+    </div>
+
     <div class="page" id="pg-notes">
       <div class="pghead nthead"><div><h1>Notes<b>.</b></h1><div class="micro">Sealed letters. Only the two of you can read them.</div></div><button class="ncomp" id="nNew" aria-label="Write a note" title="Write a note."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7.4 18.6l-4 1 1-4z"/></svg></button></div>
       <div class="nchips" id="nchips"><button class="on" data-nf="all">All</button><button data-nf="unread">Unread</button></div>
@@ -1745,27 +1808,18 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
   <div id="altlist"></div>
 </div>
 
-<div class="sheet" id="orgview">
-  <div class="sword">DEEDS<b>.</b></div>
-  <div id="ovMark"></div>
-  <h3 id="ovName">Organization.</h3>
-  <p class="remnote" style="margin:-8px 0 14px" id="ovMeta"></p>
-  <div class="ovacts" id="ovActs"></div>
-  <div id="ovBody"></div>
-</div>
-
 <div class="sheet" id="goodsheet">
   <div class="sword">DEEDS<b>.</b></div>
   <div class="gc-head">
     <div>
       <div class="gc-micro" id="gcMicro">The 2027 List</div>
-      <h3 class="gc-h1" style="margin:0 0 12px">GOOD COMPANIES.</h3>
+      <h3 class="gc-h1" id="gcH1" style="margin:0 0 12px">GOOD COMPANIES.</h3>
       <div class="gc-sub">Companies whose people turn good intentions into measurable action.</div>
     </div>
     <div id="gcSeal"></div>
   </div>
   <div class="gc-tools">
-    <select class="gc-sel" id="gcYear" aria-label="Program year"><option value="2027">2027</option></select>
+    <select class="gc-sel" id="gcYear" aria-label="Program year"><option value="2026">2026</option><option value="2027">2027</option></select>
     <select class="gc-sel" id="gcKind" aria-label="Organization type"><option value="">All companies</option><option value="company">Companies</option><option value="nonprofit">Nonprofits</option><option value="church">Churches</option><option value="school">Schools</option><option value="community">Community</option></select>
     <input class="gc-search" id="gcSearch" type="search" placeholder="Search companies" aria-label="Search companies" autocomplete="off">
   </div>
@@ -2855,7 +2909,7 @@ sheet('#moresheet')}});
 $$('[data-lmember]').forEach(function(el){el.onclick=function(e){e.stopPropagation();openLiveMember(el.getAttribute('data-lmember'))}});
 $$('[data-limg]').forEach(function(d){d.onclick=function(){liveLightbox(d.getAttribute('data-limg'))}});
 $$('[data-exnudge]').forEach(function(b){b.onclick=function(e){e.stopPropagation();exNudge()}})}
-function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS,(typeof EXPOSTS!=='undefined'&&EXPOSTS)||[]);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
+function findLive(id){var all=LIVEPOSTS.concat(SRES,MROWS,(typeof CROWS!=='undefined'&&CROWS)||[],(typeof EXPOSTS!=='undefined'&&EXPOSTS)||[]);for(var i=0;i<all.length;i++)if(String(all[i].id)===String(id))return all[i];return null}
 /* MEM:begin ---- share a post as a memory: the white print, the print on the forest, or just the photo ---- */
 var MROWS=[],MEM={r:null,mode:'memory',img:null,blob:null,url:'',text:'',handle:'',spec:'',card:false,styled:false};
 var MEMFAM='Georgia,"Times New Roman",serif',MEMSANS='"Helvetica Neue",Helvetica,Arial,sans-serif',MEMMONO='Menlo,Consolas,"Liberation Mono","Courier New",monospace';
@@ -4403,9 +4457,9 @@ wireLive();wireCommon()}).catch(function(){})}
 
 function openOrgView(id){var o=OSTORE[id];if(!o)return;
 var own=!!(PROFILE&&o.owner_id===PROFILE.id);
-var mk=$('#ovMark');if(mk)mk.innerHTML=orgMarkHTML(o,56,'big');
+var mk=$('#ovMark');if(mk)mk.innerHTML=o.logo_url?orgMarkHTML(o,56,'big'):'<div class="gc-logo comono">'+esc(String(o.display_name||'?').trim().charAt(0).toUpperCase())+'</div>';
 $('#ovName').textContent=o.display_name;
-$('#ovMeta').innerHTML=(KINDL[o.kind]||'ORGANIZATION')+(o.verified_at?' · VERIFIED BY DEEDS.':' · IN REVIEW');
+var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(o);var cst=$('#coStatus');if(cst)cst.textContent=o.verified_at?'Verified by DEEDS.':'In review';
 var ac=$('#ovActs');if(ac)ac.innerHTML='';
 var h='';
 function row(k,val){if(!val)return;h+='<div class="ovrow"><div class="k">'+k+'</div><div>'+val+'</div></div>'}
@@ -4421,7 +4475,7 @@ var s=r&&r.data;if(!s)return;var b=$('#ovBody');if(!b)return;
 b.insertAdjacentHTML('beforeend','<div class="ovrow"><div class="k">Impact</div><div>'+(s.member_count||0)+((s.member_count||0)===1?' member':' members')+' \u00B7 '+(s.total_deeds||0)+((s.total_deeds||0)===1?' deed':' deeds')+' and counting.</div></div>')
 }).catch(function(){})}
 if(liveOn&&sb){loadOrgActs(id,o);loadOrgPanel(id,o)}
-sheet('#orgview')}
+closeSheets();coOpen(id,o)}
 
 /* ---- v4.11: company marks, Follow / Associate, followers, logos ---- */
 var OFOLL={};
@@ -4543,12 +4597,12 @@ if(nm){toast('You joined '+nm+'. '+(mc||1)+' strong.');loadMemberships()}
 }).catch(function(){})}catch(e){}}
 function joinCampaign(cid,t){if(!PROFILE){openJoin();return}
 closeSheets();wantLog();CAMPLOG=cid;CAMPTITLE=String(t||'');
-var c=$('#logcamp');if(c){c.style.display='inline-flex';c.textContent='CAMPAIGN \u00B7 '+CAMPTITLE.toUpperCase().slice(0,40)}}
+var c=$('#logcamp');if(c){c.style.display='inline-flex';c.textContent='DRIVE \u00B7 '+CAMPTITLE.toUpperCase().slice(0,40)}}
 function campPct(a,b){if(!b)return 0;var p=a/b;return p<0?0:(p>1?1:p)}
 function cdShort(s){if(!s)return'';var d=new Date(s+'T12:00:00');var M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return M[d.getMonth()]+' '+d.getDate()}
 function campIsPast(c){if(c.status==='closed')return true;if(!c.ends_on)return false;return c.ends_on<(new Date()).toISOString().slice(0,10)}
 function campCard(c,s,ally,opts){var dc=(s&&s.deed_count)||0,pp=(s&&s.participants)||0;
-var h='<div style="margin:0 0 16px">';
+var h='<div style="margin:0 0 16px">'+driveHeadHTML(c.drive_type);
 h+='<div style="font-weight:800">'+esc(c.title)+(campIsPast(c)?' <span class="cmicro">'+(c.status==='closed'?'CLOSED':'ENDED')+'</span>':'')+'</div>';
 if(ally&&ally.length)h+='<div class="cmicro" style="margin-top:2px">WITH '+ally.map(esc).join(', ')+'</div>';
 if(c.description&&!campIsPast(c))h+='<div class="remnote" style="margin:2px 0 4px">'+esc(c.description)+'</div>';
@@ -4604,7 +4658,7 @@ var b=$('#ovBody');if(!b)return;
 var h='';
 var openC=cams.filter(function(c){return !campIsPast(c)});
 var pastC=cams.filter(campIsPast);
-if(openC.length){h+='<div class="ovrow"><div class="k">Campaigns</div><div>';
+if(openC.length){h+='<div class="ovrow"><div class="k">Drives</div><div>';
 openC.forEach(function(c){h+=campCard(c,ST[c.id],(AL[c.id]||[]).map(function(x){return NM[x]||'An ally'}),{own:own})});
 h+='</div></div>'}
 if(pending.length){h+='<div class="ovrow"><div class="k">Invited</div><div>';
@@ -4616,10 +4670,10 @@ var accC=accepted.map(function(a){return CA[a.campaign_id]}).filter(function(c){
 if(accC.length){h+='<div class="ovrow"><div class="k">Causes</div><div>';
 accC.forEach(function(c){h+='<div class="cmicro">A CAUSE WITH '+esc((NM[c.org_id]||'AN ORGANIZATION').toUpperCase())+'</div>'+campCard(c,ST[c.id],null,{})});
 h+='</div></div>'}
-if(pastC.length){h+='<div class="ovrow"><div class="k">Past Campaigns</div><div>';
+if(pastC.length){h+='<div class="ovrow"><div class="k">Past Drives</div><div>';
 pastC.forEach(function(c){h+=campCard(c,ST[c.id],(AL[c.id]||[]).map(function(x){return NM[x]||'An ally'}),{})});
 h+='</div></div>'}
-if(own)h+='<div class="ovrow"><div class="k">Run It</div><div><button class="fbtn" id="ovNewCamp">New Campaign.</button><div id="ovCampForm"></div></div></div>';
+if(own)h+='<div class="ovrow"><div class="k">Run It</div><div><button class="fbtn" id="ovNewCamp">Start a Drive.</button><div id="ovCampForm"></div></div></div>';
 if(isMember){
 h+='<div class="ovrow"><div class="k">Grow It</div><div><div class="remnote" style="margin-bottom:6px">Emails, separated by commas or lines. Twenty a day.</div>';
 h+='<textarea class="logarea" id="growTa" style="min-height:64px" placeholder="one@company.com, two@company.com"></textarea>';
@@ -4651,18 +4705,21 @@ toast(v==='ok'?'Invited. Their owner decides from their sheet.':v==='full'?'Ten 
 }).catch(function(){})}})}).catch(function(){})};inp.focus()}});
 var nb=$('#ovNewCamp');if(nb)nb.onclick=function(){
 var f=$('#ovCampForm');if(!f)return;
-f.innerHTML='<input class="oin" id="ncTitle" maxlength="80" placeholder="Canned Food Drive" style="margin:8px 0 6px">'
+f.innerHTML='<div class="cmicro" style="margin-top:8px">WHAT KIND OF DRIVE</div><div class="dtypes" id="ncTypes">'+DTORDER.map(function(t){return '<button type="button" data-dt="'+t+'">'+esc(DTYPES[t])+'</button>'}).join('')+'</div>'
++'<input class="oin" id="ncTitle" maxlength="80" placeholder="Canned Food Drive" style="margin:8px 0 6px">'
 +'<textarea class="logarea" id="ncDesc" maxlength="500" style="min-height:52px" placeholder="What it is, where, when."></textarea>'
 +'<input class="oin" id="ncGoal" type="number" min="1" max="100000" placeholder="Goal in deeds (optional)" style="margin:6px 0 0">'
 +'<div style="display:flex;gap:8px;margin-top:6px"><input class="oin" id="ncStart" type="date" style="flex:1"><input class="oin" id="ncEnd" type="date" style="flex:1"></div>'
 +'<div class="cmicro" style="margin-top:4px">START AND END SET THE TERM. BOTH OPTIONAL.</div>'
 +'<button class="fbtn" id="ncGo" style="margin-top:8px">Create It.</button>';
+$$('#ncTypes [data-dt]').forEach(function(tb){tb.onclick=function(){$$('#ncTypes [data-dt]').forEach(function(x){x.classList.toggle('on',x===tb)})}});
 $('#ncGo').onclick=function(){var t=($('#ncTitle').value||'').trim();if(t.length<3){toast('Give it a name.');return}
+var tb0=$('#ncTypes button.on');var dt=tb0?tb0.getAttribute('data-dt'):'';if(!DTYPES[dt]){toast('Pick the kind of drive.');return}
 var g=parseInt($('#ncGoal').value,10);var s0=$('#ncStart').value||null,e0=$('#ncEnd').value||null;
 if(s0&&e0&&e0<s0){toast('The end comes after the start.');return}
-sb.from('org_campaigns').insert({org_id:id,created_by:PROFILE.id,title:t,description:($('#ncDesc').value||'').trim()||null,goal_deeds:(g>0?g:null),starts_on:s0,ends_on:e0}).then(function(r){
+sb.from('org_campaigns').insert({org_id:id,created_by:PROFILE.id,title:t,description:($('#ncDesc').value||'').trim()||null,goal_deeds:(g>0?g:null),starts_on:s0,ends_on:e0,drive_type:dt}).then(function(r){
 if(r.error){toast('Not saved: '+r.error.message);return}
-toast('Campaign is up.');openOrgView(id)}).catch(function(){})}};
+toast('The drive is up.');openOrgView(id)}).catch(function(){})}};
 var gb2=$('#growBtn');if(gb2)gb2.onclick=function(){
 var raw=($('#growTa').value||'').split(/[\s,;]+/).filter(function(x){return x});
 if(!raw.length){toast('Add at least one email.');return}
@@ -4689,7 +4746,7 @@ return '<svg class="gc-sealsvg" viewBox="0 0 220 220" width="'+size+'" height="'
 '<text x="110" y="131" text-anchor="middle" font-family="\'Playfair Display\',Georgia,serif" font-weight="700" font-size="72" fill="#F6E4AE" opacity=".55">G</text>'+
 '<text x="110" y="160" text-anchor="middle" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" letter-spacing="2.4" fill="#6E4F12">CERTIFIED '+esc(String(year))+'</text>'+
 '<text font-family="Inter,Helvetica,Arial,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#6E4F12"><textPath href="#'+id+'b" startOffset="50%" text-anchor="middle">BY DEEDS.</textPath></text></svg>'}
-var GCROWS=[],GCYEAR=2027,GCSEAL='gc-seal-2027.webp?v=4.11';/* v4.11.1: shape-aware logos */
+var GCROWS=[],GCTOTAL=0,GCYEAR=2027,GCSEAL='gc-seal-2027.webp?v=4.11';/* v4.12: company pages + drives */
 function gcSealImg(px,cls){return '<img class="gcsealimg '+(cls||'')+'" data-sealpx="'+px+'" src="'+GCSEAL+'" width="'+px+'" height="'+px+'" alt="GOOD COMPANIES seal, certified '+esc(String(GCYEAR))+' by DEEDS." decoding="async">'}
 function gcSealGuard(root){$$((root||'')+' img.gcsealimg').forEach(function(im){if(im._sg)return;im._sg=1;var px=+im.getAttribute('data-sealpx')||46;im.onerror=function(){gcSealFallback(im,px)};if(im.complete&&im.naturalWidth===0)gcSealFallback(im,px)})}
 function gcSealFallback(img,px){try{var w=document.createElement('span');w.innerHTML=gcSealSVG('gcf'+Math.floor(Math.random()*1e6),GCYEAR,px);var s=w.firstChild;if(!s)return;s.setAttribute('class',(img.className||'')+' gc-sealsvg');if(px>=100){s.removeAttribute('width');s.removeAttribute('height')}img.parentNode.replaceChild(s,img)}catch(e){}}
@@ -4699,7 +4756,8 @@ function gcRender(){var el=$('#goodlist');if(!el)return;
 var q=String(($('#gcSearch')||{}).value||'').trim().toLowerCase(),k=String(($('#gcKind')||{}).value||'');
 var rows=GCROWS.filter(function(g){if(k&&String(g.kind||'')!==k)return false;if(q&&String(g.display_name||'').toLowerCase().indexOf(q)<0)return false;return true});
 var deeds=0;rows.forEach(function(g){deeds+=(+g.total_deeds||0)});
-var gc=$('#gcCount');if(gc)gc.textContent=rows.length?(gcNum(rows.length)+(rows.length===1?' COMPANY':' COMPANIES')+' \u00B7 '+gcNum(deeds)+' VERIFIED DEEDS'):(GCROWS.length?'NO MATCHES':'0 COMPANIES');
+var unf=!q&&!k,ncos=(unf&&GCTOTAL>rows.length)?GCTOTAL:rows.length;coListHead(unf);
+var gc=$('#gcCount');if(gc)gc.textContent=rows.length?(gcNum(ncos)+(ncos===1?' COMPANY':' COMPANIES')+' \u00B7 '+gcNum(deeds)+' VERIFIED DEEDS'):(GCROWS.length?'NO MATCHES':'0 COMPANIES');
 if(!rows.length){el.innerHTML='<div class="gc-empty">'+(GCROWS.length?'No company matches that. Try another name.':'No verified organizations yet. The list starts with one.')+'</div>';return}
 var h='';rows.forEach(function(g,i){var host=gcHost(g.website_url),meta=(KINDL[g.kind]||'ORGANIZATION');meta=meta.charAt(0)+meta.slice(1).toLowerCase();if(host)meta+=' \u00B7 '+host;
 var logo=g.logo_url?'<img class="orgimg" src="'+esc(g.logo_url)+'" alt="" decoding="async">':esc(String(g.display_name||'?').trim().charAt(0).toUpperCase());
@@ -4709,11 +4767,10 @@ h+='<div class="gc-row" data-gcorg="'+esc(g.org_id)+'" role="button" tabindex="0
 '<div class="gc-logo'+(g.logo_url?' has-logo':'')+'">'+logo+'</div>'+
 '<div class="gc-main"><div class="gc-name">'+esc(g.display_name)+'</div><div class="gc-meta">'+esc(meta)+'</div></div>'+
 '<div class="gc-stats"><b>'+gcNum(mc)+'</b> '+(mc===1?'PARTICIPANT':'PARTICIPANTS')+'<br><b>'+gcNum(g.total_deeds)+'</b> VERIFIED DEEDS<br><b>'+gcNum(fc)+'</b> '+(fc===1?'FOLLOWER':'FOLLOWERS')+'</div>'+
-'<div class="gc-mini">'+gcSealImg(46,'')+'</div>'+
 '<div class="gc-arrow">\u2192</div></div>'});
 el.innerHTML=h;gcSealGuard('#goodlist');
 $$('#goodlist [data-gcorg]').forEach(function(rw){var open=function(){var oid=rw.getAttribute('data-gcorg');if(!sb)return;
-sb.from('organizations').select('*').eq('id',oid).maybeSingle().then(function(orr){if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;openOrgView(orr.data.id)}}).catch(function(){})};
+sb.from('organizations').select('*').eq('id',oid).maybeSingle().then(function(orr){if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;COFROM='list';openOrgView(orr.data.id)}}).catch(function(){})};
 rw.onclick=open;rw.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}})}
 function gcEnrich(){/* v4.11: logos and follower counts ride alongside the ranked rows, two reads, then one repaint */
 var ids=GCROWS.map(function(g){return g.org_id}).filter(function(x){return x});if(!ids.length||!sb)return;
@@ -4726,11 +4783,67 @@ if(r[0]&&!r[0].error)(r[0].data||[]).forEach(function(x){L[x.id]=x.logo_url||nul
 if(r[1]&&!r[1].error)(r[1].data||[]).forEach(function(x){F[x.org_id]=+x.followers||0});
 GCROWS.forEach(function(g){if(L.hasOwnProperty(g.org_id))g.logo_url=L[g.org_id];g.followers=F[g.org_id]||0});
 gcRender()}).catch(function(){})}
+/* ================= COMPANY PAGE (v4.12): the company profile, surfaced by DEEDS, not the company ================= */
+var CROWS=[],COCUR=null,COFROM='',COSLUG='',COEND=false,COBUSY=false;
+var DTYPES={food:'Food & Essentials',children:'Children & Education',housing:'Housing & Homelessness',health:'Health & Wellness',disaster:'Disaster Relief',environment:'Environment',other:'Other'};
+var DTORDER=['food','children','housing','health','disaster','environment','other'];
+function driveLabel(t){t=DTYPES[t]?t:'other';return (t==='other'?'':DTYPES[t].toUpperCase()+' ')+'DRIVE'}
+function driveHeadHTML(t){t=DTYPES[t]?t:'other';return '<div class="drivehead"><img class="driveimg" src="drive-'+t+'.jpg?v=4.12" alt="" loading="lazy" decoding="async"><div class="dt">'+esc(driveLabel(t))+'</div></div>'}
+document.addEventListener('error',function(e){var t=e.target;if(t&&t.classList&&t.classList.contains('driveimg')){var p=t.parentNode;if(p)p.classList.add('nopic');t.parentNode&&t.remove()}},true);
+function coKind(k){var l=KINDL[k]||'ORGANIZATION';return l.charAt(0)+l.slice(1).toLowerCase()}
+function coMeta(o){return [o.industry,o.region].filter(function(x){return x}).join(' \u00B7 ')||coKind(o.kind)}
+function coListHead(unf){var h1=$('#gcH1'),mc=$('#gcMicro'),yr=new Date().getFullYear(),hundred=GCTOTAL>100;
+if(h1)h1.textContent=hundred?'The Hundred.':'GOOD COMPANIES.';
+if(mc)mc.textContent=hundred?('GOOD COMPANIES \u00B7 '+yr):('The '+yr+' Leaderboard')}
+function coOpen(id,o){var fresh=(curPage!=='company'||COCUR!==id);COCUR=id;COSLUG=o.slug||'';
+var bl=$('#coBackLab');if(bl)bl.textContent=COFROM==='list'?'GOOD COMPANIES':'BACK';
+if(fresh){CROWS=[];COEND=false;var f=$('#coFeed');if(f)f.innerHTML='';var n=$('#coFeedNote');if(n)n.textContent='';var m=$('#coMore');if(m)m.style.display='none';var sl0=$('#coSeal');if(sl0)sl0.innerHTML='';var rc0=$('#coRecord');if(rc0)rc0.innerHTML='';go('company')}
+coHead(id,o);if(fresh)coFeed(id,null)}
+function coHead(id,o){var sl=$('#coSeal'),rc=$('#coRecord'),yr=new Date().getFullYear();if(!sb)return;
+sb.rpc('company_page',{p_org:id}).then(function(r){var c=r&&r.data&&r.data[0];if(!c||COCUR!==id)return;
+COSLUG=c.slug||'';o.slug=c.slug;o.industry=c.industry;o.region=c.region;
+var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(c);
+if(sl){if(c.verified_at&&c.rank)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">No<b>.</b> '+c.rank+'</div><div class="m">of '+c.ranked+' on the list<br>Certification begins 2027</div>';
+else if(c.verified_at)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">New<b>.</b></div><div class="m">to the list<br>Certification begins 2027</div>';
+else sl.innerHTML='<div class="m">In review</div>'}
+if(rc)rc.innerHTML='<div class="micro">The '+yr+' Record</div><div class="corow"><div><div class="n">'+gcNum(c.participants)+'</div><div class="l">'+(c.participants===1?'Participant':'Participants')+'</div></div><div><div class="n">'+gcNum(c.total_deeds)+'</div><div class="l">'+(c.total_deeds===1?'Deed':'Deeds')+'</div></div><div><div class="n">'+gcNum(c.drives)+'</div><div class="l">'+(c.drives===1?'Drive':'Drives')+'</div></div></div>';
+var fs=$('#coFeedSub');if(fs)fs.textContent='ALL \u00B7 '+yr;
+coDetails(id,o,c)}).catch(function(){})}
+function coDetails(id,o,c){var b=$('#ovBody');if(!b||!PROFILE||o.owner_id!==PROFILE.id||$('#coDet'))return;
+b.insertAdjacentHTML('beforeend','<div class="ovrow" id="coDet"><div class="k">Details</div><div><div class="codet"><input class="oin" id="coInd" maxlength="60" placeholder="Industry, e.g. Electrical distribution" value="'+esc(c.industry||'')+'"><input class="oin" id="coReg" maxlength="60" placeholder="Region, e.g. Western United States" value="'+esc(c.region||'')+'"></div><button class="fbtn" id="coDetGo" style="margin-top:8px">Save.</button><div class="remnote" style="margin-top:6px">One line under the name. Sixty characters each.</div></div></div>');
+var g=$('#coDetGo');if(g)g.onclick=function(){var ind=($('#coInd').value||'').trim().slice(0,60),reg=($('#coReg').value||'').trim().slice(0,60);
+sb.from('organizations').update({industry:ind||null,region:reg||null}).eq('id',id).then(function(r){if(r.error){toast('Not saved: '+r.error.message);return}
+o.industry=ind||null;o.region=reg||null;OSTORE[id]=o;toast('Saved.');var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(o)}).catch(function(){})}}
+function coFeed(id,before){if(!sb||COBUSY)return;COBUSY=true;var note=$('#coFeedNote');
+if(!before&&note)note.textContent='Counting the good...';
+sb.rpc('company_deeds',{p_org:id,p_before:before,p_limit:20}).then(function(r){COBUSY=false;if(COCUR!==id)return;
+if(r.error){if(note)note.textContent='Their deeds could not load: '+r.error.message;return}
+var rows=(r.data||[]).map(function(x){return markKind(x,'deed')});
+rows=rows.filter(function(nw){return !CROWS.some(function(x){return String(x.id)===String(nw.id)})});
+COEND=rows.length<20;CROWS=CROWS.concat(rows);
+fetchNames(rows).then(function(){return loadCounts(rows)}).then(coPaint).catch(coPaint)}).catch(function(){COBUSY=false;if(note)note.textContent='Their deeds could not load.'})}
+function coPaint(){var f=$('#coFeed'),note=$('#coFeedNote'),more=$('#coMore');if(!f)return;
+var h='';CROWS.forEach(function(r){var nm=NAMES[r.profile_id]||{};if(nm.handle&&BLK[nm.handle])return;h+=livePostHTML(r)});
+f.innerHTML=h;
+if(note)note.textContent=CROWS.length?(COEND?'That is every public deed their people chose to show.':''):'No public deeds from their people yet. The first one starts the record.';
+if(more)more.style.display=(CROWS.length&&!COEND)?'':'none';
+wireLive()}
+(function(){var m=$('#coMore');if(m)m.onclick=function(){if(!COCUR||!CROWS.length)return;coFeed(COCUR,CROWS[CROWS.length-1].created_at)};
+var b=$('#coBack');if(b)b.onclick=function(){var from=COFROM;COFROM='';go(lastPage==='company'?'feed':lastPage);if(from==='list')openGoodCompanies()};
+var sh=$('#coShare');if(sh)sh.onclick=function(){var o=OSTORE[COCUR];if(!o)return;var slug=COSLUG||o.slug||'';var url=slug?('https://deeds.fun/company/'+slug):'https://deeds.fun/';
+var txt=(o.display_name||'A company')+' on DEEDS. Recognition earned by what their people do.';
+if(navigator.share){navigator.share({title:o.display_name||'DEEDS.',text:txt,url:url}).catch(function(){})}else{try{navigator.clipboard.writeText(url);toast('Copied. Send it anywhere.')}catch(e){toast('Copied. Send it anywhere.')}}};
+var hw=$('#coHow');if(hw)hw.onclick=function(){openGoodCompanies();setTimeout(function(){var st=$('#gcStd');if(st){st.classList.add('on');st.scrollIntoView({block:'nearest',behavior:'smooth'})}},80)}})();
+function coArrival(){var m=location.search.match(/[?&]org=([a-z0-9-]{2,60})(?:&|$)/i);if(!m||!sb)return;var slug=m[1].toLowerCase();
+try{history.replaceState(null,'',location.pathname)}catch(e){}
+sb.rpc('company_page',{p_slug:slug}).then(function(r){var c=r&&r.data&&r.data[0];if(!c){toast('That company is not on DEEDS yet.');return}
+sb.from('organizations').select('*').eq('id',c.id).maybeSingle().then(function(orr){if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;COFROM='';openOrgView(orr.data.id)}else toast('That company page could not load.')}).catch(function(){})}).catch(function(){})}
 function openGoodCompanies(){var el=$('#goodlist');if(el)el.innerHTML='<div class="gc-empty">Counting the good...</div>';
 var sl=$('#gcSeal');if(sl&&!sl.innerHTML){sl.innerHTML=gcSealImg(168,'gc-seal');gcSealGuard('#gcSeal')}
-var mc=$('#gcMicro');if(mc)mc.textContent='The '+GCYEAR+' List';
+coListHead(true);
 var st=$('#gcStd');if(st)st.classList.remove('on');
 sheet('#goodsheet');if(!sb)return;
+sb.rpc('good_companies_count').then(function(r){GCTOTAL=(r&&!r.error&&+r.data)||0;coListHead(true)}).catch(function(){});
 sb.rpc('good_companies').then(function(r){
 var el2=$('#goodlist');if(!el2)return;
 if(r.error){GCROWS=[];el2.innerHTML='<div class="gc-empty">The list could not load: '+esc(r.error.message)+'</div>';var gc=$('#gcCount');if(gc)gc.textContent='THE LIST DID NOT LOAD';return}
@@ -5071,7 +5184,7 @@ renderFeed();
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
 var blk=$('#impblock');if(blk)blk.style.display='none';
-guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();
+guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();coArrival();
 sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;
 if(s){SESSION=s;loadProfile(0)}}).catch(function(){});
 sb.auth.onAuthStateChange(function(ev,s){
