@@ -987,32 +987,55 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .econt .cl{display:block;font-weight:700;font-size:12.5px;line-height:1.2}
 .econt.on{border-color:var(--forest);box-shadow:inset 0 0 0 1.4px var(--forest)}
 #eggpane .ehead2{margin-top:4px}
-/* ================= COMPANY PAGE (v4.12 · the company profile, surfaced by DEEDS, not the company) ================= */
+/* ================= COMPANY PAGE (v4.13 · the company landing page, surfaced by DEEDS, not the company) ================= */
 #pg-company .cobar{display:flex;align-items:center;justify-content:space-between;padding-right:14px}
 .coshare{background:none;border:0;color:var(--ink);cursor:pointer;padding:16px 4px 0;display:inline-flex}
 .coshare svg{width:22px;height:22px}
 .cowrap{padding:8px 18px 40px}
-.cohead{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;padding-bottom:18px;border-bottom:1px solid var(--line)}
-.comono{width:64px;height:64px;font-size:30px;margin-bottom:4px}
-.coname{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.65rem,7vw,2.5rem);letter-spacing:.01em;text-transform:uppercase;line-height:1.05;margin:10px 0 6px;overflow-wrap:anywhere}
-.cometa{font-family:Georgia,"Times New Roman",serif;font-size:15.5px;color:var(--ink)}
-.costatus{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--forest);margin-top:6px}
-.cosurf{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px}
-.coseal{text-align:center;min-width:104px;padding-top:8px}
-.coseal .rk{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(2rem,9vw,3rem);line-height:1;color:var(--ink);white-space:nowrap}
-.coseal .rk b{color:var(--forest)}
-.coseal .m{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px;line-height:1.5}
-.corec{padding:16px 0 4px;border-bottom:1px solid var(--line)}
+.cohead{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:6px 0 16px}
+.cohead #ovMark{margin:0}
+.cohead #ovMark .orgimg{--mh:92px;--mw:124px;padding:6px}
+.comono{width:84px;height:84px;font-size:38px;margin:0}
+.coname{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.4rem,6.2vw,2.3rem);letter-spacing:.01em;text-transform:uppercase;line-height:1.02;margin:0 0 6px;overflow-wrap:anywhere}
+.cokind{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.costatus{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--forest);margin-top:5px;display:flex;align-items:center;gap:6px}
+.coseal{text-align:center;min-width:96px;padding:9px 6px;border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);color:var(--gold)}
+.coseal .m{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--gold);line-height:1.4}
+.coseal .rk{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.8rem,8vw,2.6rem);line-height:1;color:var(--gold);margin-top:6px;white-space:nowrap}
+.coacts{display:flex;align-items:center;flex-wrap:wrap;gap:0;row-gap:10px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0}
+.coacts>*{padding:0 12px;border-left:1px solid var(--line);line-height:1.2}
+.coacts>*:first-child{border-left:0;padding-left:0}
+.coacts .fbtn{padding:9px 20px;font-size:13px}
+.coacts .cnt{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted);white-space:nowrap}
+.coacts .cnt b{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:20px;color:var(--ink);margin-right:5px;letter-spacing:0}
+.coacts .lnkb{font-size:13px;font-weight:800;letter-spacing:.02em}
+.corec{padding:18px 0 4px}
 .corec .micro{color:var(--forest);letter-spacing:.2em}
 .corow{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:12px}
-.corow>div{padding:2px 8px 12px 12px;border-left:1px solid var(--line)}
-.corow>div:first-child{border-left:0;padding-left:0}
-.corow .n{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(1.55rem,6.5vw,2.3rem);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.corow>div{padding:2px 6px 10px;border-left:1px solid var(--line);text-align:center}
+.corow>div:first-child{border-left:0}
+.corow .n{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:clamp(1.6rem,7vw,2.4rem);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .corow .l{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:6px}
-.coline{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.05rem,4vw,1.3rem);line-height:1.35;color:var(--ink);padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
-.cofeedhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:22px 0 6px;border-top:1px solid var(--line);margin-top:10px}
+.coline{font-family:Georgia,"Times New Roman",serif;font-size:clamp(.95rem,3.6vw,1.1rem);line-height:1.4;color:var(--muted);padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.codlab{color:var(--forest);letter-spacing:.2em;margin-bottom:10px}
+.cohero{border-radius:18px;overflow:hidden;background:var(--bone);margin-bottom:16px}
+.cohero .art{position:relative;height:0;padding-bottom:44%;background:linear-gradient(120deg,#EDE8DC,#D9E2DB)}
+.cohero .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cohero .ov{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 14px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.6) 75%);color:#fff}
+.cohero .big{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(1.5rem,7.4vw,2.7rem);line-height:1;text-transform:uppercase;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.cohero .m{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-top:6px;opacity:.95}
+.cohero .foot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.cohero .foot .fbtn{padding:10px 24px;font-size:13px}
+.cotabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:2px}
+.cotabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:12px 6px;font:inherit;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);cursor:pointer}
+.cotabs button.on{color:var(--forest);border-bottom-color:var(--forest)}
+.cofeedhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:18px 0 6px}
 .cofeedhead .micro{color:var(--forest);letter-spacing:.2em}
 #coFeed .post{padding-left:0;padding-right:0}
+.coabout{margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
+.coabout>.micro{color:var(--forest);letter-spacing:.2em;margin-bottom:2px}
+.camp-flash{animation:campflash 1.6s ease-out}
+@keyframes campflash{0%{background:rgba(31,75,58,.16)}100%{background:transparent}}
 .cohow{display:block;width:100%;text-align:center;margin-top:22px;padding:14px 0;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:none;font:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--forest);cursor:pointer}
 .codet{display:flex;gap:8px;flex-wrap:wrap}
 .codet .oin{flex:1;min-width:150px;border:0;border-bottom:1px solid var(--line);background:none;font-size:15px;padding:8px 2px;outline:none}
@@ -1024,7 +1047,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .dtypes{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
 .dtypes button{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font:inherit;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ink);cursor:pointer}
 .dtypes button.on{border-color:var(--forest);background:var(--forest);color:var(--ivory)}
-@media(min-width:1080px){.cowrap{padding:8px 32px 48px}#pg-company .backbtn{padding-left:32px}#pg-company .cobar{padding-right:28px}.coseal{min-width:128px}}
+@media(min-width:1080px){.cowrap{padding:8px 32px 48px}#pg-company .backbtn{padding-left:32px}#pg-company .cobar{padding-right:28px}.coseal{min-width:120px}.cohead{gap:22px}}
 /* ================= GOOD COMPANIES · THE LIST (v4.10 · editorial list page) ================= */
 .gc-head{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;margin:2px 0 14px}
 .gc-micro{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
@@ -1491,23 +1514,24 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
       <div class="cobar"><button class="backbtn" id="coBack"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg><span id="coBackLab">BACK</span></button><button class="coshare" id="coShare" aria-label="Share this company" title="Share this company."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
       <div class="cowrap">
         <div class="cohead">
+          <div id="ovMark"></div>
           <div class="coid">
-            <div id="ovMark"></div>
             <h1 class="coname" id="ovName">Organization.</h1>
-            <div class="cometa" id="ovMeta"></div>
+            <div class="cokind" id="ovMeta"></div>
             <div class="costatus" id="coStatus"></div>
-            <div class="cosurf">Surfaced by DEEDS, not the company.</div>
           </div>
           <div class="coseal" id="coSeal"></div>
         </div>
+        <div class="ovacts coacts" id="ovActs"></div>
         <div class="corec" id="coRecord"></div>
         <div class="coline">Recognition is earned by the measurable actions of people, not purchased by the company.</div>
-        <div class="ovacts" id="ovActs"></div>
-        <div id="ovBody"></div>
-        <div class="cofeedhead"><div class="micro">Recent deeds from their people</div><div class="cmicro" id="coFeedSub"></div></div>
+        <div id="coDrive"></div>
+        <div class="cotabs" id="coTabs" style="display:none"><button type="button" class="on" data-cotab="all">All Company</button><button type="button" data-cotab="drive">This Drive</button></div>
+        <div class="cofeedhead"><div class="micro">Recent activity</div><div class="cmicro" id="coFeedSub"></div></div>
         <div id="coFeed"></div>
         <p class="remnote" id="coFeedNote" style="margin-top:8px"></p>
         <button class="fbtn" id="coMore" style="display:none;margin-top:10px">More.</button>
+        <div class="coabout"><div class="micro" id="coAboutLab">About</div><div id="ovBody"></div></div>
         <button class="cohow" id="coHow">How certification works &#8594;</button>
       </div>
     </div>
@@ -4459,7 +4483,7 @@ function openOrgView(id){var o=OSTORE[id];if(!o)return;
 var own=!!(PROFILE&&o.owner_id===PROFILE.id);
 var mk=$('#ovMark');if(mk)mk.innerHTML=o.logo_url?orgMarkHTML(o,56,'big'):'<div class="gc-logo comono">'+esc(String(o.display_name||'?').trim().charAt(0).toUpperCase())+'</div>';
 $('#ovName').textContent=o.display_name;
-var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(o);var cst=$('#coStatus');if(cst)cst.textContent=o.verified_at?'Verified by DEEDS.':'In review';
+var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(o);var cst=$('#coStatus');if(cst)cst.innerHTML=o.verified_at?('Verified by DEEDS. '+DeedsTypes.chk(13)):'In review';
 var ac=$('#ovActs');if(ac)ac.innerHTML='';
 var h='';
 function row(k,val){if(!val)return;h+='<div class="ovrow"><div class="k">'+k+'</div><div>'+val+'</div></div>'}
@@ -4500,11 +4524,13 @@ OFOLL[id]=isF?1:0;
 paintOrgActs(id,o,{fol:fol,mem:mem,isM:isM,own:own})}).catch(function(){})}
 function paintOrgActs(id,o,s){var a=$('#ovActs');if(!a)return;var isF=!!OFOLL[id];
 var h='<button class="fbtn'+(isF?' on':'')+'" data-orgfollow="'+esc(id)+'">'+(isF?'Following':'Follow')+'</button>';
-if(s.own)h+='<span class="cnt">YOURS</span>';
+if(!s.own&&!s.isM)h+='<button class="fbtn" data-orgjoin="'+esc(id)+'">Associate.</button>';
+h+='<span class="cnt"><b>'+gcNum(s.mem)+'</b>'+(s.mem===1?'MEMBER':'MEMBERS')+'</span>';
+h+='<span class="cnt"><button class="lnkb" data-orgpeople="'+esc(id)+'" style="font:inherit;letter-spacing:inherit;text-decoration:none;color:inherit"><b>'+gcNum(s.fol)+'</b>'+(s.fol===1?'FOLLOWER':'FOLLOWERS')+'</button></span>';
+if(s.own)h+='<button class="lnkb" data-comanage="1">Manage</button>';
 else if(s.isM)h+='<span class="cnt">ASSOCIATED \u00B7 <button class="lnkb" data-orgleave="'+esc(id)+'">Leave.</button></span>';
-else h+='<button class="fbtn" data-orgjoin="'+esc(id)+'">Associate.</button>';
-h+='<span class="cnt"><button class="lnkb" data-orgpeople="'+esc(id)+'">'+gcNum(s.fol)+(s.fol===1?' FOLLOWER':' FOLLOWERS')+'</button> \u00B7 '+gcNum(s.mem)+(s.mem===1?' MEMBER':' MEMBERS')+'</span>';
-a.innerHTML=h;
+a.innerHTML=h;var mg=$('#ovActs [data-comanage]');if(mg)mg.onclick=function(){var ab=$('.coabout');if(ab)ab.scrollIntoView({behavior:'smooth',block:'start'})};
+var al=$('#coAboutLab');if(al)al.textContent=s.own?'Manage':'About';
 $$('#ovActs [data-orgfollow]').forEach(function(b){b.onclick=function(){followOrgToggle(id,o,s)}});
 $$('#ovActs [data-orgpeople]').forEach(function(b){b.onclick=function(){openOrgPeople(id,o.display_name)}});
 $$('#ovActs [data-orgjoin]').forEach(function(b){b.onclick=function(){if(!PROFILE){closeSheets();openJoin();return}b.textContent='...';
@@ -4602,7 +4628,7 @@ function campPct(a,b){if(!b)return 0;var p=a/b;return p<0?0:(p>1?1:p)}
 function cdShort(s){if(!s)return'';var d=new Date(s+'T12:00:00');var M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];return M[d.getMonth()]+' '+d.getDate()}
 function campIsPast(c){if(c.status==='closed')return true;if(!c.ends_on)return false;return c.ends_on<(new Date()).toISOString().slice(0,10)}
 function campCard(c,s,ally,opts){var dc=(s&&s.deed_count)||0,pp=(s&&s.participants)||0;
-var h='<div style="margin:0 0 16px">'+driveHeadHTML(c.drive_type);
+var h='<div id="camp-'+esc(c.id)+'" style="margin:0 0 16px">'+driveHeadHTML(c.drive_type);
 h+='<div style="font-weight:800">'+esc(c.title)+(campIsPast(c)?' <span class="cmicro">'+(c.status==='closed'?'CLOSED':'ENDED')+'</span>':'')+'</div>';
 if(ally&&ally.length)h+='<div class="cmicro" style="margin-top:2px">WITH '+ally.map(esc).join(', ')+'</div>';
 if(c.description&&!campIsPast(c))h+='<div class="remnote" style="margin:2px 0 4px">'+esc(c.description)+'</div>';
@@ -4746,7 +4772,7 @@ return '<svg class="gc-sealsvg" viewBox="0 0 220 220" width="'+size+'" height="'
 '<text x="110" y="131" text-anchor="middle" font-family="\'Playfair Display\',Georgia,serif" font-weight="700" font-size="72" fill="#F6E4AE" opacity=".55">G</text>'+
 '<text x="110" y="160" text-anchor="middle" font-family="Inter,Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" letter-spacing="2.4" fill="#6E4F12">CERTIFIED '+esc(String(year))+'</text>'+
 '<text font-family="Inter,Helvetica,Arial,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.8" fill="#6E4F12"><textPath href="#'+id+'b" startOffset="50%" text-anchor="middle">BY DEEDS.</textPath></text></svg>'}
-var GCROWS=[],GCTOTAL=0,GCYEAR=2027,GCSEAL='gc-seal-2027.webp?v=4.11';/* v4.12: company pages + drives */
+var GCROWS=[],GCTOTAL=0,GCYEAR=2027,GCSEAL='gc-seal-2027.webp?v=4.11';/* v4.13: company landing page, drive-linked feed */
 function gcSealImg(px,cls){return '<img class="gcsealimg '+(cls||'')+'" data-sealpx="'+px+'" src="'+GCSEAL+'" width="'+px+'" height="'+px+'" alt="GOOD COMPANIES seal, certified '+esc(String(GCYEAR))+' by DEEDS." decoding="async">'}
 function gcSealGuard(root){$$((root||'')+' img.gcsealimg').forEach(function(im){if(im._sg)return;im._sg=1;var px=+im.getAttribute('data-sealpx')||46;im.onerror=function(){gcSealFallback(im,px)};if(im.complete&&im.naturalWidth===0)gcSealFallback(im,px)})}
 function gcSealFallback(img,px){try{var w=document.createElement('span');w.innerHTML=gcSealSVG('gcf'+Math.floor(Math.random()*1e6),GCYEAR,px);var s=w.firstChild;if(!s)return;s.setAttribute('class',(img.className||'')+' gc-sealsvg');if(px>=100){s.removeAttribute('width');s.removeAttribute('height')}img.parentNode.replaceChild(s,img)}catch(e){}}
@@ -4784,31 +4810,50 @@ if(r[1]&&!r[1].error)(r[1].data||[]).forEach(function(x){F[x.org_id]=+x.follower
 GCROWS.forEach(function(g){if(L.hasOwnProperty(g.org_id))g.logo_url=L[g.org_id];g.followers=F[g.org_id]||0});
 gcRender()}).catch(function(){})}
 /* ================= COMPANY PAGE (v4.12): the company profile, surfaced by DEEDS, not the company ================= */
-var CROWS=[],COCUR=null,COFROM='',COSLUG='',COEND=false,COBUSY=false;
+var CROWS=[],COCUR=null,COFROM='',COSLUG='',COEND=false,COBUSY=false,CODRIVE=null,COTAB='all';
 var DTYPES={food:'Food & Essentials',children:'Children & Education',housing:'Housing & Homelessness',health:'Health & Wellness',disaster:'Disaster Relief',environment:'Environment',other:'Other'};
 var DTORDER=['food','children','housing','health','disaster','environment','other'];
 function driveLabel(t){t=DTYPES[t]?t:'other';return (t==='other'?'':DTYPES[t].toUpperCase()+' ')+'DRIVE'}
 function driveHeadHTML(t){t=DTYPES[t]?t:'other';return '<div class="drivehead"><img class="driveimg" src="drive-'+t+'.jpg?v=4.12" alt="" loading="lazy" decoding="async"><div class="dt">'+esc(driveLabel(t))+'</div></div>'}
 document.addEventListener('error',function(e){var t=e.target;if(t&&t.classList&&t.classList.contains('driveimg')){var p=t.parentNode;if(p)p.classList.add('nopic');t.parentNode&&t.remove()}},true);
 function coKind(k){var l=KINDL[k]||'ORGANIZATION';return l.charAt(0)+l.slice(1).toLowerCase()}
-function coMeta(o){return [o.industry,o.region].filter(function(x){return x}).join(' \u00B7 ')||coKind(o.kind)}
+function coMeta(o){return ([o.industry,o.region].filter(function(x){return x}).join(' \u00B7 ')||coKind(o.kind)).toUpperCase()}
 function coListHead(unf){var h1=$('#gcH1'),mc=$('#gcMicro'),yr=new Date().getFullYear(),hundred=GCTOTAL>100;
 if(h1)h1.textContent=hundred?'The Hundred.':'GOOD COMPANIES.';
 if(mc)mc.textContent=hundred?('GOOD COMPANIES \u00B7 '+yr):('The '+yr+' Leaderboard')}
 function coOpen(id,o){var fresh=(curPage!=='company'||COCUR!==id);COCUR=id;COSLUG=o.slug||'';
 var bl=$('#coBackLab');if(bl)bl.textContent=COFROM==='list'?'GOOD COMPANIES':'BACK';
-if(fresh){CROWS=[];COEND=false;var f=$('#coFeed');if(f)f.innerHTML='';var n=$('#coFeedNote');if(n)n.textContent='';var m=$('#coMore');if(m)m.style.display='none';var sl0=$('#coSeal');if(sl0)sl0.innerHTML='';var rc0=$('#coRecord');if(rc0)rc0.innerHTML='';go('company')}
+if(fresh){CROWS=[];COEND=false;COTAB='all';CODRIVE=null;var f=$('#coFeed');if(f)f.innerHTML='';var n=$('#coFeedNote');if(n)n.textContent='';var m=$('#coMore');if(m)m.style.display='none';var sl0=$('#coSeal');if(sl0)sl0.innerHTML='';var rc0=$('#coRecord');if(rc0)rc0.innerHTML='';var d0=$('#coDrive');if(d0)d0.innerHTML='';var t0=$('#coTabs');if(t0)t0.style.display='none';coTabPaint();go('company')}
 coHead(id,o);if(fresh)coFeed(id,null)}
 function coHead(id,o){var sl=$('#coSeal'),rc=$('#coRecord'),yr=new Date().getFullYear();if(!sb)return;
 sb.rpc('company_page',{p_org:id}).then(function(r){var c=r&&r.data&&r.data[0];if(!c||COCUR!==id)return;
 COSLUG=c.slug||'';o.slug=c.slug;o.industry=c.industry;o.region=c.region;
 var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(c);
-if(sl){if(c.verified_at&&c.rank)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">No<b>.</b> '+c.rank+'</div><div class="m">of '+c.ranked+' on the list<br>Certification begins 2027</div>';
-else if(c.verified_at)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">New<b>.</b></div><div class="m">to the list<br>Certification begins 2027</div>';
+if(sl){if(c.verified_at&&c.rank)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">No. '+c.rank+'</div>';
+else if(c.verified_at)sl.innerHTML='<div class="m">Good Companies \u00B7 '+yr+'</div><div class="rk">New.</div>';
 else sl.innerHTML='<div class="m">In review</div>'}
-if(rc)rc.innerHTML='<div class="micro">The '+yr+' Record</div><div class="corow"><div><div class="n">'+gcNum(c.participants)+'</div><div class="l">'+(c.participants===1?'Participant':'Participants')+'</div></div><div><div class="n">'+gcNum(c.total_deeds)+'</div><div class="l">'+(c.total_deeds===1?'Deed':'Deeds')+'</div></div><div><div class="n">'+gcNum(c.drives)+'</div><div class="l">'+(c.drives===1?'Drive':'Drives')+'</div></div></div>';
-var fs=$('#coFeedSub');if(fs)fs.textContent='ALL \u00B7 '+yr;
-coDetails(id,o,c)}).catch(function(){})}
+if(rc)rc.innerHTML='<div class="micro">The '+yr+' Record</div><div class="corow"><div><div class="n">'+gcNum(c.total_deeds)+'</div><div class="l">'+(c.total_deeds===1?'Deed':'Deeds')+'</div></div><div><div class="n">'+gcNum(c.participants)+'</div><div class="l">'+(c.participants===1?'Person':'People')+'</div></div><div><div class="n">'+gcNum(c.drives)+'</div><div class="l">'+(c.drives===1?'Drive':'Drives')+'</div></div></div>';
+coFeedSub();coDetails(id,o,c)}).catch(function(){});
+coHero(id,o)}
+function coWhen(c){if(c.starts_on&&c.ends_on){var now=new Date(),st=new Date(c.starts_on+'T00:00:00'),en=new Date(c.ends_on+'T23:59:59');
+if(now<st)return 'STARTS '+cdShort(c.starts_on);if(now>en)return 'RAN '+cdShort(c.starts_on)+' TO '+cdShort(c.ends_on);
+var dl=Math.max(1,Math.ceil((en-now)/86400000));return dl+(dl===1?' DAY':' DAYS')+' LEFT \u00B7 ENDS '+cdShort(c.ends_on)}
+if(c.ends_on)return 'ENDS '+cdShort(c.ends_on);return ''}
+function coFeedSub(){var fs=$('#coFeedSub');if(!fs)return;var yr=new Date().getFullYear();fs.textContent=(COTAB==='drive'&&CODRIVE)?String(CODRIVE.title||'THIS DRIVE').toUpperCase().slice(0,40):('ALL DRIVES \u00B7 '+yr)}
+function coHero(id,o){var d=$('#coDrive'),tabs=$('#coTabs');if(!d||!sb)return;
+sb.from('org_campaigns').select('*').eq('org_id',id).eq('status','open').order('created_at',{ascending:false}).limit(10).then(function(r){if(COCUR!==id)return;
+var cams=((r&&!r.error)?(r.data||[]):[]).filter(function(c){return !campIsPast(c)});var c=cams[0]||null;CODRIVE=c;
+if(!c){d.innerHTML='';if(tabs)tabs.style.display='none';if(COTAB!=='all'){COTAB='all';coTabPaint();coReload()}return}
+sb.from('campaign_stats').select('*').eq('campaign_id',c.id).maybeSingle().then(function(sr){if(COCUR!==id||CODRIVE!==c)return;var st=(sr&&sr.data)||{};
+var t=DTYPES[c.drive_type]?c.drive_type:'other',tl=(t==='other'?c.title:DTYPES[t]),when=coWhen(c),pp=+st.participants||0,dc=+st.deed_count||0;
+d.innerHTML='<div class="micro codlab">Current drive</div><div class="cohero"><div class="art"><img class="driveimg" src="drive-'+t+'.jpg?v=4.12" alt="" decoding="async"><div class="ov"><div class="big">'+esc(tl)+'</div>'+(t!=='other'?'<div class="m">'+esc(c.title)+'</div>':'')+(when?'<div class="m">'+when+'</div>':'')+'<div class="m">'+gcNum(pp)+(pp===1?' PARTICIPANT':' PARTICIPANTS')+' \u00B7 '+gcNum(dc)+(dc===1?' DEED':' DEEDS')+'</div></div></div><div class="foot"><button class="fbtn on" data-codview="'+esc(c.id)+'">View Drive.</button><button class="lnkb" data-codshare="1">Share.</button></div></div>';
+if(tabs)tabs.style.display='';coTabPaint();
+var vb=$('#coDrive [data-codview]');if(vb)vb.onclick=function(){var el=$('#camp-'+c.id);if(!el){var ab=$('.coabout');if(ab)ab.scrollIntoView({behavior:'smooth',block:'start'});return}el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.remove('camp-flash');void el.offsetWidth;el.classList.add('camp-flash')};
+var sh=$('#coDrive [data-codshare]');if(sh)sh.onclick=function(){var slug=COSLUG||o.slug||'';var url=slug?('https://deeds.fun/company/'+slug):'https://deeds.fun/';var txt='Join the '+tl+' Drive at '+(o.display_name||'a company')+' on DEEDS.';
+if(navigator.share){navigator.share({title:tl+' Drive',text:txt,url:url}).catch(function(){})}else{try{navigator.clipboard.writeText(txt+' '+url);toast('Copied. Send it anywhere.')}catch(e){toast('Copied. Send it anywhere.')}}}}).catch(function(){})}).catch(function(){})}
+function coTabPaint(){$$('#coTabs [data-cotab]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-cotab')===COTAB)});coFeedSub()}
+function coReload(){if(!COCUR)return;CROWS=[];COEND=false;var f=$('#coFeed');if(f)f.innerHTML='';var m=$('#coMore');if(m)m.style.display='none';coFeed(COCUR,null)}
+(function(){$$('#coTabs [data-cotab]').forEach(function(b){b.onclick=function(){var t=b.getAttribute('data-cotab');if(t===COTAB)return;COTAB=t;coTabPaint();coReload()}})})();
 function coDetails(id,o,c){var b=$('#ovBody');if(!b||!PROFILE||o.owner_id!==PROFILE.id||$('#coDet'))return;
 b.insertAdjacentHTML('beforeend','<div class="ovrow" id="coDet"><div class="k">Details</div><div><div class="codet"><input class="oin" id="coInd" maxlength="60" placeholder="Industry, e.g. Electrical distribution" value="'+esc(c.industry||'')+'"><input class="oin" id="coReg" maxlength="60" placeholder="Region, e.g. Western United States" value="'+esc(c.region||'')+'"></div><button class="fbtn" id="coDetGo" style="margin-top:8px">Save.</button><div class="remnote" style="margin-top:6px">One line under the name. Sixty characters each.</div></div></div>');
 var g=$('#coDetGo');if(g)g.onclick=function(){var ind=($('#coInd').value||'').trim().slice(0,60),reg=($('#coReg').value||'').trim().slice(0,60);
@@ -4816,7 +4861,8 @@ sb.from('organizations').update({industry:ind||null,region:reg||null}).eq('id',i
 o.industry=ind||null;o.region=reg||null;OSTORE[id]=o;toast('Saved.');var mt=$('#ovMeta');if(mt)mt.textContent=coMeta(o)}).catch(function(){})}}
 function coFeed(id,before){if(!sb||COBUSY)return;COBUSY=true;var note=$('#coFeedNote');
 if(!before&&note)note.textContent='Counting the good...';
-sb.rpc('company_deeds',{p_org:id,p_before:before,p_limit:20}).then(function(r){COBUSY=false;if(COCUR!==id)return;
+var args={p_org:id,p_before:before,p_limit:20};var tab=COTAB;if(tab==='drive'&&CODRIVE)args.p_campaign=CODRIVE.id;
+sb.rpc('company_deeds',args).then(function(r){COBUSY=false;if(COCUR!==id||tab!==COTAB)return;
 if(r.error){if(note)note.textContent='Their deeds could not load: '+r.error.message;return}
 var rows=(r.data||[]).map(function(x){return markKind(x,'deed')});
 rows=rows.filter(function(nw){return !CROWS.some(function(x){return String(x.id)===String(nw.id)})});
@@ -4825,7 +4871,7 @@ fetchNames(rows).then(function(){return loadCounts(rows)}).then(coPaint).catch(c
 function coPaint(){var f=$('#coFeed'),note=$('#coFeedNote'),more=$('#coMore');if(!f)return;
 var h='';CROWS.forEach(function(r){var nm=NAMES[r.profile_id]||{};if(nm.handle&&BLK[nm.handle])return;h+=livePostHTML(r)});
 f.innerHTML=h;
-if(note)note.textContent=CROWS.length?(COEND?'That is every public deed their people chose to show.':''):'No public deeds from their people yet. The first one starts the record.';
+if(note)note.textContent=CROWS.length?(COEND?'That is every deed on the record.':''):((COTAB==='drive'&&CODRIVE)?'No deeds on this drive yet. Join In and log the first one.':'No drive activity yet. Deeds logged to this company\'s drives show here.');
 if(more)more.style.display=(CROWS.length&&!COEND)?'':'none';
 wireLive()}
 (function(){var m=$('#coMore');if(m)m.onclick=function(){if(!COCUR||!CROWS.length)return;coFeed(COCUR,CROWS[CROWS.length-1].created_at)};
