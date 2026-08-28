@@ -1,0 +1,1343 @@
+{
+"agapanthus": {
+"f": "g2-agapanthus.webp",
+"w": 733,
+"h": 800,
+"kb": 226,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "agapanthus_map.png"
+},
+"apple-tree-blossom": {
+"f": "g2-apple-tree-blossom.webp",
+"w": 800,
+"h": 729,
+"kb": 272,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "apple_tree_blossom_map.png"
+},
+"aster": {
+"f": "g2-aster.webp",
+"w": 800,
+"h": 737,
+"kb": 239,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "aster_map.png"
+},
+"balustrade-segment-curved": {
+"f": "g2-balustrade-segment-curved.webp",
+"w": 895,
+"h": 811,
+"kb": 85,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "balustrade_segment_curved_map.png"
+},
+"balustrade-segment-straight": {
+"f": "g2-balustrade-segment-straight.webp",
+"w": 968,
+"h": 764,
+"kb": 85,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "balustrade_segment_straight_map.png"
+},
+"basin-still": {
+"f": "g2-basin-still.webp",
+"w": 1024,
+"h": 774,
+"kb": 206,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "basin_still_map.png"
+},
+"beehive-skep": {
+"f": "g2-beehive-skep.webp",
+"w": 687,
+"h": 892,
+"kb": 117,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "beehive_skep_map.png"
+},
+"beehive-white-box": {
+"f": "g2-beehive-white-box.webp",
+"w": 558,
+"h": 947,
+"kb": 113,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "beehive_white_box_map.png"
+},
+"butterfly-blue": {
+"f": "g2-butterfly-blue.webp",
+"w": 384,
+"h": 378,
+"kb": 52,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "blackbird_map.png"
+},
+"bluebell-drift": {
+"f": "g2-bluebell-drift.webp",
+"w": 800,
+"h": 719,
+"kb": 235,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "bluebell_drift_map.png"
+},
+"bougainvillea-support": {
+"f": "g2-bougainvillea-support.webp",
+"w": 800,
+"h": 741,
+"kb": 213,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "bougainvillea_support_map.png"
+},
+"boundary-hedge-corner": {
+"f": "g2-boundary-hedge-corner.webp",
+"w": 1024,
+"h": 680,
+"kb": 176,
+"cat": "entrance_boundary",
+"kind": "map_cutout",
+"src": "boundary_hedge_corner_map.png"
+},
+"boundary-hedge-straight": {
+"f": "g2-boundary-hedge-straight.webp",
+"w": 1024,
+"h": 665,
+"kb": 166,
+"cat": "entrance_boundary",
+"kind": "map_cutout",
+"src": "boundary_hedge_straight_map.png"
+},
+"tile-brick-herringbone": {
+"f": "g2-tile-brick-herringbone.webp",
+"w": 512,
+"h": 512,
+"kb": 76,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "brick_herringbone.png"
+},
+"buttercup-drift": {
+"f": "g2-buttercup-drift.webp",
+"w": 775,
+"h": 800,
+"kb": 254,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "buttercup_drift_map.png"
+},
+"butterfly-ivory": {
+"f": "g2-butterfly-ivory.webp",
+"w": 384,
+"h": 294,
+"kb": 39,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "butterfly_blue_map.png"
+},
+"ladybird": {
+"f": "g2-ladybird.webp",
+"w": 384,
+"h": 287,
+"kb": 34,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "butterfly_ivory_map.png"
+},
+"camellia": {
+"f": "g2-camellia.webp",
+"w": 760,
+"h": 800,
+"kb": 213,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "camellia_map.png"
+},
+"cascade": {
+"f": "g2-cascade.webp",
+"w": 1024,
+"h": 923,
+"kb": 368,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "cascade_map.png"
+},
+"cherry-tree-blossom": {
+"f": "g2-cherry-tree-blossom.webp",
+"w": 800,
+"h": 733,
+"kb": 283,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "cherry_tree_blossom_map.png"
+},
+"sky-morning": {
+"f": "g2-sky-morning.webp",
+"w": 2048,
+"h": 1024,
+"kb": 38,
+"cat": "atmosphere",
+"kind": "sky",
+"src": "cloud_soft_01.png"
+},
+"tile-fog-locked-region-tile": {
+"f": "g2-tile-fog-locked-region-tile.webp",
+"w": 512,
+"h": 512,
+"kb": 25,
+"cat": "atmosphere",
+"kind": "tile",
+"src": "cloud_soft_02.png"
+},
+"moon-waning-crescent": {
+"f": "g2-moon-waning-crescent.webp",
+"w": 384,
+"h": 383,
+"kb": 32,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "cloud_wisp_01.png"
+},
+"cloud-wisp-01": {
+"f": "g2-cloud-wisp-01.webp",
+"w": 1024,
+"h": 546,
+"kb": 124,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "cloud_wisp_02.png"
+},
+"crocus": {
+"f": "g2-crocus.webp",
+"w": 800,
+"h": 724,
+"kb": 191,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "crocus_map.png"
+},
+"cypress-column": {
+"f": "g2-cypress-column.webp",
+"w": 223,
+"h": 945,
+"kb": 74,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "cypress_column_map.png"
+},
+"dahlia": {
+"f": "g2-dahlia.webp",
+"w": 800,
+"h": 733,
+"kb": 228,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "dahlia_map.png"
+},
+"dovecote": {
+"f": "g2-dovecote.webp",
+"w": 496,
+"h": 844,
+"kb": 73,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "dovecote_map.png"
+},
+"butterfly-amber": {
+"f": "g2-butterfly-amber.webp",
+"w": 382,
+"h": 384,
+"kb": 51,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "doves_pair_map.png"
+},
+"bumblebee": {
+"f": "g2-bumblebee.webp",
+"w": 384,
+"h": 350,
+"kb": 44,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "dragonfly_map.png"
+},
+"robin": {
+"f": "g2-robin.webp",
+"w": 330,
+"h": 384,
+"kb": 36,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "duck_with_ducklings_map.png"
+},
+"echinacea": {
+"f": "g2-echinacea.webp",
+"w": 754,
+"h": 800,
+"kb": 250,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "echinacea_map.png"
+},
+"fig-tree-potted": {
+"f": "g2-fig-tree-potted.webp",
+"w": 524,
+"h": 800,
+"kb": 159,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "fig_tree_potted_map.png"
+},
+"sun-disc-glow": {
+"f": "g2-sun-disc-glow.webp",
+"w": 768,
+"h": 527,
+"kb": 113,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "fog_locked_region_tile.png"
+},
+"foxglove": {
+"f": "g2-foxglove.webp",
+"w": 455,
+"h": 800,
+"kb": 157,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "foxglove_map.png"
+},
+"geranium": {
+"f": "g2-geranium.webp",
+"w": 752,
+"h": 800,
+"kb": 210,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "geranium_map.png"
+},
+"glasshouse-map-lit": {
+"f": "g2-glasshouse-map-lit.webp",
+"w": 1024,
+"h": 669,
+"kb": 140,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "glasshouse_map_lit.png"
+},
+"golden-gate": {
+"f": "g2-golden-gate.webp",
+"w": 1024,
+"h": 681,
+"kb": 207,
+"cat": "entrance_boundary",
+"kind": "map_cutout",
+"src": "golden_gate_map.png"
+},
+"grapevine-fruit-support": {
+"f": "g2-grapevine-fruit-support.webp",
+"w": 753,
+"h": 800,
+"kb": 291,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "grapevine_fruit_support_map.png"
+},
+"grapevine-green-support": {
+"f": "g2-grapevine-green-support.webp",
+"w": 694,
+"h": 800,
+"kb": 234,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "grapevine_green_support_map.png"
+},
+"tile-gravel-dark-hills": {
+"f": "g2-tile-gravel-dark-hills.webp",
+"w": 512,
+"h": 512,
+"kb": 102,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "gravel_dark_hills.png"
+},
+"tile-gravel-warm-estate": {
+"f": "g2-tile-gravel-warm-estate.webp",
+"w": 512,
+"h": 512,
+"kb": 118,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "gravel_warm_estate.png"
+},
+"hanging-lantern-day": {
+"f": "g2-hanging-lantern-day.webp",
+"w": 473,
+"h": 954,
+"kb": 64,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "hanging_lantern_day_map.png"
+},
+"hanging-lantern-lit": {
+"f": "g2-hanging-lantern-lit.webp",
+"w": 451,
+"h": 922,
+"kb": 61,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "hanging_lantern_lit_map.png"
+},
+"hollyhock": {
+"f": "g2-hollyhock.webp",
+"w": 496,
+"h": 800,
+"kb": 166,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "hollyhock_map.png"
+},
+"honeysuckle-support": {
+"f": "g2-honeysuckle-support.webp",
+"w": 462,
+"h": 800,
+"kb": 164,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "honeysuckle_support_map.png"
+},
+"hyacinth": {
+"f": "g2-hyacinth.webp",
+"w": 800,
+"h": 754,
+"kb": 184,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "hyacinth_map.png"
+},
+"iris": {
+"f": "g2-iris.webp",
+"w": 800,
+"h": 744,
+"kb": 223,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "iris_map.png"
+},
+"iron-gate": {
+"f": "g2-iron-gate.webp",
+"w": 1003,
+"h": 745,
+"kb": 138,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "iron_gate_map.png"
+},
+"ivy-support": {
+"f": "g2-ivy-support.webp",
+"w": 522,
+"h": 800,
+"kb": 168,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "ivy_support_map.png"
+},
+"jasmine-support": {
+"f": "g2-jasmine-support.webp",
+"w": 718,
+"h": 800,
+"kb": 239,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "jasmine_support_map.png"
+},
+"jetty": {
+"f": "g2-jetty.webp",
+"w": 977,
+"h": 908,
+"kb": 127,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "jetty_map.png"
+},
+"dragonfly": {
+"f": "g2-dragonfly.webp",
+"w": 384,
+"h": 260,
+"kb": 37,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "ladybird_map.png"
+},
+"lake-island": {
+"f": "g2-lake-island.webp",
+"w": 1024,
+"h": 686,
+"kb": 143,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lake_island_map.png"
+},
+"lake-shore-cove": {
+"f": "g2-lake-shore-cove.webp",
+"w": 1024,
+"h": 833,
+"kb": 179,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lake_shore_cove_map.png"
+},
+"lake-shore-curve-left": {
+"f": "g2-lake-shore-curve-left.webp",
+"w": 1024,
+"h": 698,
+"kb": 223,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lake_shore_curve_left_map.png"
+},
+"lake-shore-curve-right": {
+"f": "g2-lake-shore-curve-right.webp",
+"w": 1024,
+"h": 732,
+"kb": 251,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lake_shore_curve_right_map.png"
+},
+"lake-shore-straight": {
+"f": "g2-lake-shore-straight.webp",
+"w": 1024,
+"h": 684,
+"kb": 207,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lake_shore_straight_map.png"
+},
+"tile-lake-water-still": {
+"f": "g2-tile-lake-water-still.webp",
+"w": 512,
+"h": 512,
+"kb": 56,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "lake_water_still.png"
+},
+"lantern-post-day": {
+"f": "g2-lantern-post-day.webp",
+"w": 197,
+"h": 954,
+"kb": 32,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lantern_post_day_map.png"
+},
+"lantern-post-lit": {
+"f": "g2-lantern-post-lit.webp",
+"w": 1024,
+"h": 825,
+"kb": 38,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lantern_post_lit_map.png"
+},
+"lattice-gate-wood": {
+"f": "g2-lattice-gate-wood.webp",
+"w": 1024,
+"h": 681,
+"kb": 180,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lattice_gate_wood_map.png"
+},
+"lavender-row": {
+"f": "g2-lavender-row.webp",
+"w": 800,
+"h": 527,
+"kb": 181,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "lavender_row_map.png"
+},
+"tile-lawn-clipped": {
+"f": "g2-tile-lawn-clipped.webp",
+"w": 512,
+"h": 512,
+"kb": 102,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "lawn_clipped.png"
+},
+"lemon-tree-potted": {
+"f": "g2-lemon-tree-potted.webp",
+"w": 515,
+"h": 800,
+"kb": 151,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "lemon_tree_potted_map.png"
+},
+"cloud-soft-01": {
+"f": "g2-cloud-soft-01.webp",
+"w": 1024,
+"h": 609,
+"kb": 171,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "light_shafts_pair.png"
+},
+"lilac": {
+"f": "g2-lilac.webp",
+"w": 751,
+"h": 800,
+"kb": 234,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "lilac_map.png"
+},
+"lily-pads-group": {
+"f": "g2-lily-pads-group.webp",
+"w": 1024,
+"h": 660,
+"kb": 190,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "lily_pads_group_map.png"
+},
+"lotus": {
+"f": "g2-lotus.webp",
+"w": 800,
+"h": 711,
+"kb": 164,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "lotus_map.png"
+},
+"lupin": {
+"f": "g2-lupin.webp",
+"w": 755,
+"h": 800,
+"kb": 212,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "lupin_map.png"
+},
+"magnolia-tree-blossom": {
+"f": "g2-magnolia-tree-blossom.webp",
+"w": 800,
+"h": 559,
+"kb": 184,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "magnolia_tree_blossom_map.png"
+},
+"magnolia-tree-green": {
+"f": "g2-magnolia-tree-green.webp",
+"w": 787,
+"h": 800,
+"kb": 235,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "magnolia_tree_green_map.png"
+},
+"marsh-marigold": {
+"f": "g2-marsh-marigold.webp",
+"w": 723,
+"h": 800,
+"kb": 193,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "marsh_marigold_map.png"
+},
+"maze-centre-ring": {
+"f": "g2-maze-centre-ring.webp",
+"w": 824,
+"h": 753,
+"kb": 137,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "maze_centre_ring_map.png"
+},
+"tile-meadow-grass-daisies": {
+"f": "g2-tile-meadow-grass-daisies.webp",
+"w": 512,
+"h": 512,
+"kb": 118,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "meadow_grass_daisies.png"
+},
+"moon-waxing-crescent": {
+"f": "g2-moon-waxing-crescent.webp",
+"w": 383,
+"h": 384,
+"kb": 30,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "mist_band.png"
+},
+"cloud-soft-02": {
+"f": "g2-cloud-soft-02.webp",
+"w": 1024,
+"h": 556,
+"kb": 147,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "moon_first_quarter.png"
+},
+"moon-new": {
+"f": "g2-moon-new.webp",
+"w": 384,
+"h": 384,
+"kb": 27,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "moon_last_quarter.png"
+},
+"sky-dusk": {
+"f": "g2-sky-dusk.webp",
+"w": 2048,
+"h": 1024,
+"kb": 37,
+"cat": "atmosphere",
+"kind": "sky",
+"src": "moon_waning_crescent.png"
+},
+"mist-band": {
+"f": "g2-mist-band.webp",
+"w": 1536,
+"h": 709,
+"kb": 266,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "moon_waning_gibbous.png"
+},
+"moon-waxing-gibbous": {
+"f": "g2-moon-waxing-gibbous.webp",
+"w": 375,
+"h": 384,
+"kb": 44,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "moon_waxing_crescent.png"
+},
+"cloud-wisp-02": {
+"f": "g2-cloud-wisp-02.webp",
+"w": 1024,
+"h": 530,
+"kb": 113,
+"cat": "atmosphere",
+"kind": "overlay",
+"src": "moon_waxing_gibbous.png"
+},
+"tile-moss-and-stone-bank": {
+"f": "g2-tile-moss-and-stone-bank.webp",
+"w": 512,
+"h": 512,
+"kb": 93,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "moss_and_stone_bank.png"
+},
+"tile-mulch-tree-bed": {
+"f": "g2-tile-mulch-tree-bed.webp",
+"w": 512,
+"h": 512,
+"kb": 118,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "mulch_tree_bed.png"
+},
+"muscari": {
+"f": "g2-muscari.webp",
+"w": 800,
+"h": 796,
+"kb": 220,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "muscari_map.png"
+},
+"orange-tree-potted": {
+"f": "g2-orange-tree-potted.webp",
+"w": 531,
+"h": 800,
+"kb": 153,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "orange_tree_potted_map.png"
+},
+"tile-orchard-grass-buttercups": {
+"f": "g2-tile-orchard-grass-buttercups.webp",
+"w": 512,
+"h": 512,
+"kb": 117,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "orchard_grass_buttercups.png"
+},
+"orchid-potted": {
+"f": "g2-orchid-potted.webp",
+"w": 528,
+"h": 800,
+"kb": 157,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "orchid_potted_map.png"
+},
+"palm-potted": {
+"f": "g2-palm-potted.webp",
+"w": 545,
+"h": 800,
+"kb": 190,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "palm_potted_map.png"
+},
+"passionflower-support": {
+"f": "g2-passionflower-support.webp",
+"w": 655,
+"h": 800,
+"kb": 200,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "passionflower_support_map.png"
+},
+"pear-tree-blossom": {
+"f": "g2-pear-tree-blossom.webp",
+"w": 750,
+"h": 800,
+"kb": 268,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "pear_tree_blossom_map.png"
+},
+"pergola-section-corner": {
+"f": "g2-pergola-section-corner.webp",
+"w": 995,
+"h": 917,
+"kb": 217,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "pergola_section_corner_map.png"
+},
+"pergola-section-straight": {
+"f": "g2-pergola-section-straight.webp",
+"w": 1024,
+"h": 815,
+"kb": 137,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "pergola_section_straight_map.png"
+},
+"phlox": {
+"f": "g2-phlox.webp",
+"w": 739,
+"h": 800,
+"kb": 241,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "phlox_map.png"
+},
+"planter-box-long": {
+"f": "g2-planter-box-long.webp",
+"w": 1024,
+"h": 467,
+"kb": 106,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "planter_box_long_map.png"
+},
+"planter-box-square": {
+"f": "g2-planter-box-square.webp",
+"w": 695,
+"h": 707,
+"kb": 96,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "planter_box_square_map.png"
+},
+"plinth-round": {
+"f": "g2-plinth-round.webp",
+"w": 527,
+"h": 948,
+"kb": 151,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "plinth_round_map.png"
+},
+"plinth-square": {
+"f": "g2-plinth-square.webp",
+"w": 648,
+"h": 907,
+"kb": 154,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "plinth_square_map.png"
+},
+"plum-tree-blossom": {
+"f": "g2-plum-tree-blossom.webp",
+"w": 759,
+"h": 800,
+"kb": 250,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "plum_tree_blossom_map.png"
+},
+"pond-edge": {
+"f": "g2-pond-edge.webp",
+"w": 1024,
+"h": 695,
+"kb": 130,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "pond_edge_map.png"
+},
+"reeds": {
+"f": "g2-reeds.webp",
+"w": 518,
+"h": 800,
+"kb": 166,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "reeds_map.png"
+},
+"rhododendron": {
+"f": "g2-rhododendron.webp",
+"w": 800,
+"h": 733,
+"kb": 225,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "rhododendron_map.png"
+},
+"bee": {
+"f": "g2-bee.webp",
+"w": 384,
+"h": 369,
+"kb": 47,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "robin_map.png"
+},
+"rose-arch-wood": {
+"f": "g2-rose-arch-wood.webp",
+"w": 766,
+"h": 858,
+"kb": 130,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "rose_arch_wood_map.png"
+},
+"rose-obelisk": {
+"f": "g2-rose-obelisk.webp",
+"w": 397,
+"h": 911,
+"kb": 76,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "rose_obelisk_map.png"
+},
+"rowboat": {
+"f": "g2-rowboat.webp",
+"w": 983,
+"h": 705,
+"kb": 82,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "rowboat_map.png"
+},
+"salvia": {
+"f": "g2-salvia.webp",
+"w": 800,
+"h": 640,
+"kb": 210,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "salvia_map.png"
+},
+"moon-first-quarter": {
+"f": "g2-moon-first-quarter.webp",
+"w": 384,
+"h": 384,
+"kb": 42,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "sky_dawn.png"
+},
+"sky-dawn": {
+"f": "g2-sky-dawn.webp",
+"w": 2048,
+"h": 1024,
+"kb": 35,
+"cat": "atmosphere",
+"kind": "sky",
+"src": "sky_dusk.png"
+},
+"moon-waning-gibbous": {
+"f": "g2-moon-waning-gibbous.webp",
+"w": 377,
+"h": 384,
+"kb": 46,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "sky_morning.png"
+},
+"snowdrop": {
+"f": "g2-snowdrop.webp",
+"w": 765,
+"h": 800,
+"kb": 207,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "snowdrop_map.png"
+},
+"tile-soil-dark-bed": {
+"f": "g2-tile-soil-dark-bed.webp",
+"w": 512,
+"h": 512,
+"kb": 74,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "soil_dark_bed.png"
+},
+"statue-figure": {
+"f": "g2-statue-figure.webp",
+"w": 349,
+"h": 947,
+"kb": 103,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "statue_figure_map.png"
+},
+"statue-lion": {
+"f": "g2-statue-lion.webp",
+"w": 569,
+"h": 890,
+"kb": 66,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "statue_lion_map.png"
+},
+"stepping-stones-set": {
+"f": "g2-stepping-stones-set.webp",
+"w": 1024,
+"h": 672,
+"kb": 196,
+"cat": "ground_tiles",
+"kind": "map_cutout",
+"src": "stepping_stones_set_map.png"
+},
+"stone-bench-weathered": {
+"f": "g2-stone-bench-weathered.webp",
+"w": 1024,
+"h": 757,
+"kb": 120,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_bench_weathered_map.png"
+},
+"stone-circle": {
+"f": "g2-stone-circle.webp",
+"w": 1024,
+"h": 869,
+"kb": 262,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_circle_map.png"
+},
+"stone-kerb-curve": {
+"f": "g2-stone-kerb-curve.webp",
+"w": 1024,
+"h": 574,
+"kb": 69,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_kerb_curve_map.png"
+},
+"stone-kerb-straight": {
+"f": "g2-stone-kerb-straight.webp",
+"w": 1024,
+"h": 554,
+"kb": 75,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_kerb_straight_map.png"
+},
+"stone-steps-narrow": {
+"f": "g2-stone-steps-narrow.webp",
+"w": 745,
+"h": 806,
+"kb": 93,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_steps_narrow_map.png"
+},
+"stone-steps-wide": {
+"f": "g2-stone-steps-wide.webp",
+"w": 1024,
+"h": 674,
+"kb": 159,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "stone_steps_wide_map.png"
+},
+"tile-stream-water-clear": {
+"f": "g2-tile-stream-water-clear.webp",
+"w": 512,
+"h": 512,
+"kb": 98,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "stream_water_clear.png"
+},
+"moon-last-quarter": {
+"f": "g2-moon-last-quarter.webp",
+"w": 384,
+"h": 384,
+"kb": 35,
+"cat": "atmosphere",
+"kind": "moon",
+"src": "sun_disc_glow.png"
+},
+"sunflower": {
+"f": "g2-sunflower.webp",
+"w": 781,
+"h": 800,
+"kb": 252,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "sunflower_map.png"
+},
+"duck-with-ducklings": {
+"f": "g2-duck-with-ducklings.webp",
+"w": 384,
+"h": 307,
+"kb": 45,
+"cat": "creatures_map",
+"kind": "sprite",
+"src": "swallows_map.png"
+},
+"swing-seat-bough": {
+"f": "g2-swing-seat-bough.webp",
+"w": 809,
+"h": 827,
+"kb": 114,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "swing_seat_bough_map.png"
+},
+"tile-terrace-stone-slabs": {
+"f": "g2-tile-terrace-stone-slabs.webp",
+"w": 512,
+"h": 512,
+"kb": 56,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "terrace_stone_slabs.png"
+},
+"topiary-ball": {
+"f": "g2-topiary-ball.webp",
+"w": 773,
+"h": 778,
+"kb": 125,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "topiary_ball_map.png"
+},
+"topiary-cone": {
+"f": "g2-topiary-cone.webp",
+"w": 588,
+"h": 895,
+"kb": 65,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "topiary_cone_map.png"
+},
+"topiary-spiral": {
+"f": "g2-topiary-spiral.webp",
+"w": 262,
+"h": 951,
+"kb": 75,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "topiary_spiral_map.png"
+},
+"trellis-panel": {
+"f": "g2-trellis-panel.webp",
+"w": 846,
+"h": 788,
+"kb": 131,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "trellis_panel_map.png"
+},
+"urn-tall": {
+"f": "g2-urn-tall.webp",
+"w": 766,
+"h": 950,
+"kb": 68,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "urn_tall_map.png"
+},
+"urn-tall-pair": {
+"f": "g2-urn-tall-pair.webp",
+"w": 676,
+"h": 850,
+"kb": 105,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "urn_tall_pair_map.png"
+},
+"urn-wide": {
+"f": "g2-urn-wide.webp",
+"w": 1024,
+"h": 696,
+"kb": 158,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "urn_wide_map.png"
+},
+"viburnum": {
+"f": "g2-viburnum.webp",
+"w": 759,
+"h": 800,
+"kb": 249,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "viburnum_map.png"
+},
+"tile-vineyard-earth-rows": {
+"f": "g2-tile-vineyard-earth-rows.webp",
+"w": 512,
+"h": 512,
+"kb": 98,
+"cat": "ground_tiles",
+"kind": "tile",
+"src": "vineyard_earth_rows.png"
+},
+"water-iris": {
+"f": "g2-water-iris.webp",
+"w": 647,
+"h": 800,
+"kb": 175,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "water_iris_map.png"
+},
+"water-lily": {
+"f": "g2-water-lily.webp",
+"w": 800,
+"h": 561,
+"kb": 118,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "water_lily_map.png"
+},
+"wildflower-drift": {
+"f": "g2-wildflower-drift.webp",
+"w": 773,
+"h": 800,
+"kb": 297,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "wildflower_drift_map.png"
+},
+"wisteria-support": {
+"f": "g2-wisteria-support.webp",
+"w": 791,
+"h": 800,
+"kb": 305,
+"cat": "plants_map",
+"kind": "map_cutout",
+"src": "wisteria_support_map.png"
+},
+"wooden-bench": {
+"f": "g2-wooden-bench.webp",
+"w": 1024,
+"h": 692,
+"kb": 132,
+"cat": "built_elements",
+"kind": "map_cutout",
+"src": "wooden_bench_map.png"
+},
+"yew-hedge-arch-gated": {
+"f": "g2-yew-hedge-arch-gated.webp",
+"w": 676,
+"h": 911,
+"kb": 167,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_arch_gated_map.png"
+},
+"yew-hedge-arch-open": {
+"f": "g2-yew-hedge-arch-open.webp",
+"w": 644,
+"h": 923,
+"kb": 116,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_arch_open_map.png"
+},
+"yew-hedge-corner": {
+"f": "g2-yew-hedge-corner.webp",
+"w": 1024,
+"h": 468,
+"kb": 107,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_corner_map.png"
+},
+"yew-hedge-curve-medium": {
+"f": "g2-yew-hedge-curve-medium.webp",
+"w": 1024,
+"h": 513,
+"kb": 89,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_curve_medium_map.png"
+},
+"yew-hedge-curve-tight": {
+"f": "g2-yew-hedge-curve-tight.webp",
+"w": 752,
+"h": 694,
+"kb": 85,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_curve_tight_map.png"
+},
+"yew-hedge-curve-wide": {
+"f": "g2-yew-hedge-curve-wide.webp",
+"w": 1024,
+"h": 611,
+"kb": 87,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_curve_wide_map.png"
+},
+"yew-hedge-end-cap": {
+"f": "g2-yew-hedge-end-cap.webp",
+"w": 580,
+"h": 894,
+"kb": 134,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_end_cap_map.png"
+},
+"yew-hedge-straight": {
+"f": "g2-yew-hedge-straight.webp",
+"w": 1024,
+"h": 499,
+"kb": 112,
+"cat": "hedges_topiary",
+"kind": "map_cutout",
+"src": "yew_hedge_straight_map.png"
+}
+}
