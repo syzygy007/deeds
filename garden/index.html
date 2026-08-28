@@ -89,7 +89,7 @@ button{font:inherit;cursor:pointer}
 /* seat */
 #seat{position:fixed;inset:0;background:#0f1a12;display:none;overflow:hidden;z-index:70;touch-action:none}
 #seat.on{display:block}
-.layer{position:absolute;left:-8%;top:-8%;width:116%;height:116%;will-change:transform}
+.layer{position:absolute;left:-30%;top:-50%;width:160%;height:156%;will-change:transform}
 .layer svg,.layer canvas{width:100%;height:100%;display:block}
 .limg{position:absolute;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
 #vig{position:absolute;inset:0;pointer-events:none;z-index:12;background:radial-gradient(ellipse at 50% 55%,rgba(0,0,0,0) 55%,rgba(0,0,0,.4) 100%)}
@@ -122,6 +122,8 @@ button{font:inherit;cursor:pointer}
 #bflight{position:fixed;inset:0;pointer-events:none;z-index:56}
 .bfy{position:absolute;animation:bfrise 3.1s ease-in forwards;opacity:0}
 @keyframes bfrise{0%{transform:translate(0,0);opacity:0}12%{opacity:1}100%{transform:translate(var(--fx),-62vh);opacity:0}}
+#bMusic{padding:6px 13px;font-size:15px}
+#bMusic.on{background:var(--forest);color:var(--ivory)}
 </style>
 </head>
 <body>
@@ -150,7 +152,7 @@ button{font:inherit;cursor:pointer}
   <button class="btn" id="bClear">Start Over.</button>
 </div>
 <div id="timechips"></div>
-<div id="zoomer"><button class="btn" id="zin">+</button><button class="btn" id="zout">&minus;</button></div>
+<div id="zoomer"><button class="btn" id="bMusic" title="Music">&#9834;</button><button class="btn" id="zin">+</button><button class="btn" id="zout">&minus;</button></div>
 <img id="canimg" src="garden-watercan.webp" alt="">
 <div id="bflight"></div>
 <div id="confirm"><div class="cbox"><div class="ch">Start over?</div><div class="cb">Every plant returns to your sack as seeds. Deeds, land and waterings stay.</div><div class="crow"><button class="btn" id="cNo">Keep It.</button><button class="btn primary" id="cYes">Clear It.</button></div></div></div>
@@ -347,11 +349,12 @@ function build(){
   sizeFireflies();
   applyPhase();
 }
-function growth(p){const d=p.g||0;return d>=2?1:d>=.9?.78:.5}
+function growth(p){const d=p.g||0;return d>=2?1:d>=1?.55:0}
 function renderPlants(){paintWet();
   const P=$('#plantimgs');let s='';
-  Object.entries(S.plants).forEach(([plot,p])=>{const [x,y]=bedWorld(+plot);const w=Math.min(200,bedSize(+plot)*1.28)*growth(p);
-    s+=`<img class="bedimg sway" src="garden-${CAT[p.t].img}-map.webp" style="left:${(x-w/2)|0}px;top:${(y-w*0.66)|0}px;width:${w|0}px;animation-delay:${(plot*.37%3).toFixed(2)}s" alt="">`});
+  Object.entries(S.plants).forEach(([plot,p])=>{const [x,y]=bedWorld(+plot);const g=growth(p);
+    if(g===0){const w=Math.min(74,bedSize(+plot)*.46);s+=`<img class="bedimg" src="garden-seeds.webp" style="left:${(x-w/2)|0}px;top:${(y-w*.4)|0}px;width:${w|0}px" alt="">`}
+    else{const w=Math.min(200,bedSize(+plot)*1.28)*g;s+=`<img class="bedimg sway" src="garden-${CAT[p.t].img}-map.webp" style="left:${(x-w/2)|0}px;top:${(y-w*0.66)|0}px;width:${w|0}px;animation-delay:${(plot*.37%3).toFixed(2)}s" alt="">`}});
   P.innerHTML=s;
 }
 function renderMists(){
@@ -390,7 +393,7 @@ function openDrawer(plot){curPlot=plot;const t=tierOf(S.deeds);
   document.querySelectorAll('.pk').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.id;const c=CAT[id];
     if(b.classList.contains('locked')){toast('Opens at '+TIERS[c.tier]+' deeds.');return}
     if(seeds()<c.price){toast('Not enough seeds. Post a deed, four more arrive.');return}
-    spend(c.price);S.plants[curPlot]={t:id,g:0};save();closeDrawer();renderPlants();renderHud();toast('Planted. '+c.n+' in bed '+(curPlot+1)+'.');
+    spend(c.price);S.plants[curPlot]={t:id,g:0};save();closeDrawer();renderPlants();renderHud();toast('Sown. '+c.n+' seeds in bed '+(curPlot+1)+'.');
     checkUnlocks();
   }));
   $('#drawer').classList.add('on');
@@ -457,49 +460,66 @@ function flLoop(t){fx.clearRect(0,0,fc.width,fc.height);if(fireflyOn){FLZ.forEac
 requestAnimationFrame(flLoop);
 
 /* ---------- the seat ---------- */
-let seatOpen=false,seatRaf=null,LAY=[],tx=0,ty=0,cx=0,cy=0,curSeat=-1;
+let seatOpen=false,seatRaf=null,LAY=[],tx=0,ty=0,cx=0,cy=0,curSeat=-1,LOOKX=0,LOOKY=0,sDrag=false,slx=0,sly=0;
 const SKY={dawn:['#F6C9A8','#FBEAD2'],day:['#B6D4E8','#F1EEDC'],golden:['#F2B571','#FBE6C0'],dusk:['#8B7FC0','#E8C4A8'],night:['#0B1430','#1E2C55']};
 const HED={dawn:'#4A6E3F',day:'#3E6B3D',golden:'#556F34',dusk:'#33523B',night:'#22382C'};
 function buildSeatLayers(){
   const p=S.plants[curSeat];if(!p)return;
-  const ph=phase();const c=CAT[p.t];
+  const ph=phase();const c=CAT[p.t];const g=growth(p);
   const L=$('#slayers');
-  const sky=`<div class="layer" data-d="6" style="z-index:0"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[ph][0]}"/><stop offset="1" stop-color="${SKY[ph][1]}"/></linearGradient></defs><rect width="1600" height="1000" fill="url(#sg)"/>${ph==='night'?[...Array(90)].map((_,i)=>{const r=rng(i*7+3)();const r2=rng(i*13+5)();return `<circle cx="${(r*1600)|0}" cy="${(r2*520)|0}" r="${(0.7+r2*1.3).toFixed(1)}" fill="#EDF2FF" opacity="${(.3+.7*r).toFixed(2)}"/>`}).join(''):''}${ph==='night'?'<circle cx="1180" cy="200" r="52" fill="#F2EFDF" opacity=".95"/><circle cx="1160" cy="192" r="52" fill="'+SKY.night[0]+'" opacity=".18"/>':''}</svg></div>`;
+  const sky=`<div class="layer" data-d="6" style="z-index:0"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[ph][0]}"/><stop offset="1" stop-color="${SKY[ph][1]}"/></linearGradient></defs><rect width="1600" height="1560" fill="url(#sg)"/>${ph==='night'?[...Array(90)].map((_,i)=>{const r=rng(i*7+3)();const r2=rng(i*13+5)();return `<circle cx="${(r*1600)|0}" cy="${(60+r2*840)|0}" r="${(0.7+r2*1.3).toFixed(1)}" fill="#EDF2FF" opacity="${(.3+.7*r).toFixed(2)}"/>`}).join(''):''}${ph==='night'?'<circle cx="1180" cy="560" r="52" fill="#F2EFDF" opacity=".95"/><circle cx="1160" cy="552" r="52" fill="'+SKY.night[0]+'" opacity=".18"/>':''}</svg></div>`;
   const r1=rng(31);let tr='';const cs=ph==='night'?['#22382C','#2A4536','#1C3026']:ph==='golden'||ph==='dusk'?['#7E8F5A','#8FA067','#6F8050']:['#5F8A52','#6F9A5E','#4F7A46'];
-  for(let i=0;i<22;i++){const x=i*80-40+r1()*40,y=350+r1()*40,rx=70+r1()*60,ry=48+r1()*44;tr+=`<ellipse cx="${x|0}" cy="${y|0}" rx="${rx|0}" ry="${ry|0}" fill="${cs[i%3]}"/>`}
-  const trees=`<div class="layer" data-d="12" style="z-index:1"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice"><g opacity=".92">${tr}</g></svg></div>`;
-  const hc=HED[ph];const top=[...Array(21)].map((_,i)=>`Q${i*80+40},${i%2?408:384} ${i*80+80},396`).join(' ');
-  const hedge=`<div class="layer" data-d="20" style="z-index:2"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice"><path d="M0,396 ${top} V600 H0 Z" fill="${hc}"/><path d="M0,396 ${top} V470 H0 Z" fill="#FFFFFF" opacity=".08"/><rect x="0" y="600" width="1600" height="400" fill="${ph==='night'?'#8E8873':'#E7DFCC'}"/></svg></div>`;
-  const fount=`<div class="layer" data-d="30" style="z-index:3"><img class="limg" src="garden-fountain-seat.webp" style="right:-3%;bottom:24%;width:31%" alt=""></div>`;
-  const lant=`<div class="layer" data-d="36" style="z-index:4"><img class="limg" src="garden-lantern-${(ph==='night'||ph==='dusk')?'lit':'day'}.webp" style="left:6%;bottom:30%;width:11%" alt=""></div>`;
-  const plant=`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-${c.img}-seat.webp" style="left:50%;transform:translateX(-50%);bottom:12%;width:min(62%,760px)" alt=""></div>`;
-  const bfs=`<div class="layer" data-d="40" style="z-index:6"><img id="bf1" class="limg" src="garden-bf-blue-open.webp" style="left:30%;top:38%;width:9%" alt=""><img id="bf2" class="limg" src="garden-bf-ivory-open.webp" style="left:62%;top:30%;width:8%" alt=""><img id="bee1" class="limg" src="garden-bee.webp" style="left:46%;top:52%;width:5%" alt=""></div>`;
-  const fore=`<div class="layer" data-d="72" style="z-index:7"><img class="limg" src="garden-overhang-left.webp" style="left:-6%;top:-4%;width:46%" alt=""><img class="limg" src="garden-overhang-right.webp" style="right:-6%;top:-4%;width:46%" alt=""><img class="limg" src="garden-benchedge-seat.webp" style="left:50%;transform:translateX(-50%);bottom:-9%;width:78%" alt=""></div>`;
+  for(let i=0;i<22;i++){const x=i*80-40+r1()*40,y=880+r1()*44,rx=80+r1()*70,ry=54+r1()*48;tr+=`<ellipse cx="${x|0}" cy="${y|0}" rx="${rx|0}" ry="${ry|0}" fill="${cs[i%3]}"/>`}
+  const trees=`<div class="layer" data-d="12" style="z-index:1"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><g opacity=".92">${tr}</g></svg></div>`;
+  const hc=HED[ph];const top=[...Array(21)].map((_,i)=>`Q${i*80+40},${i%2?968:944} ${i*80+80},956`).join(' ');
+  const hedge=`<div class="layer" data-d="20" style="z-index:2"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><path d="M0,956 ${top} V1064 H0 Z" fill="${hc}"/><path d="M0,956 ${top} V1016 H0 Z" fill="#FFFFFF" opacity=".08"/><rect x="0" y="1064" width="1600" height="496" fill="${ph==='night'?'#8E8873':'#E7DFCC'}"/></svg></div>`;
+  const fount=`<div class="layer" data-d="30" style="z-index:3"><img class="limg" src="garden-fountain-seat.webp" style="left:66%;bottom:18%;width:22.5%" alt=""></div>`;
+  const lant=`<div class="layer" data-d="36" style="z-index:4"><img class="limg" src="garden-lantern-${(ph==='night'||ph==='dusk')?'lit':'day'}.webp" style="left:18%;bottom:22%;width:8%" alt=""></div>`;
+  const plant=g===0?`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-seeds.webp" style="left:50%;transform:translateX(-50%);bottom:10%;width:13%" alt=""></div>`:`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-${c.img}-seat.webp" style="left:50%;transform:translateX(-50%);bottom:9%;width:min(${g>=1&&g<2?32:45}%,760px)" alt=""></div>`;
+  const bfs=`<div class="layer" data-d="40" style="z-index:6"><img id="bf1" class="limg" src="garden-bf-blue-open.webp" style="left:35%;top:55%;width:6.5%" alt=""><img id="bf2" class="limg" src="garden-bf-ivory-open.webp" style="left:59%;top:49%;width:5.8%" alt=""><img id="bee1" class="limg" src="garden-bee.webp" style="left:47%;top:65%;width:3.6%" alt=""></div>`;
+  const fore=`<div class="layer" data-d="72" style="z-index:7"><img class="limg" src="garden-overhang-left.webp" style="left:9%;top:24%;width:33%" alt=""><img class="limg" src="garden-overhang-right.webp" style="right:9%;top:24%;width:33%" alt=""><img class="limg" src="garden-benchedge-seat.webp" style="left:50%;transform:translateX(-50%);bottom:-6.5%;width:56%" alt=""></div>`;
   L.innerHTML=sky+trees+hedge+fount+lant+plant+bfs+fore;
   LAY=[...document.querySelectorAll('#slayers .layer')].map(el=>({el,d:+el.dataset.d}));
   $('#stint').style.background=ph==='night'?'rgba(10,16,42,.3)':TINT[ph];
   $('#sMicro').textContent='You are sitting in the parterre · Bed '+(curSeat+1);
   $('#sTitle').innerHTML=c.n+'s<span>.</span>';
-  $('#sSub').textContent=(growth(p)>=1?'In bloom':'Growing')+' · '+ph[0].toUpperCase()+ph.slice(1);
+  $('#sSub').textContent=(g>=1?(g>=2?'In bloom':'Growing'):'Sown')+' · '+ph[0].toUpperCase()+ph.slice(1);
 }
-function seatLoop(now){if(!seatOpen)return;const t=now/1000;const amp=innerWidth<1024?1:1.6;
-  const ax=Math.sin(t*.35)*.35+Math.sin(t*.21+1.3)*.2,ay=Math.sin(t*.27+.7)*.22;
-  cx+=((tx+ax)-cx)*.06;cy+=((ty+ay)-cy)*.06;
-  LAY.forEach(l=>{l.el.style.transform=`translate3d(${(-cx*l.d*amp).toFixed(2)}px,${(-cy*l.d*amp*.62).toFixed(2)}px,0)`});
+function seatLoop(now){if(!seatOpen)return;const t=now/1000;
+  const RX=innerWidth*.27,RYU=innerHeight*.42,RYD=innerHeight*.05;
+  const ax=Math.sin(t*.35)*.06+Math.sin(t*.21+1.3)*.04,ay=Math.sin(t*.27+.7)*.04;
+  const tgx=LOOKX*RX+(tx+ax)*10,tgy=(LOOKY<0?LOOKY*RYU:LOOKY*RYD)+(ty+ay)*7;
+  cx+=(tgx-cx)*.08;cy+=(tgy-cy)*.08;
+  LAY.forEach(l=>{const dn=l.d/72;l.el.style.transform=`translate3d(${(-cx*dn).toFixed(2)}px,${(-cy*dn).toFixed(2)}px,0)`});
   const b1=$('#bf1'),b2=$('#bf2'),bee=$('#bee1');
-  if(b1){b1.style.left=(30+8*Math.sin(t*.4))+'%';b1.style.top=(38+6*Math.sin(t*.31+1))+'%';b1.src=Math.sin(t*7)>0?'garden-bf-blue-open.webp':'garden-bf-blue-closed.webp'}
-  if(b2){b2.style.left=(62+7*Math.sin(t*.33+2))+'%';b2.style.top=(30+5*Math.cos(t*.27))+'%';b2.src=Math.sin(t*6+2)>0?'garden-bf-ivory-open.webp':'garden-bf-ivory-closed.webp'}
-  if(bee){bee.style.left=(46+10*Math.sin(t*1.1))+'%';bee.style.top=(52+4*Math.cos(t*1.7))+'%'}
+  if(b1){b1.style.left=(35+5.8*Math.sin(t*.4))+'%';b1.style.top=(55+4.5*Math.sin(t*.31+1))+'%';b1.src=Math.sin(t*7)>0?'garden-bf-blue-open.webp':'garden-bf-blue-closed.webp'}
+  if(b2){b2.style.left=(59+5.1*Math.sin(t*.33+2))+'%';b2.style.top=(49+3.7*Math.cos(t*.27))+'%';b2.src=Math.sin(t*6+2)>0?'garden-bf-ivory-open.webp':'garden-bf-ivory-closed.webp'}
+  if(bee){bee.style.left=(47+7.3*Math.sin(t*1.1))+'%';bee.style.top=(65+3*Math.cos(t*1.7))+'%'}
   seatRaf=requestAnimationFrame(seatLoop)}
 function onMove(e){tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2}
 function onOrient(e){if(e.gamma==null)return;tx=clamp(e.gamma/22,-1,1);ty=clamp((e.beta-45)/22,-1,1)}
-function openSeat(plot){curSeat=plot;seatOpen=true;buildSeatLayers();const s=$('#seat');s.classList.add('on');tx=ty=cx=cy=0;s.addEventListener('pointermove',onMove);addEventListener('deviceorientation',onOrient);cancelAnimationFrame(seatRaf);seatRaf=requestAnimationFrame(seatLoop);
+function openSeat(plot){curSeat=plot;seatOpen=true;buildSeatLayers();const s=$('#seat');s.classList.add('on');tx=ty=cx=cy=0;LOOKX=LOOKY=0;sDrag=false;addEventListener('deviceorientation',onOrient);cancelAnimationFrame(seatRaf);seatRaf=requestAnimationFrame(seatLoop);
   const chips=$('#sChips');chips.innerHTML='';['now',...PHASES].forEach(p=>{const b=document.createElement('button');b.className='btn'+((phaseOverride||'now')===(p==='now'?(phaseOverride?'':'now'):p)?' on':'');b.textContent=p==='now'?'Now':p;b.addEventListener('click',()=>{phaseOverride=p==='now'?null:p;applyPhase();chips.querySelectorAll('.btn').forEach(x=>x.classList.remove('on'));b.classList.add('on')});chips.appendChild(b)});
-  $('#sHint').textContent=matchMedia('(pointer:coarse)').matches?'Tilt the phone':'Move the mouse';
+  $('#sHint').textContent=matchMedia('(pointer:coarse)').matches?'Drag to look around. Tilt works too.':'Drag to look around.';
 }
-function closeSeat(){seatOpen=false;$('#seat').classList.remove('on');$('#seat').removeEventListener('pointermove',onMove);removeEventListener('deviceorientation',onOrient);cancelAnimationFrame(seatRaf)}
+function closeSeat(){seatOpen=false;$('#seat').classList.remove('on');removeEventListener('deviceorientation',onOrient);cancelAnimationFrame(seatRaf)}
+const seatEl=$('#seat');
+seatEl.addEventListener('pointerdown',e=>{if(!seatOpen)return;if(e.target.closest('button')){return}sDrag=true;slx=e.clientX;sly=e.clientY;try{seatEl.setPointerCapture(e.pointerId)}catch(err){}});
+seatEl.addEventListener('pointermove',e=>{if(!seatOpen)return;if(sDrag){LOOKX=clamp(LOOKX-(e.clientX-slx)/(innerWidth*.5),-1,1);LOOKY=clamp(LOOKY-(e.clientY-sly)/(innerHeight*.45),-1,.25);slx=e.clientX;sly=e.clientY}else{tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2}});
+seatEl.addEventListener('pointerup',()=>{sDrag=false});
 $('#sClose').addEventListener('click',closeSeat);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(seatOpen)closeSeat();else closeDrawer()}});
+
+/* ---------- music (drop garden-music-N.mp3 into this folder and it plays) ---------- */
+const PLAYLIST=[{f:'garden-music-1.mp3',t:'Morning Mood \u00B7 Grieg'},{f:'garden-music-2.mp3',t:'Spring \u00B7 Vivaldi'}];
+let MTRACK=0,MFAILS=0;const AU=new Audio();AU.volume=.35;
+function mPlay(){AU.src=PLAYLIST[MTRACK].f;AU.play().catch(()=>{})}
+AU.addEventListener('playing',()=>{MFAILS=0;toast(PLAYLIST[MTRACK].t)});
+AU.addEventListener('ended',()=>{MTRACK=(MTRACK+1)%PLAYLIST.length;mPlay()});
+AU.addEventListener('error',()=>{MFAILS++;if(MFAILS>=PLAYLIST.length){mStop();toast('The music arrives with the next drop.');return}MTRACK=(MTRACK+1)%PLAYLIST.length;mPlay()});
+function mStop(){AU.pause();S.flags.music=0;save();$('#bMusic').classList.remove('on')}
+$('#bMusic').addEventListener('click',()=>{if(S.flags.music){mStop();return}S.flags.music=1;save();$('#bMusic').classList.add('on');mPlay()});
+if(S.flags&&S.flags.music){$('#bMusic').classList.add('on');const arm=()=>{document.removeEventListener('pointerdown',arm);if(S.flags.music)mPlay()};document.addEventListener('pointerdown',arm)}
 
 /* boot */
 build();renderHud();
