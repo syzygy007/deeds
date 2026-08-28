@@ -31,7 +31,19 @@ button{font:inherit;cursor:pointer}
 #bar .stat b{font-size:1.05rem;letter-spacing:-.02em}
 #bar .stat .sub{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:rgba(21,19,14,.55);display:block;line-height:1.1}
 #bar .sp{flex:1}
-#tierchip{border:1px solid var(--hair);border-radius:3px;padding:5px 9px;background:transparent;color:var(--forest)}
+#bar .mark .g{color:var(--ink)}
+#bar button.stat{appearance:none;border:1px solid var(--hair);background:rgba(255,255,255,.4);border-radius:3px;padding:4px 9px 4px 6px;color:inherit;text-align:left;font:inherit}
+#bar button.stat.on{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+#bar button.stat.on .sub{color:rgba(246,243,235,.75)}
+.dc{display:inline-block;height:.95em;width:auto;vertical-align:-.12em}
+@media (max-width:480px){#bar{gap:9px}#bar .mark .g{display:none}#sowchip{left:max(14px,env(safe-area-inset-left));transform:none}}
+@media (max-width:400px){#bar{gap:6px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}#bar .stat b{font-size:.95rem}#bar .stat .sub{letter-spacing:.09em}#bar button.stat{padding:4px 6px 4px 5px}}
+#sowchip{position:fixed;left:50%;transform:translateX(-50%);top:62px;z-index:41;display:none;align-items:center;gap:10px;background:rgba(246,243,235,.96);border:1px solid var(--forest);border-radius:3px;padding:6px 8px 6px 10px;box-shadow:0 6px 18px rgba(21,19,14,.2);white-space:nowrap}
+#sowchip.on{display:flex}
+#sowchip img{height:32px;width:auto;display:block}
+#sowchip .micro{color:var(--forest)}
+#sowchip .ct{font-weight:700;font-size:.78rem;margin-top:2px}
+#sowchip .btn{padding:7px 10px;font-size:.72rem}
 
 /* world */
 #vp{position:fixed;inset:0;overflow:hidden;cursor:grab}
@@ -83,6 +95,50 @@ button{font:inherit;cursor:pointer}
 .pk .nm{position:absolute;top:7%;left:10%;right:10%;font-weight:800;font-size:.78rem;letter-spacing:.02em;color:#4a4433}
 .pk .price{position:absolute;bottom:6.5%;left:14%;right:14%;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#7a6f52}
 .pk.locked{filter:grayscale(1);opacity:.55}
+.pk .qty{position:absolute;top:5%;right:7%;background:var(--forest);color:var(--ivory);font-size:.62rem;font-weight:800;padding:3px 7px;border-radius:12px}
+.pk .card{cursor:pointer}
+.pk .row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+.pk .sb{width:34px;height:34px;border:1px solid var(--ink);background:var(--ivory);border-radius:3px;font-weight:800;font-size:1.15rem;line-height:1;padding:0}
+.pk .sb:active{transform:translateY(1px)}
+.pk .q{min-width:22px;text-align:center;font-weight:800}
+.pk.locked .sb{pointer-events:none}
+.sheet .head{flex-wrap:wrap}
+.sheet .head .hb{display:flex;gap:8px;flex-wrap:wrap}
+.sheet .dart{height:54px;width:auto;display:none;align-self:center}
+.sheet.coins .dart{display:block}
+#dBody{display:none}
+.sheet.body #dBody{display:block}
+.sheet.body #packets{display:none}
+.balance{display:flex;align-items:center;gap:14px;margin:2px 0 8px}
+.balance b{font-size:2.4rem;letter-spacing:-.04em;line-height:1}
+.balance img{height:44px;width:auto}
+.sec{margin:18px 0 8px;color:var(--forest)}
+.lg{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--hair)}
+.lg .l,.gift .l{font-weight:700;font-size:.92rem}
+.lg .w,.gift .w{color:rgba(21,19,14,.55);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-top:3px}
+.lg .a{font-weight:800;white-space:nowrap}
+.lg .a.plus{color:var(--forest)}
+.lg .a.minus{color:rgba(21,19,14,.7)}
+.gift{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--hair);border-radius:6px;margin-bottom:8px;background:rgba(255,255,255,.4)}
+.gift .btn{padding:7px 10px;font-size:.72rem;white-space:nowrap}
+.frow{margin:14px 0}
+.frow .lbl{margin-bottom:8px;color:var(--forest)}
+.fchips{display:flex;gap:6px;flex-wrap:wrap}
+.fchips .btn{padding:8px 11px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+.fchips .btn.on{background:var(--ink);border-color:var(--ink);color:var(--ivory)}
+.fchips .btn:disabled{opacity:.45;cursor:default}
+.spk{display:flex;gap:8px;flex-wrap:wrap}
+.spk .btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px}
+.spk .btn img{height:26px;width:auto}
+.spk .btn.on{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
+.amt{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.amt b{font-size:1.5rem;min-width:3ch;text-align:center;letter-spacing:-.02em}
+.amt .hint{color:rgba(21,19,14,.55);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.inp{font:inherit;font-weight:700;font-size:1rem;padding:10px 12px;border:1px solid var(--ink);border-radius:3px;background:#fff;color:var(--ink);width:min(100%,320px)}
+.inp:focus{outline:2px solid var(--forest);outline-offset:1px}
+.btn:disabled{opacity:.45;cursor:default}
+.layer.canopy{left:-40%;width:180%}
+.layer.canopy img{position:absolute;left:0;top:0;width:100%;height:41%;object-fit:cover;object-position:50% 100%;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
 .sheet .foot{margin-top:14px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
 .sheet .foot .micro{color:rgba(21,19,14,.6)}
 
@@ -129,11 +185,11 @@ button{font:inherit;cursor:pointer}
 <body>
 
 <div id="bar">
-  <div class="mark">DEEDS<span>.</span> THE GARDEN</div>
+  <div class="mark">DEEDS<span>.</span><span class="g"> THE GARDEN</span></div>
   <div class="sp"></div>
-  <div class="stat"><img src="garden-sack.webp" alt=""><div><b id="hudSeeds">0</b><span class="sub" id="hudDaily">Plant a seed</span></div></div>
+  <button class="stat" id="bPurse" title="Your purse"><img src="garden-coin.webp" alt=""><div><b id="hudCoins">0</b><span class="sub">Deedcoins</span></div></button>
+  <button class="stat" id="bSack" title="Your seed sack"><img src="garden-sack.webp" alt=""><div><b id="hudSeeds">0</b><span class="sub" id="hudSack">Seeds</span></div></button>
   <div class="stat"><img src="garden-seeds.webp" alt=""><div><b id="hudDeeds">0</b><span class="sub">Deeds</span></div></div>
-  <button class="micro" id="tierchip">Tier 1</button>
 </div>
 
 <div id="vp">
@@ -147,11 +203,12 @@ button{font:inherit;cursor:pointer}
 </div>
 
 <div id="hud">
-  <button class="btn primary" id="bDeed">Post a deed. +4 seeds</button>
+  <button class="btn primary" id="bDeed">Post a deed. +200 <img class="dc" src="garden-coin.webp" alt="Deedcoins"></button>
   <button class="btn" id="bWater">Water.</button>
   <button class="btn" id="bClear">Start Over.</button>
 </div>
 <div id="timechips"></div>
+<div id="sowchip"><img id="sowImg" src="garden-seeds.webp" alt=""><div><div class="micro" id="sowNm">Sowing</div><div class="ct" id="sowCt"></div></div><button class="btn" id="sowDone">Done.</button></div>
 <div id="zoomer"><button class="btn" id="bMusic" title="Music">&#9834;</button><button class="btn" id="zin">+</button><button class="btn" id="zout">&minus;</button></div>
 <img id="canimg" src="garden-watercan.webp" alt="">
 <div id="bflight"></div>
@@ -160,9 +217,10 @@ button{font:inherit;cursor:pointer}
 
 <div id="drawer">
   <div class="sheet">
-    <div class="head"><div><div class="micro" style="color:var(--forest)" id="dMicro">Pick a seed</div><h3 id="dTitle">Sow good seeds<span>.</span></h3></div><button class="btn" id="dClose">Not now.</button></div>
+    <div class="head"><img class="dart" src="garden-coins.webp" alt=""><div><div class="micro" style="color:var(--forest)" id="dMicro">Pick a seed</div><h3 id="dTitle">Your seed sack<span>.</span></h3></div><div class="hb"><button class="btn primary" id="dAlt">Buy seeds.</button><button class="btn" id="dClose">Not now.</button></div></div>
     <div class="packets" id="packets"></div>
-    <div class="foot"><div class="micro" id="dNote">Two free seeds a day. Use them or lose them. A posted deed pays ten.</div></div>
+    <div id="dBody"></div>
+    <div class="foot"><div class="micro" id="dNote">Tap a seed to sow it.</div></div>
   </div>
 </div>
 
@@ -194,28 +252,28 @@ const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e
 
 /* ---------- catalogue ---------- */
 const CAT={
- rose:{n:'Rose',img:'rose',price:1,tier:0,kind:'flower'},
- lavender:{n:'Lavender',img:'lavender',price:1,tier:0,kind:'flower'},
- hydrangea:{n:'Hydrangea',img:'hydrangea',price:1,tier:0,kind:'flower'},
- peony:{n:'Peony',img:'peony',price:1,tier:0,kind:'flower'},
- tulip:{n:'Tulip',img:'tulip',price:1,tier:0,kind:'flower'},
- daffodil:{n:'Daffodil',img:'daffodil',price:1,tier:0,kind:'flower'},
- delphinium:{n:'Delphinium',img:'delphinium',price:1,tier:0,kind:'flower'},
- cosmos:{n:'Cosmos',img:'cosmos',price:1,tier:0,kind:'flower'},
- hyacinth:{n:'Hyacinth',img:'hyacinth',price:1,tier:1,kind:'flower'},
- bench:{n:'Ivory bench',img:'bench',price:2,tier:1,kind:'thing'},
- lantern:{n:'Lantern',img:'lantern',price:2,tier:1,kind:'thing'},
- birdbath:{n:'Birdbath',img:'birdbath',price:2,tier:1,kind:'thing'},
- sundial:{n:'Sundial',img:'sundial',price:3,tier:1,kind:'thing'},
- curvedbench:{n:'Stone bench',img:'curvedbench',price:4,tier:2,kind:'thing'},
- arch:{n:'Golden arch',img:'arch',price:4,tier:2,kind:'thing'},
- apple:{n:'Apple tree',img:'apple',price:3,tier:2,kind:'thing'},
- willow:{n:'Willow',img:'willow',price:5,tier:2,kind:'thing'},
- pergola:{n:'Pergola',img:'pergola',price:5,tier:2,kind:'thing'},
- bridge:{n:'Stone bridge',img:'bridge',price:6,tier:2,kind:'thing'},
- gazebo:{n:'The pavilion',img:'gazebo',price:8,tier:3,kind:'thing'},
- apiary:{n:'The apiary',img:'apiary',price:6,tier:3,kind:'thing'},
- golden:{n:'Golden Wonder',img:'golden',price:12,tier:3,kind:'thing'},
+ rose:{n:'Rose',img:'rose',price:50,tier:0,kind:'flower'},
+ lavender:{n:'Lavender',img:'lavender',price:50,tier:0,kind:'flower'},
+ hydrangea:{n:'Hydrangea',img:'hydrangea',price:50,tier:0,kind:'flower'},
+ peony:{n:'Peony',img:'peony',price:50,tier:0,kind:'flower'},
+ tulip:{n:'Tulip',img:'tulip',price:50,tier:0,kind:'flower'},
+ daffodil:{n:'Daffodil',img:'daffodil',price:50,tier:0,kind:'flower'},
+ delphinium:{n:'Delphinium',img:'delphinium',price:50,tier:0,kind:'flower'},
+ cosmos:{n:'Cosmos',img:'cosmos',price:50,tier:0,kind:'flower'},
+ hyacinth:{n:'Hyacinth',img:'hyacinth',price:50,tier:1,kind:'flower'},
+ bench:{n:'Ivory bench',img:'bench',price:100,tier:1,kind:'thing'},
+ lantern:{n:'Lantern',img:'lantern',price:100,tier:1,kind:'thing'},
+ birdbath:{n:'Birdbath',img:'birdbath',price:100,tier:1,kind:'thing'},
+ sundial:{n:'Sundial',img:'sundial',price:150,tier:1,kind:'thing'},
+ curvedbench:{n:'Stone bench',img:'curvedbench',price:200,tier:2,kind:'thing'},
+ arch:{n:'Golden arch',img:'arch',price:200,tier:2,kind:'thing'},
+ apple:{n:'Apple tree',img:'apple',price:150,tier:2,kind:'thing'},
+ willow:{n:'Willow',img:'willow',price:250,tier:2,kind:'thing'},
+ pergola:{n:'Pergola',img:'pergola',price:250,tier:2,kind:'thing'},
+ bridge:{n:'Stone bridge',img:'bridge',price:300,tier:2,kind:'thing'},
+ gazebo:{n:'The pavilion',img:'gazebo',price:400,tier:3,kind:'thing'},
+ apiary:{n:'The apiary',img:'apiary',price:300,tier:3,kind:'thing'},
+ golden:{n:'Golden Wonder',img:'golden',price:600,tier:3,kind:'thing'},
 };
 const TIERS=[0,10,50,100];
 const TIERNAMES=['Tier 1','Tier 2 at 10 deeds','Tier 3 at 50 deeds','Tier 4 at 100 deeds'];
@@ -223,23 +281,29 @@ const seatImg={rose:1,lavender:1,hydrangea:1,peony:1,tulip:1,daffodil:1,delphini
 
 /* ---------- state ---------- */
 const today=()=>new Date().toISOString().slice(0,10);
+const DEED_PAY=200,START_COINS=100; /* every Deedcoin is a dollar: a deed pays 200, a seed costs 50 */
+const fresh=()=>({deeds:0,coins:START_COINS,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[]});
 let S=store.get('garden')||null;
-if(!S){
-  S={deeds:0,bank:4,plants:{},pads:{},flags:{}};
-}
+if(!S)S=fresh();
 /* older saves (v1 demo dressing or the watering budget builds) reset to a true fresh start */
-if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined){
-  S={deeds:0,bank:4,plants:{},pads:{},flags:{}};
-}
-function save(){store.set('garden',S)}
-const seeds=()=>S.bank;
+if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined)S=fresh();
+/* v4.7 seed banks convert to Deedcoins at 50 a seed; typed seeds now live in the sack */
+if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
+if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};
+/* v4.9 purse: a ledger of every coin movement, what was deed earned (the only sendable coins), and gifts waiting to be opened */
+if(!S.ledger){S.ledger=[];if(S.coins)S.ledger.push({t:Date.now(),l:'Balance carried in',w:'the purse opens',a:S.coins})}
+if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
+const sendable=()=>Math.max(0,Math.min(S.coins,S.earned-S.sent));
+function ledger(l,a,w,u){S.ledger.unshift({t:Date.now(),l,a,w:w||'',u:u||''});if(S.ledger.length>60)S.ledger.length=60}
+const sackTotal=()=>Object.values(S.sack).reduce((a,b)=>a+b,0);
+function save(){S.bank=sackTotal();store.set('garden',S)} /* bank mirrors the sack so the profile door keeps its seed count */
+const seeds=sackTotal;
 const planted=()=>Object.keys(S.plants).length;
 const thirsty=()=>Object.values(S.plants).filter(p=>(p.g||0)<2&&(TESTING||p.wd!==today())).length;
-function spend(n){S.bank-=n;save()}
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 
 /* ---------- HUD ---------- */
-function renderHud(){$('#hudSeeds').textContent=seeds();$('#hudDaily').textContent=planted()?(thirsty()?thirsty()+' to water':'All watered'):'Plant a seed';$('#hudDeeds').textContent=S.deeds;$('#tierchip').textContent='Catalogue tier '+(tierOf(S.deeds)+1)}
+function renderHud(){$('#hudCoins').textContent=S.coins;$('#hudSeeds').textContent=sackTotal();$('#hudSack').textContent=SOW?'Sowing':'Seeds';$('#hudDeeds').textContent=S.deeds;const th=planted()?thirsty():0;$('#bWater').textContent=th?'Water. '+th+' thirsty':'Water.'}
 
 /* ---------- time of day ---------- */
 const PHASES=['dawn','day','golden','dusk','night'];
@@ -381,23 +445,92 @@ $('#zin').addEventListener('click',()=>zoomAt(innerWidth/2,innerHeight/2,clamp(v
 $('#zout').addEventListener('click',()=>zoomAt(innerWidth/2,innerHeight/2,clamp(vz*.85,.4,1.6)));
 addEventListener('resize',apply);
 
-/* ---------- planting ---------- */
-let curPlot=-1;
+/* ---------- the sack, the store, sowing ---------- */
+let curPlot=-1,DMODE='sack',SOW=null;
 let lastBedT=0,lastBedP=-1;
-function onBed(plot){if(CANON||Date.now()-lastWater<450)return;if(moved>8)return;if(plot===lastBedP&&Date.now()-lastBedT<420)return;lastBedT=Date.now();lastBedP=plot;const p=S.plants[plot];if(p){openSeat(plot);return}openDrawer(plot)}
-function openDrawer(plot){curPlot=plot;const t=tierOf(S.deeds);
-  $('#dMicro').textContent='Bed '+(plot+1)+' · '+seeds()+' seeds in hand';
-  let s='';Object.entries(CAT).forEach(([id,c])=>{if(c.kind!=='flower')return;const locked=c.tier>t;
-    s+=`<button class="pk ${locked?'locked':''}" data-id="${id}"><div class="card" style="background-image:url(garden-packet.webp)"><div class="nm">${c.n.toUpperCase()}</div><img class="art" src="garden-${c.img}-map.webp" alt=""><div class="price">${locked?'At '+TIERS[c.tier]+' deeds':c.price+' seed'+(c.price>1?'s':'')}</div></div></button>`});
+function onBed(plot){if(CANON||Date.now()-lastWater<450)return;if(moved>8)return;if(plot===lastBedP&&Date.now()-lastBedT<420)return;lastBedT=Date.now();lastBedP=plot;
+  if(SOW){sowAt(plot);return}
+  const p=S.plants[plot];if(p){openSeat(plot);return}openDrawer(plot)}
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+const NEXTMODE={sack:'store',store:'sack',purse:'send',send:'purse'};
+const ALTLBL={sack:'Buy seeds.',store:'Back to the sack.',purse:'Send a gift.',send:'Back to the purse.'};
+function openDrawer(plot,mode){curPlot=plot;DMODE=mode||(sackTotal()>0?'sack':'store');renderDrawer();$('#drawer').classList.add('on')}
+function renderDrawer(){const t=tierOf(S.deeds);const sack=DMODE==='sack',store=DMODE==='store';const sh=$('#drawer .sheet');
+  sh.classList.toggle('store',store);sh.classList.toggle('coins',store);sh.classList.toggle('body',DMODE==='purse'||DMODE==='send');
+  $('#dAlt').textContent=ALTLBL[DMODE];
+  if(DMODE==='purse'){$('#dTitle').innerHTML='Your purse<span>.</span>';$('#dMicro').textContent=S.coins+' Deedcoins \u00B7 '+sendable()+' sendable';$('#dNote').textContent='Deed earned coins can travel. The starter 100 stays home. A sent gift waits here, sealed, until it is opened.';renderPurse();return}
+  if(DMODE==='send'){$('#dTitle').innerHTML='Send a gift<span>.</span>';$('#dMicro').textContent=sendable()+' Deedcoins sendable \u00B7 '+plural(sackTotal(),'seed')+' in the sack';$('#dNote').textContent='A gift leaves your purse the moment you send it and waits, sealed, until it is opened. Take it back any time before that.';renderSend();return}
+  $('#dTitle').innerHTML=sack?'Your seed sack<span>.</span>':'Seed store<span>.</span>';
+  $('#dMicro').textContent=sack?((curPlot>=0?'Bed '+(curPlot+1)+' \u00B7 ':'')+plural(sackTotal(),'seed')+' \u00B7 '+S.coins+' Deedcoins'):(S.coins+' Deedcoins \u00B7 every seed is 50');
+  $('#dNote').textContent=sack?'Tap a seed to sow it, then keep tapping empty beds until it runs out.':'Catalogue tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+' \u00B7 sell any seed back for 50.';
+  let s='';Object.entries(CAT).forEach(([id,c])=>{if(c.kind!=='flower')return;const q=S.sack[id]||0;if(sack&&!q)return;const locked=c.tier>t;
+    s+=`<div class="pk ${locked?'locked':''}" data-id="${id}"><div class="card" style="background-image:url(garden-packet.webp)"><div class="nm">${c.n.toUpperCase()}</div><img class="art" src="garden-${c.img}-map.webp" alt="">${q?`<div class="qty">${q}</div>`:''}<div class="price">${locked?'At '+TIERS[c.tier]+' deeds':(sack?plural(q,'seed'):`<img class="dc" src="garden-coin.webp" alt=""> ${c.price}`)}</div></div>${sack?'':`<div class="row"><button class="sb" data-act="sell" aria-label="Sell one back">&minus;</button><span class="q">${q}</span><button class="sb" data-act="buy" aria-label="Buy one">+</button></div>`}</div>`});
+  if(!s)s='<div class="micro" style="padding:26px 0;color:rgba(21,19,14,.6)">The sack is empty. Buy seeds.</div>';
   $('#packets').innerHTML=s;
-  document.querySelectorAll('.pk').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.id;const c=CAT[id];
-    if(b.classList.contains('locked')){toast('Opens at '+TIERS[c.tier]+' deeds.');return}
-    if(seeds()<c.price){toast('Not enough seeds. Post a deed, four more arrive.');return}
-    spend(c.price);S.plants[curPlot]={t:id,g:0};save();closeDrawer();renderPlants();renderHud();toast('Sown. '+c.n+' seeds in bed '+(curPlot+1)+'.');
-    checkUnlocks();
-  }));
-  $('#drawer').classList.add('on');
+  document.querySelectorAll('.pk').forEach(el=>{const id=el.dataset.id;
+    el.querySelector('.card').addEventListener('click',()=>{if(DMODE==='store')buy(id);else pick(id)});
+    el.querySelectorAll('.sb').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(b.dataset.act==='buy')buy(id);else sell(id)}))});
 }
+function buy(id){const c=CAT[id];if(c.tier>tierOf(S.deeds)){toast('Opens at '+TIERS[c.tier]+' deeds.');return}
+  if(S.coins<c.price){toast('Not enough Deedcoins. Post a deed, '+DEED_PAY+' arrive.');return}
+  S.coins-=c.price;S.sack[id]=(S.sack[id]||0)+1;ledger(c.n+' seeds',-c.price,'seed store');save();renderDrawer();renderHud();toast(c.n+' seeds in the sack. '+c.price+' Deedcoins.')}
+function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to sell.');return}
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');if(SOW===id&&!S.sack[id])sowStop();save();renderDrawer();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
+function pick(id){const c=CAT[id];if(!(S.sack[id]>0)){toast('No '+c.n.toLowerCase()+' seeds in the sack.');return}
+  closeDrawer();sowStart(id);if(curPlot>=0&&!S.plants[curPlot])sowAt(curPlot)}
+function sowStart(id){if(CANON)canOff();SOW=id;const c=CAT[id];$('#sowImg').src='garden-'+c.img+'-map.webp';$('#sowNm').textContent='Sowing '+c.n.toLowerCase();sowCount();$('#sowchip').classList.add('on');$('#bSack').classList.add('on');renderHud();toast('Tap empty beds to sow '+c.n.toLowerCase()+'. Done. puts the seeds away.')}
+function sowCount(){const n=S.sack[SOW]||0;$('#sowCt').textContent=plural(n,'seed')+' left'}
+function sowStop(msg){SOW=null;$('#sowchip').classList.remove('on');$('#bSack').classList.remove('on');renderHud();if(msg)toast(msg)}
+function sowAt(plot){const id=SOW,c=CAT[id];if(S.plants[plot]){toast('Bed '+(plot+1)+' is taken.');return}
+  if(!(S.sack[id]>0)){sowStop('Out of '+c.n.toLowerCase()+' seeds.');return}
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.plants[plot]={t:id,g:0};save();renderPlants();renderHud();
+  const left=S.sack[id]||0;
+  if(left){sowCount();toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+plural(left,'seed')+' left.')}
+  else sowStop('Sown. '+c.n+' in bed '+(plot+1)+'. That was the last '+c.n.toLowerCase()+' seed.')}
+$('#sowDone').addEventListener('click',()=>sowStop('Seeds put away.'));
+$('#bSack').addEventListener('click',()=>openDrawer(-1));
+$('#bPurse').addEventListener('click',()=>openDrawer(-1,'purse'));
+$('#dAlt').addEventListener('click',()=>{DMODE=NEXTMODE[DMODE];renderDrawer()});
+
+/* ---------- the purse: ledger, gifts, send ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const when=t=>new Date(t).toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const giftLine=g=>g.what==='coins'?g.n+' Deedcoins':plural(g.n,(CAT[g.type]?CAT[g.type].n.toLowerCase():'')+' seed');
+const viaLine=g=>g.via==='note'?'sealed note':'artifact';
+function renderPurse(){const B=$('#dBody');
+  let s=`<div class="balance"><img src="garden-coins.webp" alt=""><div><b>${S.coins}</b><div class="micro" style="color:var(--forest)">Deedcoins \u00B7 ${sendable()} sendable</div></div></div>`;
+  if(S.gifts.length){s+='<div class="micro sec">Sealed, unopened</div>';S.gifts.forEach(g=>{s+=`<div class="gift"><div><div class="l">${giftLine(g)} for @${esc(g.to)}</div><div class="w">${g.via==='note'?'In a sealed note':'Hidden in an artifact'} \u00B7 waiting to be opened</div></div><button class="btn" data-take="${g.id}">Take it back.</button></div>`})}
+  s+='<div class="micro sec">The ledger</div>';
+  if(!S.ledger.length)s+='<div class="micro" style="color:rgba(21,19,14,.6)">Nothing yet.</div>';
+  S.ledger.forEach(r=>{const n=r.u==='seeds'?r.n:r.a;const amt=(n>=0?'+':'\u2212')+Math.abs(n)+(r.u==='seeds'?' seeds':'');s+=`<div class="lg"><div><div class="l">${esc(r.l)}</div><div class="w">${r.w?esc(r.w)+' \u00B7 ':''}${when(r.t)}</div></div><div class="a ${n>=0?'plus':'minus'}">${amt}</div></div>`});
+  B.innerHTML=s;B.querySelectorAll('[data-take]').forEach(b=>b.addEventListener('click',()=>takeBack(b.dataset.take)))}
+let SEND={what:'coins',type:null,n:50,to:'',via:'note'};
+function renderSend(){const B=$('#dBody');const types=Object.keys(S.sack);if(SEND.what==='seeds'&&!S.sack[SEND.type])SEND.type=types[0]||null;
+  const coins=SEND.what==='coins';const max=coins?sendable():(S.sack[SEND.type]||0);const step=coins?50:1;SEND.n=Math.max(Math.min(SEND.n,max),Math.min(step,max));if(coins&&SEND.n%50)SEND.n=Math.floor(SEND.n/50)*50;
+  let s=`<div class="frow"><div class="micro lbl">What travels</div><div class="fchips"><button class="btn ${coins?'on':''}" data-what="coins">Deedcoins</button><button class="btn ${coins?'':'on'}" data-what="seeds" ${types.length?'':'disabled'}>Seeds${types.length?'':' \u00B7 the sack is empty'}</button></div></div>`;
+  if(!coins)s+=`<div class="frow"><div class="micro lbl">Which seed</div><div class="spk">${types.map(id=>`<button class="btn ${SEND.type===id?'on':''}" data-type="${id}"><img src="garden-${CAT[id].img}-map.webp" alt="">${CAT[id].n} \u00B7 ${S.sack[id]}</button>`).join('')}</div></div>`;
+  s+=`<div class="frow"><div class="micro lbl">How much</div><div class="amt"><button class="sb" data-step="-1" aria-label="Less">&minus;</button><b id="sendN">${SEND.n}</b><button class="sb" data-step="1" aria-label="More">+</button><span class="hint">${coins?'of '+sendable()+' sendable \u00B7 50 is a seed':'of '+(S.sack[SEND.type]||0)+' in the sack'}</span></div></div>`;
+  s+=`<div class="frow"><div class="micro lbl">To</div><input class="inp" id="sendTo" placeholder="@handle" value="${esc(SEND.to)}" autocomplete="off" autocapitalize="none" spellcheck="false"></div>`;
+  s+=`<div class="frow"><div class="micro lbl">How it travels</div><div class="fchips"><button class="btn ${SEND.via==='note'?'on':''}" data-via="note">Sealed note</button><button class="btn ${SEND.via==='artifact'?'on':''}" data-via="artifact">Artifact</button></div><div class="micro" style="margin-top:8px;color:rgba(21,19,14,.6)">${SEND.via==='note'?'Tucked inside a sealed note. It lands when they break the seal.':'Hidden inside an artifact. The piggy bank spills it when they open it.'}</div></div>`;
+  s+=`<div class="frow"><button class="btn primary" id="sendGo" ${max<step?'disabled':''}>Send it.</button></div>`;
+  B.innerHTML=s;
+  B.querySelectorAll('[data-what]').forEach(b=>b.addEventListener('click',()=>{if(b.disabled)return;SEND.what=b.dataset.what;SEND.n=SEND.what==='coins'?50:1;renderSend()}));
+  B.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>{SEND.type=b.dataset.type;SEND.n=1;renderSend()}));
+  B.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{SEND.n=Math.max(Math.min(SEND.n+step*(+b.dataset.step),max),Math.min(step,max));$('#sendN').textContent=SEND.n}));
+  B.querySelectorAll('[data-via]').forEach(b=>b.addEventListener('click',()=>{SEND.via=b.dataset.via;renderSend()}));
+  $('#sendTo').addEventListener('input',e=>{SEND.to=e.target.value});
+  $('#sendGo').addEventListener('click',doSend)}
+const cleanHandle=v=>String(v||'').trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9_.]/g,'').slice(0,24);
+function doSend(){const to=cleanHandle($('#sendTo').value);if(!to){toast('Who is it for? Type a handle.');$('#sendTo').focus();return}
+  const g={id:'g'+Date.now().toString(36)+Math.floor(Math.random()*1e4),to,what:SEND.what,type:SEND.type,n:SEND.n,via:SEND.via,t:Date.now()};
+  if(g.what==='coins'){if(g.n<50||g.n>sendable()){toast('Not enough sendable Deedcoins.');return}S.coins-=g.n;S.sent+=g.n;ledger('Sent to @'+to,-g.n,viaLine(g))}
+  else{const c=CAT[g.type];if(!c||g.n<1||!(S.sack[g.type]>=g.n)){toast('Not enough seeds in the sack.');return}S.sack[g.type]-=g.n;if(!S.sack[g.type])delete S.sack[g.type];if(SOW===g.type&&!S.sack[g.type])sowStop();const r={t:Date.now(),l:'Sent '+giftLine(g)+' to @'+to,a:0,w:viaLine(g),u:'seeds',n:-g.n};S.ledger.unshift(r)}
+  S.gifts.unshift(g);SEND.to='';save();renderHud();closeDrawer();
+  toast(giftLine(g)+(g.via==='note'?' sealed for @'+to+'. It lands when the note is opened.':' hidden in an artifact for @'+to+'. It lands when it is opened.'))}
+function takeBack(id){const i=S.gifts.findIndex(g=>g.id===id);if(i<0)return;const g=S.gifts[i];S.gifts.splice(i,1);
+  if(g.what==='coins'){S.coins+=g.n;S.sent=Math.max(0,S.sent-g.n);ledger('Took back from @'+g.to,g.n,'unopened')}
+  else{S.sack[g.type]=(S.sack[g.type]||0)+g.n;S.ledger.unshift({t:Date.now(),l:'Took back '+giftLine(g)+' from @'+g.to,a:0,w:'unopened',u:'seeds',n:g.n});if(SOW)sowCount()}
+  save();renderDrawer();renderHud();toast('Taken back. Nothing was opened.')}
 function closeDrawer(){$('#drawer').classList.remove('on')}
 $('#dClose').addEventListener('click',closeDrawer);
 $('#drawer').addEventListener('click',e=>{if(e.target.id==='drawer')closeDrawer()});
@@ -409,7 +542,7 @@ function checkUnlocks(){
 }
 
 /* ---------- actions ---------- */
-$('#bDeed').addEventListener('click',()=>{S.deeds++;S.bank+=4;save();renderHud();checkUnlocks();toast('Deed '+S.deeds+'. Four seeds.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
+$('#bDeed').addEventListener('click',()=>{S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'earned');save();renderHud();checkUnlocks();toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
 let CANON=false,POURING=false,lastWater=0;
 function canMove(x,y){CANX=x;CANY=y;const c=$('#canimg');c.style.left=(x-12)+'px';c.style.top=(y-26)+'px'}
 function canOff(){CANON=false;POURING=false;showerOff();$('#bWater').classList.remove('on');const c=$('#canimg');c.classList.remove('pour');c.style.display='none'}
@@ -417,7 +550,7 @@ $('#bWater').addEventListener('click',()=>{
   if(CANON){canOff();return}
   if(!planted()){toast('Nothing planted yet.');return}
   if(!thirsty()){toast('Everything is watered. Come back tomorrow.');return}
-  CANON=true;$('#bWater').classList.add('on');const c=$('#canimg');c.style.display='block';canMove(innerWidth/2,innerHeight/2);
+  if(SOW)sowStop();CANON=true;$('#bWater').classList.add('on');const c=$('#canimg');c.style.display='block';canMove(innerWidth/2,innerHeight/2);
   toast('Tap or drag to water. Water. puts the can down.')});
 function splash(x,y,n){n=n||6;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='drop';const sz=4+Math.random()*5;s.style.width=sz+'px';s.style.height=sz+'px';s.style.left=(x+Math.random()*26-13)+'px';s.style.top=(y-6+Math.random()*10)+'px';s.style.setProperty('--dx',(Math.random()*52-26)+'px');s.style.setProperty('--dy',(38+Math.random()*30)+'px');s.style.animationDelay=(Math.random()*.08)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),750)}}
 let CANX=0,CANY=0,SHOWER=null;
@@ -439,7 +572,7 @@ vp.addEventListener('pointerup',e=>{if(CANON){POURING=false;$('#canimg').classLi
 if(moved<=8){const el=document.elementFromPoint(e.clientX,e.clientY);const bed=el&&el.closest?el.closest('.bed'):null;if(bed)onBed(+bed.dataset.plot)}});
 $('#bClear').addEventListener('click',()=>{if(!planted()){toast('Nothing planted yet.');return}$('#confirm').classList.add('on')});
 $('#cNo').addEventListener('click',()=>$('#confirm').classList.remove('on'));
-$('#cYes').addEventListener('click',()=>{let back=0;Object.values(S.plants).forEach(p=>{back+=(CAT[p.t]&&CAT[p.t].price)||1});S.plants={};S.pads={};S.bank+=back;save();renderPlants();renderHud();$('#confirm').classList.remove('on');toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')});
+$('#cYes').addEventListener('click',()=>{let back=0;Object.values(S.plants).forEach(p=>{const id=CAT[p.t]?p.t:'rose';S.sack[id]=(S.sack[id]||0)+1;back++});S.plants={};S.pads={};save();if(SOW)sowCount();renderPlants();renderHud();$('#confirm').classList.remove('on');toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')});
 
 /* ---------- time chips ---------- */
 const chipsBox=$('#timechips');
@@ -470,15 +603,16 @@ function buildSeatLayers(){
   const sky=`<div class="layer" data-d="6" style="z-index:0"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[ph][0]}"/><stop offset="1" stop-color="${SKY[ph][1]}"/></linearGradient></defs><rect width="1600" height="1560" fill="url(#sg)"/>${ph==='night'?[...Array(90)].map((_,i)=>{const r=rng(i*7+3)();const r2=rng(i*13+5)();return `<circle cx="${(r*1600)|0}" cy="${(60+r2*840)|0}" r="${(0.7+r2*1.3).toFixed(1)}" fill="#EDF2FF" opacity="${(.3+.7*r).toFixed(2)}"/>`}).join(''):''}${ph==='night'?'<circle cx="1180" cy="560" r="52" fill="#F2EFDF" opacity=".95"/><circle cx="1160" cy="552" r="52" fill="'+SKY.night[0]+'" opacity=".18"/>':''}</svg></div>`;
   const r1=rng(31);let tr='';const cs=ph==='night'?['#22382C','#2A4536','#1C3026']:ph==='golden'||ph==='dusk'?['#7E8F5A','#8FA067','#6F8050']:['#5F8A52','#6F9A5E','#4F7A46'];
   for(let i=0;i<22;i++){const x=i*80-40+r1()*40,y=880+r1()*44,rx=80+r1()*70,ry=54+r1()*48;tr+=`<ellipse cx="${x|0}" cy="${y|0}" rx="${rx|0}" ry="${ry|0}" fill="${cs[i%3]}"/>`}
-  const trees=`<div class="layer" data-d="12" style="z-index:1"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><g opacity=".92">${tr}</g></svg></div>`;
+  const trees=`<div class="layer" data-d="12" style="z-index:1"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><rect x="0" y="905" width="1600" height="655" fill="${cs[2]}"/><g opacity=".92">${tr}</g></svg></div>`;
   const hc=HED[ph];const top=[...Array(21)].map((_,i)=>`Q${i*80+40},${i%2?968:944} ${i*80+80},956`).join(' ');
   const hedge=`<div class="layer" data-d="20" style="z-index:2"><svg viewBox="0 0 1600 1560" preserveAspectRatio="none"><path d="M0,956 ${top} V1064 H0 Z" fill="${hc}"/><path d="M0,956 ${top} V1016 H0 Z" fill="#FFFFFF" opacity=".08"/><rect x="0" y="1064" width="1600" height="496" fill="${ph==='night'?'#8E8873':'#E7DFCC'}"/></svg></div>`;
   const fount=`<div class="layer" data-d="30" style="z-index:3"><img class="limg" src="garden-fountain-seat.webp" style="left:66%;bottom:18%;width:22.5%" alt=""></div>`;
   const lant=`<div class="layer" data-d="36" style="z-index:4"><img class="limg" src="garden-lantern-${(ph==='night'||ph==='dusk')?'lit':'day'}.webp" style="left:18%;bottom:22%;width:8%" alt=""></div>`;
-  const plant=g===0?`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-seeds.webp" style="left:50%;transform:translateX(-50%);bottom:10%;width:13%" alt=""></div>`:`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-${c.img}-seat.webp" style="left:50%;transform:translateX(-50%);bottom:9%;width:min(${g>=1&&g<2?32:45}%,760px)" alt=""></div>`;
+  const plant=g===0?`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-seeds.webp" style="left:50%;transform:translateX(-50%);bottom:10%;width:13%" alt=""></div>`:`<div class="layer" data-d="46" style="z-index:5"><img class="limg" src="garden-${c.img}-${seatImg[p.t]?'seat':'map'}.webp" style="left:50%;transform:translateX(-50%);bottom:9%;width:min(${g>=1&&g<2?32:45}%,760px)" alt=""></div>`;
   const bfs=`<div class="layer" data-d="40" style="z-index:6"><img id="bf1" class="limg" src="garden-bf-blue-open.webp" style="left:35%;top:55%;width:6.5%" alt=""><img id="bf2" class="limg" src="garden-bf-ivory-open.webp" style="left:59%;top:49%;width:5.8%" alt=""><img id="bee1" class="limg" src="garden-bee.webp" style="left:47%;top:65%;width:3.6%" alt=""></div>`;
-  const fore=`<div class="layer" data-d="72" style="z-index:7"><img class="limg" src="garden-overhang-left.webp" style="left:9%;top:24%;width:33%" alt=""><img class="limg" src="garden-overhang-right.webp" style="right:9%;top:24%;width:33%" alt=""><img class="limg" src="garden-benchedge-seat.webp" style="left:50%;transform:translateX(-50%);bottom:-6.5%;width:56%" alt=""></div>`;
-  L.innerHTML=sky+trees+hedge+fount+lant+plant+bfs+fore;
+  const canopy=`<div class="layer canopy" data-d="64" style="z-index:7"><img id="canopyimg" src="garden-canopy.webp" alt=""></div>`;
+  const fore=`<div class="layer" data-d="72" style="z-index:8"><img class="limg" src="garden-benchedge-seat.webp" style="left:50%;transform:translateX(-50%);bottom:-6.5%;width:56%" alt=""></div>`;
+  L.innerHTML=sky+trees+hedge+fount+lant+plant+bfs+canopy+fore;
   LAY=[...document.querySelectorAll('#slayers .layer')].map(el=>({el,d:+el.dataset.d}));
   $('#stint').style.background=ph==='night'?'rgba(10,16,42,.3)':TINT[ph];
   $('#sMicro').textContent='You are sitting in the parterre · Bed '+(curSeat+1);
@@ -508,7 +642,7 @@ seatEl.addEventListener('pointerdown',e=>{if(!seatOpen)return;if(e.target.closes
 seatEl.addEventListener('pointermove',e=>{if(!seatOpen)return;if(sDrag){LOOKX=clamp(LOOKX-(e.clientX-slx)/(innerWidth*.5),-1,1);LOOKY=clamp(LOOKY-(e.clientY-sly)/(innerHeight*.45),-1,.25);slx=e.clientX;sly=e.clientY}else{tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2}});
 seatEl.addEventListener('pointerup',()=>{sDrag=false});
 $('#sClose').addEventListener('click',closeSeat);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(seatOpen)closeSeat();else closeDrawer()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(seatOpen)closeSeat();else if($('#drawer').classList.contains('on'))closeDrawer();else if(SOW)sowStop('Seeds put away.')}});
 
 /* ---------- music (drop garden-music-N.mp3 into this folder and it plays) ---------- */
 const PLAYLIST=[{f:'garden-music-1.mp3',t:'Morning Mood \u00B7 Grieg'},{f:'garden-music-2.mp3',t:'Spring \u00B7 Vivaldi'}];
@@ -523,7 +657,7 @@ if(S.flags&&S.flags.music){$('#bMusic').classList.add('on');const arm=()=>{docum
 
 /* boot */
 build();renderHud();
-if(!S.flags.hello){S.flags.hello=1;save();setTimeout(()=>toast('Your garden. Tap an empty bed to plant, a planted one to sit.'),700)}
+if(!S.flags.hello){S.flags.hello=1;save();setTimeout(()=>toast('Your garden. Tap the sack to buy seeds, then tap an empty bed to sow.'),700)}
 })();
 </script>
 </body>
