@@ -3416,7 +3416,8 @@ memMark(ctx,W-MX-6,py,26,'#E8ECE4','#A0B0A4')}
 /* the posted card. the same renderers the share sheet uses, driven from the composer */
 function artCard(img,style,text,handle,spec){
 var keep={img:MEM.img,text:MEM.text,handle:MEM.handle,spec:MEM.spec,card:MEM.card,styled:MEM.styled};
-MEM.img=img;MEM.text=text||'';MEM.handle=String(handle||'A MEMBER').toUpperCase();MEM.spec=spec||'';MEM.card=false;MEM.styled=false;
+/* the words stay in the post body above the photo and are never baked into a posted treatment (his Aug 28 rule); the spec line, handle and mark stay */
+MEM.img=img;MEM.text='';MEM.handle=String(handle||'A MEMBER').toUpperCase();MEM.spec=spec||'';MEM.card=false;MEM.styled=false;
 var cv=document.createElement('canvas');cv.width=1080;cv.height=1350;
 try{if(style==='art'){memArt(cv)}
 else{var off=document.createElement('canvas');off.width=1080;off.height=1350;memPrint(off);
@@ -3779,7 +3780,7 @@ function lsWhen(){var b=$('#logdates .lchip.on'),t=b?b.textContent:'',d=new Date
 if(t.indexOf('Yesterday')===0)d.setDate(d.getDate()-1);return d.toISOString()}
 function lsText(){var e=$('#logtext');return e?e.value.replace(/\s+/g,' ').trim():''}
 function lsSpec(){return(composeMode==='post'?'POST':'DEED')+' \u00B7 '+memDate(lsWhen())}
-function lsKey(){return LSTYLE+'|'+lsText()+'|'+lsSpec()}
+function lsKey(){return LSTYLE+'|'+lsSpec()} /* the words no longer change the treatment, so typing never re-renders it */
 var LSCACHE=null,LSPEND=0;
 function lsBuild(cb){if(!LPHOTO||LSTYLE==='plain'){cb(null);return}
 var k=lsKey();if(LSCACHE&&LSCACHE.k===k){cb(LSCACHE);return}
