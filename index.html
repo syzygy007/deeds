@@ -1187,6 +1187,58 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 .pikcard.uv .inkhelp{color:#B9A8E8}
 @media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}.eggart[data-cont="pinata"]{width:84vw}.econt .cl{font-size:11.5px}}
 @media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.tap .emain{animation:none!important}.eggin,.eggopen .eoplate,.eggopen .eomicro,.eggopen .eowords,.eggopen .tdrow,.eggopen .tdmicro{animation:none}.inkwords{transition:none}}
+/* ============ GUEST SKY + ARTIFACT SHARE (v4.14 · the welcome sky behind the signed-out profile; Artifacts and ink travel as sealed links) ============ */
+#gsky{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0E1A14;pointer-events:none}
+#gsky .gl{position:absolute;left:-7%;top:-7%;width:114%;height:114%;will-change:transform}
+#gskyMoon{top:-15%}
+#gsky .gl img,#gsky video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+#gsky video{opacity:0;transition:opacity 1.4s ease}
+#gsky video.on{opacity:1}
+#gsky canvas{position:absolute;inset:0;width:100%;height:100%}
+#gsky .gscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,26,20,.55) 0%,rgba(14,26,20,0) 24%),linear-gradient(0deg,rgba(14,26,20,.80) 0%,rgba(14,26,20,.18) 56%)}
+#profguest .gcopy{position:relative;z-index:2;min-height:calc(100vh - 150px);min-height:calc(100svh - 150px - env(safe-area-inset-bottom));display:flex;flex-direction:column;justify-content:flex-end;color:var(--ivory);padding:26px 22px 28px;will-change:transform}
+#profguest .gcopy .micro{color:var(--sage)}
+#profguest .gcopy h1{color:var(--ivory);font-weight:800;font-size:clamp(2.6rem,11.5vw,3.6rem);letter-spacing:-.035em;line-height:.95;margin-top:14px}
+#profguest .gcopy h1 b{color:var(--gold)}
+#profguest .gcopy .gdeck{font-size:15px;line-height:1.55;margin-top:16px;max-width:440px;color:rgba(246,243,235,.8)}
+#profguest .gspec{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(246,243,235,.2)}
+#profguest .gspec div{padding:11px 0 10px;border-bottom:1px solid rgba(246,243,235,.2);font-size:9.5px;letter-spacing:.2em;font-weight:800;color:rgba(246,243,235,.72)}
+#profguest .gspec div:nth-child(odd){border-right:1px solid rgba(246,243,235,.2);padding-right:12px}
+#profguest .gspec div:nth-child(even){padding-left:14px}
+#profguest .gcopy .mbtn{background:var(--ivory);color:var(--ink);font-size:15px;padding:14px 26px}
+#profguest .gcopy .remnote{color:rgba(246,243,235,.62)}
+#profguest .gcopy .remnote a{color:rgba(246,243,235,.62);text-decoration:none;border-bottom:1px solid rgba(246,243,235,.25)}
+body.gsky-on{background:#0E1A14}
+body.gsky-on .mtop{background:rgba(14,26,20,.55);border-bottom-color:rgba(246,243,235,.14);color:var(--ivory)}
+body.gsky-on .mtop .mword,body.gsky-on .mtop .mword b,body.gsky-on .mtop button{color:var(--ivory)}
+body.gsky-on .tabs{background:rgba(14,26,20,.74);border-top-color:rgba(246,243,235,.14)}
+body.gsky-on .tab{color:rgba(246,243,235,.55)}
+body.gsky-on .tab.on{color:var(--ivory)}
+@media(min-width:1080px){
+ #gskyMoon{top:-7%}
+ body.gsky-on .rail-r{display:none}
+ #pg-profile #profguest .prof{background:none;border:0;padding:0}
+ #profguest .gcopy{min-height:calc(100vh - 190px);padding:40px 44px 44px;max-width:760px}
+ #profguest .gcopy h1{font-size:clamp(3.4rem,6.4vw,5.6rem)}
+ #profguest .gspec{grid-template-columns:repeat(4,1fr);max-width:640px}
+ #profguest .gspec div{border-right:1px solid rgba(246,243,235,.2);padding:11px 12px 10px}
+ #profguest .gspec div:nth-child(odd){border-right:1px solid rgba(246,243,235,.2);padding-right:12px}
+ #profguest .gspec div:nth-child(even){padding-left:12px}
+ #profguest .gspec div:first-child{padding-left:0}
+ #profguest .gspec div:last-child{border-right:0}
+ body.gsky-on .dtop{background:rgba(14,26,20,.62);border-bottom-color:rgba(246,243,235,.14)}
+ body.gsky-on .dword,body.gsky-on .dword b,body.gsky-on .dme .dhandle,body.gsky-on .dchev{color:var(--ivory)}
+ body.gsky-on .dnav button{color:rgba(246,243,235,.72)}
+ body.gsky-on .dnav button.on{color:var(--ivory)}
+ body.gsky-on .dnav button.on::after{background:var(--gold)}
+ body.gsky-on .dsep{background:rgba(246,243,235,.2)}
+ body.gsky-on .dme:hover{background:rgba(246,243,235,.1)}
+ body.gsky-on .dfoot{position:relative;z-index:2;color:rgba(246,243,235,.62)}
+ body.gsky-on .dfoot a{color:rgba(246,243,235,.62)}
+}
+.sentflash{animation:sentflash 2.4s ease-out}
+@keyframes sentflash{0%{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(190,154,78,.16)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
+@media(prefers-reduced-motion:reduce){#gsky .gl,#profguest .gcopy{transform:none!important}.sentflash{animation:none}}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1396,13 +1448,20 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 
     <div class="page" id="pg-profile">
       <div id="profguest" style="display:none">
-        <div class="prof">
-          <div class="micro" style="color:var(--muted)">Profile</div>
-          <h1 style="font-size:34px;font-weight:800;letter-spacing:-.01em;line-height:1.05;margin-top:8px">Anonymous, and followed<b>.</b></h1>
-          <p style="font-size:15px;color:#4A463C;line-height:1.55;margin-top:12px;max-width:440px">One profile. A generated handle. No headshots, no real names. The community knows what you do, never who you are.</p>
+        <div id="gsky" aria-hidden="true">
+          <div class="gl" id="gskySky"><picture><source media="(min-width:1080px)" data-srcset="/nebula-wide.webp"><img data-src="/nebula.webp" alt=""></picture><video id="gskyVid" muted loop playsinline preload="none" aria-hidden="true"></video><canvas id="gskyStars"></canvas></div>
+          <div class="gl" id="gskyMoon"><picture><source media="(min-width:1080px)" data-srcset="/moon-wide.webp"><img data-src="/moon.webp" alt=""></picture></div>
+          <div class="gl" id="gskyFol"><picture><source media="(min-width:1080px)" data-srcset="/foliage-wide.webp"><img data-src="/foliage.webp" alt=""></picture></div>
+          <div class="gscrim"></div>
+        </div>
+        <div class="prof gcopy" id="gskyCopy">
+          <div class="micro">Profile &middot; Anonymous</div>
+          <h1>Anonymous, and followed<b>.</b></h1>
+          <p class="gdeck">One profile. A generated handle. No headshots, no real names. The community knows what you do, never who you are.</p>
+          <div class="gspec"><div>SEE IT</div><div>DO IT</div><div>PASS IT</div><div>WATCH IT MOVE</div></div>
           <div class="mrow" style="margin-top:24px"><button class="mbtn" id="gJoin">Sign In or Join.</button></div>
           <p class="remnote" style="margin-top:14px">Same door, one code. It takes one minute.</p>
-          <p class="remnote" style="margin-top:26px;line-height:2"><a href="/terms/" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)">Terms</a> &middot; <a href="/privacy/" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)">Privacy</a> &middot; <a href="/guidelines/" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)">Guidelines</a> &middot; <a href="/copyright/" style="color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)">Copyright</a><br>&copy; 2026 Unilateral Good LLC</p>
+          <p class="remnote" style="margin-top:18px;line-height:2"><a href="/terms/">Terms</a> &middot; <a href="/privacy/">Privacy</a> &middot; <a href="/guidelines/">Guidelines</a> &middot; <a href="/copyright/">Copyright</a><br>&copy; 2026 Unilateral Good LLC</p>
         </div>
       </div>
       <div id="profreal">
@@ -2669,7 +2728,8 @@ $('#app').classList.add('on');setTimeout(function(){th.style.display='none'},750
 var arrival=parseArrival();
 /* WELCOME: first visits and invite arrivals see the sky at /welcome.html once; the landing sets deeds_welcomed before sending them back here */
 var _welcomed=false;try{_welcomed=sessionStorage.getItem('deeds_welcomed')==='1'}catch(e){}
-if(!_welcomed&&(arrival||!safeGet('deeds_seen'))){safeSet('deeds_seen','1');location.replace('/welcome.html'+location.search)}
+var _pin=/[?&]p=[0-9a-f]{8}-[0-9a-f-]{27}(?:&|$)/i.test(location.search);/* an Artifact link lands on the feed, not the front door */
+if(!_welcomed&&!_pin&&(arrival||!safeGet('deeds_seen'))){safeSet('deeds_seen','1');location.replace('/welcome.html'+location.search)}
 $('#threshold').style.display='none';$('#app').classList.add('on');
 $('#thEnter').onclick=enter;
 $('#thLog').onclick=function(){enter();setTimeout(function(){openCompose('deed')},420)};
@@ -2920,7 +2980,7 @@ $$('[data-linsp]').forEach(function(b){b.onclick=function(e){e.stopPropagation()
 $$('[data-lcmt]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openLiveCmts(b.getAttribute('data-lcmt'))}});
 $$('[data-redeed]').forEach(function(b){b.onclick=function(e){e.stopPropagation();openRedeed(b.getAttribute('data-redeed'))}});
 $$('[data-lshare]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-lshare');
-var r=findLive(id);if(!r)return;if(r._k==='post'){openMemory(r);return}var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
+var r=findLive(id);if(!r)return;if(r._k==='post'){if(isArtifact(r)){shareArtifact(r);return}openMemory(r);return}var txt='"'+(r.story||r.title||'')+'" · an anonymous deed on DEEDS. https://deeds.fun';
 if(navigator.share){navigator.share({text:txt}).catch(function(){})}else{try{navigator.clipboard.writeText(txt);toast('Copied. Post it anywhere.')}catch(e){toast('Copied. Post it anywhere.')}}}});
 $$('[data-lmore]').forEach(function(b){b.onclick=function(){morePostLive={id:b.getAttribute('data-lmore'),handle:b.getAttribute('data-lmh'),own:b.hasAttribute('data-lown')};
 var _r=findLive(morePostLive.id),_mc=$('#morechain'),_me2=$('#moreedit'),_mr2=$('#morereport'),_mb2=$('#moreblock'),_md2=$('#moredelete');
@@ -3005,6 +3065,14 @@ function memLoad(r){var url=MEM.url;if(!url)return;
 fetch(url,{mode:'cors'}).then(function(rs){if(!rs.ok)throw new Error('load');return rs.blob()}).then(function(bl){if(MEM.r!==r)return;
 MEM.blob=bl;var im=new Image();im.onload=function(){if(MEM.r!==r)return;MEM.img=im;drawMem()};im.onerror=function(){if(MEM.r===r)toast('The photo could not load for the card.')};
 im.src=URL.createObjectURL(bl)}).catch(function(){if(MEM.r===r)toast('The photo could not load for the card.')})}
+/* ---- ARTIFACT SHARE (v4.14): an Artifact or ink post travels as a sealed link, never as a card, so the surprise survives the trip. URL alone, since Messages only unfurls a bare link. ---- */
+function isArtifact(r){return !!(r&&r._k==='post'&&(r.presentation_type==='golden_egg'||r.presentation_type==='disappearing_note'))}
+function artifactURL(r){return 'https://deeds.fun/artifact.html?p='+encodeURIComponent(r.id)}
+function fallbackCopy(s){try{var t=document.createElement('textarea');t.value=s;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t)}catch(e){}}
+function shareArtifact(r){var url=artifactURL(r),ink=r.presentation_type==='disappearing_note';
+var done=function(){toast(ink?'Sent sealed. The ink fades when they read it.':'Sent sealed. They open it on DEEDS.')};
+if(navigator.share){navigator.share({url:url}).then(done).catch(function(){});return}
+fallbackCopy(url);try{navigator.clipboard.writeText(url).catch(function(){})}catch(e){}toast('Link copied. It opens sealed, wherever you send it.')}
 function openMemory(r){gfLoad(null);var nm=NAMES[r.profile_id]||{handle:'A Member'};
 MEM.r=r;MEM.img=null;MEM.blob=null;MEM.text=r.body||'';MEM.handle=String(nm.handle||'A MEMBER').toUpperCase();MEM.spec='POST \u00B7 '+memDate(r.created_at);
 var mlive=!r.media_status||r.media_status==='live';MEM.url=(r.media_path&&mlive)?mediaURL(r.media_path):'';
@@ -3340,10 +3408,48 @@ blk.style.display='block'}).catch(function(){})}
 
 /* ---- profile page: guest door or the real account ---- */
 var baseRenderProfile=renderProfile;
+/* ---- GUEST SKY (v4.14): the welcome sky behind the signed-out profile. Assets load the first time a guest opens the page, the video carries the motion, canvas stars twinkle until it plays, the page tilts with the pointer or the phone. ---- */
+var GSKY={on:false,loaded:false,raf:0,vid:null,vidOn:false,stars:[],ctx:null,tx:0,ty:0,cx:0,cy:0,tilt:false,dpr:1,last:0,rt:0};
+function gskyRM(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+function gskyWide(){return window.innerWidth>=1080}
+function gskyClamp(v){return v<-1?-1:v>1?1:v}
+function gskyTilt(e){if(e.gamma==null)return;GSKY.tx=gskyClamp(e.gamma/12);GSKY.ty=gskyClamp((e.beta-45)/12)}
+function gskyRng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+function gskyLoad(){if(GSKY.loaded)return;var root=$('#gsky');if(!root)return;GSKY.loaded=true;
+$$('#gsky source[data-srcset]').forEach(function(s){s.setAttribute('srcset',s.getAttribute('data-srcset'))});
+$$('#gsky img[data-src]').forEach(function(i){i.setAttribute('src',i.getAttribute('data-src'))});
+var v=$('#gskyVid'),cv=$('#gskyStars');GSKY.vid=v;GSKY.ctx=cv?cv.getContext('2d'):null;
+if(v&&!gskyRM()){v.src=gskyWide()?'/sky-wide.mp4':'/sky.mp4';v.addEventListener('playing',function(){GSKY.vidOn=true;v.classList.add('on');if(GSKY.ctx&&cv){GSKY.ctx.setTransform(1,0,0,1,0,0);GSKY.ctx.clearRect(0,0,cv.width,cv.height)}});v.addEventListener('error',function(){GSKY.vidOn=false;v.classList.remove('on')})}
+window.addEventListener('mousemove',function(e){if(!GSKY.on)return;GSKY.tx=gskyClamp((e.clientX/window.innerWidth-.5)*2);GSKY.ty=gskyClamp((e.clientY/window.innerHeight-.5)*2)},{passive:true});
+if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission!=='function')window.addEventListener('deviceorientation',function(e){if(GSKY.on)gskyTilt(e)});
+var pg=$('#pg-profile');if(pg)pg.addEventListener('touchend',function(){if(GSKY.tilt||!GSKY.on)return;if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){GSKY.tilt=true;DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')window.addEventListener('deviceorientation',function(e){if(GSKY.on)gskyTilt(e)})}).catch(function(){})}},{passive:true});
+window.addEventListener('resize',function(){clearTimeout(GSKY.rt);GSKY.rt=setTimeout(function(){if(GSKY.on)gskySeed()},160)})}
+function gskySeed(){var cv=$('#gskyStars');if(!cv||!GSKY.ctx)return;var box=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.max(1,Math.round(box.width*dpr));cv.height=Math.max(1,Math.round(box.height*dpr));GSKY.dpr=dpr;
+var r=gskyRng(20260827),n=Math.min(430,Math.round(box.width*box.height/9200)),big=gskyWide()?1.25:1,st=[];
+for(var i=0;i<n;i++){var y=Math.pow(r(),1.45);if(y>.7&&r()>.22)continue;var sharp=r()<.38;st.push({x:r(),y:y,r:(.7+r()*.85)*big,ph:r()*6.283,sp:sharp?(2.1+r()*1.1):(4.5+r()*4),k:sharp?(4.6+r()*2.4):(2.2+r()*1.1),spike:r()<.08})}
+GSKY.stars=st}
+function gskyPaint(t){var cv=$('#gskyStars'),ctx=GSKY.ctx;if(!cv||!ctx)return;var dpr=GSKY.dpr||1,W=cv.width,H=cv.height;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);
+GSKY.stars.forEach(function(s){var a=Math.pow((Math.sin(t/1000*6.283/s.sp+s.ph)+1)/2,s.k);a=.05+a*.95;var rr=s.r*dpr*(.7+a*.85),x=s.x*W,y=s.y*H;
+ctx.globalAlpha=a*.6;ctx.fillStyle='#F6F3EB';ctx.beginPath();ctx.arc(x,y,rr,0,6.283);ctx.fill();
+if(a>.6){var g=ctx.createRadialGradient(x,y,0,x,y,rr*4);g.addColorStop(0,'rgba(246,243,235,'+(a*.35).toFixed(3)+')');g.addColorStop(1,'rgba(246,243,235,0)');ctx.globalAlpha=1;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,rr*4,0,6.283);ctx.fill()}
+if(s.spike&&a>.75){ctx.globalAlpha=(a-.75)*2;ctx.strokeStyle='#F6F3EB';ctx.lineWidth=Math.max(1,dpr*.6);ctx.beginPath();ctx.moveTo(x-rr*5,y);ctx.lineTo(x+rr*5,y);ctx.moveTo(x,y-rr*5);ctx.lineTo(x,y+rr*5);ctx.stroke()}});
+ctx.globalAlpha=1}
+function gskyFrame(t){if(!GSKY.on){GSKY.raf=0;return}
+GSKY.cx+=(GSKY.tx-GSKY.cx)*.075;GSKY.cy+=(GSKY.ty-GSKY.cy)*.075;
+var ax=Math.sin(t/9700)*.56+Math.sin(t/23100)*.44,ay=Math.sin(t/13300)*.58+Math.cos(t/31700)*.42,w=gskyWide(),mul=w?1.6:1,aw=w?.62:.34;
+[['#gskySky',5],['#gskyMoon',8],['#gskyFol',22],['#gskyCopy',2]].forEach(function(L){var el=$(L[0]);if(!el)return;var d=L[1]*mul;el.style.transform='translate3d('+(-(GSKY.cx+ax*aw)*d).toFixed(2)+'px,'+(-(GSKY.cy+ay*aw)*d*.62).toFixed(2)+'px,0)'});
+if(!GSKY.vidOn&&t-GSKY.last>24){gskyPaint(t);GSKY.last=t}
+GSKY.raf=requestAnimationFrame(gskyFrame)}
+function gskyOn(){var pg=$('#pg-profile'),g=$('#profguest');if(!pg||!g||!pg.classList.contains('on')||g.style.display!=='block')return;
+gskyLoad();document.body.classList.add('gsky-on');if(GSKY.on)return;GSKY.on=true;gskySeed();
+if(GSKY.vid&&!gskyRM()){try{var p=GSKY.vid.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
+if(gskyRM())gskyPaint(0);else if(!GSKY.raf)GSKY.raf=requestAnimationFrame(gskyFrame)}
+function gskyOff(){document.body.classList.remove('gsky-on');if(!GSKY.on)return;GSKY.on=false;if(GSKY.vid){try{GSKY.vid.pause()}catch(e){}}}
+var _goPre=window.go;window.go=function(p){_goPre(p);if(p==='profile')gskyOn();else gskyOff()};
 renderProfile=function(){var g=$('#profguest'),rr=$('#profreal');
-if(liveOn&&!PROFILE){if(g)g.style.display='block';if(rr)rr.style.display='none';
+if(liveOn&&!PROFILE){if(g)g.style.display='block';if(rr)rr.style.display='none';gskyOn();
 var gj=$('#gJoin');if(gj)gj.onclick=openJoin;return}
-if(g)g.style.display='none';if(rr)rr.style.display='block';
+gskyOff();if(g)g.style.display='none';if(rr)rr.style.display='block';
 baseRenderProfile();
 var so=$('#pSignout');
 if(PROFILE){$('#myHandle').textContent=PROFILE.handle;
@@ -4884,6 +4990,18 @@ function coArrival(){var m=location.search.match(/[?&]org=([a-z0-9-]{2,60})(?:&|
 try{history.replaceState(null,'',location.pathname)}catch(e){}
 sb.rpc('company_page',{p_slug:slug}).then(function(r){var c=r&&r.data&&r.data[0];if(!c){toast('That company is not on DEEDS yet.');return}
 sb.from('organizations').select('*').eq('id',c.id).maybeSingle().then(function(orr){if(orr&&orr.data){OSTORE[orr.data.id]=orr.data;COFROM='';openOrgView(orr.data.id)}else toast('That company page could not load.')}).catch(function(){})}).catch(function(){})}
+/* ---- ARTIFACT ARRIVAL (v4.14): /artifact.html?p=<id> lands on the feed with that post on top, still sealed, no account needed ---- */
+function artArrival(){var m=location.search.match(/[?&]p=([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:&|$)/i);if(!m||!sb)return;var id=m[1].toLowerCase();
+try{history.replaceState(null,'',location.pathname)}catch(e){}
+sb.from('posts').select('*').eq('id',id).maybeSingle().then(function(r){
+if(r.error||!r.data){toast('That one is not on DEEDS any more.');return}
+var row=markKind(r.data,'post');if(row.mod_status&&row.mod_status!=='live'){toast('That one is not showing on DEEDS right now.');return}
+var tries=0;(function place(){if(feedBusy&&tries++<60){setTimeout(place,150);return}
+var had=LIVEPOSTS.filter(function(x){return String(x.id)===String(row.id)});LIVEPOSTS=LIVEPOSTS.filter(function(x){return String(x.id)!==String(row.id)});LIVEPOSTS.unshift(had[0]||row);if(!had.length)pageFrom++;/* pinned on top for this visit */
+fetchNames([row]).then(function(){return loadCounts([row])}).then(function(){renderFeed();go('feed');
+var a=document.querySelector('article[data-lid="'+row.id+'"]');if(!a)return;
+var hd=a.querySelector('.p-head');if(hd&&!a.querySelector('.senttag'))hd.insertAdjacentHTML('afterend','<div class="chaintag senttag">SENT TO YOU \u00B7 '+(row.presentation_type==='disappearing_note'?'READ IT WHILE IT LASTS':'OPEN IT')+'</div>');
+a.classList.add('sentflash');setTimeout(function(){try{a.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},120)}).catch(function(){})})()}).catch(function(){})}
 function openGoodCompanies(){var el=$('#goodlist');if(el)el.innerHTML='<div class="gc-empty">Counting the good...</div>';
 var sl=$('#gcSeal');if(sl&&!sl.innerHTML){sl.innerHTML=gcSealImg(168,'gc-seal');gcSealGuard('#gcSeal')}
 coListHead(true);
@@ -5230,7 +5348,7 @@ renderFeed();
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
 var blk=$('#impblock');if(blk)blk.style.display='none';
-guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();coArrival();
+guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();coArrival();artArrival();
 sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;
 if(s){SESSION=s;loadProfile(0)}}).catch(function(){});
 sb.auth.onAuthStateChange(function(ev,s){

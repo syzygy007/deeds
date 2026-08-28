@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEEDS. Someone left you an Artifact.</title>
+<meta name="description" content="Sealed until you open it. Crack it on DEEDS.">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DEEDS.">
+<meta property="og:url" content="https://deeds.fun/artifact.html">
+<meta property="og:title" content="Someone left you an Artifact.">
+<meta property="og:description" content="Sealed until you open it. Crack it on DEEDS.">
+<meta property="og:image" content="https://deeds.fun/artifact-og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A sealed golden egg. Someone left you something on DEEDS.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Someone left you an Artifact.">
+<meta name="twitter:description" content="Sealed until you open it. Crack it on DEEDS.">
+<meta name="twitter:image" content="https://deeds.fun/artifact-og.jpg">
+
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/icon-180.png">
+
+<script>
+/* Crawlers never run this. They read the meta above and stop.
+   A human is moved straight into the app with the post id
+   carried across untouched, and the app opens the wall on it. */
+(function(){
+  try{
+    var qs = window.location.search || '';
+    window.location.replace('/' + qs);
+  }catch(e){}
+})();
+</script>
+
+<style>
+  :root{--ink:#15130E;--ivory:#F6F3EB;--forest:#1F4B3A;--sage:#A0B0A4}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink);color:var(--ivory);
+       font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+       min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+  .card{max-width:560px;text-align:center}
+  .word{font-weight:800;font-size:22px;letter-spacing:.02em;margin-bottom:34px}
+  .word b{color:var(--sage)}
+  .micro{font-size:11px;letter-spacing:.18em;font-weight:800;color:var(--sage);margin-bottom:18px}
+  h1{font-size:clamp(2.1rem,7vw,3.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.04}
+  h1 b{color:var(--sage)}
+  p{color:rgba(246,243,235,.66);font-size:15px;line-height:1.6;margin-top:18px}
+  a.go{display:inline-block;margin-top:30px;background:var(--ivory);color:var(--ink);
+       text-decoration:none;font-weight:800;font-size:15px;padding:15px 30px;border-radius:999px}
+  .egg{width:96px;height:auto;display:block;margin:26px auto 0}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="word">DEEDS<b>.</b></div>
+    <div class="micro">AN ARTIFACT &middot; SEALED FOR YOU</div>
+    <h1>Someone left you something<b>.</b></h1>
+    <p>It stays sealed until you open it. No account needed to crack it, and you will never be told who sent it unless they say so themselves.</p>
+    <img class="egg" src="/egg-frame-sealed.webp" alt="">
+    <a class="go" href="/">Open DEEDS.</a>
+  </div>
+</body>
+</html>
