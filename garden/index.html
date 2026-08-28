@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DEEDS. The Garden</title>
-<meta name="garden-build" content="6.1">
+<meta name="garden-build" content="6.2">
 <meta name="description" content="Your profile is a garden. Every deed sows it.">
 <meta property="og:title" content="Come see my garden.">
 <meta property="og:description" content="Grown one good deed at a time.">
@@ -24,8 +24,11 @@ body{margin:0;-webkit-user-select:none;user-select:none;background:#24462B;color
 button{font:inherit;cursor:pointer}
 
 /* top bar */
-#bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:14px;padding:10px max(14px,env(safe-area-inset-left)) 10px max(14px,env(safe-area-inset-right));background:rgba(246,243,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
-#bar .mark{font-weight:800;letter-spacing:-.04em;font-size:1.15rem;white-space:nowrap}
+#bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:14px;padding:10px max(14px,env(safe-area-inset-left)) 10px max(14px,env(safe-area-inset-right));background:rgba(246,243,235,.97);border-bottom:1px solid var(--hair)}
+#bar .mark{font-weight:800;letter-spacing:-.04em;font-size:1.15rem;white-space:nowrap;color:inherit;text-decoration:none}
+#bar .back{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+#bar .back svg{width:14px;height:14px}
+#bar .back .l{display:inline}#bar .back .s{display:none}
 #bar .mark span{color:var(--forest)}
 #bar .stat{display:flex;align-items:center;gap:7px;white-space:nowrap}
 #bar .stat img{height:22px;width:auto;display:block}
@@ -37,7 +40,7 @@ button{font:inherit;cursor:pointer}
 #bar button.stat.on{background:var(--forest);border-color:var(--forest);color:var(--ivory)}
 #bar button.stat.on .sub{color:rgba(246,243,235,.75)}
 .dc{display:inline-block;height:.95em;width:auto;vertical-align:-.12em}
-@media (max-width:480px){#bar{gap:9px}#bar .mark .g{display:none}#sowchip{left:max(14px,env(safe-area-inset-left));transform:none}}
+@media (max-width:480px){#bar{gap:9px}#bar .mark .g{display:none}#bar .back{padding:7px 8px}#bar .back .l{display:none}#bar .back .s{display:inline}#sowchip{left:max(14px,env(safe-area-inset-left));transform:none}}
 @media (max-width:400px){#bar{gap:6px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}#bar .stat b{font-size:.95rem}#bar .stat .sub{letter-spacing:.09em}#bar button.stat{padding:4px 6px 4px 5px}}
 #sowchip{position:fixed;left:50%;transform:translateX(-50%);top:62px;z-index:41;display:none;align-items:center;gap:10px;background:rgba(246,243,235,.96);border:1px solid var(--forest);border-radius:3px;padding:6px 8px 6px 10px;box-shadow:0 6px 18px rgba(21,19,14,.2);white-space:nowrap}
 #sowchip.on{display:flex}
@@ -223,7 +226,8 @@ button{font:inherit;cursor:pointer}
 <body>
 
 <div id="bar">
-  <div class="mark">DEEDS<span>.</span><span class="g"> THE GARDEN</span></div>
+  <a class="btn back" href="../" title="Back to DEEDS."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span class="l">Back to DEEDS.</span><span class="s">Back.</span></a>
+  <a class="mark" href="../">DEEDS<span>.</span><span class="g"> THE GARDEN</span></a>
   <div class="sp"></div>
   <button class="stat" id="bPurse" title="Your purse"><img src="garden-coin.webp" alt=""><div><b id="hudCoins">0</b><span class="sub">Deedcoins</span></div></button>
   <button class="stat" id="bSack" title="Your seed sack"><img src="garden-sack.webp" alt=""><div><b id="hudSeeds">0</b><span class="sub" id="hudSack">Seeds</span></div></button>
