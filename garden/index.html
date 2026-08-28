@@ -369,8 +369,8 @@ let vz=Math.min(1,innerWidth<700?.6:.85),vx=innerWidth/2-PX*vz,vy=innerHeight/2-
 function apply(){vx=clamp(vx,innerWidth-W*vz,0);vy=clamp(vy,innerHeight-H*vz,0);world.style.transform=`translate(${vx}px,${vy}px) scale(${vz})`}
 apply();
 let dragging=false,lx=0,ly=0,moved=0;
-vp.addEventListener('pointerdown',e=>{dragging=true;moved=0;lx=e.clientX;ly=e.clientY;vp.classList.add('drag');try{vp.setPointerCapture(e.pointerId)}catch(err){}});
-vp.addEventListener('pointermove',e=>{if(CANON&&POURING)return;if(!dragging)return;vx+=e.clientX-lx;vy+=e.clientY-ly;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;apply()});
+vp.addEventListener('pointerdown',e=>{if(CANON)return;dragging=true;moved=0;lx=e.clientX;ly=e.clientY;vp.classList.add('drag');try{vp.setPointerCapture(e.pointerId)}catch(err){}});
+vp.addEventListener('pointermove',e=>{if(CANON)return;if(!dragging)return;vx+=e.clientX-lx;vy+=e.clientY-ly;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;apply()});
 vp.addEventListener('pointerup',()=>{dragging=false;vp.classList.remove('drag')});
 vp.addEventListener('wheel',e=>{e.preventDefault();const z=clamp(vz*(e.deltaY<0?1.1:.9),.4,1.6);zoomAt(e.clientX,e.clientY,z)},{passive:false});
 function zoomAt(cx,cy,z){const wx=(cx-vx)/vz,wy=(cy-vy)/vz;vz=z;vx=cx-wx*vz;vy=cy-wy*vz;apply()}
@@ -415,7 +415,7 @@ $('#bWater').addEventListener('click',()=>{
   if(!planted()){toast('Nothing planted yet.');return}
   if(!thirsty()){toast('Everything is watered. Come back tomorrow.');return}
   CANON=true;$('#bWater').classList.add('on');const c=$('#canimg');c.style.display='block';canMove(innerWidth/2,innerHeight/2);
-  toast('Tap a bed to water it. Drag to pour.')});
+  toast('Tap or drag to water. Water. puts the can down.')});
 function splash(x,y,n){n=n||6;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='drop';const sz=4+Math.random()*5;s.style.width=sz+'px';s.style.height=sz+'px';s.style.left=(x+Math.random()*26-13)+'px';s.style.top=(y-6+Math.random()*10)+'px';s.style.setProperty('--dx',(Math.random()*52-26)+'px');s.style.setProperty('--dy',(38+Math.random()*30)+'px');s.style.animationDelay=(Math.random()*.08)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),750)}}
 let CANX=0,CANY=0,SHOWER=null;
 function showerOn(){if(SHOWER)return;SHOWER=setInterval(()=>splash(CANX,CANY,3),80)}
@@ -430,7 +430,7 @@ for(let i=0;i<9;i++){const k=kinds[i%3];const im=document.createElement('img');i
 im.style.left=(10+Math.random()*76)+'%';im.style.top=(42+Math.random()*38)+'%';im.style.width=(36+Math.random()*30)+'px';
 im.style.setProperty('--fx',(Math.random()*160-80)+'px');im.style.animationDelay=(Math.random()*.5)+'s';
 let f=0;const iv=setInterval(()=>{f^=1;im.src=k[f]},140);F.appendChild(im);setTimeout(()=>{clearInterval(iv);im.remove()},4200)}}
-vp.addEventListener('pointerdown',e=>{if(!CANON)return;canMove(e.clientX,e.clientY);const el=document.elementFromPoint(e.clientX,e.clientY);if(!(el&&el.closest&&el.closest('.bed')))return;e.preventDefault();POURING=true;$('#canimg').classList.add('pour');showerOn();waterAt(e.clientX,e.clientY)});
+vp.addEventListener('pointerdown',e=>{if(!CANON)return;e.preventDefault();canMove(e.clientX,e.clientY);POURING=true;$('#canimg').classList.add('pour');showerOn();waterAt(e.clientX,e.clientY)});
 vp.addEventListener('pointermove',e=>{if(!CANON)return;canMove(e.clientX,e.clientY);if(POURING)waterAt(e.clientX,e.clientY)});
 vp.addEventListener('pointerup',e=>{if(CANON){POURING=false;$('#canimg').classList.remove('pour');showerOff();return}
 if(moved<=8){const el=document.elementFromPoint(e.clientX,e.clientY);const bed=el&&el.closest?el.closest('.bed'):null;if(bed)onBed(+bed.dataset.plot)}});
