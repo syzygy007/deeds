@@ -1254,6 +1254,56 @@ body.gsky-on .tab.on{color:var(--ivory)}
 .gdoor-seeds{background:rgba(246,243,235,.94);color:var(--forest);font-size:10px;letter-spacing:.12em;font-weight:800;padding:5px 10px;border-radius:999px;white-space:nowrap}
 #profreal>#gardsect{order:1}
 @media (max-width:419px){.gdoor-share span{display:none}.gdoor-enter{padding:11px 18px;font-size:13.5px}}
+/* ===== DEEDCOINS (v4.16): the coin in the top bar, its dropdown, the send sheet, artifact notes, coins in the letter ===== */
+.cbtn{position:relative;display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;padding:0;cursor:pointer;color:var(--ink);font:inherit}
+.cbtn img{width:26px;height:26px;display:block;filter:drop-shadow(0 1px 2px rgba(21,19,14,.25))}
+.cbtn b{font-size:13px;font-weight:800;letter-spacing:-.01em}
+.cbtn.hide{display:none}
+.cbtn.bump img{animation:cbump .5s ease}
+@keyframes cbump{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+.coinmenu{position:fixed;z-index:80;min-width:250px;max-width:calc(100vw - 24px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 44px rgba(21,19,14,.16);padding:14px 14px 12px;display:none}
+.coinmenu.on{display:block}
+.coinmenu .cm-bal{display:flex;align-items:center;gap:10px;margin:2px 0 4px}
+.coinmenu .cm-bal img{width:38px;height:38px}
+.coinmenu .cm-bal b{font-size:26px;letter-spacing:-.03em;line-height:1}
+.coinmenu .cm-sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:rgba(21,19,14,.55);margin-bottom:12px}
+.coinmenu .cm-row{display:flex;gap:8px}
+.coinmenu .cm-row button{flex:1;font:inherit;font-weight:800;font-size:13px;padding:10px 10px;border-radius:999px;cursor:pointer;border:1px solid var(--forest);background:var(--forest);color:var(--ivory);white-space:nowrap}
+.coinmenu .cm-row button.ghost{background:transparent;color:var(--forest)}
+.coinmenu .cm-foot{font-size:11px;color:rgba(21,19,14,.6);margin-top:10px;line-height:1.4}
+.csamt{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+.csamt button{width:46px;height:46px;border-radius:50%;border:1px solid var(--forest);background:var(--ivory);color:var(--forest);font-size:24px;font-weight:800;cursor:pointer;line-height:1;flex:0 0 auto}
+.csamt input{flex:1;min-width:0;font:inherit;font-weight:800;font-size:30px;letter-spacing:-.03em;text-align:center;border:0;border-bottom:2px solid var(--forest);background:transparent;padding:6px 0;color:var(--ink);outline:0;-moz-appearance:textfield}
+.csamt input::-webkit-outer-spin-button,.csamt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.csquick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.csquick button{font:inherit;font-weight:800;font-size:12px;letter-spacing:.08em;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--ivory);cursor:pointer;color:var(--ink)}
+.csquick button.on{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+#ncoin{display:none;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.5)}
+#ncoin.on{display:flex}
+#ncoin img{width:28px;height:28px}
+#ncoin b{font-weight:800}
+#ncoin .rm{margin-left:auto;font:inherit;font-size:12px;font-weight:800;color:var(--forest);background:transparent;border:0;cursor:pointer;text-decoration:underline}
+#ncoinAdd{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:800;color:var(--forest);background:transparent;border:0;cursor:pointer;margin:0 0 12px;padding:0}
+#ncoinAdd img{width:18px;height:18px}
+#ncont{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+#ncont.on{display:grid}
+#ncont button{font:inherit;border:1px solid var(--line);background:var(--ivory);border-radius:12px;padding:8px 6px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink)}
+#ncont button img{width:52px;height:52px;object-fit:contain}
+#ncont button.on{border-color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest);background:#fff}
+#nkind button{white-space:nowrap}
+#ltContWrap{display:none;flex-direction:column;align-items:center;gap:8px;width:100%}
+.lt-stage.contmode #ltContWrap{display:flex}
+.lt-stage.contmode .envwrap{display:none}
+.lt-stage.contmode.opened #ltContWrap{display:none}
+#ltContWrap .eggart{width:min(62vw,260px)}
+#ltContWrap .egghl{font-weight:800;font-size:15px;letter-spacing:-.01em;text-align:center}
+#ltContWrap .eggline{font-family:"Special Elite",Courier,"Courier New",monospace;font-size:13px;color:#7A756A;text-align:center}
+.pp-coins{display:none;align-items:center;justify-content:center;gap:10px;margin:6px 0 10px;padding:10px 14px;border:1px solid rgba(190,154,78,.5);border-radius:12px;background:linear-gradient(180deg,rgba(255,244,199,.55),rgba(255,244,199,.15))}
+.pp-coins.on{display:flex}
+.pp-coins img{width:44px;height:44px;filter:drop-shadow(0 2px 4px rgba(120,80,0,.3))}
+.pp-coins b{font-size:22px;letter-spacing:-.03em;line-height:1.1}
+.pp-coins small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:rgba(21,19,14,.6);margin-top:2px}
+.pp-coins.mine{opacity:.8}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1293,6 +1343,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
       <button data-go="profile">Profile.</button>
     </nav>
     <div class="dright">
+      <button class="cbtn hide" id="dCoin" aria-label="Deedcoins" title="Deedcoins."><img src="deedcoin.webp" alt=""><b id="dCoinN"></b></button>
       <button class="dnotes nbtn" id="dNotes" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
       <button class="dlog" id="dLog" aria-label="Log a Deed" title="Log a Deed."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <span class="dsep"></span>
@@ -1328,6 +1379,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
     <div class="mtop">
       <div class="mword" data-go="feed">D<b>.</b></div>
       <div style="display:flex;align-items:center;gap:18px">
+        <button class="cbtn hide" id="mCoin" aria-label="Deedcoins" title="Deedcoins."><img src="deedcoin.webp" alt=""><b id="mCoinN"></b></button>
         <button id="mNotes" class="nbtn" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
         <button id="mBell" class="bell" aria-label="Activity"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg><span class="bdot"></span></button>
         <button id="mSearchT" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/></svg></button>
@@ -1958,6 +2010,23 @@ body.gsky-on .tab.on{color:var(--ivory)}
   <div id="cxlist"></div>
 </div>
 
+<div class="coinmenu" id="coinmenu" role="menu" aria-label="Deedcoins">
+  <div class="cm-bal"><img src="deedcoin.webp" alt=""><b id="cmBal">0</b></div>
+  <div class="cm-sub" id="cmSub">DEEDCOINS</div>
+  <div class="cm-row"><button type="button" id="cmSend">Send.</button><button type="button" class="ghost" id="cmLog">Log a deed.</button></div>
+  <div class="cm-foot" id="cmFoot">A deed pays 200. Coins you earned can travel inside a note.</div>
+</div>
+
+<div class="sheet" id="coinsend">
+  <div class="sword">DEEDS<b>.</b></div>
+  <h3>Send Deedcoins.</h3>
+  <p class="remnote" style="margin:-8px 0 10px" id="csHint">Pick how many. Then who, and how it travels.</p>
+  <div class="csamt"><button type="button" id="csMinus" aria-label="Less">&minus;</button><input id="csAmt" type="number" inputmode="numeric" min="1" step="1" value="50" aria-label="How many Deedcoins"><button type="button" id="csPlus" aria-label="More">+</button></div>
+  <div class="csquick" id="csQuick"><button type="button" data-q="50">50</button><button type="button" data-q="100">100</button><button type="button" data-q="200">200</button><button type="button" data-q="500">500</button></div>
+  <p class="remnote" id="csLeft"></p>
+  <button class="chbtn nsend" id="csGo">Choose Who.</button>
+</div>
+
 <div class="sheet" id="lettersheet">
   <div class="sword">DEEDS<b>.</b></div>
   <div class="lt-meta"><span class="mono" id="ltWho" role="button" tabindex="0"></span><span class="micro" id="ltWhen"></span></div>
@@ -1967,6 +2036,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
       <button class="env3" id="ltEnv" type="button" aria-label="Open the sealed note"><div class="env-pic"></div><div class="seal" id="ltSeal"><div class="sh l"></div><div class="sh r"></div></div></button>
       <div class="env-cap">Tap to open</div>
     </div>
+    <div id="ltContWrap"><div class="egghl" id="ltContHl"></div><button class="eggart" type="button" id="ltContArt" aria-label=""><img class="erip" src="egg-ripples.webp" alt=""><img class="espark" src="egg-sparkles.webp" alt=""><img class="emain" id="ltContImg" src="" alt=""></button><div class="eggline" id="ltContLine"></div><button class="logbtn eggbtn" type="button" id="ltContBtn"></button></div>
     <div class="paperwrap" id="ltWrap"><div class="paper" id="ltPaper">
       <div class="pp-from" id="ltFrom"></div>
       <div class="pp-rule"><i></i></div>
@@ -1982,6 +2052,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
       </div>
     </div>
   </div>
+  <div class="pp-coins" id="ltCoins"><img src="deedcoin.webp" alt=""><div><b id="ltCoinN">0</b><small id="ltCoinL">Deedcoins for you</small></div></div>
   <div class="lt-state micro" id="ltState"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="inkdust" x="-12%" y="-12%" width="124%" height="124%"><feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"><animate id="inkdustA" attributeName="scale" values="0;46;9" keyTimes="0;.72;1" dur="2.6s" begin="indefinite" fill="freeze"/></feDisplacementMap></filter></defs></svg>
   <div class="cmtin" id="ltReply"><input id="ltIn" placeholder="Write a reply. It arrives sealed." maxlength="2000"><button class="chbtn" id="ltSend">Seal It.</button></div>
@@ -1991,8 +2062,11 @@ body.gsky-on .tab.on{color:var(--ivory)}
   <div class="sword">DEEDS<b>.</b></div>
   <h3>Write a Note.</h3>
   <p class="remnote" style="margin:-8px 0 14px">To <span class="mono" id="notewho"></span>. Only the two of you can read it.</p>
-  <div class="modetog nkind" id="nkind"><button class="on" data-nk="sealed">SEALED.</button><button data-nk="ink">DISAPPEARING INK.</button></div>
+  <div class="modetog nkind" id="nkind"><button class="on" data-nk="sealed">SEALED.</button><button data-nk="ink">DISAPPEARING INK.</button><button data-nk="artifact">ARTIFACT.</button></div>
   <p class="nkhint" id="nkHint">Delivered as a sealed letter. They open it when they are ready.</p>
+  <div id="ncont"><button type="button" data-nc="piggy_bank"><img src="pres-pick-piggy.webp" alt="">Piggy Bank</button><button type="button" data-nc="treasure_chest"><img src="pres-pick-chest.webp" alt="">Chest</button><button type="button" data-nc="golden_egg"><img src="pres-pick-egg.webp" alt="">Golden Egg</button><button type="button" data-nc="pinata"><img src="pres-pick-pinata.webp" alt="">Pi&ntilde;ata</button><button type="button" data-nc="fortune_cookie"><img src="pres-pick-cookie.webp" alt="">Cookie</button><button type="button" data-nc="geode"><img src="pres-pick-geode.webp" alt="">Geode</button></div>
+  <div id="ncoin"><img src="deedcoin.webp" alt=""><span><b id="ncoinN">0</b> Deedcoins ride along.</span><button type="button" class="rm" id="ncoinRm">Remove.</button></div>
+  <button type="button" id="ncoinAdd"><img src="deedcoin.webp" alt="">Tuck in Deedcoins.</button>
   <div class="nspaper" id="nspaper"><textarea id="notein" placeholder="Say something true." maxlength="2000" rows="5"></textarea></div>
   <div class="nsfoot"><span class="p-time" id="nsSign"></span><span class="p-time" id="nsLeft">2000 LEFT</span></div>
   <div class="micro ntouchl">Add a touch. <span>Small touches. Big meaning.</span></div>
@@ -4025,7 +4099,7 @@ toast(chg?(ph?'Your number is changed. It opens the same door.':'Your email is c
 var ATX=$('#atx');if(ATX)ATX.onclick=closeSheets;
 
 /* ---- session, profile, welcome ---- */
-function guestUI(){PROFILE=null;MYORGS=[];
+function guestUI(){PROFILE=null;MYORGS=[];WALLET=null;NOTEPURSE={};COINATT=0;if(typeof paintCoin==='function')paintCoin();
 MYFOLL={};MYINSP={};NOTES=[];NOTEUNREAD=0;NOTEWITH=null;ALERTS=[];ALUNREAD=0;paintNoteDot();var av=$('#advsect');if(av)av.style.display='none';var mv2=$('#modsect');if(mv2)mv2.style.display='none';
 my.handle='';my.type='doer';my.deeds=[];my.inspired={};my.following={};
 renderProfile();renderRail();renderFeed();paintDoors()}
@@ -4080,7 +4154,7 @@ if(!MEMBERS[my.handle])MEMBERS[my.handle]={type:my.type,v:!!PROFILE.member_type_
 else{MEMBERS[my.handle].type=my.type}
 NAMES[PROFILE.id]={handle:PROFILE.handle,type:my.type,v:!!PROFILE.member_type_verified_at};
 loadMyDeeds(function(){renderProfile();renderRail();renderFeed()});
-loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();paintDoors();freshDoors();
+loadCounts(LIVEPOSTS).then(renderFeed);loadOrgs();loadMemberships();loadPrefs();loadMyFollows().then(renderFeed);try{paintCoin();loadWallet().then(coinArrival)}catch(e){}loadNotes();loadAlerts().then(function(){renderAlerts();paintNoteDot()});claimOrgJoin();claimInviter();claimInvite();loadReach();checkAccept();paintDoors();freshDoors();
 if(!safeGet('deeds_w_'+PROFILE.id)){showWelcome()}
 else if(justVerified){justVerified=false;toast('Signed in as '+PROFILE.handle+'.')}}
 function showWelcome(){$('#wHandle').textContent=PROFILE.handle;
@@ -4225,9 +4299,10 @@ open:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1
 ink:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/></svg>',
 flowers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="1.8"/><path d="M12 2.5v2.2M16.8 5.2l-1.6 1.6M17.5 8h-2.2M16.8 10.8l-1.6-1.6M7.2 5.2l1.6 1.6M6.5 8h2.2M7.2 10.8l1.6-1.6M12 13.8v7.7"/><path d="M12 18.5c-1.6-.2-3-1.3-3.8-2.7M12 20.2c1.6-.2 3-1.3 3.8-2.7"/></svg>',
 balloons:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8.5" rx="5" ry="6"/><path d="M12 14.5l-1.1 1.7h2.2z"/><path d="M12 16.2c.2 2.4-2.2 2.6-2 5.3"/></svg>',
-confetti:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="17" cy="5" r="1.4"/><circle cx="12" cy="11" r="1.4"/><circle cx="5" cy="15" r="1.4"/><circle cx="18.5" cy="14" r="1.4"/><circle cx="11" cy="19" r="1.4"/></svg>'};
+confetti:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="6" cy="6" r="1.4"/><circle cx="17" cy="5" r="1.4"/><circle cx="12" cy="11" r="1.4"/><circle cx="5" cy="15" r="1.4"/><circle cx="18.5" cy="14" r="1.4"/><circle cx="11" cy="19" r="1.4"/></svg>',
+artifact:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M12 10v11"/><path d="M9.5 13.5h5"/></svg>'};
 function ico(k){return NICO[k]||''}
-function nkindOf(n){return n&&n.kind==='ink'?'ink':'sealed'}
+function nkindOf(n){return n&&n.kind==='ink'?'ink':(n&&n.kind==='artifact'?'artifact':'sealed')}
 function nTouch(n){var t=n&&n.touch;return(t==='flowers'||t==='balloons'||t==='confetti')?t:''}
 function isMine(n){return!!(PROFILE&&n&&n.sender_id===PROFILE.id)}
 function nameOf(id){return NAMES[id]||{handle:'A Member',type:'doer',v:false}}
@@ -4252,7 +4327,7 @@ return sb.from('notes').select('*').or('sender_id.eq.'+PROFILE.id+',recipient_id
 if(r.error){NOTES=[];return Promise.resolve()}
 NOTES=r.data||[];countUnread();
 var need=[];NOTES.forEach(function(n){need.push({profile_id:n.sender_id});need.push({profile_id:n.recipient_id})});
-return fetchNames(need)}).then(function(){indexNames();paintNoteDot();subNotes();repaintNotes()}).catch(function(){})}
+return fetchNames(need)}).then(function(){indexNames();paintNoteDot();subNotes();repaintNotes();loadPurses()}).catch(function(){})}
 function subNotes(){if(!sb||!PROFILE||typeof sb.channel!=='function')return;
 if(NOTECH&&NOTECHID!==PROFILE.id){try{sb.removeChannel(NOTECH)}catch(e){}NOTECH=null}
 if(NOTECH)return;NOTECHID=PROFILE.id;
@@ -4261,7 +4336,7 @@ function noteArrived(n){if(!n||!PROFILE||n.recipient_id!==PROFILE.id)return;
 if(NOTES.some(function(x){return x.id===n.id}))return;
 NOTES.unshift(n);countUnread();
 fetchNames([{profile_id:n.sender_id}]).then(function(){indexNames();paintNoteDot();repaintNotes();
-toast(nkindOf(n)==='ink'?'Disappearing ink arrived.':'A sealed note arrived.')}).catch(function(){})}
+toast(nkindOf(n)==='ink'?'Disappearing ink arrived.':nkindOf(n)==='artifact'?'An artifact arrived. Open it when you are ready.':'A sealed note arrived.');loadPurses()}).catch(function(){})}
 function threads(){var t={},order=[];
 NOTES.forEach(function(n){if(!PROFILE)return;
 var other=n.sender_id===PROFILE.id?n.recipient_id:n.sender_id;
@@ -4271,8 +4346,8 @@ if(n.recipient_id===PROFILE.id&&!n.read_at)t[other].unread++});
 return order.map(function(id){return t[id]})}
 /* one row grammar for the Profile section and the Notes. page */
 function previewOf(n){var mine=isMine(n),kind=nkindOf(n);
-if(mine)return{cls:'',ic:kind==='ink'?'ink':'sealed',txt:kind==='ink'?'You sent disappearing ink.':'You sent a sealed note.'};
-if(!n.read_at)return{cls:'sealed',ic:kind==='ink'?'ink':'sealed',txt:kind==='ink'?'Sent you disappearing ink.':'Sent you a sealed note.'};
+if(mine)return{cls:'',ic:kind==='ink'?'ink':kind==='artifact'?'artifact':'sealed',txt:kind==='ink'?'You sent disappearing ink.':kind==='artifact'?'You left an artifact.':'You sent a sealed note.'};
+if(!n.read_at)return{cls:'sealed',ic:kind==='ink'?'ink':kind==='artifact'?'artifact':'sealed',txt:kind==='ink'?'Sent you disappearing ink.':kind==='artifact'?'Left you an artifact.':'Sent you a sealed note.'};
 if(kind==='ink')return{cls:'',ic:'ink',txt:'The ink has faded.'};
 return{cls:'',ic:'',txt:String(n.body||'').replace(/\s+/g,' ').slice(0,90)}}
 function threadRows(list){var h='';
@@ -4299,12 +4374,12 @@ if(!PROFILE){openJoin();return}go('notes');loadNotes()}
 function openNote(pid){if(!PROFILE){openJoin();return}
 THWITH=pid;closeSheets();go('thread');loadNotes()}
 function envRow(n){var mine=isMine(n),kind=nkindOf(n),tc=nTouch(n),opened=!!n.read_at,burned=kind==='ink'&&opened;
-var cls='env'+(mine?' mine':'')+(kind==='ink'?' ink':'')+(opened&&!mine?' open':'')+(!mine&&kind!=='ink'?' pic':'');
-var l,s,still=false;
-if(mine){l=kind==='ink'?'Disappearing ink':'Sealed note';s=opened?(kind==='ink'?'Read. Faded.':'Opened '+whenLine(n.read_at)+'.'):(kind==='ink'?'Not read yet.':'Not opened yet.')}
-else{l=kind==='ink'?'Disappearing ink':'Sealed note';s=burned?'Faded. Black light reads it.':(opened?'Opened.':'Tap to open.')}
+var cls='env'+(mine?' mine':'')+(kind==='ink'?' ink':'')+(opened&&!mine?' open':'')+(!mine&&kind==='sealed'?' pic':'');
+var l,s,still=false,pu=NOTEPURSE[String(n.id)];
+if(mine){l=kind==='ink'?'Disappearing ink':kind==='artifact'?'Artifact':'Sealed note';s=opened?(kind==='ink'?'Read. Faded.':'Opened '+whenLine(n.read_at)+'.'):(kind==='ink'?'Not read yet.':'Not opened yet.');if(pu)s+=' '+pu.amount+' Deedcoins inside.'}
+else{l=kind==='ink'?'Disappearing ink':kind==='artifact'?'Artifact':'Sealed note';s=burned?'Faded. Black light reads it.':(opened?'Opened.':(kind==='artifact'?'Tap to open it.':'Tap to open.'))}
 var h='<button class="lrow'+(still?' still':'')+'" data-lt="'+esc(n.id)+'"'+(still?' disabled':'')+'>';
-var ic=kind==='ink'?'ink':((opened&&!mine)?'open':'sealed');
+var ic=kind==='ink'?'ink':((opened&&!mine)?'open':(kind==='artifact'?'artifact':'sealed'));
 h+='<div class="'+cls+'">'+ico(ic)+(tc?'<span class="ts">'+ico(tc)+'</span>':'')+'</div>';
 h+='<div class="in"><div class="l">'+l+'</div><div class="s">'+s+'</div></div>';
 h+='<span class="p-time">'+clock(n.created_at)+'</span></button>';return h}
@@ -4326,7 +4401,7 @@ var st=$('#ltStage'),env=$('#ltEnv'),wrap=$('#ltWrap'),body=$('#ltBody'),tl=$('#
 st.classList.remove('opened');env.classList.remove('open','gone','pressing','ink');env.style.display='';
 wrap.classList.remove('shown');body.classList.remove('fading','inkf');$('#ltSign').classList.remove('inkf');$('#ltPaper').classList.remove('tf');body.innerHTML='';tl.innerHTML='';
 var g=$('#ltPaper .pp-gone');if(g)g.parentNode.removeChild(g);
-st.classList.remove('inkmode');$('#ltInkWrap').classList.remove('shown');blSet(false);$('#ltInk').classList.remove('faded');$('#ltInkText').classList.remove('fading');$('#blBar').classList.remove('show');
+st.classList.remove('inkmode','contmode');$('#ltCoins').classList.remove('on','mine');CONTST=0;CONTBUSY=false;$('#ltInkWrap').classList.remove('shown');blSet(false);$('#ltInk').classList.remove('faded');$('#ltInkText').classList.remove('fading');$('#blBar').classList.remove('show');
 $('#ltInkFrom').style.transitionDelay='';$('#ltInkSign').style.transitionDelay='';var dc=$('#ltDust');if(dc)dc.style.display='none'}
 function fillPaper(n){var from=nameOf(n.sender_id);
 $('#ltFrom').textContent='From '+from.handle;
@@ -4374,19 +4449,20 @@ function stateLine(n,over){var mine=isMine(n),kind=nkindOf(n),s='',warm=false;
 if(over){var el0=$('#ltState');el0.textContent=over;el0.classList.add('warm');return}
 if(mine){s=kind==='ink'?(n.read_at?'FADED · BLACK LIGHT BRINGS IT BACK':'DISAPPEARING INK · NOT READ YET'):(n.read_at?'OPENED '+whenLine(n.read_at).toUpperCase():'SEALED · NOT OPENED YET');warm=!n.read_at}
 else{s=kind==='ink'?(n.read_at?'FADED · BLACK LIGHT BRINGS IT BACK':'DISAPPEARING INK · READ ONCE, THEN IT FADES'):(n.read_at?'OPENED '+whenLine(n.read_at).toUpperCase():'SEALED · ONLY THE TWO OF YOU CAN READ IT');warm=!n.read_at}
-var el=$('#ltState');el.textContent=s;el.classList.toggle('warm',warm)}
+if(kind==='artifact')s=s.replace('SEALED','HIDDEN');var el=$('#ltState');el.textContent=s;el.classList.toggle('warm',warm)}
 function openLetter(n){if(!PROFILE||!n)return;LT=n;resetLetter();
-var mine=isMine(n),kind=nkindOf(n),other=nameOf(mine?n.recipient_id:n.sender_id),tc=nTouch(n);
+var mine=isMine(n),kind=nkindOf(n),other=nameOf(mine?n.recipient_id:n.sender_id),tc=nTouch(n),cont=kind==='artifact'?(CONTS[n.container]||CONTS.golden_egg):null;
 $('#ltWho').textContent=other.handle;$('#ltWhen').textContent=whenLine(n.created_at).toUpperCase();
-$('#ltKind').innerHTML=ico(kind==='ink'?'ink':'sealed')+'<span>'+(kind==='ink'?'Disappearing ink':'Sealed note')+'</span>'+(tc?'<i class="tg" style="margin-left:4px">'+ico(tc)+'</i>':'');
+$('#ltKind').innerHTML=ico(kind==='ink'?'ink':kind==='artifact'?'artifact':'sealed')+'<span>'+(kind==='ink'?'Disappearing ink':kind==='artifact'?'Artifact \u00B7 '+cont.n:'Sealed note')+'</span>'+(tc?'<i class="tg" style="margin-left:4px">'+ico(tc)+'</i>':'');
 stateLine(n);
 var env=$('#ltEnv');env.classList.toggle('ink',kind==='ink');
 var st=$('#ltStage'),wrap=kind==='ink'?$('#ltInkWrap'):$('#ltWrap');
 st.classList.toggle('inkmode',kind==='ink');
-if(!mine&&!n.read_at){sheet('#lettersheet');return}
+st.classList.toggle('contmode',kind==='artifact'&&!mine&&!n.read_at);
+if(!mine&&!n.read_at){if(kind==='artifact')contSetup(n);sheet('#lettersheet');return}
 if(kind==='ink'){fillInk(n);if(n.read_at){$('#ltInk').classList.add('faded');$('#blBar').classList.add('show')}}else fillPaper(n);
 st.classList.add('opened');sheet('#lettersheet');
-LTTIMER=setTimeout(function(){wrap.classList.add('shown');if(tc&&kind!=='ink')playTouch(tc)},60)}
+LTTIMER=setTimeout(function(){wrap.classList.add('shown');showCoins(n);if(tc&&kind!=='ink')playTouch(tc)},60)}
 function breakSeal(){var n=LT;if(!n||isMine(n)||n.read_at)return;
 var kind=nkindOf(n),env=$('#ltEnv'),st=$('#ltStage'),wrap=kind==='ink'?$('#ltInkWrap'):$('#ltWrap'),tc=nTouch(n);
 if(env.classList.contains('open'))return;
@@ -4395,7 +4471,7 @@ if(kind==='ink')fillInk(n);else fillPaper(n);
 markRead([n]);
 LTTIMER=setTimeout(function(){env.classList.remove('pressing');env.classList.add('open');
 LTTIMER=setTimeout(function(){st.classList.add('opened');
-LTTIMER=setTimeout(function(){wrap.classList.add('shown');stateLine(n,kind==='ink'?'DISAPPEARING INK \u00B7 READ ONCE, THEN IT FADES':null);
+LTTIMER=setTimeout(function(){wrap.classList.add('shown');stateLine(n,kind==='ink'?'DISAPPEARING INK \u00B7 READ ONCE, THEN IT FADES':null);showCoins(n);
 if(tc&&kind!=='ink')setTimeout(function(){playTouch(tc)},380);
 if(kind==='ink'){LTFADE=setTimeout(function(){fadeInk(n)},9000)}},40)},640)},140)}
 function markRead(list){if(!PROFILE||!sb)return;
@@ -4409,10 +4485,10 @@ if(kind==='flowers'){tl.innerHTML='<img class="tch flowers" src="note-flowers.we
 if(kind==='balloons'){tl.innerHTML='<img class="tch balloon b1" src="note-balloon-cream.webp" alt=""><img class="tch balloon b2" src="note-balloon-sage.webp" alt="">';return}
 if(kind==='confetti'){tl.innerHTML='<img class="tch confetti" src="note-confetti.webp" alt="">';return}}
 /* ---- compose ---- */
-function setKind(k){NKIND=k==='ink'?'ink':'sealed';
+function setKind(k){NKIND=k==='ink'?'ink':k==='artifact'?'artifact':'sealed';
 $$('#nkind [data-nk]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nk')===NKIND)});
-$('#nkHint').textContent=NKIND==='ink'?'Read once. Then the words fade away for good, for both of you.':'Delivered as a sealed letter. They open it when they are ready.';
-$('#notesend').textContent=NKIND==='ink'?'Send the Ink.':'Seal It.';$('#nspaper').classList.toggle('ink',NKIND==='ink')}
+$('#nkHint').textContent=NKIND==='ink'?'Read once. Then the words fade away for good, for both of you.':NKIND==='artifact'?'Hidden inside something they have to open. A few taps, and it is theirs.':'Delivered as a sealed letter. They open it when they are ready.';
+$('#ncont').classList.toggle('on',NKIND==='artifact');$('#nspaper').classList.toggle('ink',NKIND==='ink');paintCoinAtt()}
 function setTouch(t){NTOUCH=t||'';
 $$('#ntouch [data-nt]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nt')===NTOUCH)});
 $('#ntNote').textContent=NTOUCH?({flowers:'Flowers grow across the page when it is opened.',balloons:'Balloons lift off the page when it is opened.',confetti:'Confetti falls, softly, when it is opened.'})[NTOUCH]:'Touches are added to your note and seen when it is opened.'}
@@ -4420,10 +4496,20 @@ function countLeft(){var v=$('#notein').value;$('#nsLeft').textContent=(2000-v.l
 function writeNote(pid){if(!PROFILE){openJoin();return}
 THWITH=pid;var nm=nameOf(pid);
 $('#notewho').textContent=nm.handle;$('#nsSign').textContent='SIGNED - '+initialOf(PROFILE.handle);
-$('#notein').value='';countLeft();setKind('sealed');setTouch('');
+$('#notein').value='';countLeft();setKind(COINATT>0?'artifact':'sealed');setCont(COINATT>0?'piggy_bank':NCONT);setTouch('');paintCoinAtt();
 closeSheets();sheet('#notesheet');setTimeout(function(){try{$('#notein').focus()}catch(e){}},350)}
 function sendNote(body,kind,touch,btn,done){if(!PROFILE||!sb||!THWITH)return;
 var label=btn.textContent;btn.textContent='Sealing...';btn.disabled=true;
+var amt=COINATT>0?COINATT:0;
+if(amt>0||kind==='artifact'){
+sb.rpc('send_coin_note',{p_recipient:THWITH,p_body:body.slice(0,2000),p_kind:kind,p_touch:touch||null,p_container:kind==='artifact'?NCONT:null,p_amount:amt}).then(function(r){btn.textContent=label;btn.disabled=false;
+if(r.error){var m=String(r.error.message||'');toast(/not_sendable/.test(m)?'Only coins you earned can travel. '+(WALLET?WALLET.sendable:0)+' sendable.':/daily_cap/.test(m)?'That is the daily limit for sending Deedcoins. Tomorrow.':/twenty notes/i.test(m)?'That is twenty notes today. The rest can wait.':/function|schema cache|not find/i.test(m)?'Run patch 42 to send Deedcoins.':'Not sent: '+m);return}
+var d=r.data||{},n=d.note;if(!n){toast('Not sent.');return}
+if(d.purse)NOTEPURSE[String(n.id)]=d.purse;if(WALLET&&d.balance!=null){WALLET.balance=+d.balance;WALLET.sendable=+d.sendable||0;paintCoin()}
+COINATT=0;paintCoinAtt();NOTES.unshift(n);repaintNotes();
+var c=CONTS[n.container]||CONTS.golden_egg;toast((kind==='artifact'?'Hidden in '+c.a+' and sent':kind==='ink'?'The ink is on its way':'Sealed and sent')+(amt?' with '+amt+' Deedcoins.':'.'));
+done&&done(n)}).catch(function(){btn.textContent=label;btn.disabled=false;toast('Not sent: the note did not send.')});
+return}
 var row={sender_id:PROFILE.id,recipient_id:THWITH,body:body.slice(0,2000)};
 var full={};for(var k in row)full[k]=row[k];full.kind=kind;if(touch)full.touch=touch;
 function fail(msg){btn.textContent=label;btn.disabled=false;
@@ -4442,7 +4528,7 @@ $$('#ntouch [data-nt]').forEach(function(b){b.onclick=function(){setTouch(b.getA
 $('#notein').addEventListener('input',countLeft);
 $('#notein').addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#notesend').onclick()}});
 $('#notesend').onclick=function(){if(!PROFILE){closeSheets();openJoin();return}
-var val=$('#notein').value.trim();if(!val){toast('Say something true first.');return}
+var val=$('#notein').value.trim();if(!val&&!(COINATT>0)){toast('Say something true first.');return}
 sendNote(val,NKIND,NTOUCH,this,function(){$('#notein').value='';countLeft();closeSheets();if(curPage!=='thread')openNote(THWITH)})};
 $('#ltSend').onclick=function(){if(!PROFILE||!LT){closeSheets();openJoin();return}
 var val=$('#ltIn').value.trim();if(!val)return;
@@ -4488,6 +4574,72 @@ $('#thWho').onclick=function(){if(!THWITH)return;var nm=nameOf(THWITH);if(nm.han
 $$('#nchips [data-nf]').forEach(function(b){b.onclick=function(){NFILTER=b.getAttribute('data-nf');renderNotesPage()}});
 (function(){var _goN=window.go;if(typeof _goN!=='function')return;
 window.go=function(p){_goN(p);if(p==='notes')renderNotesPage();if(p==='thread')renderThreadPage()}})();
+
+/* ================= DEEDCOINS (v4.16): the coin in the top bar, send inside a note, claim on open ================= */
+var WALLET=null,NOTEPURSE={},COINATT=0,COINCTX='new',NCONT='piggy_bank',CONTST=0,CONTBUSY=false,WALCH=null;
+function coinFmt(n){n=Math.max(0,Math.round(+n||0));return n>=10000?(Math.round(n/100)/10)+'k':String(n)}
+function paintCoin(bump){var on=!!(liveOn&&PROFILE);$$('.cbtn').forEach(function(b){b.classList.toggle('hide',!on);if(bump&&on){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}});
+var v=WALLET?coinFmt(WALLET.balance):'';$('#dCoinN').textContent=v;$('#mCoinN').textContent=v;
+if(WALLET){$('#cmBal').textContent=String(WALLET.balance);$('#cmSub').textContent='DEEDCOINS \u00B7 '+WALLET.sendable+' SENDABLE';$('#cmFoot').textContent='A deed pays '+WALLET.deedPay+', up to '+WALLET.perDay+' a day. Coins you earned can travel inside a note.'}}
+function loadWallet(){if(!sb||!PROFILE)return Promise.resolve();return sb.rpc('garden_state').then(function(r){if(r.error){WALLET=null;paintCoin();return}var d=r.data||{};
+WALLET={balance:+d.balance||0,sendable:+d.sendable||0,earned:+d.earned||0,sent:+d.sent||0,deedPay:+d.deed_pay||200,perDay:+d.deeds_per_day||5};paintCoin();subWallet()}).catch(function(){})}
+function subWallet(){if(!sb||!PROFILE||typeof sb.channel!=='function'||WALCH)return;
+try{WALCH=sb.channel('wallet-'+PROFILE.id).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+PROFILE.id},function(pl){var w=pl&&pl.new;if(!w||!WALLET)return;var up=+w.balance>WALLET.balance;
+WALLET.balance=+w.balance;WALLET.earned=+w.earned;WALLET.sent=+w.sent;WALLET.sendable=Math.max(0,Math.min(WALLET.balance,WALLET.earned-WALLET.sent));paintCoin(up)}).subscribe()}catch(e){WALCH=null}}
+function loadPurses(){if(!sb||!PROFILE)return Promise.resolve();return sb.from('coin_purses').select('*').limit(500).then(function(r){if(r.error)return;NOTEPURSE={};(r.data||[]).forEach(function(p){NOTEPURSE[String(p.note_id)]=p});repaintNotes()}).catch(function(){})}
+/* the dropdown */
+function coinMenu(btn){var m=$('#coinmenu');if(!PROFILE){openJoin();return}if(m.classList.contains('on')){coinMenuClose();return}
+var r=btn.getBoundingClientRect();m.style.top=(r.bottom+10)+'px';m.style.right=Math.max(12,window.innerWidth-r.right)+'px';m.classList.add('on');paintCoin();loadWallet()}
+function coinMenuClose(){$('#coinmenu').classList.remove('on')}
+document.addEventListener('click',function(e){var m=$('#coinmenu');if(!m.classList.contains('on'))return;if(e.target.closest('#coinmenu')||e.target.closest('.cbtn'))return;coinMenuClose()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')coinMenuClose()});
+$('#dCoin').onclick=function(e){e.stopPropagation();coinMenu(this)};
+$('#mCoin').onclick=function(e){e.stopPropagation();coinMenu(this)};
+$('#cmLog').onclick=function(){coinMenuClose();wantLog()};
+$('#cmSend').onclick=function(){coinMenuClose();COINCTX='new';openCoinSend(0)};
+/* the send sheet: how many, then who, then how it travels */
+function csMax(){return WALLET?WALLET.sendable:0}
+function csSet(v){v=Math.max(1,Math.min(Math.max(csMax(),1),Math.round(+v||0)));$('#csAmt').value=v;$$('#csQuick [data-q]').forEach(function(b){b.classList.toggle('on',+b.getAttribute('data-q')===v)});return v}
+function csStep(dir){var v=+$('#csAmt').value||0,st=(dir<0?v<=100:v<100)?10:(dir<0?v<=500:v<500)?50:100;csSet(v+dir*st)}
+function csPaint(){var m=csMax();$('#csLeft').textContent=m?(m+' sendable. Coins from your own deeds can travel; the starter 100 stays home.'):'Nothing to send yet. Log a deed, it pays 200, and those coins can travel.';$('#csGo').disabled=!m;$('#csGo').textContent=COINCTX==='attach'?'Tuck Them In.':'Choose Who.'}
+function openCoinSend(pre){if(!PROFILE){openJoin();return}closeSheets();csPaint();csSet(pre||Math.min(50,csMax())||1);sheet('#coinsend');
+loadWallet().then(function(){csPaint();csSet($('#csAmt').value)})}
+$('#csMinus').onclick=function(){csStep(-1)};$('#csPlus').onclick=function(){csStep(1)};
+$$('#csQuick [data-q]').forEach(function(b){b.onclick=function(){csSet(+b.getAttribute('data-q'))}});
+$('#csAmt').addEventListener('input',function(){var v=Math.round(+this.value||0);$$('#csQuick [data-q]').forEach(function(b){b.classList.toggle('on',+b.getAttribute('data-q')===v)})});
+$('#csAmt').addEventListener('blur',function(){csSet(this.value)});
+$('#csAmt').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('#csGo').onclick()}});
+$('#csGo').onclick=function(){if(!csMax()){toast('Nothing to send yet.');return}var v=csSet($('#csAmt').value);COINATT=v;
+if(COINCTX==='attach'){COINCTX='new';closeSheets();sheet('#notesheet');if(NKIND!=='artifact'){setKind('artifact');setCont('piggy_bank')}paintCoinAtt()}
+else{closeSheets();openToPick()}};
+/* coins riding along in the compose sheet */
+function paintCoinAtt(){var on=COINATT>0;$('#ncoin').classList.toggle('on',on);$('#ncoinN').textContent=COINATT;$('#ncoinAdd').style.display=on?'none':'';
+var s=$('#notesend');s.textContent=(NKIND==='ink'?'Send the Ink.':NKIND==='artifact'?'Hide It.':'Seal It.')+(on?' With '+COINATT+' Deedcoins.':'')}
+$('#ncoinRm').onclick=function(){COINATT=0;paintCoinAtt()};
+$('#ncoinAdd').onclick=function(){if(!PROFILE){openJoin();return}COINCTX='attach';openCoinSend(COINATT||0)};
+function setCont(c){NCONT=CONTS[c]?c:'piggy_bank';$$('#ncont [data-nc]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nc')===NCONT)})}
+$$('#ncont [data-nc]').forEach(function(b){b.onclick=function(){setCont(b.getAttribute('data-nc'))}});
+/* the artifact in the letter: tap it open, then the paper and the coins */
+function contSetup(n){var c=CONTS[n.container]||CONTS.golden_egg;CONTST=0;CONTBUSY=false;var from=nameOf(n.sender_id);
+$('#ltContHl').textContent=from.handle+' left you '+c.a+'.';$('#ltContImg').src=presContFrame(c,0);$('#ltContArt').setAttribute('aria-label',presAria(c,0));$('#ltContArt').classList.remove('opened','tap');$('#ltContArt').disabled=false;
+$('#ltContLine').textContent=c.line.replace('the post','the note');$('#ltContBtn').innerHTML=c.lbl[0];$('#ltContBtn').disabled=false;try{preloadEgg(c)}catch(e){}}
+function contTap(){var n=LT;if(!n||CONTBUSY||isMine(n)||nkindOf(n)!=='artifact')return;var c=CONTS[n.container]||CONTS.golden_egg,img=$('#ltContImg'),art=$('#ltContArt'),btn=$('#ltContBtn'),rm=presRM();
+if(CONTST<c.taps-1){CONTST++;img.src=presContFrame(c,CONTST);btn.innerHTML=c.lbl[CONTST];art.setAttribute('aria-label',presAria(c,CONTST));if(!rm){art.classList.remove('tap');void art.offsetWidth;art.classList.add('tap')}return}
+CONTBUSY=true;btn.disabled=true;art.disabled=true;art.classList.remove('tap');art.classList.add('opened');if(c.frames.length>c.taps)img.src=c.frames[c.taps];
+var tc=nTouch(n),st=$('#ltStage'),wrap=$('#ltWrap');fillPaper(n);markRead([n]);
+LTTIMER=setTimeout(function(){st.classList.add('opened');LTTIMER=setTimeout(function(){wrap.classList.add('shown');stateLine(n);showCoins(n);if(tc)setTimeout(function(){playTouch(tc)},380)},40)},rm?160:c.hold)}
+$('#ltContArt').onclick=contTap;$('#ltContBtn').onclick=contTap;
+function showCoins(n){var el=$('#ltCoins'),p=NOTEPURSE[String(n.id)];if(!p){el.classList.remove('on','mine');return}
+var mine=isMine(n);el.classList.add('on');el.classList.toggle('mine',mine);
+if(mine){$('#ltCoinN').textContent=p.amount;$('#ltCoinL').textContent=p.status==='opened'?'Deedcoins \u00B7 taken':p.status==='returned'?'Deedcoins \u00B7 taken back':'Deedcoins tucked inside \u00B7 not opened yet';return}
+$('#ltCoinN').textContent='+'+p.amount;$('#ltCoinL').textContent=p.status==='opened'?'Deedcoins \u00B7 yours':'Deedcoins for you';
+if(p.status==='sealed'&&sb){sb.rpc('coin_claim',{p_note:String(n.id)}).then(function(r){var d=r.data;
+if(r.error||!d||!d.ok){if(d&&d.reason==='returned'){$('#ltCoinN').textContent=p.amount;$('#ltCoinL').textContent='Deedcoins \u00B7 taken back before you opened it'}return}
+p.status='opened';if(WALLET){WALLET.balance=+d.balance;paintCoin(true)}$('#ltCoinL').textContent='Deedcoins \u00B7 yours';if(!d.already)toast(d.amount+' Deedcoins are yours.')}).catch(function(){})}}
+/* arrivals from the garden: /?send=150 opens the send sheet, /?log=1 opens the composer */
+function coinArrival(){var q=location.search||'';var m=/[?&]send=(\d+)/.exec(q),l=/[?&]log=1/.test(q);if(!m&&!l)return;
+try{history.replaceState(null,'',location.pathname)}catch(e){}
+if(l){setTimeout(wantLog,300);return}setTimeout(function(){COINCTX='new';openCoinSend(+m[1])},400)}
 
 /* ================= ADMIN: organization review ================= */
 function renderAdmin(){var s=$('#advsect'),ms=$('#modsect');if(!s)return;
