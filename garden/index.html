@@ -5,11 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DEEDS. The Garden</title>
 <meta name="description" content="Your profile is a garden. Every deed sows it.">
+<meta property="og:title" content="Come see my garden.">
+<meta property="og:description" content="Grown one good deed at a time.">
+<meta property="og:image" content="https://deeds.fun/garden-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://deeds.fun/garden/">
+<meta property="og:site_name" content="DEEDS.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://deeds.fun/garden-og.jpg">
 <style>
 :root{--ivory:#F6F3EB;--paper:#EFE9DA;--ink:#15130E;--forest:#1F4B3A;--sage:#A0B0A4;--gold:#BE9A4E;--hair:rgba(21,19,14,.14)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{margin:0;background:#24462B;color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;touch-action:none}
+body{margin:0;-webkit-user-select:none;user-select:none;background:#24462B;color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;touch-action:none}
 .micro{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
 button{font:inherit;cursor:pointer}
 
@@ -98,6 +107,21 @@ button{font:inherit;cursor:pointer}
 .seat-ui .chips .btn{padding:7px 10px;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase}
 .seat-ui .chips .btn.on{background:var(--ivory);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.sway{animation:none}}
+#confirm{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(21,19,14,.45);z-index:60;padding:20px}
+#confirm.on{display:flex}
+#confirm .cbox{background:var(--ivory);border-radius:18px;padding:26px 24px;max-width:340px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+#confirm .ch{font-weight:800;font-size:20px;letter-spacing:-.01em}
+#confirm .cb{font-size:13.5px;line-height:1.55;color:rgba(21,19,14,.72);margin:10px 0 18px}
+#confirm .crow{display:flex;gap:10px;justify-content:center}
+#canimg{position:fixed;display:none;width:120px;z-index:55;pointer-events:none;transform:rotate(-14deg);transition:transform .18s ease;filter:drop-shadow(4px 8px 10px rgba(12,26,14,.45))}
+#canimg.pour{transform:rotate(-40deg) translate(-4px,6px)}
+.bed.wet{filter:brightness(.84) saturate(1.15);transition:filter .5s}
+#bWater.on{background:var(--forest);color:var(--ivory)}
+.drop{position:fixed;border-radius:50%;background:#7FB4C9;z-index:54;pointer-events:none;animation:dropfall .55s ease-in forwards}
+@keyframes dropfall{from{transform:translate(0,0);opacity:.95}to{transform:translate(var(--dx),var(--dy,46px));opacity:0}}
+#bflight{position:fixed;inset:0;pointer-events:none;z-index:56}
+.bfy{position:absolute;animation:bfrise 3.1s ease-in forwards;opacity:0}
+@keyframes bfrise{0%{transform:translate(0,0);opacity:0}12%{opacity:1}100%{transform:translate(var(--fx),-62vh);opacity:0}}
 </style>
 </head>
 <body>
@@ -105,7 +129,7 @@ button{font:inherit;cursor:pointer}
 <div id="bar">
   <div class="mark">DEEDS<span>.</span> THE GARDEN</div>
   <div class="sp"></div>
-  <div class="stat"><img src="garden-sack.webp" alt=""><div><b id="hudSeeds">0</b><span class="sub" id="hudDaily">2 free today</span></div></div>
+  <div class="stat"><img src="garden-sack.webp" alt=""><div><b id="hudSeeds">0</b><span class="sub" id="hudDaily">Plant a seed</span></div></div>
   <div class="stat"><img src="garden-seeds.webp" alt=""><div><b id="hudDeeds">0</b><span class="sub">Deeds</span></div></div>
   <button class="micro" id="tierchip">Tier 1</button>
 </div>
@@ -121,11 +145,15 @@ button{font:inherit;cursor:pointer}
 </div>
 
 <div id="hud">
-  <button class="btn primary" id="bDeed">Post a deed. +10 seeds</button>
+  <button class="btn primary" id="bDeed">Post a deed. +4 seeds</button>
   <button class="btn" id="bWater">Water.</button>
+  <button class="btn" id="bClear">Start Over.</button>
 </div>
 <div id="timechips"></div>
 <div id="zoomer"><button class="btn" id="zin">+</button><button class="btn" id="zout">&minus;</button></div>
+<img id="canimg" src="garden-watercan.webp" alt="">
+<div id="bflight"></div>
+<div id="confirm"><div class="cbox"><div class="ch">Start over?</div><div class="cb">Every plant returns to your sack as seeds. Deeds, land and waterings stay.</div><div class="crow"><button class="btn" id="cNo">Keep It.</button><button class="btn primary" id="cYes">Clear It.</button></div></div></div>
 <div id="status"></div>
 
 <div id="drawer">
@@ -194,20 +222,21 @@ const seatImg={rose:1,lavender:1,hydrangea:1,peony:1,tulip:1,daffodil:1,delphini
 const today=()=>new Date().toISOString().slice(0,10);
 let S=store.get('garden')||null;
 if(!S){
-  S={deeds:4,bank:8,daily:2,dailyDate:today(),plants:{},pads:{},flags:{}};
-  const pre=['rose','lavender','hydrangea','peony','tulip','daffodil','delphinium','cosmos','rose','peony','tulip','hydrangea','lavender','cosmos','daffodil','delphinium','rose','tulip','peony','hydrangea','delphinium','cosmos','lavender','daffodil','rose','hydrangea','tulip','peony','lavender','cosmos'];
-  const spots=[0,1,2,3,4,5,6,7,10,11,12,13,14,15,16,17,20,21,22,23,24,25,26,27,30,31,32,33,34,35];
-  spots.forEach((p,i)=>S.plants[p]={t:pre[i],d:Date.now()-5*864e5});
+  S={deeds:0,bank:4,plants:{},pads:{},flags:{}};
 }
-if(S.dailyDate!==today()){S.daily=2;S.dailyDate=today()}
+/* older saves (v1 demo dressing or the watering budget builds) reset to a true fresh start */
+if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined){
+  S={deeds:0,bank:4,plants:{},pads:{},flags:{}};
+}
 function save(){store.set('garden',S)}
-const seeds=()=>S.bank+S.daily;
+const seeds=()=>S.bank;
 const planted=()=>Object.keys(S.plants).length;
-function spend(n){let d=Math.min(S.daily,n);S.daily-=d;S.bank-=(n-d);save()}
+const thirsty=()=>Object.values(S.plants).filter(p=>(p.g||0)<2&&p.wd!==today()).length;
+function spend(n){S.bank-=n;save()}
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 
 /* ---------- HUD ---------- */
-function renderHud(){$('#hudSeeds').textContent=seeds();$('#hudDaily').textContent=S.daily+' free today';$('#hudDeeds').textContent=S.deeds;$('#tierchip').textContent='Catalogue tier '+(tierOf(S.deeds)+1)}
+function renderHud(){$('#hudSeeds').textContent=seeds();$('#hudDaily').textContent=planted()?(thirsty()?thirsty()+' to water':'All watered'):'Plant a seed';$('#hudDeeds').textContent=S.deeds;$('#tierchip').textContent='Catalogue tier '+(tierOf(S.deeds)+1)}
 
 /* ---------- time of day ---------- */
 const PHASES=['dawn','day','golden','dusk','night'];
@@ -272,7 +301,7 @@ function parterreSVG(){
 
 /* regions + fixed things */
 const REGIONS=[
- {id:'court',nm:'The Fountain Court',x:1600,y:510,rx:400,ry:215,need:()=>planted()>=32,lock:'Opens when the parterre is 32 of 40 planted'},
+ {id:'court',nm:'The Fountain Court',x:1600,y:510,rx:400,ry:215,need:()=>S.deeds>=10,lock:'Opens at 10 deeds'},
  {id:'lake',nm:'The Lake',x:560,y:1450,rx:430,ry:330,need:()=>false,lock:'Opens beyond the fountain court'},
  {id:'maze',nm:'The Maze',x:2620,y:520,rx:380,ry:300,need:()=>false,lock:'Opens beyond the fountain court'},
  {id:'glass',nm:'The Glasshouse',x:520,y:470,rx:400,ry:280,need:()=>false,lock:'Opens beyond the fountain court'},
@@ -317,8 +346,8 @@ function build(){
   sizeFireflies();
   applyPhase();
 }
-function growth(p){const d=(Date.now()-p.d)/864e5+(p.w||0);return d>=2?1:d>=.9?.78:.5}
-function renderPlants(){
+function growth(p){const d=p.g||0;return d>=2?1:d>=.9?.78:.5}
+function renderPlants(){paintWet();
   const P=$('#plantimgs');let s='';
   Object.entries(S.plants).forEach(([plot,p])=>{const [x,y]=bedWorld(+plot);const w=Math.min(200,bedSize(+plot)*1.28)*growth(p);
     s+=`<img class="bedimg sway" src="garden-${CAT[p.t].img}-map.webp" style="left:${(x-w/2)|0}px;top:${(y-w*0.66)|0}px;width:${w|0}px;animation-delay:${(plot*.37%3).toFixed(2)}s" alt="">`});
@@ -335,12 +364,12 @@ function renderMists(){
 
 /* ---------- pan + zoom ---------- */
 const vp=$('#vp'),world=$('#world');
-let vx=-(PX-innerWidth/2),vy=-(PY-innerHeight/2),vz=Math.min(1,innerWidth<700?.6:.85);
+let vz=Math.min(1,innerWidth<700?.6:.85),vx=innerWidth/2-PX*vz,vy=innerHeight/2-PY*vz;
 function apply(){vx=clamp(vx,innerWidth-W*vz,0);vy=clamp(vy,innerHeight-H*vz,0);world.style.transform=`translate(${vx}px,${vy}px) scale(${vz})`}
 apply();
 let dragging=false,lx=0,ly=0,moved=0;
 vp.addEventListener('pointerdown',e=>{dragging=true;moved=0;lx=e.clientX;ly=e.clientY;vp.classList.add('drag');try{vp.setPointerCapture(e.pointerId)}catch(err){}});
-vp.addEventListener('pointermove',e=>{if(!dragging)return;vx+=e.clientX-lx;vy+=e.clientY-ly;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;apply()});
+vp.addEventListener('pointermove',e=>{if(CANON&&POURING)return;if(!dragging)return;vx+=e.clientX-lx;vy+=e.clientY-ly;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;apply()});
 vp.addEventListener('pointerup',()=>{dragging=false;vp.classList.remove('drag')});
 vp.addEventListener('wheel',e=>{e.preventDefault();const z=clamp(vz*(e.deltaY<0?1.1:.9),.4,1.6);zoomAt(e.clientX,e.clientY,z)},{passive:false});
 function zoomAt(cx,cy,z){const wx=(cx-vx)/vz,wy=(cy-vy)/vz;vz=z;vx=cx-wx*vz;vy=cy-wy*vz;apply()}
@@ -350,7 +379,7 @@ addEventListener('resize',apply);
 
 /* ---------- planting ---------- */
 let curPlot=-1;
-function onBed(plot){if(moved>8)return;const p=S.plants[plot];if(p){openSeat(plot);return}openDrawer(plot)}
+function onBed(plot){if(CANON||Date.now()-lastWater<450)return;if(moved>8)return;const p=S.plants[plot];if(p){openSeat(plot);return}openDrawer(plot)}
 function openDrawer(plot){curPlot=plot;const t=tierOf(S.deeds);
   $('#dMicro').textContent='Bed '+(plot+1)+' · '+seeds()+' seeds in hand';
   let s='';Object.entries(CAT).forEach(([id,c])=>{if(c.kind!=='flower')return;const locked=c.tier>t;
@@ -358,8 +387,8 @@ function openDrawer(plot){curPlot=plot;const t=tierOf(S.deeds);
   $('#packets').innerHTML=s;
   document.querySelectorAll('.pk').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.id;const c=CAT[id];
     if(b.classList.contains('locked')){toast('Opens at '+TIERS[c.tier]+' deeds.');return}
-    if(seeds()<c.price){toast('Not enough seeds. Post a deed, ten more arrive.');return}
-    spend(c.price);S.plants[curPlot]={t:id,d:Date.now()};save();closeDrawer();renderPlants();renderHud();toast('Planted. '+c.n+' in bed '+(curPlot+1)+'.');
+    if(seeds()<c.price){toast('Not enough seeds. Post a deed, four more arrive.');return}
+    spend(c.price);S.plants[curPlot]={t:id,g:0};save();closeDrawer();renderPlants();renderHud();toast('Planted. '+c.n+' in bed '+(curPlot+1)+'.');
     checkUnlocks();
   }));
   $('#drawer').classList.add('on');
@@ -375,8 +404,36 @@ function checkUnlocks(){
 }
 
 /* ---------- actions ---------- */
-$('#bDeed').addEventListener('click',()=>{S.deeds++;S.bank+=10;save();renderHud();toast('Deed '+S.deeds+'. Ten seeds.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
-$('#bWater').addEventListener('click',()=>{const k=today();if(S.flags['w_'+k]){toast('Already watered today. It grows either way.');return}S.flags['w_'+k]=1;Object.values(S.plants).forEach(p=>p.w=(p.w||0)+1);save();renderPlants();toast('Watered. A day faster.')});
+$('#bDeed').addEventListener('click',()=>{S.deeds++;S.bank+=4;save();renderHud();checkUnlocks();toast('Deed '+S.deeds+'. Four seeds.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
+let CANON=false,POURING=false,lastWater=0;
+function canMove(x,y){CANX=x;CANY=y;const c=$('#canimg');c.style.left=(x-12)+'px';c.style.top=(y-26)+'px'}
+function canOff(){CANON=false;POURING=false;showerOff();$('#bWater').classList.remove('on');const c=$('#canimg');c.classList.remove('pour');c.style.display='none'}
+$('#bWater').addEventListener('click',()=>{
+  if(CANON){canOff();return}
+  if(!planted()){toast('Nothing planted yet.');return}
+  if(!thirsty()){toast('Everything is watered. Come back tomorrow.');return}
+  CANON=true;$('#bWater').classList.add('on');const c=$('#canimg');c.style.display='block';canMove(innerWidth/2,innerHeight/2);
+  toast('Tap a bed to water it. Drag to pour.')});
+function splash(x,y,n){n=n||6;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='drop';const sz=4+Math.random()*5;s.style.width=sz+'px';s.style.height=sz+'px';s.style.left=(x+Math.random()*26-13)+'px';s.style.top=(y-6+Math.random()*10)+'px';s.style.setProperty('--dx',(Math.random()*52-26)+'px');s.style.setProperty('--dy',(38+Math.random()*30)+'px');s.style.animationDelay=(Math.random()*.08)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),750)}}
+let CANX=0,CANY=0,SHOWER=null;
+function showerOn(){if(SHOWER)return;SHOWER=setInterval(()=>splash(CANX,CANY,3),80)}
+function showerOff(){clearInterval(SHOWER);SHOWER=null}
+function paintWet(){const k=today();document.querySelectorAll('.bed').forEach(el=>{const p=S.plants[+el.dataset.plot];el.classList.toggle('wet',!!(p&&p.wd===k))})}
+function waterAt(x,y){const el=document.elementFromPoint(x,y);const bed=el&&el.closest?el.closest('.bed'):null;if(!bed)return;
+  const p=S.plants[+bed.dataset.plot];if(!p)return;const k=today();if(p.wd===k||(p.g||0)>=2)return;
+  p.g=Math.min(2,(p.g||0)+1);p.wd=k;lastWater=Date.now();save();renderPlants();renderHud();splash(x,y);
+  if(!thirsty()){canOff();celebrate();toast('The garden is watered.')}}
+function celebrate(){const F=$('#bflight');const kinds=[['garden-bf-blue-open.webp','garden-bf-blue-closed.webp'],['garden-bf-ivory-open.webp','garden-bf-ivory-closed.webp'],['garden-bf-amber-open.webp','garden-bf-amber-open.webp']];
+for(let i=0;i<9;i++){const k=kinds[i%3];const im=document.createElement('img');im.className='bfy';im.src=k[0];
+im.style.left=(10+Math.random()*76)+'%';im.style.top=(42+Math.random()*38)+'%';im.style.width=(36+Math.random()*30)+'px';
+im.style.setProperty('--fx',(Math.random()*160-80)+'px');im.style.animationDelay=(Math.random()*.5)+'s';
+let f=0;const iv=setInterval(()=>{f^=1;im.src=k[f]},140);F.appendChild(im);setTimeout(()=>{clearInterval(iv);im.remove()},4200)}}
+vp.addEventListener('pointerdown',e=>{if(!CANON)return;canMove(e.clientX,e.clientY);const el=document.elementFromPoint(e.clientX,e.clientY);if(!(el&&el.closest&&el.closest('.bed')))return;e.preventDefault();POURING=true;$('#canimg').classList.add('pour');showerOn();waterAt(e.clientX,e.clientY)});
+vp.addEventListener('pointermove',e=>{if(!CANON)return;canMove(e.clientX,e.clientY);if(POURING)waterAt(e.clientX,e.clientY)});
+vp.addEventListener('pointerup',()=>{if(CANON){POURING=false;$('#canimg').classList.remove('pour');showerOff()}});
+$('#bClear').addEventListener('click',()=>{if(!planted()){toast('Nothing planted yet.');return}$('#confirm').classList.add('on')});
+$('#cNo').addEventListener('click',()=>$('#confirm').classList.remove('on'));
+$('#cYes').addEventListener('click',()=>{let back=0;Object.values(S.plants).forEach(p=>{back+=(CAT[p.t]&&CAT[p.t].price)||1});S.plants={};S.pads={};S.bank+=back;save();renderPlants();renderHud();$('#confirm').classList.remove('on');toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')});
 
 /* ---------- time chips ---------- */
 const chipsBox=$('#timechips');
