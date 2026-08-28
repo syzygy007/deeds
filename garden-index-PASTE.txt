@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DEEDS. The Garden</title>
 <meta name="description" content="Your profile is a garden. Every deed sows it.">
+<meta property="og:title" content="Come see my garden.">
+<meta property="og:description" content="Grown one good deed at a time.">
+<meta property="og:image" content="https://deeds.fun/garden-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://deeds.fun/garden/">
+<meta property="og:site_name" content="DEEDS.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://deeds.fun/garden-og.jpg">
 <style>
 :root{--ivory:#F6F3EB;--paper:#EFE9DA;--ink:#15130E;--forest:#1F4B3A;--sage:#A0B0A4;--gold:#BE9A4E;--hair:rgba(21,19,14,.14)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
