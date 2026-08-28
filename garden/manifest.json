@@ -1,0 +1,302 @@
+{
+"rose-map": {
+"f": "garden-rose-map.webp",
+"w": 797,
+"h": 900,
+"kb": 190
+},
+"peony-map": {
+"f": "garden-peony-map.webp",
+"w": 822,
+"h": 900,
+"kb": 168
+},
+"hydrangea-map": {
+"f": "garden-hydrangea-map.webp",
+"w": 900,
+"h": 845,
+"kb": 209
+},
+"tulip-map": {
+"f": "garden-tulip-map.webp",
+"w": 900,
+"h": 649,
+"kb": 126
+},
+"daffodil-map": {
+"f": "garden-daffodil-map.webp",
+"w": 900,
+"h": 597,
+"kb": 142
+},
+"lavender-map": {
+"f": "garden-lavender-map.webp",
+"w": 883,
+"h": 900,
+"kb": 327
+},
+"cosmos-map": {
+"f": "garden-cosmos-map.webp",
+"w": 900,
+"h": 601,
+"kb": 206
+},
+"delphinium-map": {
+"f": "garden-delphinium-map.webp",
+"w": 900,
+"h": 633,
+"kb": 152
+},
+"hyacinth-map": {
+"f": "garden-hyacinth-map.webp",
+"w": 900,
+"h": 614,
+"kb": 151
+},
+"apple-map": {
+"f": "garden-apple-map.webp",
+"w": 866,
+"h": 900,
+"kb": 345
+},
+"willow-map": {
+"f": "garden-willow-map.webp",
+"w": 857,
+"h": 900,
+"kb": 388
+},
+"golden-map": {
+"f": "garden-golden-map.webp",
+"w": 900,
+"h": 639,
+"kb": 95
+},
+"arch-map": {
+"f": "garden-arch-map.webp",
+"w": 650,
+"h": 900,
+"kb": 171
+},
+"bench-map": {
+"f": "garden-bench-map.webp",
+"w": 900,
+"h": 654,
+"kb": 99
+},
+"birdbath-map": {
+"f": "garden-birdbath-map.webp",
+"w": 670,
+"h": 849,
+"kb": 75
+},
+"bridge-map": {
+"f": "garden-bridge-map.webp",
+"w": 900,
+"h": 621,
+"kb": 104
+},
+"fountain-map": {
+"f": "garden-fountain-map.webp",
+"w": 900,
+"h": 665,
+"kb": 121
+},
+"glasshouse-map": {
+"f": "garden-glasshouse-map.webp",
+"w": 900,
+"h": 734,
+"kb": 173
+},
+"curvedbench-map": {
+"f": "garden-curvedbench-map.webp",
+"w": 900,
+"h": 488,
+"kb": 90
+},
+"sundial-map": {
+"f": "garden-sundial-map.webp",
+"w": 542,
+"h": 868,
+"kb": 83
+},
+"pond-map": {
+"f": "garden-pond-map.webp",
+"w": 900,
+"h": 598,
+"kb": 119
+},
+"maze-map": {
+"f": "garden-maze-map.webp",
+"w": 900,
+"h": 595,
+"kb": 148
+},
+"pergola-map": {
+"f": "garden-pergola-map.webp",
+"w": 900,
+"h": 610,
+"kb": 94
+},
+"gazebo-map": {
+"f": "garden-gazebo-map.webp",
+"w": 900,
+"h": 639,
+"kb": 95
+},
+"apiary-map": {
+"f": "garden-apiary-map.webp",
+"w": 900,
+"h": 621,
+"kb": 104
+},
+"rose-seat": {
+"f": "garden-rose-seat.webp",
+"w": 1377,
+"h": 1359,
+"kb": 372
+},
+"peony-seat": {
+"f": "garden-peony-seat.webp",
+"w": 1129,
+"h": 1259,
+"kb": 245
+},
+"hydrangea-seat": {
+"f": "garden-hydrangea-seat.webp",
+"w": 1337,
+"h": 1400,
+"kb": 413
+},
+"tulip-seat": {
+"f": "garden-tulip-seat.webp",
+"w": 1137,
+"h": 1358,
+"kb": 195
+},
+"daffodil-seat": {
+"f": "garden-daffodil-seat.webp",
+"w": 1153,
+"h": 1379,
+"kb": 227
+},
+"lavender-seat": {
+"f": "garden-lavender-seat.webp",
+"w": 1181,
+"h": 1373,
+"kb": 387
+},
+"cosmos-seat": {
+"f": "garden-cosmos-seat.webp",
+"w": 1128,
+"h": 1400,
+"kb": 534
+},
+"delphinium-seat": {
+"f": "garden-delphinium-seat.webp",
+"w": 1202,
+"h": 1400,
+"kb": 502
+},
+"fountain-seat": {
+"f": "garden-fountain-seat.webp",
+"w": 1413,
+"h": 836,
+"kb": 189
+},
+"benchedge-seat": {
+"f": "garden-benchedge-seat.webp",
+"w": 1380,
+"h": 977,
+"kb": 198
+},
+"overhang-left": {
+"f": "garden-overhang-left.webp",
+"w": 1065,
+"h": 747,
+"kb": 132
+},
+"overhang-right": {
+"f": "garden-overhang-right.webp",
+"w": 1210,
+"h": 882,
+"kb": 151
+},
+"lantern-day": {
+"f": "garden-lantern-day.webp",
+"w": 222,
+"h": 1300,
+"kb": 46
+},
+"lantern-lit": {
+"f": "garden-lantern-lit.webp",
+"w": 214,
+"h": 1300,
+"kb": 44
+},
+"bf-blue-open": {
+"f": "garden-bf-blue-open.webp",
+"w": 560,
+"h": 360,
+"kb": 50
+},
+"bf-blue-closed": {
+"f": "garden-bf-blue-closed.webp",
+"w": 500,
+"h": 560,
+"kb": 62
+},
+"bf-ivory-open": {
+"f": "garden-bf-ivory-open.webp",
+"w": 560,
+"h": 452,
+"kb": 56
+},
+"bf-ivory-closed": {
+"f": "garden-bf-ivory-closed.webp",
+"w": 560,
+"h": 540,
+"kb": 54
+},
+"bf-amber-open": {
+"f": "garden-bf-amber-open.webp",
+"w": 560,
+"h": 400,
+"kb": 50
+},
+"bee": {
+"f": "garden-bee.webp",
+"w": 420,
+"h": 411,
+"kb": 41
+},
+"watercan": {
+"f": "garden-watercan.webp",
+"w": 480,
+"h": 339,
+"kb": 25
+},
+"sack": {
+"f": "garden-sack.webp",
+"w": 440,
+"h": 480,
+"kb": 57
+},
+"seeds": {
+"f": "garden-seeds.webp",
+"w": 480,
+"h": 321,
+"kb": 22
+},
+"packet": {
+"f": "garden-packet.webp",
+"w": 675,
+"h": 900,
+"kb": 43
+},
+"climb-map": {
+"f": "garden-climb-map.webp",
+"w": 596,
+"h": 900,
+"kb": 176
+}
+}
