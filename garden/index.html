@@ -244,7 +244,12 @@ button{font:inherit;cursor:pointer}
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
-const TESTING=true; /* LAUNCH FLIP: set false to restore one watering per plant per day */
+const TESTING=true; /* DEMO ONLY (signed out): unlimited watering for the local sample. Signed in, the server rules: one watering per plant per day, admins free */
+const SB_URL='https://helqqdygwaihrliglbvw.supabase.co',SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
+let sb=null,LIVE=false,ADMIN=false,ME=null,HYDRATED=false;
+const freeWater=()=>LIVE?ADMIN:TESTING;
+const APP='../';
+function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 42 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function rng(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
 let toastT;function toast(m){const t=$('#status');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800)}
@@ -299,11 +304,11 @@ const sackTotal=()=>Object.values(S.sack).reduce((a,b)=>a+b,0);
 function save(){S.bank=sackTotal();store.set('garden',S)} /* bank mirrors the sack so the profile door keeps its seed count */
 const seeds=sackTotal;
 const planted=()=>Object.keys(S.plants).length;
-const thirsty=()=>Object.values(S.plants).filter(p=>(p.g||0)<2&&(TESTING||p.wd!==today())).length;
+const thirsty=()=>Object.values(S.plants).filter(p=>(p.g||0)<2&&(freeWater()||p.wd!==today())).length;
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 
 /* ---------- HUD ---------- */
-function renderHud(){$('#hudCoins').textContent=S.coins;$('#hudSeeds').textContent=sackTotal();$('#hudSack').textContent=SOW?'Sowing':'Seeds';$('#hudDeeds').textContent=S.deeds;const th=planted()?thirsty():0;$('#bWater').textContent=th?'Water. '+th+' thirsty':'Water.'}
+function renderHud(){$('#bDeed').innerHTML=LIVE?'Log a deed. +'+DEED_PAY+' <img class="dc" src="garden-coin.webp" alt="Deedcoins">':'Post a deed. +'+DEED_PAY+' <img class="dc" src="garden-coin.webp" alt="Deedcoins">';$('#hudCoins').textContent=S.coins;$('#hudSeeds').textContent=sackTotal();$('#hudSack').textContent=SOW?'Sowing':'Seeds';$('#hudDeeds').textContent=S.deeds;const th=planted()?thirsty():0;$('#bWater').textContent=th?'Water. '+th+' thirsty':'Water.'}
 
 /* ---------- time of day ---------- */
 const PHASES=['dawn','day','golden','dusk','night'];
@@ -458,7 +463,7 @@ function openDrawer(plot,mode){curPlot=plot;DMODE=mode||(sackTotal()>0?'sack':'s
 function renderDrawer(){const t=tierOf(S.deeds);const sack=DMODE==='sack',store=DMODE==='store';const sh=$('#drawer .sheet');
   sh.classList.toggle('store',store);sh.classList.toggle('coins',store);sh.classList.toggle('body',DMODE==='purse'||DMODE==='send');
   $('#dAlt').textContent=ALTLBL[DMODE];
-  if(DMODE==='purse'){$('#dTitle').innerHTML='Your purse<span>.</span>';$('#dMicro').textContent=S.coins+' Deedcoins \u00B7 '+sendable()+' sendable';$('#dNote').textContent='Deed earned coins can travel. The starter 100 stays home. A sent gift waits here, sealed, until it is opened.';renderPurse();return}
+  if(DMODE==='purse'){$('#dTitle').innerHTML='Your purse<span>.</span>';$('#dMicro').textContent=S.coins+' Deedcoins \u00B7 '+sendable()+' sendable';$('#dAlt').textContent=LIVE?'Send Deedcoins.':'Send a gift.';$('#dNote').textContent=LIVE?'Deed earned coins can travel inside a note. Sending happens on DEEDS: tap the coin in the top bar. A sent gift waits here, sealed, until it is opened.':'Deed earned coins can travel. The starter 100 stays home. A sent gift waits here, sealed, until it is opened.';renderPurse();return}
   if(DMODE==='send'){$('#dTitle').innerHTML='Send a gift<span>.</span>';$('#dMicro').textContent=sendable()+' Deedcoins sendable \u00B7 '+plural(sackTotal(),'seed')+' in the sack';$('#dNote').textContent='A gift leaves your purse the moment you send it and waits, sealed, until it is opened. Take it back any time before that.';renderSend();return}
   $('#dTitle').innerHTML=sack?'Your seed sack<span>.</span>':'Seed store<span>.</span>';
   $('#dMicro').textContent=sack?((curPlot>=0?'Bed '+(curPlot+1)+' \u00B7 ':'')+plural(sackTotal(),'seed')+' \u00B7 '+S.coins+' Deedcoins'):(S.coins+' Deedcoins \u00B7 every seed is 50');
@@ -471,10 +476,15 @@ function renderDrawer(){const t=tierOf(S.deeds);const sack=DMODE==='sack',store=
     el.querySelector('.card').addEventListener('click',()=>{if(DMODE==='store')buy(id);else pick(id)});
     el.querySelectorAll('.sb').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();if(b.dataset.act==='buy')buy(id);else sell(id)}))});
 }
+let BUSY=false;
 function buy(id){const c=CAT[id];if(c.tier>tierOf(S.deeds)){toast('Opens at '+TIERS[c.tier]+' deeds.');return}
-  if(S.coins<c.price){toast('Not enough Deedcoins. Post a deed, '+DEED_PAY+' arrive.');return}
+  if(S.coins<c.price){toast('Not enough Deedcoins. '+(LIVE?'Log a deed, ':'Post a deed, ')+DEED_PAY+' arrive.');return}
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_buy',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message)?'Not enough Deedcoins.':/locked/.test(r.error.message)?'Opens at '+TIERS[c.tier]+' deeds.':null));return}
+    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;ledger(c.n+' seeds',-c.price,'seed store');save();renderDrawer();renderHud();toast(c.n+' seeds in the sack. '+c.price+' Deedcoins.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
   S.coins-=c.price;S.sack[id]=(S.sack[id]||0)+1;ledger(c.n+' seeds',-c.price,'seed store');save();renderDrawer();renderHud();toast(c.n+' seeds in the sack. '+c.price+' Deedcoins.')}
 function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to sell.');return}
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
+    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');if(SOW===id&&!S.sack[id])sowStop();save();renderDrawer();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
   S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');if(SOW===id&&!S.sack[id])sowStop();save();renderDrawer();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
 function pick(id){const c=CAT[id];if(!(S.sack[id]>0)){toast('No '+c.n.toLowerCase()+' seeds in the sack.');return}
   closeDrawer();sowStart(id);if(curPlot>=0&&!S.plants[curPlot])sowAt(curPlot)}
@@ -483,14 +493,16 @@ function sowCount(){const n=S.sack[SOW]||0;$('#sowCt').textContent=plural(n,'see
 function sowStop(msg){SOW=null;$('#sowchip').classList.remove('on');$('#bSack').classList.remove('on');renderHud();if(msg)toast(msg)}
 function sowAt(plot){const id=SOW,c=CAT[id];if(S.plants[plot]){toast('Bed '+(plot+1)+' is taken.');return}
   if(!(S.sack[id]>0)){sowStop('Out of '+c.n.toLowerCase()+' seeds.');return}
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.plants[plot]={t:id,g:0};save();renderPlants();renderHud();
+  if(LIVE&&!S.plants[plot]){S.plants[plot]={t:id,g:0,pending:1};sb.rpc('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();renderPlants();renderHud();if(SOW===id)sowCount();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();renderPlants();renderHud()})}
+  else S.plants[plot]={t:id,g:0};
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();renderPlants();renderHud();
   const left=S.sack[id]||0;
   if(left){sowCount();toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+plural(left,'seed')+' left.')}
   else sowStop('Sown. '+c.n+' in bed '+(plot+1)+'. That was the last '+c.n.toLowerCase()+' seed.')}
 $('#sowDone').addEventListener('click',()=>sowStop('Seeds put away.'));
 $('#bSack').addEventListener('click',()=>openDrawer(-1));
 $('#bPurse').addEventListener('click',()=>openDrawer(-1,'purse'));
-$('#dAlt').addEventListener('click',()=>{DMODE=NEXTMODE[DMODE];renderDrawer()});
+$('#dAlt').addEventListener('click',()=>{if(LIVE&&DMODE==='purse'){location.href=APP+'?send='+Math.max(1,Math.min(50,sendable()||50));return}DMODE=NEXTMODE[DMODE];renderDrawer()});
 
 /* ---------- the purse: ledger, gifts, send ---------- */
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -527,7 +539,10 @@ function doSend(){const to=cleanHandle($('#sendTo').value);if(!to){toast('Who is
   else{const c=CAT[g.type];if(!c||g.n<1||!(S.sack[g.type]>=g.n)){toast('Not enough seeds in the sack.');return}S.sack[g.type]-=g.n;if(!S.sack[g.type])delete S.sack[g.type];if(SOW===g.type&&!S.sack[g.type])sowStop();const r={t:Date.now(),l:'Sent '+giftLine(g)+' to @'+to,a:0,w:viaLine(g),u:'seeds',n:-g.n};S.ledger.unshift(r)}
   S.gifts.unshift(g);SEND.to='';save();renderHud();closeDrawer();
   toast(giftLine(g)+(g.via==='note'?' sealed for @'+to+'. It lands when the note is opened.':' hidden in an artifact for @'+to+'. It lands when it is opened.'))}
-function takeBack(id){const i=S.gifts.findIndex(g=>g.id===id);if(i<0)return;const g=S.gifts[i];S.gifts.splice(i,1);
+function takeBack(id){const i=S.gifts.findIndex(g=>g.id===id);if(i<0)return;const g=S.gifts[i];
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('coin_return',{p_note:String(g.note)}).then(r=>{BUSY=false;const d=r.data;if(r.error||!d||!d.ok){toast(rpcFail(r.error,d&&d.reason==='opened'?'Too late. It was opened.':'That gift could not come back.'));if(d&&d.reason)S.gifts.splice(i,1);renderDrawer();return}
+    S.gifts.splice(i,1);S.coins=+d.balance;S.sent=Math.max(0,S.sent-g.n);ledger('Took back from @'+g.to,g.n,'unopened');save();renderDrawer();renderHud();toast('Taken back. Nothing was opened.')}).catch(()=>{BUSY=false});return}
+  S.gifts.splice(i,1);
   if(g.what==='coins'){S.coins+=g.n;S.sent=Math.max(0,S.sent-g.n);ledger('Took back from @'+g.to,g.n,'unopened')}
   else{S.sack[g.type]=(S.sack[g.type]||0)+g.n;S.ledger.unshift({t:Date.now(),l:'Took back '+giftLine(g)+' from @'+g.to,a:0,w:'unopened',u:'seeds',n:g.n});if(SOW)sowCount()}
   save();renderDrawer();renderHud();toast('Taken back. Nothing was opened.')}
@@ -542,7 +557,7 @@ function checkUnlocks(){
 }
 
 /* ---------- actions ---------- */
-$('#bDeed').addEventListener('click',()=>{S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'earned');save();renderHud();checkUnlocks();toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
+$('#bDeed').addEventListener('click',()=>{if(LIVE){location.href=APP+'?log=1';return}S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'earned');save();renderHud();checkUnlocks();toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins.');const t=TIERS.indexOf(S.deeds);if(t>0)setTimeout(()=>toast('Catalogue tier '+(t+1)+' opens.'),1400)});
 let CANON=false,POURING=false,lastWater=0;
 function canMove(x,y){CANX=x;CANY=y;const c=$('#canimg');c.style.left=(x-12)+'px';c.style.top=(y-26)+'px'}
 function canOff(){CANON=false;POURING=false;showerOff();$('#bWater').classList.remove('on');const c=$('#canimg');c.classList.remove('pour');c.style.display='none'}
@@ -558,7 +573,8 @@ function showerOn(){if(SHOWER)return;SHOWER=setInterval(()=>splash(CANX,CANY,3),
 function showerOff(){clearInterval(SHOWER);SHOWER=null}
 function paintWet(){const k=today();document.querySelectorAll('.bed').forEach(el=>{const p=S.plants[+el.dataset.plot];el.classList.toggle('wet',!!(p&&p.wd===k))})}
 function waterAt(x,y){const el=document.elementFromPoint(x,y);const bed=el&&el.closest?el.closest('.bed'):null;if(!bed)return;
-  const p=S.plants[+bed.dataset.plot];if(!p)return;const k=today();if((p.g||0)>=2||(!TESTING&&p.wd===k))return;
+  const p=S.plants[+bed.dataset.plot];if(!p||p.pending)return;const k=today();if((p.g||0)>=2||(!freeWater()&&p.wd===k))return;
+  if(LIVE){const plot=+bed.dataset.plot,g0=p.g||0,wd0=p.wd;sb.rpc('garden_water',{p_plot:plot,p_day:k}).then(r=>{const d=r.data;if(r.error||!d||!d.ok){if(r.error)toast(rpcFail(r.error,'The water did not reach bed '+(plot+1)+'.'));if(d&&d.reason==='watered'){p.wd=k;renderPlants();renderHud()}else if(r.error){p.g=g0;p.wd=wd0;renderPlants();renderHud()}return}p.g=+d.g;p.wd=k;save();renderPlants();renderHud()}).catch(()=>{})}
   p.g=Math.min(2,(p.g||0)+1);p.wd=k;lastWater=Date.now();save();renderPlants();renderHud();splash(x,y);
   if(!thirsty()){canOff();celebrate();toast('The garden is watered.')}}
 function celebrate(){const F=$('#bflight');const kinds=[['garden-bf-blue-open.webp','garden-bf-blue-closed.webp'],['garden-bf-ivory-open.webp','garden-bf-ivory-closed.webp'],['garden-bf-amber-open.webp','garden-bf-amber-open.webp']];
@@ -572,7 +588,9 @@ vp.addEventListener('pointerup',e=>{if(CANON){POURING=false;$('#canimg').classLi
 if(moved<=8){const el=document.elementFromPoint(e.clientX,e.clientY);const bed=el&&el.closest?el.closest('.bed'):null;if(bed)onBed(+bed.dataset.plot)}});
 $('#bClear').addEventListener('click',()=>{if(!planted()){toast('Nothing planted yet.');return}$('#confirm').classList.add('on')});
 $('#cNo').addEventListener('click',()=>$('#confirm').classList.remove('on'));
-$('#cYes').addEventListener('click',()=>{let back=0;Object.values(S.plants).forEach(p=>{const id=CAT[p.t]?p.t:'rose';S.sack[id]=(S.sack[id]||0)+1;back++});S.plants={};S.pads={};save();if(SOW)sowCount();renderPlants();renderHud();$('#confirm').classList.remove('on');toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')});
+function clearLocal(){let back=0;Object.values(S.plants).forEach(p=>{const id=CAT[p.t]?p.t:'rose';S.sack[id]=(S.sack[id]||0)+1;back++});S.plants={};S.pads={};save();if(SOW)sowCount();renderPlants();renderHud();$('#confirm').classList.remove('on');return back}
+$('#cYes').addEventListener('click',()=>{if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('garden_clear').then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The garden did not clear.'));$('#confirm').classList.remove('on');return}const back=clearLocal();toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')}).catch(()=>{BUSY=false});return}
+  let back=clearLocal();toast(back+(back===1?' seed is':' seeds are')+' back in the sack. Plant it your way.')});
 
 /* ---------- time chips ---------- */
 const chipsBox=$('#timechips');
@@ -655,9 +673,24 @@ function mStop(){AU.pause();S.flags.music=0;save();$('#bMusic').classList.remove
 $('#bMusic').addEventListener('click',()=>{if(S.flags.music){mStop();return}S.flags.music=1;save();$('#bMusic').classList.add('on');mPlay()});
 if(S.flags&&S.flags.music){$('#bMusic').classList.add('on');const arm=()=>{document.removeEventListener('pointerdown',arm);if(S.flags.music)mPlay()};document.addEventListener('pointerdown',arm)}
 
+/* ---------- live: the ledger is the truth for signed in members ---------- */
+const KINDW={starter:'the purse opens',deed:'earned',buy:'seed store',sell:'seed store',send:'sent',receive:'a gift',return:'unopened',adjust:''};
+function hydrate(d){LIVE=true;ADMIN=!!d.admin;
+  (d.catalog||[]).forEach(c=>{if(CAT[c.t]){CAT[c.t].price=+c.price;CAT[c.t].tier=Math.max(0,TIERS.indexOf(+c.min_deeds))}});
+  S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
+  S.plants={};(d.plots||[]).forEach(p=>{if(CAT[p.t])S.plants[p.plot]={t:p.t,g:+p.g||0,wd:p.wd||undefined}});
+  S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
+  S.gifts=(d.purses_out||[]).map(p=>({id:'p'+p.id,note:p.note_id,to:p.to||'a member',what:'coins',n:+p.amount,via:p.kind==='artifact'?'artifact':'note',t:p.at?new Date(p.at).getTime():Date.now()}));
+  HYDRATED=true;save();renderPlants();renderMists();renderHud();if(SOW&&!S.sack[SOW])sowStop();if($('#drawer').classList.contains('on'))renderDrawer()}
+function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
+  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
+    return sb.rpc('garden_state').then(r2=>{if(r2.error){toast(rpcFail(r2.error,'The garden could not load your purse.'));return}hydrate(r2.data||{});
+      try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if($('#drawer').classList.contains('on'))renderDrawer()}).subscribe()}catch(e){}})}).catch(()=>{})}
+(function(){const c=document.createElement('script');c.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';c.onload=goLive;c.onerror=()=>{};document.head.appendChild(c)})();
+
 /* boot */
 build();renderHud();
-if(!S.flags.hello){S.flags.hello=1;save();setTimeout(()=>toast('Your garden. Tap the sack to buy seeds, then tap an empty bed to sow.'),700)}
+if(!S.flags.hello){S.flags.hello=1;save();setTimeout(()=>toast(LIVE?'Your garden. Tap the sack to buy seeds, then tap an empty bed to sow.':'Your garden. Sign in on DEEDS to keep it and earn Deedcoins.'),900)}
 })();
 </script>
 </body>
