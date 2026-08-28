@@ -178,6 +178,9 @@ button{font:inherit;cursor:pointer}
 .seat-ui .chips{display:flex;gap:6px;flex-wrap:wrap;pointer-events:auto}
 .seat-ui .chips .btn{padding:7px 10px;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase}
 .seat-ui .chips .btn.on{background:var(--ivory);color:var(--ink)}
+.seat-ui .r1 .hb{display:flex;gap:8px;align-items:flex-start;flex:0 0 auto}
+#sMusic{padding:9px 13px;font-size:1.05rem;line-height:1}
+#sMusic.on{background:var(--ivory);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.sway{animation:none}}
 #confirm{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(21,19,14,.45);z-index:60;padding:20px}
 #confirm.on{display:flex}
@@ -248,7 +251,7 @@ button{font:inherit;cursor:pointer}
   <div class="seat-ui">
     <div class="r1">
       <div class="t"><div class="micro" id="sMicro">You are sitting in the parterre</div><h3 id="sTitle">Roses<span>.</span></h3><div class="sub" id="sSub"></div></div>
-      <button class="btn" id="sClose">Back.</button>
+      <div class="hb"><button class="btn" id="sMusic" title="Music" aria-label="Music on or off">&#9834;</button><button class="btn" id="sClose">Back.</button></div>
     </div>
     <div class="r2">
       <div class="chips" id="sChips"></div>
@@ -713,15 +716,20 @@ $('#sClose').addEventListener('click',closeSeat);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(seatOpen)closeSeat();else if($('#drawer').classList.contains('on'))closeDrawer();else if(SOW)sowStop('Seeds put away.')}});
 
 /* ---------- music (drop garden-music-N.mp3 into this folder and it plays) ---------- */
-const PLAYLIST=[{f:'garden-music-1.mp3',t:'Morning Mood \u00B7 Grieg'},{f:'garden-music-2.mp3',t:'Spring \u00B7 Vivaldi'}];
+const PLAYLIST=[{f:'garden-music-1.mp3',t:'The Seed Theme'},{f:'garden-music-2.mp3',t:'Birdsong Through the Hedges'},{f:'garden-music-3.mp3',t:'Butterflies in the Sun'},{f:'garden-music-4.mp3',t:'The Garden Gate'},{f:'garden-music-5.mp3',t:'Rain Beneath the Leaves'},{f:'garden-music-6.mp3',t:'Moonlight Among the Flowers'}];
+/* every visit opens with The Seed Theme, then the list plays in order and loops; mute and unmute resume the current song */
 let MTRACK=0,MFAILS=0;const AU=new Audio();AU.volume=.35;
 function mPlay(){AU.src=PLAYLIST[MTRACK].f;AU.play().catch(()=>{})}
 AU.addEventListener('playing',()=>{MFAILS=0;toast(PLAYLIST[MTRACK].t)});
 AU.addEventListener('ended',()=>{MTRACK=(MTRACK+1)%PLAYLIST.length;mPlay()});
 AU.addEventListener('error',()=>{MFAILS++;if(MFAILS>=PLAYLIST.length){mStop();toast('The music arrives with the next drop.');return}MTRACK=(MTRACK+1)%PLAYLIST.length;mPlay()});
-function mStop(){AU.pause();S.flags.music=0;save();$('#bMusic').classList.remove('on')}
-$('#bMusic').addEventListener('click',()=>{if(S.flags.music){mStop();return}S.flags.music=1;save();$('#bMusic').classList.add('on');mPlay()});
-if(S.flags&&S.flags.music){$('#bMusic').classList.add('on');const arm=()=>{document.removeEventListener('pointerdown',arm);if(S.flags.music)mPlay()};document.addEventListener('pointerdown',arm)}
+function paintMusic(){const on=!!S.flags.music;['#bMusic','#sMusic'].forEach(s=>{const b=$(s);b.classList.toggle('on',on);b.title=on?'Music on. Tap to mute':'Music off. Tap to play'})}
+function mStop(){AU.pause();S.flags.music=0;save();paintMusic()}
+function mStart(){S.flags.music=1;save();paintMusic();if(AU.src&&!AU.error&&!AU.ended)AU.play().catch(()=>mPlay());else mPlay()}
+function mToggle(){if(S.flags.music)mStop();else mStart()}
+$('#bMusic').addEventListener('click',mToggle);
+$('#sMusic').addEventListener('click',e=>{e.stopPropagation();mToggle()});
+if(S.flags&&S.flags.music){paintMusic();const arm=()=>{document.removeEventListener('pointerdown',arm);if(S.flags.music)mPlay()};document.addEventListener('pointerdown',arm)}
 
 /* ---------- live: the ledger is the truth for signed in members ---------- */
 const KINDW={starter:'the purse opens',deed:'earned',buy:'seed store',sell:'seed store',send:'sent',receive:'a gift',return:'unopened',adjust:''};
