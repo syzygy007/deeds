@@ -388,6 +388,10 @@ input,textarea{font:inherit;color:var(--ink)}
 [data-go="profile"].newnotes::after{content:'';position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--forest)}
 .bdot{display:none;width:8px;height:8px;border-radius:50%;background:var(--forest);margin-left:7px;flex:none}
 .bell.newalerts .bdot{display:inline-block}
+.dnav .bell,.lnav .bell{display:none!important} /* Aug 28: Alerts left the nav; it is the bell beside Notes */
+.dbell{position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;background:var(--card);transition:border-color .15s}
+.dbell:hover{border-color:var(--ink)}
+.dbell .bdot{position:absolute;top:9px;right:9px;margin:0}
 #mBell{position:relative}
 #mBell .bdot{position:absolute;top:-1px;right:-4px;margin:0}
 .vchk{vertical-align:-2px;margin-left:5px}
@@ -1345,6 +1349,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
     <div class="dright">
       <button class="cbtn hide" id="dCoin" aria-label="Deedcoins" title="Deedcoins."><img src="deedcoin.webp" alt=""><b id="dCoinN"></b></button>
       <button class="dnotes nbtn" id="dNotes" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
+      <button class="bell dbell" id="dBellH" aria-label="Activity" title="Activity."><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg><span class="bdot"></span></button>
       <button class="dlog" id="dLog" aria-label="Log a Deed" title="Log a Deed."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <span class="dsep"></span>
       <button class="dme" id="dMe" aria-haspopup="true" aria-expanded="false"><span class="dav" id="dAv"></span><span class="mono dhandle" id="dHandle"></span><svg class="dchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
