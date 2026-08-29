@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="world-build" content="0.1">
+<title>The Garden · Walk</title>
+<style>
+:root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#0f1a12;font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;color:var(--ivory)}
+canvas{display:block;touch-action:none}
+.micro{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;font-weight:800}
+#hud{position:fixed;inset:0;z-index:20;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
+     padding:max(14px,env(safe-area-inset-top)) 18px max(14px,env(safe-area-inset-bottom))}
+#hud .row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+#hud .row.b{align-items:flex-end}
+.btn{pointer-events:auto;background:rgba(21,19,14,.34);border:1px solid rgba(246,243,235,.75);color:var(--ivory);
+     padding:8px 12px;border-radius:999px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;cursor:pointer}
+.btn.on{background:var(--ivory);color:var(--ink)}
+#place{text-shadow:0 1px 18px rgba(0,0,0,.55)}
+#place h1{margin:.1em 0 0;font-size:clamp(1.5rem,4.4vw,2.6rem);letter-spacing:-.035em;line-height:.95;font-weight:800}
+#place h1 span{color:var(--gold)}
+#hint{opacity:.8;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+#stick{position:fixed;left:0;bottom:0;width:50%;height:46%;z-index:15;touch-action:none}
+#knob{position:absolute;width:104px;height:104px;border-radius:50%;border:1px solid rgba(246,243,235,.45);
+      background:rgba(21,19,14,.18);display:none;transform:translate(-50%,-50%)}
+#knob i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(246,243,235,.72)}
+#load{position:fixed;inset:0;z-index:40;background:#0f1a12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .6s}
+#load .bar{width:min(240px,54vw);height:2px;background:rgba(246,243,235,.2)}
+#load .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
+#load h2{margin:0;font-size:clamp(1.6rem,6vw,2.6rem);letter-spacing:-.04em;font-weight:800}
+#load h2 span{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div id="load"><h2>The Garden<span>.</span></h2><div class="micro" id="lmsg">Opening the gate</div><div class="bar"><i id="lbar"></i></div></div>
+
+<div id="hud">
+  <div class="row">
+    <div id="place"><div class="micro">You are walking in</div><h1 id="area">The Avenue<span>.</span></h1></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button class="btn" id="music">Music</button>
+      <button class="btn" id="back">Leave</button>
+    </div>
+  </div>
+  <div class="row b">
+    <div class="micro" id="hint">Drag left to walk · drag right to look</div>
+    <button class="btn" id="phase">Day</button>
+  </div>
+</div>
+
+<div id="stick"><div id="knob"><i></i></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ======================================================================
+   THE GARDEN · walk test 0.1
+   Reads the same world data as the 2D map: PATCH ground regions, FIXED
+   props with world coordinates, MA size manifest, BEDS parterre plots.
+   Nothing here authors a new map. It stands the existing one up.
+   ====================================================================== */
+const BASE='../';
+function rng(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
+const PATCH=[
+ {cx:1600,cy:510,w:920,h:480,t:'gravel-warm-estate',hard:1},
+ {cx:520,cy:470,w:820,h:560,t:'gravel-warm-estate'},
+ {cx:2680,cy:1420,w:920,h:700,t:'orchard-grass-buttercups'},
+ {cx:760,cy:2060,w:940,h:580,t:'meadow-grass-daisies'},
+ {cx:2520,cy:2000,w:720,h:480,t:'gravel-warm-estate'},
+ {cx:1990,cy:2120,w:520,h:300,t:'mulch-tree-bed'},
+ {cx:290,cy:1180,w:420,h:300,t:'moss-and-stone-bank'},
+ {cx:560,cy:1480,w:840,h:560,t:'lake-water-still',hard:1,water:1},
+ {cx:2850,cy:380,w:560,h:360,t:'orchard-grass-buttercups'},
+];
+const BEDS=[
+  {k:'e',cx:80,cy:80,rx:58,ry:40},{k:'t',cx:198,cy:76,s:66,rot:0},{k:'c',cx:312,cy:78,r:40},
+  {k:'e',cx:100,cy:198,rx:86,ry:46},{k:'c',cx:222,cy:192,r:34},{k:'e',cx:320,cy:204,rx:44,ry:74},
+  {k:'e',cx:62,cy:314,rx:34,ry:52},{k:'c',cx:162,cy:320,r:46},{k:'t',cx:268,cy:318,s:70,rot:180},{k:'c',cx:336,cy:326,r:28}];
+const QT=[[140,140,.825,.825],[860,140,-.825,.825],[140,860,.825,-.825],[860,860,-.825,-.825]];
+const FIXED=[
+ /* the entrance and the avenue */
+ {g:'golden-gate',x:1600,y:2394,w:720},
+ {g:'yew-hedge-straight',x:60,y:2396,w:340},{g:'yew-hedge-straight',x:390,y:2396,w:340},{g:'yew-hedge-straight',x:720,y:2396,w:340},{g:'yew-hedge-straight',x:1050,y:2396,w:340},
+ {g:'yew-hedge-straight',x:2150,y:2396,w:340},{g:'yew-hedge-straight',x:2480,y:2396,w:340},{g:'yew-hedge-straight',x:2810,y:2396,w:340},{g:'yew-hedge-straight',x:3140,y:2396,w:340},
+ {g:'lantern-post-day',x:1400,y:2330,w:66,lant:1},{g:'lantern-post-day',x:1800,y:2330,w:66,lant:1},
+ {g:'cypress-column',x:1470,y:2300,w:84,tree:1},{g:'cypress-column',x:1730,y:2300,w:84,tree:1},
+ {g:'cypress-column',x:1470,y:2190,w:84,tree:1},{g:'cypress-column',x:1730,y:2190,w:84,tree:1},
+ {g:'rose-arch-wood',x:1600,y:2118,w:250},
+ {g:'cypress-column',x:1470,y:2060,w:84,tree:1},{g:'cypress-column',x:1730,y:2060,w:84,tree:1},
+ {g:'cypress-column',x:1470,y:1960,w:84,tree:1},{g:'cypress-column',x:1730,y:1960,w:84,tree:1},
+ {g:'wooden-bench',x:1330,y:2010,w:200},{g:'stone-bench-weathered',x:1870,y:2010,w:200},
+ /* the parterre */
+ {g:'topiary-cone',x:1000,y:722,w:104},{g:'topiary-cone',x:2200,y:722,w:104},{g:'topiary-cone',x:1000,y:1912,w:104},{g:'topiary-cone',x:2200,y:1912,w:104},
+ {g:'yew-hedge-arch-open',x:1600,y:748,w:190},{g:'yew-hedge-arch-open',x:1600,y:1934,w:190},
+ {g:'basin-still',x:1600,y:1336,w:190},
+ /* the fountain court */
+ {g:'statue-figure',x:1600,y:318,w:92},
+ {img:'curvedbench-map',x:1600,y:400,w:300},
+ {g:'urn-tall-pair',x:1230,y:640,w:150},{g:'urn-tall-pair',x:1970,y:640,w:150},
+ {img:'fountain-map',x:1600,y:600,w:330},
+ {g:'lantern-post-day',x:1380,y:604,w:64,lant:1},{g:'lantern-post-day',x:1820,y:604,w:64,lant:1},
+ {g:'balustrade-segment-straight',x:1330,y:712,w:330},{g:'balustrade-segment-straight',x:1870,y:712,w:330},
+ {g:'statue-lion',x:1440,y:706,w:118},{g:'statue-lion',x:1760,y:706,w:118},
+ {g:'stone-steps-wide',x:1600,y:748,w:290},
+ /* the glasshouse */
+ {g:'urn-wide',x:150,y:520,w:130},
+ {g:'glasshouse-map-lit',x:520,y:580,w:600,glow:1},
+ {g:'planter-box-long',x:280,y:700,w:250},{g:'planter-box-long',x:760,y:700,w:250},
+ {g:'orange-tree-potted',x:300,y:770,w:110},{g:'lemon-tree-potted',x:740,y:770,w:110},
+ {g:'topiary-cone',x:420,y:760,w:96},{g:'topiary-cone',x:620,y:760,w:96},
+ /* the maze */
+ {g:'maze-centre-ring',x:2620,y:790,w:700},
+ {g:'topiary-ball',x:2250,y:806,w:130},{g:'topiary-ball',x:2990,y:806,w:130},
+ /* the overlook, under the mist until the Golden Wonder arrives */
+ {g:'stone-circle',x:2850,y:440,w:380},{g:'yew-hedge-arch-gated',x:2850,y:590,w:190},
+ /* the orchard */
+ {g:'dovecote',x:2350,y:1236,w:170},
+ {img:'apple-map',x:2560,y:1330,w:280,tree:1},{g:'pear-tree-blossom',x:2900,y:1300,w:260,tree:1},
+ {img:'apple-map',x:2760,y:1450,w:300,tree:1},{g:'plum-tree-blossom',x:2450,y:1520,w:240,tree:1},
+ {img:'apple-map',x:2600,y:1580,w:270,tree:1},{g:'cherry-tree-blossom',x:2860,y:1600,w:260,tree:1},
+ {g:'beehive-skep',x:2980,y:1500,w:90},{g:'beehive-white-box',x:3040,y:1440,w:80},
+ {g:'wooden-bench',x:2700,y:1710,w:200},
+ /* the lake */
+ {g:'cascade',x:300,y:1250,w:300},
+ {g:'lake-shore-straight',x:600,y:1215,w:520},{g:'lake-shore-curve-right',x:900,y:1340,w:380},
+ {img:'willow-map',x:250,y:1430,w:330,tree:1},
+ {img:'pergola-map',x:930,y:1500,w:250},
+ {g:'lily-pads-group',x:420,y:1500,w:150,flat:1},{g:'lily-pads-group',x:680,y:1420,w:130,flat:1},
+ {g:'rowboat',x:480,y:1560,w:190,flat:1},
+ {g:'jetty',x:720,y:1700,w:320},
+ {g:'reeds',x:300,y:1690,w:120},{g:'water-iris',x:540,y:1740,w:110},{g:'marsh-marigold',x:880,y:1700,w:110},
+ /* the pergola */
+ {g:'trellis-panel',x:2250,y:1900,w:240},{g:'planter-box-square',x:2760,y:1900,w:110},
+ {g:'pergola-section-corner',x:2520,y:2090,w:460},
+ {g:'wisteria-support',x:2300,y:2150,w:150},{g:'swing-seat-bough',x:2790,y:2110,w:260},
+ {g:'lantern-post-day',x:2380,y:2220,w:64,lant:1},{g:'lantern-post-day',x:2660,y:2220,w:64,lant:1},
+ /* the rose garden */
+ {g:'trellis-panel',x:1990,y:1960,w:260},
+ {g:'camellia',x:1780,y:2060,w:110},{g:'hollyhock',x:2200,y:2060,w:100},
+ {g:'pond-edge',x:1990,y:2110,w:240},
+ {g:'rose-obelisk',x:1850,y:2150,w:110},{g:'rose-obelisk',x:2130,y:2150,w:110},
+ {g:'lavender-row',x:1870,y:2240,w:160},{g:'lavender-row',x:2110,y:2240,w:160},
+ /* the meadow */
+ {g:'wildflower-drift',x:450,y:2000,w:170},
+ {img:'gazebo-map',x:700,y:2050,w:300},
+ {img:'birdbath-map',x:840,y:1960,w:110},
+ {img:'hyacinth-map',x:560,y:2040,w:140,sway:1},{img:'hyacinth-map',x:660,y:2160,w:120,sway:1},{img:'hyacinth-map',x:880,y:2060,w:130,sway:1},
+ {img:'apiary-map',x:930,y:2130,w:210},
+ {img:'sundial-map',x:600,y:2180,w:110},
+ {g:'buttercup-drift',x:520,y:2230,w:150},{g:'bluebell-drift',x:1000,y:2210,w:150},
+];
+/* the forest ring: trees along the far and side edges, placed once by seed so every visit matches */
+(function(){const r=rng(19);const kinds=['magnolia-tree-green','apple-map','pear-tree-blossom','magnolia-tree-green','cherry-tree-blossom','apple-map','plum-tree-blossom','magnolia-tree-green'];
+  const put=(x,y,i,big)=>{const k=kinds[i%kinds.length];const e={x:x|0,y:y|0,w:(big?(220+r()*70):(170+r()*50))|0,tree:1};if(k==='apple-map')e.img=k;else e.g=k;FIXED.push(e)};
+  let i=0;for(let x=140;x<3100;x+=230){if(x>1180&&x<2020)continue;/* keep the court clear */if(x>2540&&x<3000)continue;/* the maze and the overlook */put(x+r()*60,225+r()*40,i++,0)}
+  for(let y=300;y<2200;y+=260){put(60+r()*60,y+r()*80,i++,1);put(3110+r()*40,y+r()*80,i++,1)}
+  for(let x=1170;x<2050;x+=110)FIXED.push({g:'cypress-column',x:x|0,y:(272+r()*20)|0,w:58,tree:1});
+})();
+
+
+const MA={"g2-balustrade-segment-straight.webp":[484,0.789],"g2-basin-still.webp":[418,0.756],"g2-beehive-skep.webp":[198,1.298],"g2-beehive-white-box.webp":[176,1.697],"g2-bluebell-drift.webp":[330,0.899],"g2-buttercup-drift.webp":[330,1.032],"g2-camellia.webp":[242,1.053],"g2-cascade.webp":[512,0.901],"g2-cherry-tree-blossom.webp":[400,0.916],"g2-cypress-column.webp":[111,4.238],"g2-dovecote.webp":[248,1.702],"g2-glasshouse-map-lit.webp":[512,0.653],"g2-golden-gate.webp":[512,0.665],"g2-hollyhock.webp":[220,1.613],"g2-jetty.webp":[488,0.929],"g2-lake-shore-curve-right.webp":[512,0.715],"g2-lake-shore-straight.webp":[512,0.668],"g2-lantern-post-day.webp":[98,4.843],"g2-lantern-post-lit.webp":[145,0.806],"g2-lavender-row.webp":[352,0.659],"g2-lemon-tree-potted.webp":[242,1.553],"g2-lily-pads-group.webp":[330,0.645],"g2-marsh-marigold.webp":[242,1.107],"g2-maze-centre-ring.webp":[412,0.914],"g2-orange-tree-potted.webp":[242,1.507],"g2-pear-tree-blossom.webp":[375,1.067],"g2-pergola-section-corner.webp":[497,0.922],"g2-planter-box-long.webp":[512,0.456],"g2-planter-box-square.webp":[242,1.017],"g2-plum-tree-blossom.webp":[379,1.054],"g2-pond-edge.webp":[512,0.679],"g2-reeds.webp":[259,1.544],"g2-rose-arch-wood.webp":[383,1.12],"g2-rose-obelisk.webp":[198,2.295],"g2-rowboat.webp":[418,0.717],"g2-statue-figure.webp":[174,2.713],"g2-statue-lion.webp":[260,1.564],"g2-stone-bench-weathered.webp":[440,0.739],"g2-stone-circle.webp":[512,0.849],"g2-stone-steps-wide.webp":[512,0.658],"g2-swing-seat-bough.webp":[404,1.022],"g2-topiary-ball.webp":[286,1.006],"g2-topiary-cone.webp":[229,1.522],"g2-trellis-panel.webp":[423,0.931],"g2-urn-tall-pair.webp":[330,1.257],"g2-urn-wide.webp":[286,0.68],"g2-water-iris.webp":[242,1.236],"g2-wildflower-drift.webp":[374,1.035],"g2-wisteria-support.webp":[330,1.011],"g2-wooden-bench.webp":[440,0.676],"g2-yew-hedge-arch-gated.webp":[338,1.348],"g2-yew-hedge-arch-open.webp":[322,1.433],"g2-yew-hedge-straight.webp":[512,0.487],"garden-apiary-map.webp":[450,0.69],"garden-apple-map.webp":[433,1.039],"garden-arch-map.webp":[325,1.385],"garden-bench-map.webp":[440,0.727],"garden-birdbath-map.webp":[335,1.267],"garden-bridge-map.webp":[440,0.69],"garden-cosmos-map.webp":[440,0.668],"garden-curvedbench-map.webp":[450,0.542],"garden-daffodil-map.webp":[440,0.663],"garden-delphinium-map.webp":[440,0.703],"garden-fountain-map.webp":[450,0.739],"garden-gazebo-map.webp":[450,0.71],"garden-golden-map.webp":[440,0.71],"garden-hyacinth-map.webp":[440,0.682],"garden-hydrangea-map.webp":[440,0.939],"garden-lavender-map.webp":[440,1.019],"garden-peony-map.webp":[411,1.095],"garden-pergola-map.webp":[450,0.678],"garden-rose-map.webp":[398,1.129],"garden-sundial-map.webp":[271,1.601],"garden-tulip-map.webp":[440,0.721],"garden-willow-map.webp":[428,1.05],"g2-magnolia-tree-green.webp":[393,1.017]};
+
+
+/* ---------- scale ----------
+   GSC  metres per world px for the ground plane
+   PSC  metres per prop px, then a Wonderland multiplier by kind         */
+const GSC=0.05, PSC=0.0092;
+const WPX=3200, HPX=2400;
+const WM=WPX*GSC, HM=HPX*GSC;
+
+/* world px -> metres, centred on the middle of the map */
+const wx=x=>(x-WPX/2)*GSC, wz=y=>(y-HPX/2)*GSC;
+
+/* Wonderland: hedges tower, blooms outgrow you, trees are old */
+function kindOf(n){
+  if(/yew-hedge|topiary|trellis|maze-centre/.test(n))return'hedge';
+  if(/tree|willow|magnolia|cypress|apple|pear|plum|cherry/.test(n))return'tree';
+  if(/rose-map|lavender|peony|tulip|daffodil|delphinium|cosmos|hyacinth|hydrangea|drift|hollyhock|camellia|iris|marigold|reeds|lily/.test(n))return'bloom';
+  if(/gate|glasshouse|gazebo|pergola|fountain|dovecote|apiary|arch|stone-circle|balustrade|steps|jetty|cascade/.test(n))return'build';
+  return'thing';
+}
+const FLAT=/maze-centre|stone-circle|lake-shore|pond-edge|stone-steps|jetty|lily-pads/;
+const MULT={hedge:2.15,tree:2.35,bloom:2.5,build:1.25,thing:1.35};
+
+/* ---------- renderer ---------- */
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(66,innerWidth/innerHeight,0.1,600);
+const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputEncoding=THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+
+/* ---------- phase ---------- */
+function livePhase(){const h=new Date().getHours()+new Date().getMinutes()/60;
+  if(h<5.5||h>=20.5)return'night';if(h<7.5)return'dawn';if(h<17)return'day';if(h<19.2)return'golden';return'dusk'}
+const PH={
+  dawn  :{top:'#2E4C74',mid:'#8FA9C8',low:'#F6C9A8',hz:'#FBEAD2',tint:0xffd9c2,fog:0.0090},
+  day   :{top:'#4E86B8',mid:'#9FC6E0',low:'#CFE2EE',hz:'#F1EEDC',tint:0xffffff,fog:0.0062},
+  golden:{top:'#5B5590',mid:'#D08A4E',low:'#F2B571',hz:'#FBE6C0',tint:0xffcf9e,fog:0.0088},
+  dusk  :{top:'#1E2450',mid:'#5C4E93',low:'#8B7FC0',hz:'#E8C4A8',tint:0xbfb0d8,fog:0.0110},
+  night :{top:'#05091E',mid:'#0B1430',low:'#1E2C55',hz:'#31406E',tint:0x8fa0c8,fog:0.0150}
+};
+let ph=livePhase();
+
+/* ---------- sky: gradient dome, twinkling stars, drifting cloud ---------- */
+function skyTexture(p){
+  const c=document.createElement('canvas');c.width=8;c.height=256;const g=c.getContext('2d');
+  const grd=g.createLinearGradient(0,0,0,256);
+  grd.addColorStop(0,p.top);grd.addColorStop(.42,p.mid);grd.addColorStop(.78,p.low);grd.addColorStop(1,p.hz);
+  g.fillStyle=grd;g.fillRect(0,0,8,256);
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
+}
+const skyMat=new THREE.MeshBasicMaterial({map:skyTexture(PH[ph]),side:THREE.BackSide,fog:false,depthWrite:false});
+const sky=new THREE.Mesh(new THREE.SphereGeometry(300,24,16),skyMat);
+scene.add(sky);
+
+/* stars: one buffer, opacity animated so they breathe */
+const STN=420, sPos=new Float32Array(STN*3), sPh=new Float32Array(STN);
+for(let i=0;i<STN;i++){
+  const a=Math.random()*Math.PI*2, e=Math.acos(Math.random()*0.92);
+  const r=280;
+  sPos[i*3]=r*Math.sin(e)*Math.cos(a); sPos[i*3+1]=r*Math.cos(e)*0.9+20; sPos[i*3+2]=r*Math.sin(e)*Math.sin(a);
+  sPh[i]=Math.random()*6.28;
+}
+const sGeo=new THREE.BufferGeometry();
+sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));
+sGeo.setAttribute('aph',new THREE.BufferAttribute(sPh,1));
+const sMat=new THREE.ShaderMaterial({
+  transparent:true,depthWrite:false,fog:false,
+  uniforms:{t:{value:0},vis:{value:0}},
+  vertexShader:`attribute float aph;varying float v;uniform float t;uniform float vis;
+    void main(){v=vis*(0.35+0.65*abs(sin(t*1.7+aph)));
+    vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=2.6*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float v;
+    void main(){vec2 d=gl_PointCoord-0.5;float a=smoothstep(0.5,0.0,length(d));
+    if(a*v<0.02)discard;gl_FragColor=vec4(0.93,0.95,1.0,a*v);}`
+});
+scene.add(new THREE.Points(sGeo,sMat));
+
+/* ---------- texture cache ---------- */
+const TL=new THREE.TextureLoader();
+const texCache=new Map();
+let pending=0, done=0;
+function tex(file,repeat){
+  if(texCache.has(file))return texCache.get(file);
+  pending++;
+  const t=TL.load(BASE+file,()=>{done++;progress()},undefined,()=>{done++;progress()});
+  t.encoding=THREE.sRGBEncoding;
+  t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy?renderer.capabilities.getMaxAnisotropy():4);
+  if(repeat){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat[0],repeat[1])}
+  texCache.set(file,t);return t;
+}
+function progress(){
+  const p=pending?done/pending:1;
+  document.getElementById('lbar').style.width=(p*100).toFixed(0)+'%';
+  if(p>=1)setTimeout(hideLoad,220);
+}
+function hideLoad(){const l=document.getElementById('load');l.style.opacity=0;setTimeout(()=>l.style.display='none',600)}
+
+/* ---------- ground ---------- */
+const groundGroup=new THREE.Group();scene.add(groundGroup);
+function plane(wpx,hpx,texfile,rx,ry,y){
+  const g=new THREE.PlaneGeometry(wpx*GSC,hpx*GSC);
+  const m=new THREE.MeshBasicMaterial({map:tex(texfile,[rx,ry])});
+  const mesh=new THREE.Mesh(g,m);mesh.rotation.x=-Math.PI/2;mesh.position.y=y;return mesh;
+}
+/* the lawn under everything */
+const lawn=plane(WPX,HPX,'g2-tile-lawn-clipped.webp',WPX/210,HPX/210,0);
+groundGroup.add(lawn);
+/* the regions */
+PATCH.forEach(p=>{
+  const m=plane(p.w,p.h,'g2-tile-'+p.t+'.webp',p.w/210,p.h/210,0.012);
+  m.position.x=wx(p.cx);m.position.z=wz(p.cy);
+  m.userData.patch=p;
+  groundGroup.add(m);
+});
+/* the parterre beds, read from the same BEDS + QT the map uses */
+const PXC=1600,PYC=1300,PPS=1.18;
+function bedWorld(plot){const q=Math.floor(plot/10),b=BEDS[plot%10];const [tx,ty,sx,sy]=QT[q];
+  const lx=tx+b.cx*sx,ly=ty+b.cy*sy;return[PXC+(lx-500)*PPS,PYC+(ly-500)*PPS]}
+function bedSize(plot){const b=BEDS[plot%10];return (b.k==='c'?2*b.r:b.k==='e'?2*b.rx:1.7*b.s)*.825*PPS}
+const bedList=[];
+for(let i=0;i<40;i++){
+  const [bx,by]=bedWorld(i), d=bedSize(i);
+  const g=new THREE.CircleGeometry(d*GSC*0.5,20);
+  const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tex('g2-tile-soil-dark-bed.webp',[1.6,1.6])}));
+  m.rotation.x=-Math.PI/2;m.position.set(wx(bx),0.02,wz(by));
+  groundGroup.add(m);bedList.push({x:wx(bx),z:wz(by),r:d*GSC*0.5});
+}
+
+/* ---------- props: billboards standing on their own coordinates ---------- */
+const bb=[];      /* everything that turns to face you */
+const blockers=[];/* what you cannot walk through */
+const srcOf=f=>f.g?'g2-'+f.g+'.webp':'garden-'+f.img+'.webp';
+function addProp(f){
+  const file=srcOf(f), meta=MA[file];
+  if(!meta)return;
+  const aspect=meta[1];
+  const k=kindOf(file), mult=MULT[k];
+  const wM=f.w*PSC*mult, hM=wM*aspect;
+  const g=new THREE.PlaneGeometry(wM,hM);
+  const m=new THREE.MeshBasicMaterial({map:tex(file),transparent:false,alphaTest:0.42,side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(g,m);
+  const px=wx(f.x), pz=wz(f.y);
+  if(f.flat||FLAT.test(file)){       /* art drawn top down lies on the ground */
+    mesh.rotation.x=-Math.PI/2;mesh.position.set(px,0.03,pz);
+  }else{
+    mesh.position.set(px,hM/2,pz);
+    bb.push(mesh);
+    if(!f.sway && (k==='hedge'||k==='build'||k==='tree'||/statue|urn|bench|obelisk|planter|beehive|sundial|birdbath|lantern/.test(file))){
+      blockers.push({x:px,z:pz,r:Math.max(0.5,wM*0.30)});
+    }
+  }
+  mesh.userData.file=file;
+  scene.add(mesh);
+}
+FIXED.forEach(addProp);
+
+/* ---------- Wonderland: mushrooms you could set a cup on ---------- */
+function capTexture(){
+  const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  g.fillStyle='#B23A2E';g.fillRect(0,0,128,128);
+  g.fillStyle='rgba(246,243,235,.92)';
+  const r=rng(7);
+  for(let i=0;i<16;i++){const x=r()*128,y=r()*128,rad=5+r()*9;g.beginPath();g.arc(x,y,rad,0,6.28);g.fill()}
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
+}
+const capTex=capTexture();
+const capMat=new THREE.MeshBasicMaterial({map:capTex});
+const stemMat=new THREE.MeshBasicMaterial({color:0xEDE4D0});
+function mushroom(x,z,scale,table){
+  const grp=new THREE.Group();
+  const h=(table?0.78:0.5)*scale, capR=(table?1.15:0.55)*scale;
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(capR*0.22,capR*0.30,h,10),stemMat);
+  stem.position.y=h/2;grp.add(stem);
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(capR,16,10,0,Math.PI*2,0,Math.PI*0.52),capMat);
+  cap.position.y=h;cap.scale.y=table?0.42:0.72;grp.add(cap);
+  grp.position.set(x,0,z);scene.add(grp);
+  blockers.push({x,z,r:capR*0.5});
+  return grp;
+}
+/* a tea table in the meadow, seats around it, and a scatter under the trees */
+const MUSH=[
+  [820,2120,1.35,1],[700,2150,0.8,0],[930,2090,0.85,0],[760,2010,0.75,0],
+  [2640,1500,1.25,1],[2520,1560,0.7,0],[2740,1590,0.8,0],
+  [330,1300,0.9,0],[430,1210,0.7,0],[250,1150,1.0,0],
+  [2870,760,1.15,1],[2760,700,0.72,0]
+];
+MUSH.forEach(m=>mushroom(wx(m[0]),wz(m[1]),m[2],m[3]));
+
+/* ---------- clouds ---------- */
+const clouds=[];
+const CLOUDF=['g2-cloud-soft-01.webp','g2-cloud-soft-02.webp','g2-cloud-wisp-01.webp','g2-cloud-wisp-02.webp'];
+(function(){const r=rng(23);
+  for(let i=0;i<14;i++){
+    const f=CLOUDF[i%4], w=40+r()*70;
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.42),
+      new THREE.MeshBasicMaterial({map:tex(f),transparent:true,opacity:.72,depthWrite:false,fog:false}));
+    m.position.set((r()-.5)*420,42+r()*46,(r()-.5)*420);
+    m.userData.sp=0.35+r()*0.5;
+    scene.add(m);clouds.push(m);
+  }
+})();
+
+/* ---------- fog and tint ---------- */
+function applyPhase(){
+  const p=PH[ph];
+  skyMat.map=skyTexture(p);skyMat.needsUpdate=true;
+  scene.fog=new THREE.FogExp2(new THREE.Color(p.hz),p.fog);
+  renderer.setClearColor(new THREE.Color(p.hz));
+  const c=new THREE.Color(p.tint);
+  scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.map&&o!==sky&&!clouds.includes(o))o.material.color.copy(c)});
+  clouds.forEach(m=>{m.material.color.copy(c);m.material.opacity=ph==='night'?.35:.72});
+  sMat.uniforms.vis.value=ph==='night'?1:(ph==='dusk'?.45:0);
+  document.getElementById('phase').textContent=ph[0].toUpperCase()+ph.slice(1);
+}
+applyPhase();
+
+/* ---------- where you are ---------- */
+const AREAS=[
+  {n:'The Fountain Court',x:1600,y:520,r:620},
+  {n:'The Glasshouse',x:520,y:580,r:520},
+  {n:'The Maze',x:2620,y:790,r:520},
+  {n:'The Orchard',x:2680,y:1420,r:620},
+  {n:'The Lake',x:560,y:1480,r:640},
+  {n:'The Meadow',x:760,y:2060,r:600},
+  {n:'The Rose Garden',x:1990,y:2060,r:420},
+  {n:'The Pergola',x:2520,y:2060,r:480},
+  {n:'The Parterre',x:1600,y:1300,r:640},
+  {n:'The Avenue',x:1600,y:2200,r:700}
+];
+let areaNow='';
+function areaAt(px,pz){
+  const X=px/GSC+WPX/2, Y=pz/GSC+HPX/2;
+  let best=null,bd=1e9;
+  AREAS.forEach(a=>{const d=Math.hypot(X-a.x,Y-a.y);if(d<a.r&&d<bd){bd=d;best=a}});
+  return best?best.n:'The Garden';
+}
+
+/* ---------- you ---------- */
+const you={x:wx(1600),z:wz(2280),yaw:0,pitch:-0.02};
+const EYE=1.62, SPEED=4.4;
+let mvX=0,mvZ=0;
+
+/* left half: walk. right half: look. desktop: WASD + drag */
+const stick=document.getElementById('stick'), knob=document.getElementById('knob');
+let sId=null,sx0=0,sy0=0;
+stick.addEventListener('pointerdown',e=>{sId=e.pointerId;sx0=e.clientX;sy0=e.clientY;
+  knob.style.display='block';knob.style.left=sx0+'px';knob.style.top=sy0+'px';stick.setPointerCapture(sId)});
+stick.addEventListener('pointermove',e=>{if(e.pointerId!==sId)return;
+  const dx=e.clientX-sx0,dy=e.clientY-sy0,m=Math.min(1,Math.hypot(dx,dy)/54);
+  const a=Math.atan2(dy,dx);mvX=Math.cos(a)*m;mvZ=Math.sin(a)*m;
+  knob.querySelector('i').style.transform=`translate(${Math.cos(a)*m*30}px,${Math.sin(a)*m*30}px)`});
+function stickEnd(e){if(e.pointerId!==sId)return;sId=null;mvX=mvZ=0;knob.style.display='none';knob.querySelector('i').style.transform=''}
+stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
+
+let lId=null,lx0=0,ly0=0;
+renderer.domElement.addEventListener('pointerdown',e=>{lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;renderer.domElement.setPointerCapture(lId)});
+renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lId)return;
+  you.yaw-=(e.clientX-lx0)*0.0042; you.pitch=Math.max(-0.5,Math.min(0.55,you.pitch-(e.clientY-ly0)*0.0032));
+  lx0=e.clientX;ly0=e.clientY});
+function lookEnd(e){if(e.pointerId===lId)lId=null}
+renderer.domElement.addEventListener('pointerup',lookEnd);renderer.domElement.addEventListener('pointercancel',lookEnd);
+
+const keys={};
+addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+
+/* ---------- collision ---------- */
+const lake=PATCH.find(p=>p.water);
+function blocked(px,pz){
+  if(lake){const X=px/GSC+WPX/2,Y=pz/GSC+HPX/2;
+    if(Math.abs(X-lake.cx)<lake.w/2-30&&Math.abs(Y-lake.cy)<lake.h/2-30)return true}
+  for(let i=0;i<blockers.length;i++){const b=blockers[i];
+    if((px-b.x)**2+(pz-b.z)**2<b.r*b.r)return true}
+  return false;
+}
+
+/* ---------- music ---------- */
+let audio=null,track=0,playing=false;
+document.getElementById('music').onclick=()=>{
+  if(!audio){audio=new Audio();audio.volume=.55;audio.addEventListener('ended',next)}
+  if(playing){audio.pause();playing=false;document.getElementById('music').classList.remove('on')}
+  else{if(!audio.src)next();else audio.play();playing=true;document.getElementById('music').classList.add('on')}
+};
+function next(){track=track%6+1;audio.src=BASE+'garden-music-'+track+'.mp3';audio.play().catch(()=>{})}
+document.getElementById('back').onclick=()=>location.href=BASE;
+document.getElementById('phase').onclick=()=>{
+  const order=['dawn','day','golden','dusk','night'];
+  ph=order[(order.indexOf(ph)+1)%order.length];applyPhase();
+};
+
+/* ---------- loop ---------- */
+let last=performance.now(), frames=0, cullTick=0;
+function loop(now){
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  const t=now/1000;
+
+  let ix=mvX, iz=mvZ;
+  if(keys['w'])iz-=1;if(keys['s'])iz+=1;if(keys['a'])ix-=1;if(keys['d'])ix+=1;
+  const mag=Math.hypot(ix,iz);
+  if(mag>0.02){
+    const s=Math.min(1,mag)*SPEED*dt;
+    const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
+    const nx=you.x+(iz*fx+ix*fz)*s, nz=you.z+(iz*fz-ix*fx)*s;
+    const cx=Math.max(-WM/2+1,Math.min(WM/2-1,nx)), cz=Math.max(-HM/2+1,Math.min(HM/2-1,nz));
+    if(!blocked(cx,you.z))you.x=cx;
+    if(!blocked(you.x,cz))you.z=cz;
+  }
+  const bob=mag>0.02?Math.sin(t*7.6)*0.035:0;
+  camera.position.set(you.x,EYE+bob,you.z);
+  camera.rotation.set(0,0,0);
+  camera.rotateY(you.yaw);camera.rotateX(you.pitch);
+  sky.position.copy(camera.position);
+
+  for(let i=0;i<bb.length;i++)bb[i].rotation.y=you.yaw;
+  sMat.uniforms.t.value=t;
+  clouds.forEach(c=>{c.position.x+=c.userData.sp*dt;if(c.position.x>230)c.position.x=-230;c.lookAt(camera.position.x,c.position.y,camera.position.z)});
+
+  if(++cullTick%12===0){
+    for(let i=0;i<bb.length;i++){const m=bb[i];
+      const d=(m.position.x-you.x)**2+(m.position.z-you.z)**2;
+      m.visible=d<70*70;}
+  }
+  const a=areaAt(you.x,you.z);
+  if(a!==areaNow){areaNow=a;document.getElementById('area').innerHTML=a+'<span>.</span>'}
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+setTimeout(()=>{if(document.getElementById('load').style.opacity!=='0')hideLoad()},9000);
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
