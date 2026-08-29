@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="0.1">
+<meta name="world-build" content="0.3">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -22,10 +22,11 @@ canvas{display:block;touch-action:none}
 #place h1{margin:.1em 0 0;font-size:clamp(1.5rem,4.4vw,2.6rem);letter-spacing:-.035em;line-height:.95;font-weight:800}
 #place h1 span{color:var(--gold)}
 #hint{opacity:.8;text-shadow:0 1px 12px rgba(0,0,0,.6)}
-#stick{position:fixed;left:0;bottom:0;width:50%;height:46%;z-index:15;touch-action:none}
-#knob{position:absolute;width:104px;height:104px;border-radius:50%;border:1px solid rgba(246,243,235,.45);
-      background:rgba(21,19,14,.18);display:none;transform:translate(-50%,-50%)}
-#knob i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(246,243,235,.72)}
+#stick{position:fixed;left:0;bottom:0;width:52%;height:58%;z-index:15;touch-action:none}
+#knob{position:absolute;width:132px;height:132px;border-radius:50%;border:1.5px solid rgba(246,243,235,.32);
+      background:rgba(21,19,14,.14);display:none;transform:translate(-50%,-50%);transition:opacity .18s}
+#knob i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;
+        background:rgba(246,243,235,.78);box-shadow:0 2px 10px rgba(0,0,0,.3)}
 #load{position:fixed;inset:0;z-index:40;background:#0f1a12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .6s}
 #load .bar{width:min(240px,54vw);height:2px;background:rgba(246,243,235,.2)}
 #load .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
@@ -197,25 +198,36 @@ document.body.appendChild(renderer.domElement);
 function livePhase(){const h=new Date().getHours()+new Date().getMinutes()/60;
   if(h<5.5||h>=20.5)return'night';if(h<7.5)return'dawn';if(h<17)return'day';if(h<19.2)return'golden';return'dusk'}
 const PH={
-  dawn  :{top:'#2E4C74',mid:'#8FA9C8',low:'#F6C9A8',hz:'#FBEAD2',tint:0xffd9c2,fog:0.0090},
-  day   :{top:'#4E86B8',mid:'#9FC6E0',low:'#CFE2EE',hz:'#F1EEDC',tint:0xffffff,fog:0.0062},
-  golden:{top:'#5B5590',mid:'#D08A4E',low:'#F2B571',hz:'#FBE6C0',tint:0xffcf9e,fog:0.0088},
-  dusk  :{top:'#1E2450',mid:'#5C4E93',low:'#8B7FC0',hz:'#E8C4A8',tint:0xbfb0d8,fog:0.0110},
-  night :{top:'#05091E',mid:'#0B1430',low:'#1E2C55',hz:'#31406E',tint:0x8fa0c8,fog:0.0150}
+  dawn  :{sky:['#1B3560','#3F6796','#8FA9C8','#E7B39A','#F6C9A8','#FCEEDA'],hz:'#F7DCC4',tint:0xffd6bd,fog:0.0072,orb:'moon',oy:0.30,ox:-0.55,glow:'#FFD9B0'},
+  day   :{sky:['#2E6DA8','#4E86B8','#8FBBDC','#BFDAEA','#DCE9EC','#F2EFE0'],hz:'#EDE8D6',tint:0xffffff,fog:0.0050,orb:'sun' ,oy:0.62,ox:0.40,glow:'#FFF6DC'},
+  golden:{sky:['#3B4A86','#7B5F8E','#C97E4E','#E9A05A','#F4BE79','#FBE6C0'],hz:'#F6D6A6',tint:0xffcb95,fog:0.0078,orb:'sun' ,oy:0.16,ox:0.62,glow:'#FFC97A'},
+  dusk  :{sky:['#141A44','#2B2C63','#544A8E','#7E6FAE','#A98BAE','#E0B79E'],hz:'#D9A98E',tint:0xb8a8d2,fog:0.0092,orb:'moon',oy:0.44,ox:0.30,glow:'#EFC3A2'},
+  night :{sky:['#02050F','#050A20','#0B1430','#141F44','#1E2C55','#2C3A66'],hz:'#26325A',tint:0x7f90bc,fog:0.0125,orb:'moon',oy:0.58,ox:-0.35,glow:'#9FB2E0'}
 };
 let ph=livePhase();
 
 /* ---------- sky: gradient dome, twinkling stars, drifting cloud ---------- */
 function skyTexture(p){
-  const c=document.createElement('canvas');c.width=8;c.height=256;const g=c.getContext('2d');
-  const grd=g.createLinearGradient(0,0,0,256);
-  grd.addColorStop(0,p.top);grd.addColorStop(.42,p.mid);grd.addColorStop(.78,p.low);grd.addColorStop(1,p.hz);
-  g.fillStyle=grd;g.fillRect(0,0,8,256);
+  const c=document.createElement('canvas');c.width=8;c.height=512;const g=c.getContext('2d');
+  const grd=g.createLinearGradient(0,0,0,512);
+  const st=[0,.22,.42,.60,.76,.90];
+  p.sky.forEach((col,i)=>grd.addColorStop(st[i],col));
+  grd.addColorStop(1,p.hz);
+  g.fillStyle=grd;g.fillRect(0,0,8,512);
+  /* the haze that sits on the horizon and gives the distance its weight */
+  const h=g.createLinearGradient(0,400,0,512);
+  h.addColorStop(0,'rgba(255,255,255,0)');h.addColorStop(1,p.hz);
+  g.fillStyle=h;g.fillRect(0,400,8,112);
   const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
 }
 const skyMat=new THREE.MeshBasicMaterial({map:skyTexture(PH[ph]),side:THREE.BackSide,fog:false,depthWrite:false});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(300,24,16),skyMat);
 scene.add(sky);
+
+/* the sun or the moon, whichever the hour is holding */
+const orb=new THREE.Mesh(new THREE.PlaneGeometry(46,46),
+  new THREE.MeshBasicMaterial({transparent:true,depthWrite:false,fog:false,opacity:.95}));
+orb.renderOrder=-1;scene.add(orb);
 
 /* stars: one buffer, opacity animated so they breathe */
 const STN=420, sPos=new Float32Array(STN*3), sPh=new Float32Array(STN);
@@ -239,6 +251,26 @@ const sMat=new THREE.ShaderMaterial({
     if(a*v<0.02)discard;gl_FragColor=vec4(0.93,0.95,1.0,a*v);}`
 });
 scene.add(new THREE.Points(sGeo,sMat));
+
+/* ---------- contact shadow: the 2D map gives every prop a drop shadow,
+   and without one on the ground a billboard always reads as hovering ---------- */
+function shadowTexture(){
+  const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  const r=g.createRadialGradient(64,64,4,64,64,62);
+  r.addColorStop(0,'rgba(10,16,10,.62)');r.addColorStop(.45,'rgba(10,16,10,.34)');
+  r.addColorStop(.78,'rgba(10,16,10,.10)');r.addColorStop(1,'rgba(10,16,10,0)');
+  g.fillStyle=r;g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+const shadeMat=new THREE.MeshBasicMaterial({map:shadowTexture(),transparent:true,opacity:.55,depthWrite:false});
+const shadeGeo=new THREE.PlaneGeometry(1,1);
+function dropShadow(x,z,w,deep){
+  const m=new THREE.Mesh(shadeGeo,shadeMat);
+  m.rotation.x=-Math.PI/2;m.rotation.z=Math.random()*3.14;
+  m.scale.set(w*(deep?1.30:1.02),w*(deep?0.86:0.62),1);
+  m.position.set(x,0.035,z);m.renderOrder=1;
+  scene.add(m);return m;
+}
 
 /* ---------- texture cache ---------- */
 const TL=new THREE.TextureLoader();
@@ -268,8 +300,38 @@ function plane(wpx,hpx,texfile,rx,ry,y){
   const mesh=new THREE.Mesh(g,m);mesh.rotation.x=-Math.PI/2;mesh.position.y=y;return mesh;
 }
 /* the lawn under everything */
-const lawn=plane(WPX,HPX,'g2-tile-lawn-clipped.webp',WPX/210,HPX/210,0);
+const OVER=3.6;   /* the lawn runs well past the map so the world never shows an edge */
+/* the country beyond the garden rolls. inside the walls it stays dead flat,
+   because every bed, patch and prop is placed on a flat plan. */
+function surroundH(X,Z){
+  const ex=Math.max(0,Math.abs(X)-WM/2), ez=Math.max(0,Math.abs(Z)-HM/2);
+  const d=Math.hypot(ex,ez);
+  if(d<=0)return 0;
+  const ramp=Math.min(1,d/30), n=Math.sin(X*0.021)*Math.cos(Z*0.017)+0.5*Math.sin(X*0.041+1.7)*Math.cos(Z*0.033+.6);
+  return ramp*ramp*(3.4+n*5.0);
+}
+const lawnGeo=new THREE.PlaneGeometry(WPX*OVER*GSC,HPX*OVER*GSC,110,84);
+(function(){const pos=lawnGeo.attributes.position;
+  for(let i=0;i<pos.count;i++){const X=pos.getX(i),Y=pos.getY(i);pos.setZ(i,surroundH(X,-Y))}
+  lawnGeo.computeVertexNormals()})();
+const lawn=new THREE.Mesh(lawnGeo,new THREE.MeshBasicMaterial({
+  map:tex('g2-tile-lawn-clipped.webp',[WPX*OVER/210,HPX*OVER/210])}));
+lawn.rotation.x=-Math.PI/2;
 groundGroup.add(lawn);
+/* a scatter of trees out on the rise so the hills read as land, not as wallpaper */
+(function(){const r=rng(67), kinds=['g2-magnolia-tree-green.webp','g2-cypress-column.webp','g2-cherry-tree-blossom.webp'];
+  for(let i=0;i<46;i++){
+    const a=r()*6.28, d=WM*0.62+r()*WM*0.9;
+    const X=Math.cos(a)*d, Z=Math.sin(a)*d*0.78;
+    if(Math.abs(X)<WM/2+8&&Math.abs(Z)<HM/2+8)continue;
+    const f=kinds[i%3], meta=MA[f]; if(!meta)continue;
+    const wM=(150+r()*130)*PSC*2.35, hM=wM*meta[1];
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(wM,hM),
+      new THREE.MeshBasicMaterial({map:tex(f),alphaTest:0.42,side:THREE.DoubleSide}));
+    m.position.set(X,surroundH(X,Z)+hM/2,Z);
+    m.userData.far=1;scene.add(m);bb.push(m);
+  }
+})();
 /* the regions */
 PATCH.forEach(p=>{
   const m=plane(p.w,p.h,'g2-tile-'+p.t+'.webp',p.w/210,p.h/210,0.012);
@@ -308,8 +370,9 @@ function addProp(f){
   if(f.flat||FLAT.test(file)){       /* art drawn top down lies on the ground */
     mesh.rotation.x=-Math.PI/2;mesh.position.set(px,0.03,pz);
   }else{
-    mesh.position.set(px,hM/2,pz);
+    mesh.position.set(px,hM/2-hM*0.012,pz);
     bb.push(mesh);
+    dropShadow(px,pz,wM*(k==='bloom'?0.55:0.72),k==='tree');
     if(!f.sway && (k==='hedge'||k==='build'||k==='tree'||/statue|urn|bench|obelisk|planter|beehive|sundial|birdbath|lantern/.test(file))){
       blockers.push({x:px,z:pz,r:Math.max(0.5,wM*0.30)});
     }
@@ -339,6 +402,7 @@ function mushroom(x,z,scale,table){
   const cap=new THREE.Mesh(new THREE.SphereGeometry(capR,16,10,0,Math.PI*2,0,Math.PI*0.52),capMat);
   cap.position.y=h;cap.scale.y=table?0.42:0.72;grp.add(cap);
   grp.position.set(x,0,z);scene.add(grp);
+  dropShadow(x,z,capR*1.5,false);
   blockers.push({x,z,r:capR*0.5});
   return grp;
 }
@@ -351,19 +415,146 @@ const MUSH=[
 ];
 MUSH.forEach(m=>mushroom(wx(m[0]),wz(m[1]),m[2],m[3]));
 
+/* ---------- rocks: real geometry, so you walk around them ---------- */
+const rockMats=[0x8A8578,0x7C7669,0x9A9486,0x6E6A5E].map(c=>new THREE.MeshBasicMaterial({color:c}));
+function rock(x,z,r,seed){
+  const g=new THREE.IcosahedronGeometry(r,0);
+  const pos=g.attributes.position, rr=rng(seed);
+  for(let i=0;i<pos.count;i++){
+    const j=0.68+rr()*0.55;
+    pos.setXYZ(i,pos.getX(i)*j,pos.getY(i)*j*0.72,pos.getZ(i)*j);
+  }
+  g.computeVertexNormals();
+  const m=new THREE.Mesh(g,rockMats[seed%4]);
+  m.position.set(x,r*0.34,z);m.rotation.set(rr()*3,rr()*6,rr()*.4);
+  scene.add(m);dropShadow(x,z,r*2.1,false);
+  if(r>0.55)blockers.push({x,z,r:r*0.9});
+  return m;
+}
+(function(){const r=rng(41);
+  /* the moss bank and the lake shore get the outcrops */
+  const seams=[[290,1180,7,1.5],[560,1180,4,1.0],[300,1690,5,0.9],[880,1360,4,0.8],
+               [2850,440,6,1.2],[2350,700,4,0.9],[430,2260,5,0.8],[1200,1000,4,0.7],
+               [2200,1500,5,0.9],[1900,700,4,0.7]];
+  seams.forEach((sm,si)=>{
+    for(let i=0;i<sm[2];i++){
+      const a=r()*6.28,d=r()*150;
+      rock(wx(sm[0]+Math.cos(a)*d),wz(sm[1]+Math.sin(a)*d),(0.30+r()*0.9)*sm[3],si*13+i+3);
+    }
+  });
+})();
+
 /* ---------- clouds ---------- */
 const clouds=[];
 const CLOUDF=['g2-cloud-soft-01.webp','g2-cloud-soft-02.webp','g2-cloud-wisp-01.webp','g2-cloud-wisp-02.webp'];
 (function(){const r=rng(23);
-  for(let i=0;i<14;i++){
-    const f=CLOUDF[i%4], w=40+r()*70;
+  for(let i=0;i<24;i++){
+    const band=i%3;                       /* three decks of cloud, near ones bigger and quicker */
+    const f=CLOUDF[i%4], w=(band===0?34:band===1?62:96)+r()*40;
     const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*0.42),
-      new THREE.MeshBasicMaterial({map:tex(f),transparent:true,opacity:.72,depthWrite:false,fog:false}));
-    m.position.set((r()-.5)*420,42+r()*46,(r()-.5)*420);
-    m.userData.sp=0.35+r()*0.5;
+      new THREE.MeshBasicMaterial({map:tex(f),transparent:true,opacity:(band===0?.42:band===1?.62:.80),depthWrite:false,fog:false}));
+    m.position.set((r()-.5)*460,(band===0?70:band===1?48:30)+r()*22,(r()-.5)*460);
+    m.userData.sp=(band===0?0.18:band===1?0.32:0.55)+r()*0.2;
     scene.add(m);clouds.push(m);
   }
 })();
+
+/* ---------- the air: what lives in it ----------
+   bees, dragonflies, butterflies and ladybirds are your own art.
+   the birds are drawn here, two wing frames each, because there is no bird art yet. */
+function birdTexture(body,wing,style){
+  const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+  g.translate(32,32);
+  const up=style==='up'?1:-1;
+  g.fillStyle=wing;
+  g.beginPath();g.moveTo(-2,0);g.quadraticCurveTo(-16,-10*up,-27,-3*up);g.quadraticCurveTo(-16,4-6*up,-2,3);g.fill();
+  g.beginPath();g.moveTo(2,0);g.quadraticCurveTo(16,-10*up,27,-3*up);g.quadraticCurveTo(16,4-6*up,2,3);g.fill();
+  g.fillStyle=body;
+  g.beginPath();g.ellipse(0,1,7,4.2,0,0,6.28);g.fill();
+  g.beginPath();g.ellipse(7,-1.5,3.4,3,0,0,6.28);g.fill();     /* head */
+  g.beginPath();g.moveTo(-6,0);g.lineTo(-14,-3);g.lineTo(-14,3);g.fill(); /* tail */
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
+}
+const BIRDART={
+  blue :[birdTexture('#3E6CB8','#5B8FD6','up'),birdTexture('#3E6CB8','#5B8FD6','dn')],
+  humm :[birdTexture('#1F7A5E','#38A87F','up'),birdTexture('#1F7A5E','#38A87F','dn')],
+  hawk :[birdTexture('#4A3B2A','#6B573D','up'),birdTexture('#4A3B2A','#6B573D','dn')]
+};
+const FLYART={bee:['g2-bee.webp',0.961],bumble:['g2-bumblebee.webp',0.911],dfly:['g2-dragonfly.webp',0.677],
+  bfb:['g2-butterfly-blue.webp',0.984],bfa:['g2-butterfly-amber.webp',1.005],bfi:['g2-butterfly-ivory.webp',0.766]};
+const air=[];
+function flyer(kind,x,z,y,size,opts){
+  let mat,asp=1;
+  if(BIRDART[kind]){mat=new THREE.MeshBasicMaterial({map:BIRDART[kind][0],transparent:true,alphaTest:0.2,depthWrite:false})}
+  else{const a=FLYART[kind];asp=a[1];mat=new THREE.MeshBasicMaterial({map:tex(a[0]),transparent:true,alphaTest:0.3,depthWrite:false})}
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(size,size*asp),mat);
+  m.position.set(x,y,z);scene.add(m);
+  const o=Object.assign({m,kind,hx:x,hz:z,hy:y,ph:Math.random()*6.28,sp:0.6+Math.random()*0.9,
+    r:opts&&opts.r||3,flap:opts&&opts.flap||9,alive:true},opts||{});
+  air.push(o);return o;
+}
+(function(){const r=rng(53);
+  const near=(cx,cy,sp)=>[wx(cx+(r()-.5)*sp),wz(cy+(r()-.5)*sp)];
+  /* bees over the beds and the hives */
+  for(let i=0;i<9;i++){const[a,b]=near(1600,1300,700);flyer(i%3?'bee':'bumble',a,b,0.9+r()*1.1,0.5,{r:2.4,sp:1.5+r()})}
+  for(let i=0;i<4;i++){const[a,b]=near(3000,1470,220);flyer('bee',a,b,1.1+r()*0.8,0.5,{r:2.0,sp:1.8})}
+  /* dragonflies over the water */
+  for(let i=0;i<7;i++){const[a,b]=near(560,1480,760);flyer('dfly',a,b,0.7+r()*0.9,0.7,{r:5.5,sp:2.6+r()})}
+  /* butterflies in the meadow and the roses */
+  for(let i=0;i<10;i++){const[a,b]=near(760,2060,860);flyer(['bfb','bfa','bfi'][i%3],a,b,1.0+r()*1.3,0.62,{r:4,sp:1.1})}
+  for(let i=0;i<5;i++){const[a,b]=near(1990,2080,420);flyer(['bfb','bfa'][i%2],a,b,1.1+r()*1.0,0.62,{r:3,sp:1.0})}
+  /* hummingbirds hold still at the blooms */
+  for(let i=0;i<5;i++){const[a,b]=near(1600,1300,900);flyer('humm',a,b,1.5+r()*0.8,0.42,{r:1.1,sp:2.4,flap:26})}
+  /* bluebirds cross the garden */
+  for(let i=0;i<8;i++){const[a,b]=near(1600,1300,1900);flyer('blue',a,b,7+r()*7,0.95,{r:16,sp:0.55+r()*0.4,flap:7,blue:1})}
+  /* and one hawk, riding higher than all of it */
+  flyer('hawk',0,0,26,2.6,{r:46,sp:0.30,flap:2.6,hawk:1,state:'ride',cool:20+r()*40});
+})();
+
+function airTick(t,dt){
+  let hawk=null;
+  for(let i=0;i<air.length;i++){
+    const o=air[i];if(!o.alive){continue}
+    if(o.hawk){hawk=o;continue}
+    const w=o.ph+t*o.sp;
+    o.m.position.x=o.hx+Math.cos(w)*o.r+Math.sin(w*1.7)*o.r*0.4;
+    o.m.position.z=o.hz+Math.sin(w*0.8)*o.r+Math.cos(w*2.1)*o.r*0.3;
+    o.m.position.y=o.hy+Math.sin(w*1.3+o.ph)*(o.blue?1.5:0.4);
+    if(BIRDART[o.kind])o.m.material.map=BIRDART[o.kind][Math.sin(t*o.flap+o.ph)>0?0:1];
+    o.m.rotation.y=you.yaw;
+  }
+  /* the hawk: rides, then picks one, then rides again */
+  if(hawk){
+    hawk.cool-=dt;
+    if(hawk.state==='ride'){
+      const w=hawk.ph+t*hawk.sp;
+      hawk.m.position.set(Math.cos(w)*hawk.r,26+Math.sin(w*0.7)*3,Math.sin(w)*hawk.r);
+      if(hawk.cool<=0){
+        const prey=air.filter(a=>a.blue&&a.alive);
+        if(prey.length){hawk.target=prey[Math.floor(Math.random()*prey.length)];hawk.state='dive'}
+        else hawk.cool=30;
+      }
+    }else if(hawk.state==='dive'){
+      const T=hawk.target;
+      if(!T||!T.alive){hawk.state='ride';hawk.cool=45+Math.random()*40}
+      else{
+        const p=hawk.m.position, q=T.m.position;
+        const dx=q.x-p.x,dy=q.y-p.y,dz=q.z-p.z,d=Math.hypot(dx,dy,dz);
+        const st=18*dt/Math.max(0.001,d);
+        p.x+=dx*st;p.y+=dy*st;p.z+=dz*st;
+        if(d<1.4){T.alive=false;T.m.visible=false;
+          setTimeout(()=>{T.alive=true;T.m.visible=true;
+            T.hx=(Math.random()-.5)*WM*0.7;T.hz=(Math.random()-.5)*HM*0.7;},22000);
+          hawk.state='climb'}
+      }
+    }else{ /* climb back to the ride */
+      hawk.m.position.y+=9*dt;
+      if(hawk.m.position.y>=26){hawk.state='ride';hawk.cool=50+Math.random()*45;hawk.ph=Math.random()*6.28}
+    }
+    hawk.m.material.map=BIRDART.hawk[Math.sin(t*hawk.flap)>0?0:1];
+    hawk.m.rotation.y=you.yaw;
+  }
+}
 
 /* ---------- fog and tint ---------- */
 function applyPhase(){
@@ -373,8 +564,11 @@ function applyPhase(){
   renderer.setClearColor(new THREE.Color(p.hz));
   const c=new THREE.Color(p.tint);
   scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.map&&o!==sky&&!clouds.includes(o))o.material.color.copy(c)});
-  clouds.forEach(m=>{m.material.color.copy(c);m.material.opacity=ph==='night'?.35:.72});
-  sMat.uniforms.vis.value=ph==='night'?1:(ph==='dusk'?.45:0);
+  clouds.forEach(m=>{m.material.color.copy(c);m.material.opacity=ph==='night'?.30:.70});
+  sMat.uniforms.vis.value=ph==='night'?1:(ph==='dusk'?.5:0);
+  orb.material.map=tex(p.orb==='sun'?'g2-sun-disc-glow.webp':'g2-moon-waxing-gibbous.webp');
+  orb.material.needsUpdate=true;
+  shadeMat.opacity=ph==='night'?.30:(ph==='day'?.55:.42);
   document.getElementById('phase').textContent=ph[0].toUpperCase()+ph.slice(1);
 }
 applyPhase();
@@ -401,8 +595,8 @@ function areaAt(px,pz){
 }
 
 /* ---------- you ---------- */
-const you={x:wx(1600),z:wz(2280),yaw:0,pitch:-0.02};
-const EYE=1.62, SPEED=4.4;
+const you={x:wx(1600),z:wz(2280),yaw:0,pitch:-0.02,vx:0,vz:0};
+const EYE=1.62, SPEED=4.4, RUN=7.6, ACC=17, DRAG=11;
 let mvX=0,mvZ=0;
 
 /* left half: walk. right half: look. desktop: WASD + drag */
@@ -410,24 +604,48 @@ const stick=document.getElementById('stick'), knob=document.getElementById('knob
 let sId=null,sx0=0,sy0=0;
 stick.addEventListener('pointerdown',e=>{sId=e.pointerId;sx0=e.clientX;sy0=e.clientY;
   knob.style.display='block';knob.style.left=sx0+'px';knob.style.top=sy0+'px';stick.setPointerCapture(sId)});
+const RMAX=62, DEAD=7;
 stick.addEventListener('pointermove',e=>{if(e.pointerId!==sId)return;
-  const dx=e.clientX-sx0,dy=e.clientY-sy0,m=Math.min(1,Math.hypot(dx,dy)/54);
-  const a=Math.atan2(dy,dx);mvX=Math.cos(a)*m;mvZ=Math.sin(a)*m;
-  knob.querySelector('i').style.transform=`translate(${Math.cos(a)*m*30}px,${Math.sin(a)*m*30}px)`});
+  let dx=e.clientX-sx0,dy=e.clientY-sy0,d=Math.hypot(dx,dy);
+  if(d>RMAX){                       /* the ring follows your thumb instead of stopping it */
+    sx0+=dx*(1-RMAX/d);sy0+=dy*(1-RMAX/d);
+    knob.style.left=sx0+'px';knob.style.top=sy0+'px';
+    dx=e.clientX-sx0;dy=e.clientY-sy0;d=RMAX;
+  }
+  const a=Math.atan2(dy,dx);
+  let m=d<DEAD?0:(d-DEAD)/(RMAX-DEAD);
+  m=m*m*(3-2*m);                    /* ease in, so a small nudge is a slow step */
+  mvX=Math.cos(a)*m;mvZ=Math.sin(a)*m;
+  knob.querySelector('i').style.transform=`translate(${Math.cos(a)*m*34}px,${Math.sin(a)*m*34}px)`});
 function stickEnd(e){if(e.pointerId!==sId)return;sId=null;mvX=mvZ=0;knob.style.display='none';knob.querySelector('i').style.transform=''}
 stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
 
 let lId=null,lx0=0,ly0=0;
-renderer.domElement.addEventListener('pointerdown',e=>{lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;renderer.domElement.setPointerCapture(lId)});
-renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lId)return;
-  you.yaw-=(e.clientX-lx0)*0.0042; you.pitch=Math.max(-0.5,Math.min(0.55,you.pitch-(e.clientY-ly0)*0.0032));
-  lx0=e.clientX;ly0=e.clientY});
+const cv=renderer.domElement;
+cv.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&!locked){cv.requestPointerLock&&cv.requestPointerLock();return}
+  lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;cv.setPointerCapture(lId)});
+cv.addEventListener('pointermove',e=>{
+  if(locked)return;
+  if(e.pointerId!==lId)return;
+  lookDX+=(e.clientX-lx0);lookDY+=(e.clientY-ly0);lx0=e.clientX;ly0=e.clientY});
 function lookEnd(e){if(e.pointerId===lId)lId=null}
-renderer.domElement.addEventListener('pointerup',lookEnd);renderer.domElement.addEventListener('pointercancel',lookEnd);
+cv.addEventListener('pointerup',lookEnd);cv.addEventListener('pointercancel',lookEnd);
+
+/* mouse look without holding the button down, the way a game does it */
+let locked=false, lookDX=0, lookDY=0;
+document.addEventListener('pointerlockchange',()=>{
+  locked=document.pointerLockElement===cv;
+  document.getElementById('hint').textContent=locked?'WASD or arrows to walk · shift to run · esc to free the mouse'
+    :(matchMedia('(pointer:coarse)').matches?'Drag left to walk · drag right to look':'Click to look · WASD or arrows to walk');
+});
+document.addEventListener('mousemove',e=>{if(locked){lookDX+=e.movementX;lookDY+=e.movementY}});
 
 const keys={};
-addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if(/^arrow| $/.test(e.key.toLowerCase()))e.preventDefault()});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+if(!matchMedia('(pointer:coarse)').matches)
+  document.getElementById('hint').textContent='Click to look · WASD or arrows to walk';
 
 /* ---------- collision ---------- */
 const lake=PATCH.find(p=>p.water);
@@ -459,31 +677,53 @@ function loop(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   const t=now/1000;
 
-  let ix=mvX, iz=mvZ;
-  if(keys['w'])iz-=1;if(keys['s'])iz+=1;if(keys['a'])ix-=1;if(keys['d'])ix+=1;
-  const mag=Math.hypot(ix,iz);
-  if(mag>0.02){
-    const s=Math.min(1,mag)*SPEED*dt;
-    const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
-    const nx=you.x+(iz*fx+ix*fz)*s, nz=you.z+(iz*fz-ix*fx)*s;
-    const cx=Math.max(-WM/2+1,Math.min(WM/2-1,nx)), cz=Math.max(-HM/2+1,Math.min(HM/2-1,nz));
-    if(!blocked(cx,you.z))you.x=cx;
-    if(!blocked(you.x,cz))you.z=cz;
+  /* look, smoothed, from whichever device is driving */
+  if(lookDX||lookDY){
+    you.yaw-=lookDX*(locked?0.0022:0.0042);
+    you.pitch=Math.max(-0.55,Math.min(0.6,you.pitch-lookDY*(locked?0.0019:0.0032)));
+    lookDX=lookDY=0;
   }
-  const bob=mag>0.02?Math.sin(t*7.6)*0.035:0;
+
+  let ix=mvX, iz=mvZ;
+  if(keys['w']||keys['arrowup'])iz-=1;
+  if(keys['s']||keys['arrowdown'])iz+=1;
+  if(keys['a']||keys['arrowleft'])ix-=1;
+  if(keys['d']||keys['arrowright'])ix+=1;
+  const run=keys['shift']?RUN:SPEED;
+  let mag=Math.hypot(ix,iz);
+  if(mag>1){ix/=mag;iz/=mag;mag=1}
+
+  /* momentum: you lean into a walk and you coast out of it */
+  const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
+  const wantX=(iz*fx+ix*fz)*run, wantZ=(iz*fz-ix*fx)*run;
+  const k=mag>0.02?ACC:DRAG;
+  you.vx+=(wantX-you.vx)*Math.min(1,k*dt);
+  you.vz+=(wantZ-you.vz)*Math.min(1,k*dt);
+  const sp=Math.hypot(you.vx,you.vz);
+  if(sp>0.01){
+    const nx=you.x+you.vx*dt, nz=you.z+you.vz*dt;
+    const cx=Math.max(-WM/2+1,Math.min(WM/2-1,nx)), cz=Math.max(-HM/2+1,Math.min(HM/2-1,nz));
+    if(!blocked(cx,you.z))you.x=cx; else you.vx*=-.15;
+    if(!blocked(you.x,cz))you.z=cz; else you.vz*=-.15;
+  }
+  const bob=Math.sin(t*(7.2+sp*0.5))*0.035*Math.min(1,sp/SPEED);
   camera.position.set(you.x,EYE+bob,you.z);
   camera.rotation.set(0,0,0);
   camera.rotateY(you.yaw);camera.rotateX(you.pitch);
   sky.position.copy(camera.position);
+  {const p=PH[ph];
+   orb.position.set(camera.position.x+p.ox*230,camera.position.y+p.oy*180,camera.position.z-Math.sqrt(Math.max(0,230*230-(p.ox*230)**2)));
+   orb.lookAt(camera.position);}
 
   for(let i=0;i<bb.length;i++)bb[i].rotation.y=you.yaw;
   sMat.uniforms.t.value=t;
+  airTick(t,dt);
   clouds.forEach(c=>{c.position.x+=c.userData.sp*dt;if(c.position.x>230)c.position.x=-230;c.lookAt(camera.position.x,c.position.y,camera.position.z)});
 
   if(++cullTick%12===0){
     for(let i=0;i<bb.length;i++){const m=bb[i];
       const d=(m.position.x-you.x)**2+(m.position.z-you.z)**2;
-      m.visible=d<70*70;}
+      m.visible=d<(m.userData.far?300*300:70*70);}
   }
   const a=areaAt(you.x,you.z);
   if(a!==areaNow){areaNow=a;document.getElementById('area').innerHTML=a+'<span>.</span>'}
