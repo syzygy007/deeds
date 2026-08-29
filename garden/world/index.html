@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="0.41">
+<meta name="world-build" content="0.45">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -36,7 +36,7 @@ canvas{display:block;touch-action:none}
 </head>
 <body>
 
-<div id="load"><h2>The Garden<span>.</span></h2><div class="micro" id="lmsg">Opening the gate</div><div class="bar"><i id="lbar"></i></div></div>
+<div id="load"><h2>The Garden<span>.</span></h2><div class="micro" id="lmsg">Opening the gate</div><div class="micro" id="srcnote" style="opacity:.5"></div><div class="bar"><i id="lbar"></i></div></div>
 
 <div id="hud">
   <div class="row">
@@ -64,12 +64,15 @@ canvas{display:block;touch-action:none}
    props with world coordinates, MA size manifest, BEDS parterre plots.
    Nothing here authors a new map. It stands the existing one up.
    ====================================================================== */
-/* absolute, not relative. a missing trailing slash in the address used to send
-   every asset request one folder too high and the whole world loaded empty. */
-const BASE='/garden/';
+/* on deeds.fun the art is served next door at /garden/. anywhere else, including
+   the chat preview panel, there is no /garden/ folder, so the art is pulled
+   straight from the repo's CDN. same files, either way. */
+const ON_SITE=/(^|\.)deeds\.fun$/.test(location.hostname);
+const BASE=ON_SITE?'/garden/':'https://raw.githubusercontent.com/syzygy007/deeds/main/garden/';
 const FAIL=[];
 function shout(m){const e=document.getElementById('err');e.style.display='block';e.textContent=String(m).slice(0,400)}
 addEventListener('error',e=>shout('ERROR: '+(e.message||e.error)));
+document.getElementById('srcnote').textContent=ON_SITE?'':'Preview · art from the repo CDN';
 function rng(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
 const PATCH=[
  {cx:1600,cy:510,w:920,h:480,t:'gravel-warm-estate',hard:1},
@@ -281,32 +284,44 @@ function dropShadow(x,z,w,deep){
   scene.add(m);return m;
 }
 
-/* ---------- texture cache ---------- */
-const TL=new THREE.TextureLoader();
-const texCache=new Map();
+/* ---------- image loading ----------
+   loaded with plain <img> elements, exactly the way the 2D garden loads the same
+   files today. no crossOrigin attribute, no loader in between: whatever serves
+   the garden serves this. each file is fetched once and shared. */
+const IMGC=new Map();
 let pending=0, done=0;
-function tex(file,repeat){
-  if(texCache.has(file))return texCache.get(file);
+function loadImg(file,ok){
+  let e=IMGC.get(file);
+  if(e){if(e.state==='ok')ok(e.img);else if(e.state==='wait')e.q.push(ok);return}
+  e={img:new Image(),q:[ok],state:'wait'};IMGC.set(file,e);
   pending++;
-  const t=TL.load(BASE+file,()=>{done++;progress()},undefined,()=>{FAIL.push(file);done++;progress()});
+  e.img.onload=()=>{e.state='ok';done++;progress();e.q.forEach(f=>f(e.img));e.q=[]};
+  e.img.onerror=()=>{e.state='bad';FAIL.push(file);done++;progress();e.q=[]};
+  e.img.src=BASE+file;
+}
+function dress(t,repeat){
   t.encoding=THREE.sRGBEncoding;
   t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy?renderer.capabilities.getMaxAnisotropy():4);
   if(repeat){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat[0],repeat[1])}
-  texCache.set(file,t);return t;
+}
+const texCache=new Map();
+function tex(file,repeat){
+  const key=file+'|'+(repeat?repeat.join(','):'');
+  if(texCache.has(key))return texCache.get(key);
+  const t=new THREE.Texture();dress(t,repeat);
+  loadImg(file,img=>{t.image=img;t.needsUpdate=true});
+  texCache.set(key,t);return t;
 }
 /* a material that shows honest colour until its picture arrives, and keeps that
    colour if the picture never arrives. nothing in this world renders as a black hole. */
 function skin(file,fallback,repeat,extra){
   const m=new THREE.MeshBasicMaterial(Object.assign({color:fallback},extra||{}));
   m.userData.base=fallback;
-  pending++;
-  TL.load(BASE+file,t=>{
-    t.encoding=THREE.sRGBEncoding;
-    t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy?renderer.capabilities.getMaxAnisotropy():4);
-    if(repeat){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat[0],repeat[1])}
+  loadImg(file,img=>{
+    const t=new THREE.Texture(img);dress(t,repeat);t.needsUpdate=true;
     m.map=t;m.userData.base=0xffffff;m.color.setHex(0xffffff);m.needsUpdate=true;
-    done++;progress();applyTint();
-  },undefined,()=>{FAIL.push(file);done++;progress()});
+    applyTint();
+  });
   return m;
 }
 function progress(){
@@ -315,7 +330,12 @@ function progress(){
   if(p>=1)setTimeout(hideLoad,220);
 }
 function report(){
-  if(FAIL.length)shout(FAIL.length+' file(s) did not load, first: '+FAIL[0]+'\nExpected at '+BASE+FAIL[0]);
+  if(!FAIL.length)return;
+  if(!ON_SITE&&FAIL.length>20){
+    shout('This is the chat preview panel. It blocks images from the outside, so the art cannot appear here.\nOpen the real thing:  deeds.fun/garden/world/');
+    return;
+  }
+  shout(FAIL.length+' file(s) did not load, first: '+FAIL[0]+'\nExpected at '+BASE+FAIL[0]);
 }
 function hideLoad(){
   report();const l=document.getElementById('load');l.style.opacity=0;setTimeout(()=>l.style.display='none',600)}
@@ -598,7 +618,8 @@ function applyPhase(){
   scene.fog=new THREE.FogExp2(new THREE.Color(p.hz),p.fog);
   renderer.setClearColor(new THREE.Color(p.hz));
   applyTint();
-  clouds.forEach(m=>{m.material.color.copy(c);m.material.opacity=ph==='night'?.30:.70});
+  const cc=new THREE.Color(p.tint);
+  clouds.forEach(m=>{m.material.color.copy(cc);m.material.opacity=ph==='night'?.30:.70});
   sMat.uniforms.vis.value=ph==='night'?1:(ph==='dusk'?.5:0);
   orb.material.map=tex(p.orb==='sun'?'g2-sun-disc-glow.webp':'g2-moon-waxing-gibbous.webp');
   orb.material.needsUpdate=true;
