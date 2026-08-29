@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DEEDS. The Garden</title>
-<meta name="garden-build" content="7.1">
+<meta name="garden-build" content="7.3">
 <meta name="description" content="Your profile is a garden. Every deed sows it.">
 <meta property="og:title" content="Come see my garden.">
 <meta property="og:description" content="Grown one good deed at a time.">
@@ -51,13 +51,9 @@ button{font:inherit;cursor:pointer}
 #hud{position:fixed;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:30;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;pointer-events:none}
 #hud .col{display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:auto}
 #hud .col.r{align-items:flex-end}
-#sowchip{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:31;display:none;align-items:center;gap:8px;background:var(--ink);color:var(--ivory);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-#sowchip.on{display:flex}
-#sowchip b{font-size:.85rem}
-#sowchip .btn{background:var(--ivory);color:var(--ink);border-color:var(--ivory);padding:6px 11px}
-#sowchip .btn.quiet{background:transparent;color:var(--ivory);border-color:rgba(246,243,235,.5)}
-#whole{position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:31;display:none}
-#whole.on{display:inline-flex}
+#pick{position:fixed;z-index:31;display:none;gap:6px;background:var(--ivory);border:1px solid var(--forest);border-radius:999px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#pick.on{display:flex}
+#pick .btn{padding:7px 12px;font-size:.62rem}
 .note{width:40px;height:40px;border-radius:50%;border:1px solid var(--ivory);background:rgba(21,19,14,.45);color:var(--ivory);display:flex;align-items:center;justify-content:center;font-size:18px}
 .note.on{background:var(--ivory);color:var(--ink)}
 /* toasts and sheets */
@@ -98,7 +94,7 @@ button{font:inherit;cursor:pointer}
   <a class="btn back quiet" href="../" title="Back to DEEDS."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Back to DEEDS.</span></a>
   <a class="mark" href="../">DEEDS<b>.</b> THE GARDEN</a>
   <div class="sp"></div>
-  <button class="stat" id="bSack" title="Your sack"><b id="hSack">0 Deedcoins · 0 seeds</b><span class="sub">Your sack · tap to buy</span></button>
+  <button class="stat" id="bSack" title="Your sack"><b id="hSack">0 Deedcoins · 0 seeds</b><span class="sub" id="hSackSub">Your sack · tap to buy</span></button>
   <div class="stat"><b id="hDeeds">0</b><span class="sub">Deeds</span></div>
 </div>
 <div id="stage"><svg id="map" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" aria-label="Your parterre, forty beds"></svg></div>
@@ -107,7 +103,7 @@ button{font:inherit;cursor:pointer}
   <div class="col r"><button class="note" id="bMute" title="Chimes">&#128276;</button><button class="note" id="bMusic" title="Music">&#9835;</button></div>
 </div>
 <button class="btn" id="whole">Whole garden.</button>
-<div id="sowchip"><span>Sowing <b id="sowNm">rose</b> · <span id="sowCt">0 left</span></span><button class="btn quiet" id="sowSwap">Change.</button><button class="btn" id="sowDone">Done.</button></div>
+<div id="pick"></div>
 <div id="status"></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro">THE SEED STORE</div><h2>Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
@@ -136,15 +132,15 @@ const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e
 
 /* ---------- catalogue: the game's names, prices and tiers; garden_state may hand down others ---------- */
 const CAT={
- rose:{n:'Rose',p:'Roses',img:'rose',price:50,tier:0,c:['#E8798F','#F6C1CB']},
- lavender:{n:'Lavender',p:'Lavender',img:'lavender',price:50,tier:0,c:['#8E7CC3','#B9A9E0']},
- hydrangea:{n:'Hydrangea',p:'Hydrangeas',img:'hydrangea',price:50,tier:0,c:['#7FA6D9','#E3B7D6']},
+ rose:{n:'Rose',p:'Roses',img:'rose',price:30,tier:0,c:['#E8798F','#F6C1CB']},
+ lavender:{n:'Lavender',p:'Lavender',img:'lavender',price:20,tier:0,c:['#8E7CC3','#B9A9E0']},
+ hydrangea:{n:'Hydrangea',p:'Hydrangeas',img:'hydrangea',price:35,tier:0,c:['#7FA6D9','#E3B7D6']},
  peony:{n:'Peony',p:'Peonies',img:'peony',price:50,tier:0,c:['#F19AB0','#F9D8E0']},
- tulip:{n:'Tulip',p:'Tulips',img:'tulip',price:50,tier:0,c:['#E8533B','#F4C244']},
- daffodil:{n:'Daffodil',p:'Daffodils',img:'daffodil',price:50,tier:0,c:['#F3D24B','#F7EBA0']},
- delphinium:{n:'Delphinium',p:'Delphiniums',img:'delphinium',price:50,tier:0,c:['#4C6FD0','#8FA6E6']},
- cosmos:{n:'Cosmos',p:'Cosmos',img:'cosmos',price:50,tier:0,c:['#EE7FB1','#F9F2E6']},
- hyacinth:{n:'Hyacinth',p:'Hyacinths',img:'hyacinth',price:50,tier:1,c:['#7C6FD6','#E6A3C2']}};
+ tulip:{n:'Tulip',p:'Tulips',img:'tulip',price:20,tier:0,c:['#E8533B','#F4C244']},
+ daffodil:{n:'Daffodil',p:'Daffodils',img:'daffodil',price:15,tier:0,c:['#F3D24B','#F7EBA0']},
+ delphinium:{n:'Delphinium',p:'Delphiniums',img:'delphinium',price:25,tier:0,c:['#4C6FD0','#8FA6E6']},
+ cosmos:{n:'Cosmos',p:'Cosmos',img:'cosmos',price:10,tier:0,c:['#EE7FB1','#F9F2E6']},
+ hyacinth:{n:'Hyacinth',p:'Hyacinths',img:'hyacinth',price:40,tier:1,c:['#7C6FD6','#E6A3C2']}};
 const FLOWERS=Object.keys(CAT);
 const TIERS=[0,10,50,100];
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
@@ -186,11 +182,18 @@ const SND=(()=>{
   function puff(t0,dur,gain,lo,hi,q){const a=ctx();if(!a)return;const T=a.currentTime+(t0||0),s=a.createBufferSource();s.buffer=noise(a);const f=a.createBiquadFilter();f.type=lo?'bandpass':'lowpass';f.frequency.value=hi||1800;f.Q.value=q||0.7;
     const g=a.createGain();g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain,T+0.01);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(T);s.stop(T+dur+0.05)}
   const vibe=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
+  /* the iPhone silent switch mutes everything the sound engine makes unless the page is also playing a media track;
+     a silent loop through a media element, made here in code, keeps the chimes audible with the music off. Off with the chimes. */
+  let KEEP=null;
+  function silentWav(){const rate=8000,n=800,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+    w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+    return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+  function keepAlive(on){try{if(on){if(MUTE)return;if(!KEEP){KEEP=new Audio(silentWav());KEEP.loop=true;KEEP.volume=0.01;KEEP.setAttribute('playsinline','')}KEEP.play().catch(()=>{})}else if(KEEP){KEEP.pause()}}catch(e){}}
   let combo=0,comboT=0;
   return{
     muted:()=>MUTE,
-    setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v)ctx()},
-    unlock(){ctx()},
+    setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v){ctx();keepAlive(true)}else keepAlive(false)},
+    unlock(){ctx();keepAlive(true)},
     /* small */
     tickUp(i){if(!gate('tick',40))return;tone(740*Math.pow(2,((i||0)%10)/12),0,0.07,0.07,'triangle')},
     tickDown(){if(!gate('tick',40))return;tone(520,0,0.07,0.06,'triangle')},
@@ -200,6 +203,8 @@ const SND=(()=>{
     splash(){puff(0,0.4,0.16,true,2200,0.6)},
     knock(){if(!gate('knock',120))return;puff(0,0.06,0.06,false,900,1);tone(190,0,0.09,0.07,'sine',120)},
     nope(){tone(260,0,0.14,0.07,'triangle',200);tone(196,0.12,0.18,0.07,'triangle',150)},
+    chip(){if(!gate('chip',60))return;puff(0,0.05,0.14,true,3400,1.4);tone(1480,0,0.045,0.05,'square');tone(3100,0.01,0.03,0.03,'square')},
+    carved(){cascade(7,659.3,0.1,0.075);chord([1318.5,1568,2093],0.55,1.3,0.07);vibe([15,40,15])},
     /* medium */
     open(){bell(1046.5,0,0.35,0.05)},
     hello(){bell(880,0,0.45,0.07);bell(1174.7,0.13,0.55,0.07)},
@@ -216,6 +221,8 @@ const SND=(()=>{
   }})();
 addEventListener('pointerdown',()=>SND.unlock(),{once:true});
 addEventListener('keydown',()=>SND.unlock(),{once:true});
+
+
 
 /* ---------- the plan: the game's own tables, so bed numbers match the walk ---------- */
 const BEDS=[
@@ -276,11 +283,12 @@ function renderPlants(){const src=BLOOM?BLOOMSET:S.plants;let s='';const k=today
   Object.entries(src).forEach(([plot,p])=>{if(CAT[p.t])s+=`<g data-plant="${plot}">${plantSVG(+plot,p)}</g>`});
   $('#plants').innerHTML=s;
   $$('.bed').forEach(el=>{const plot=+el.dataset.plot,p=src[plot];el.querySelector('.wet').setAttribute('opacity',p&&p.wd===k&&(p.g||0)<2?'.28':'0');
-    el.classList.toggle('can',!BLOOM&&!p&&!!SOW);el.classList.toggle('thirsty',!BLOOM&&!SOW&&th.indexOf(plot)>=0)})}
+    el.classList.toggle('can',!BLOOM&&!p&&sackTotal()>0);el.classList.toggle('thirsty',!BLOOM&&th.indexOf(plot)>=0)})}
 const BLOOMSET={};if(BLOOM){const r=rng(2026);for(let p=0;p<40;p++)BLOOMSET[p]={t:FLOWERS[Math.floor(r()*FLOWERS.length)],g:2};document.body.classList.add('showcase')}
 
 /* ---------- the bar ---------- */
 function renderHud(){$('#hSack').textContent=(S.coins|0).toLocaleString()+' Deedcoins · '+plural(sackTotal(),'seed');$('#hDeeds').textContent=S.deeds|0;
+  const nk=SOW&&S.sack[SOW]>0?SOW:null;$('#hSackSub').textContent=nk?'Your sack · sowing '+CAT[nk].n.toLowerCase():'Your sack · tap to buy';
   $('#bDeed').textContent=LIVE?'Log a deed. +'+DEED_PAY:'Post a deed. +'+DEED_PAY}
 
 /* ---------- the store: a basket, nothing charged until Checkout ---------- */
@@ -292,16 +300,18 @@ function openStore(){if(BLOOM)return;STORE_ON=true;CART={};$('#store').classList
 function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on')}
 function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.coins-total;
   $('#stBal').innerHTML=COINIMG+'<span><b>'+left.toLocaleString()+'</b> Deedcoins'+(total?' · basket '+total:'')+'</span>';$('#stBal').classList.toggle('short',left<0);
-  $('#stNote').textContent='Seeds are '+CAT.rose.price+' each. Tier '+(t+1)+(t<TIERS.length-1?' · tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'. Checkout, then tap the beds.';
+  const pr=FLOWERS.map(id=>CAT[id].price);$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+'. Tier '+(t+1)+(t<TIERS.length-1?' · tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'. Checkout, then tap the beds.';
   let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
     h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'"><div class="art"><img src="garden-'+c.img+'-map.webp" alt="" onerror="this.parentNode.classList.add(\'drawn\')">'+drawnBloom(id)+'</div><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':c.price+' Deedcoins'+(S.sack[id]?' · '+S.sack[id]+' in the sack':''))+'</div>';
     h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">−</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
   $('#stGrid').innerHTML=h;
   const sack=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]);
-  $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.7">YOUR SACK</div>'+sack.map(([id,q])=>'<div class="srow"><span>'+plural(q,CAT[id].n.toLowerCase()+' seed')+'</span><button class="btn" data-sell="'+id+'">Return one. +'+CAT[id].price+'</button></div>').join(''):'';
+  const nk=nextKind();
+  $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.7">YOUR SACK'+(sack.length>1?' \u00B7 TAP A KIND TO SOW IT NEXT':'')+'</div>'+sack.map(([id,q])=>'<div class="srow"><span'+(sack.length>1?' data-next="'+id+'" style="cursor:pointer"':'')+'>'+plural(q,CAT[id].n.toLowerCase()+' seed')+(id===nk&&sack.length>1?' \u00B7 <b>sowing next</b>':'')+'</span><button class="btn" data-sell="'+id+'">Return one. +'+CAT[id].price+'</button></div>').join(''):'';
   $('#stBuy').textContent=total?'Checkout · '+total+'.':'Checkout.';$('#stBuy').disabled=BUSY;
   $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d));
-  $$('#stSack [data-sell]').forEach(b=>b.onclick=()=>sell(b.dataset.sell))}
+  $$('#stSack [data-sell]').forEach(b=>b.onclick=()=>sell(b.dataset.sell));
+  $$('#stSack [data-next]').forEach(el=>el.onclick=()=>{setSow(el.dataset.next);renderStore();toast('Sowing '+CAT[el.dataset.next].n.toLowerCase()+' next.')})}
 function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
 function showShort(total){SND.nope();$('#shBody').textContent='You have '+S.coins+' and these seeds come to '+total+'. Log a deed and '+DEED_PAY+' more arrive.';$('#short').classList.add('on')}
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
@@ -310,7 +320,7 @@ $('#stClose').onclick=closeStore;
 $('#store').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStore()});
 $('#short').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#short').classList.remove('on')});
 $('#bSack').onclick=openStore;
-function bought(items){SND.buy(items.reduce((a,[id,q])=>a+q,0));closeStore();renderHud();sowStart(items[0][0]);toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Tap a bed to sow.')}
+function bought(items){SND.buy(items.reduce((a,[id,q])=>a+q,0));closeStore();setSow(items[0][0]);toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Tap a bed to sow.')}
 $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
   if(!items.length){toast('The basket is empty. Tap + on a packet.');return}
   const total=cartTotal();if(total>S.coins){showShort(total);return}
@@ -330,26 +340,29 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
   CART={};save();bought(items)};
 function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to return.');return}
   if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
-    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');if(SOW===id&&!S.sack[id])sowStop();save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');if(SOW===id&&!S.sack[id])sowStop();save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
+    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');nextKind();save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');nextKind();save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
 
-/* ---------- sowing: hold a seed type, tap bed after bed until it runs out ---------- */
-let SOW=null;
-function sowStart(id){if(!(S.sack[id]>0)){const alt=FLOWERS.find(t=>S.sack[t]>0);if(!alt){sowStop();return}id=alt}
-  SOW=id;$('#sowNm').textContent=CAT[id].n.toLowerCase();$('#sowCt').textContent=plural(S.sack[id]||0,'seed')+' left';$('#sowchip').classList.add('on');
-  $('#sowSwap').style.display=FLOWERS.filter(t=>S.sack[t]>0).length>1?'':'none';renderPlants()}
-function sowStop(msg){SOW=null;$('#sowchip').classList.remove('on');renderPlants();if(msg)toast(msg)}
-$('#sowDone').onclick=()=>sowStop('Seeds put away.');
-$('#sowSwap').onclick=()=>{const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;sowStart(types[(types.indexOf(SOW)+1)%types.length])};
-function sowAt(plot){const id=SOW,c=CAT[id];if(S.plants[plot]){SND.knock();toast('Bed '+(plot+1)+' is taken.');return}
-  if(!(S.sack[id]>0)){sowStop('Out of '+c.n.toLowerCase()+' seeds.');return}
+/* ---------- sowing: tap an empty bed and a seed goes in; SOW is the kind that goes next ---------- */
+let SOW=null;try{SOW=localStorage.getItem('garden_sow')||null}catch(e){}
+function nextKind(){if(SOW&&S.sack[SOW]>0)return SOW;const alt=FLOWERS.find(t=>S.sack[t]>0)||null;setSow(alt);return alt}
+function setSow(id){SOW=id;try{if(id)localStorage.setItem('garden_sow',id);else localStorage.removeItem('garden_sow')}catch(e){}renderHud();renderPlants()}
+function sowAt(plot,id){id=id||nextKind();const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knock();toast('Bed '+(plot+1)+' is taken.');return}
+  if(!(S.sack[id]>0)){SND.knock();toast('No '+c.n.toLowerCase()+' seeds left.');return}
   if(LIVE){S.plants[plot]={t:id,g:0,pending:1};sb.rpc('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();renderPlants();renderHud();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save();renderPlants()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();renderPlants();renderHud()})}
   else S.plants[plot]={t:id,g:0};
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();renderHud();SND.sow();
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();SND.sow();
   if(Object.keys(S.plants).length>=40)setTimeout(()=>SND.allPlanted(),300);
   const left=S.sack[id]||0;
-  if(left){sowStart(id);toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+plural(left,'seed')+' left.')}
-  else{const alt=FLOWERS.find(t=>S.sack[t]>0);if(alt){sowStart(alt);toast('Sown. '+c.n+' in bed '+(plot+1)+'. Now sowing '+CAT[alt].n.toLowerCase()+'.')}else{setTimeout(()=>SND.lastSeed(),140);sowStop('Sown. '+c.n+' in bed '+(plot+1)+'. That was the last seed. Water it, and log a deed for more.')}}}
+  if(left){setSow(id);toast('Sowed '+c.n.toLowerCase()+' in bed '+(plot+1)+' \u00B7 '+plural(left,'seed')+' left.')}
+  else{const alt=FLOWERS.find(t=>S.sack[t]>0)||null;setSow(alt);setTimeout(()=>SND.lastSeed(),140);
+    toast('Sowed '+c.n.toLowerCase()+' in bed '+(plot+1)+' \u00B7 that was the last '+c.n.toLowerCase()+' seed.'+(alt?' Next: '+CAT[alt].n.toLowerCase()+'.':' Log a deed for more.'))}}
+/* when you own several kinds and have not picked, the first empty bed asks once */
+const pickEl=$('#pick');
+function askKind(plot,x,y){const kinds=FLOWERS.filter(t=>S.sack[t]>0);pickEl.innerHTML=kinds.map(t=>'<button class="btn" data-t="'+t+'">'+CAT[t].n+' \u00B7 '+S.sack[t]+'</button>').join('');
+  pickEl.classList.add('on');const w=pickEl.offsetWidth,h=pickEl.offsetHeight;pickEl.style.left=Math.max(8,Math.min(innerWidth-w-8,x-w/2))+'px';pickEl.style.top=Math.max(60,y-h-14)+'px';
+  $$('#pick .btn').forEach(b=>b.onclick=e=>{e.stopPropagation();pickEl.classList.remove('on');setSow(b.dataset.t);sowAt(plot,b.dataset.t)})}
+addEventListener('pointerdown',e=>{if(!pickEl.contains(e.target))pickEl.classList.remove('on')});
 
 /* ---------- watering: tap a planted bed, once a day ---------- */
 function waterAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const k=today();
@@ -380,14 +393,15 @@ $('#map').addEventListener('click',e=>{const el=e.target.closest&&e.target.close
   if(!el){if(!NARROW())return;const q=quadrantAt(e);if(q===-1){ZOOM=-1;setView()}else if(q>=0&&ZOOM<0){ZOOM=q;setView()}return}
   if(BLOOM)return;const plot=+el.dataset.plot;
   if(S.plants[plot]){waterAt(plot);return}
-  if(SOW){sowAt(plot);return}
-  const alt=FLOWERS.find(t=>S.sack[t]>0);if(alt){SND.rustle();sowStart(alt);sowAt(plot);return}
-  openStore();toast('Bed '+(plot+1)+' is empty. Buy a seed for it.')});
+  const kinds=FLOWERS.filter(t=>S.sack[t]>0);
+  if(!kinds.length){openStore();toast('Bed '+(plot+1)+' is empty. Buy a seed for it.');return}
+  if(kinds.length>1&&!(SOW&&S.sack[SOW]>0)){askKind(plot,e.clientX,e.clientY);return}
+  sowAt(plot,nextKind())});
 
 /* ---------- deeds, start over, the walk ---------- */
 $('#bDeed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
   const t0=tierOf(S.deeds);S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'earned');save();renderHud();if(STORE_ON)renderStore();SND.deed();if(tierOf(S.deeds)>t0)setTimeout(()=>SND.tier(),1400);toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins. Sign in on DEEDS to log real ones.')};
-function clearLocal(){let back=0;Object.values(S.plants).forEach(p=>{S.sack[p.t]=(S.sack[p.t]||0)+1;back++});S.plants={};sowStop();save();renderPlants();renderHud();SND.undo(back);return back}
+function clearLocal(){let back=0;Object.values(S.plants).forEach(p=>{S.sack[p.t]=(S.sack[p.t]||0)+1;back++});S.plants={};nextKind();save();renderPlants();renderHud();SND.undo(back);return back}
 $('#bClear').onclick=()=>{if(BLOOM)return;if(!Object.keys(S.plants).length){toast('Nothing planted yet.');return}$('#confirm').classList.add('on')};
 $('#cNo').onclick=()=>$('#confirm').classList.remove('on');
 $('#confirm').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#confirm').classList.remove('on')});
@@ -414,7 +428,7 @@ function hydrate(d){LIVE=true;ADMIN=!!d.admin;
   S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
   S.plants={};(d.plots||[]).forEach(p=>{if(CAT[p.t])S.plants[p.plot]={t:p.t,g:+p.g||0,wd:p.wd||undefined}});
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
-  HYDRATED=true;save();if(SOW&&!S.sack[SOW])sowStop();renderPlants();renderHud();if(STORE_ON)renderStore()}
+  HYDRATED=true;save();nextKind();renderPlants();renderHud();if(STORE_ON)renderStore()}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
     return sb.rpc('garden_state').then(r2=>{if(r2.error){toast(rpcFail(r2.error,'The garden could not load your sack.'));return}hydrate(r2.data||{});
@@ -425,7 +439,7 @@ if(!BLOOM){const c=document.createElement('script');c.src='https://cdn.jsdelivr.
 renderPlants();renderHud();
 if(BLOOM)toast('The parterre in bloom. Walk in to see it up close.');
 else if(!S.flags.hello){S.flags.hello=1;save();setTimeout(()=>toast(LIVE?'Your garden. Tap the sack to buy seeds, then tap a bed.':'Your garden. Sign in on DEEDS to keep it and earn Deedcoins.'),900)}
-window.__garden={S:()=>S,sowAt,waterAt,openStore,cartAdd,live:()=>LIVE,sow:()=>SOW,snd:SND};
+window.__garden={S:()=>S,sowAt,waterAt,openStore,cartAdd,live:()=>LIVE,sow:()=>SOW,snd:SND,setSow};
 })();
 </script>
 </body>
