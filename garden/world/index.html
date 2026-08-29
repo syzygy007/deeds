@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="1.1">
+<meta name="world-build" content="1.3">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -19,6 +19,42 @@ canvas{display:block;touch-action:none}
      padding:8px 12px;border-radius:999px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;cursor:pointer;font-family:inherit}
 .btn.on{background:var(--ivory);color:var(--ink)}
 .dc{height:19px;width:auto;vertical-align:-5px;margin-right:5px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+#act{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:8px;z-index:12;pointer-events:none;text-align:center}
+#act.on{display:flex}
+.abtn{pointer-events:auto;background:var(--ivory);color:var(--ink);border:0;border-radius:999px;padding:12px 22px;font-weight:800;font-size:15px;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.abtn.quiet{background:rgba(21,19,14,.55);color:var(--ivory);border:1px solid rgba(246,243,235,.5);font-weight:700;cursor:default;box-shadow:none}
+#actChips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+.chip{background:rgba(21,19,14,.55);border:1px solid rgba(246,243,235,.55);color:var(--ivory);border-radius:999px;padding:6px 12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;cursor:pointer}
+.chip.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+#status{position:fixed;left:50%;top:15%;transform:translateX(-50%);background:rgba(21,19,14,.86);color:var(--ivory);padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .25s;z-index:40;max-width:86vw;text-align:center;pointer-events:none}
+#status.on{opacity:1}
+.sheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(21,19,14,.6);z-index:30;pointer-events:auto;padding:14px}
+.sheet.on{display:flex}
+.panel{width:min(600px,100%);max-height:88vh;overflow:auto;background:#1a1812;border:1px solid rgba(246,243,235,.28);border-radius:18px;padding:18px 18px 14px;color:var(--ivory);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.panel.small{width:min(420px,100%)}
+.panel h2{margin:2px 0 6px;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.panel h2 span{color:var(--gold)}
+.panel p{font-size:15px;line-height:1.5;margin:0 0 14px;color:rgba(246,243,235,.85)}
+.shead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sbal{white-space:nowrap;padding-top:6px}
+.sbal.short{color:#f0a08a}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 6px}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}}
+.pk{border:1px solid rgba(246,243,235,.22);border-radius:14px;padding:10px 8px 8px;text-align:center;background:rgba(246,243,235,.05)}
+.pk.in{border-color:var(--gold)}
+.pk.locked{opacity:.45}
+.pk img{width:100%;aspect-ratio:1;object-fit:contain;display:block;margin:0 auto 6px}
+.pk .nm{font-size:11px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}
+.pk .pr{font-size:12px;color:rgba(246,243,235,.7);margin:2px 0 6px}
+.stp{display:flex;justify-content:center;align-items:center;gap:6px}
+.stp button{width:32px;height:32px;border-radius:50%;border:1px solid rgba(246,243,235,.5);background:transparent;color:var(--ivory);font-size:18px;line-height:1;cursor:pointer}
+.stp b{min-width:22px;font-size:15px}
+.sfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.sfoot .btn{padding:10px 18px;font-size:12px}
+.sfoot .btn.on{background:var(--ivory);color:var(--ink)}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(246,243,235,.12);font-size:14px}
+.srow .btn{padding:6px 12px;font-size:10px}
+.lnk{background:none;border:0;color:var(--gold);font-weight:800;letter-spacing:.1em;font-size:11px;text-transform:uppercase;cursor:pointer;pointer-events:auto;padding:0}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #place{text-shadow:0 1px 18px rgba(0,0,0,.55)}
 #place h1{margin:.1em 0 0;font-size:clamp(1.5rem,4.4vw,2.6rem);letter-spacing:-.035em;line-height:.95;font-weight:800}
@@ -51,6 +87,7 @@ canvas{display:block;touch-action:none}
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
       <div class="micro" id="purse" style="text-align:right;text-shadow:0 1px 12px rgba(0,0,0,.6)"></div>
       <button class="btn" id="music">Music</button>
+      <button class="btn" id="deed">Log a deed. +200</button>
       <button class="btn" id="garden">Garden</button>
       <button class="btn" id="back">&larr; DEEDS</button>
     </div>
@@ -66,6 +103,16 @@ canvas{display:block;touch-action:none}
 <div id="err" style="position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;background:#7A1F1F;
   color:#fff;font:600 11px/1.5 ui-monospace,monospace;padding:10px 14px;white-space:pre-wrap"></div>
 
+<div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
+<div id="status" class="micro"></div>
+<div id="store" class="sheet"><div class="panel">
+  <div class="shead"><div><div class="micro">THE SEED STAND</div><h2>Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
+  <div class="micro" id="stNote" style="opacity:.75"></div>
+  <div class="grid" id="stGrid"></div>
+  <div id="stSack"></div>
+  <div class="sfoot"><button class="btn" id="stClose">Not now.</button><button class="btn on" id="stBuy">Checkout.</button></div>
+</div></div>
+<div id="short" class="sheet"><div class="panel small"><h2>Not enough Deedcoins<span>.</span></h2><p id="shBody"></p><div class="sfoot"><button class="btn" id="shKeep">Keep shopping.</button><button class="btn on" id="shDeed">Log a deed.</button></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ======================================================================
@@ -84,7 +131,7 @@ function shout(m){const e=document.getElementById('err');e.style.display='block'
 addEventListener('error',e=>shout('ERROR: '+(e.message||e.error)));
 if(!ON_SITE)document.getElementById('srcnote').textContent='Preview · pictures are blocked here, the drawn stand ins show instead';
 function rng(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const COARSE=matchMedia('(pointer:coarse)').matches;
 const QS=new URLSearchParams(location.search);
 
@@ -96,10 +143,11 @@ const BEDS=[
   {k:'e',cx:100,cy:198,rx:86,ry:46},{k:'c',cx:222,cy:192,r:34},{k:'e',cx:320,cy:204,rx:44,ry:74},
   {k:'e',cx:62,cy:314,rx:34,ry:52},{k:'c',cx:162,cy:320,r:46},{k:'t',cx:268,cy:318,s:70,rot:180},{k:'c',cx:336,cy:326,r:28}];
 const QT=[[140,140,.825,.825],[860,140,-.825,.825],[140,860,.825,-.825],[860,860,-.825,-.825]];
+/* n = the game's name (singular), p = the bed label (plural); price and tier are the game's defaults until garden_state hands down the catalog */
 const CAT={
- rose:{n:'Roses',img:'rose'},lavender:{n:'Lavender',img:'lavender'},hydrangea:{n:'Hydrangeas',img:'hydrangea'},
- peony:{n:'Peonies',img:'peony'},tulip:{n:'Tulips',img:'tulip'},daffodil:{n:'Daffodils',img:'daffodil'},
- delphinium:{n:'Delphiniums',img:'delphinium'},cosmos:{n:'Cosmos',img:'cosmos'},hyacinth:{n:'Hyacinths',img:'hyacinth'}
+ rose:{n:'Rose',p:'Roses',img:'rose',price:50,tier:0},lavender:{n:'Lavender',p:'Lavender',img:'lavender',price:50,tier:0},hydrangea:{n:'Hydrangea',p:'Hydrangeas',img:'hydrangea',price:50,tier:0},
+ peony:{n:'Peony',p:'Peonies',img:'peony',price:50,tier:0},tulip:{n:'Tulip',p:'Tulips',img:'tulip',price:50,tier:0},daffodil:{n:'Daffodil',p:'Daffodils',img:'daffodil',price:50,tier:0},
+ delphinium:{n:'Delphinium',p:'Delphiniums',img:'delphinium',price:50,tier:0},cosmos:{n:'Cosmos',p:'Cosmos',img:'cosmos',price:50,tier:0},hyacinth:{n:'Hyacinth',p:'Hyacinths',img:'hyacinth',price:50,tier:1}
 };
 const FLOWERS=Object.keys(CAT);
 
@@ -379,6 +427,15 @@ function birdCanvas(body,wing,up){const c=cv(64,48),g=c.getContext('2d');g.trans
 function cloudCanvas(){const c=cv(256,160),g=c.getContext('2d'),r=rng(61);for(let i=0;i<40;i++){const x=40+r()*176,y=60+r()*60,rad=18+r()*30;const gr=g.createRadialGradient(x,y,0,x,y,rad);gr.addColorStop(0,'rgba(255,255,255,.85)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.beginPath();g.arc(x,y,rad,0,6.28);g.fill()}return c}
 function gradCanvas(stops,hz){const c=cv(8,512),g=c.getContext('2d');const gr=g.createLinearGradient(0,0,0,512);const st=[0,.22,.42,.60,.76,.90];stops.forEach((col,i)=>gr.addColorStop(st[i],col));gr.addColorStop(1,hz);g.fillStyle=gr;g.fillRect(0,0,8,512);return c}
 
+/* the stand's wood, its striped awning and its sign */
+function woodTex(){const c=cv(256,256),g=c.getContext('2d');g.fillStyle='#7A5533';g.fillRect(0,0,256,256);const r=rng(31);
+  for(let i=0;i<220;i++){g.strokeStyle='rgba(60,35,15,'+(0.15+r()*0.35)+')';g.lineWidth=1+r()*2;const y=r()*256;g.beginPath();g.moveTo(0,y);g.bezierCurveTo(80,y+(r()-.5)*10,170,y+(r()-.5)*10,256,y);g.stroke()}
+  for(let i=0;i<60;i++){g.fillStyle="rgba(160,110,60,"+(r()*0.25)+")";g.fillRect(r()*256,r()*256,r()*40,1)}return c}
+function awningTex(){const c=cv(512,512),g=c.getContext('2d');for(let i=0;i<8;i++){g.fillStyle=i%2?'#F2EBDA':'#2F4A34';g.fillRect(0,i*64,512,64)}
+  const r=rng(7);for(let i=0;i<900;i++){g.fillStyle='rgba(0,0,0,'+(r()*0.08)+')';g.fillRect(r()*512,r()*512,2,2)}return c}
+function signTex(t){const c=cv(512,160),g=c.getContext('2d');g.fillStyle='#15130E';g.fillRect(0,0,512,160);g.strokeStyle='#C9A227';g.lineWidth=4;g.strokeRect(10,10,492,140);
+  g.fillStyle='#F6F3EB';g.font='800 92px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,256,86);return c}
+
 /* ======================================================================
    RENDERER, LIGHT, MATERIALS
    ====================================================================== */
@@ -414,6 +471,10 @@ const MAT={
   water:new THREE.MeshStandardMaterial({color:0x2c7e98,roughness:0.06,metalness:0.3,normalMap:dress(new THREE.CanvasTexture(waterNormal()),[3,3],true),normalScale:new THREE.Vector2(.45,.45),transparent:true,opacity:0.9}),
   lantern:new THREE.MeshStandardMaterial({color:0xfff1c8,emissive:0xffb060,emissiveIntensity:0,roughness:0.6}),
   iron:new THREE.MeshStandardMaterial({color:0x1d1c1a,roughness:0.7,metalness:0.5}),
+  wood:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(woodTex()),[1,1]),roughness:0.85,metalness:0}),
+  awning:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(awningTex()),[1,1]),roughness:0.9,metalness:0,side:THREE.DoubleSide}),
+  sign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('SEEDS.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
+  clay:new THREE.MeshStandardMaterial({color:0xB5643C,roughness:0.9,metalness:0}),
 };
 /* the gravel tile's grain reads at a larger scale: repeat set for 1.5 m */
 
@@ -539,6 +600,41 @@ function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0
   if(y<1.6){u=(t+d.t0+0.8)%1.6;x=d.vx*u;y=2.38+d.vy*u-4.9*u*u;z=d.vz*u}
   dropM.makeTranslation(x,y,z);dropMesh.setMatrixAt(i,dropM)}dropMesh.instanceMatrix.needsUpdate=true}
 
+/* ======================================================================
+   THE SEED STAND, at the end of the south avenue where the wood closes the way, its counter facing the garden.
+   Built in a local frame (front = local -x) and turned to face north; the Keeper stands behind the counter.
+   ====================================================================== */
+const STAND={x:0,z:48.6,front:{x:0,z:46.3}};
+const KEEPER={};
+{const G=new THREE.Group();G.position.set(STAND.x,0,STAND.z);G.rotation.y=-Math.PI/2;scene.add(G);
+ const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
+ [[-1.55,-1.05],[1.55,-1.05],[-1.55,1.05],[1.55,1.05]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
+ gm(new THREE.BoxGeometry(0.85,0.92,3.2),MAT.wood,-1.15,0.46,0);
+ gm(new THREE.BoxGeometry(1.0,0.06,3.36),MAT.wood,-1.15,0.95,0);
+ gm(new THREE.BoxGeometry(0.42,1.7,3.2),MAT.wood,1.35,0.85,0);
+ gm(new THREE.BoxGeometry(0.5,0.05,3.3),MAT.wood,1.35,1.72,0);
+ const roof=gm(new THREE.BoxGeometry(3.9,0.05,2.6),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
+ gm(new THREE.BoxGeometry(3.9,0.08,0.08),MAT.wood,-1.85,2.36,0);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.sign);sign.position.set(-1.9,1.98,0);sign.rotation.y=-Math.PI/2;G.add(sign);
+ for(let i=0;i<3;i++)gm(new THREE.CylinderGeometry(0.15,0.11,0.22,12),MAT.clay,-1.15,1.09,-1.1+i*0.62);
+ gm(new THREE.BoxGeometry(0.55,0.32,0.7),MAT.wood,-1.1,1.14,1.15);
+ /* the Keeper: coat, head, straw hat, two arms; no face to get wrong */
+ const K=new THREE.Group();K.position.set(0.15,0,0.25);G.add(K);KEEPER.g=K;
+ const coat=new THREE.MeshStandardMaterial({color:0x8B7A5A,roughness:0.95}),skin=new THREE.MeshStandardMaterial({color:0xD9B68E,roughness:0.9}),straw=new THREE.MeshStandardMaterial({color:0xC9A64E,roughness:0.95});
+ const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||K).add(o);return o};
+ km(new THREE.CylinderGeometry(0.2,0.26,1.05,14),coat,0,0.7,0);
+ km(new THREE.CylinderGeometry(0.24,0.2,0.3,14),coat,0,1.35,0);
+ const head=new THREE.Group();head.position.set(0,1.62,0);K.add(head);KEEPER.head=head;
+ km(new THREE.SphereGeometry(0.16,16,12),skin,0,0,0,head);
+ km(new THREE.CylinderGeometry(0.44,0.44,0.03,20),straw,0,0.12,0,head);
+ km(new THREE.ConeGeometry(0.24,0.3,16),straw,0,0.27,0,head);
+ const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.3,side*0.27);K.add(A);km(new THREE.CylinderGeometry(0.05,0.045,0.62,10),coat,0,-0.31,0,A);km(new THREE.SphereGeometry(0.06,10,8),skin,0,-0.64,0,A);return A};
+ KEEPER.armL=arm(-1);KEEPER.armR=arm(1);KEEPER.armR.rotation.x=-0.25;KEEPER.armL.rotation.x=0.2;
+ /* the stall footprint in world space: local x runs along world z, local z along world x */
+ markRect(STAND.x-1.25,STAND.z-1.7,STAND.x+1.25,STAND.z+1.7,1.0)}
+/* the same points in world space for the billboard wares */
+const SL=(lx,lz)=>[STAND.x-lz,STAND.z+lx];
+
 /* the golden dot: where you start, facing the garden through the south gap */
 const SPAWN={x:0,z:HALF+1.6,yaw:0};
 
@@ -567,48 +663,48 @@ const BB_MATS=[];
 function bbMaterial(map,sway){const m=new THREE.ShaderMaterial({vertexShader:BB_VS,fragmentShader:BB_FS,
   uniforms:{map:{value:map},tint:{value:new THREE.Color(1,1,1)},fogColor:{value:new THREE.Color(0xe8e2d0)},fogNear:{value:50},fogFar:{value:230},time:{value:0},sway:{value:sway},cut:{value:0.45}},
   side:THREE.DoubleSide,transparent:false,alphaToCoverage:!COARSE});BB_MATS.push(m);return m}
-/* a stand: a list of {x,z,h,flip} for one picture. widths follow the picture's own shape once it lands */
-const STANDS=[];
-function stand(file,fallback,items,opts){
-  opts=opts||{};
-  const fb=fallback();let aspect=fb.width/fb.height;
-  const map=dress(new THREE.CanvasTexture(fb));
-  const im=new THREE.InstancedMesh(BB_GEO,bbMaterial(map,opts.sway||0),items.length);
-  im.frustumCulled=false;
-  const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),P=new THREE.Vector3();
-  const lay=()=>{items.forEach((it,i)=>{const w=it.h*aspect;P.set(it.x,it.y-it.h*0.02,it.z);S.set(it.flip?-w:w,it.h,1);M.compose(P,Q,S);im.setMatrixAt(i,M)});im.instanceMatrix.needsUpdate=true};
-  lay();scene.add(im);
-  loadImg(file,img=>{aspect=img.width/img.height;map.image=img;map.needsUpdate=true;lay()});
-  STANDS.push(im);return im;
-}
+/* a kind = one picture with its material and its true aspect; a stand = an InstancedMesh of {x,z,y,h,flip} placed with that kind.
+   kinds are cached so a bed can be replanted without reloading anything */
+const STANDS=[],KINDS={};
+function kindOf(key,file,fallback,sway){if(KINDS[key])return KINDS[key];
+  const fb=fallback();const k={key,aspect:fb.width/fb.height,map:dress(new THREE.CanvasTexture(fb)),meshes:[]};k.mat=bbMaterial(k.map,sway||0);
+  loadImg(file,img=>{k.aspect=img.width/img.height;k.map.image=img;k.map.needsUpdate=true;k.meshes.forEach(layStand)});
+  KINDS[key]=k;return k}
+const _M=new THREE.Matrix4(),_Q=new THREE.Quaternion(),_S=new THREE.Vector3(),_P=new THREE.Vector3();
+function layStand(im){const k=im.userData.kind,items=im.userData.items;
+  items.forEach((it,i)=>{const w=it.h*k.aspect;_P.set(it.x,it.y-it.h*0.02,it.z);_S.set(it.flip?-w:w,it.h,1);_M.compose(_P,_Q,_S);im.setMatrixAt(i,_M)});im.instanceMatrix.needsUpdate=true}
+function placeStand(k,items){if(!items.length)return null;const im=new THREE.InstancedMesh(BB_GEO,k.mat,items.length);im.frustumCulled=false;im.userData={kind:k,items};layStand(im);scene.add(im);k.meshes.push(im);STANDS.push(im);return im}
+function dropStand(im){if(!im)return;scene.remove(im);const k=im.userData.kind,i=k.meshes.indexOf(im);if(i>=0)k.meshes.splice(i,1);const j=STANDS.indexOf(im);if(j>=0)STANDS.splice(j,1);im.dispose()}
+const flowerKind=t=>kindOf('flower-'+t,'garden-'+CAT[t].img+'-map.webp',()=>flowerCanvas(t),0.035);
+const seedKind=()=>kindOf('seeds','garden-seeds.webp',()=>{const c=cv(96,64),g=c.getContext('2d');for(let i=0;i<9;i++){g.fillStyle=i%2?'#5A3A22':'#3E2716';g.beginPath();g.ellipse(20+(i%3)*28,22+Math.floor(i/3)*12,11,6,(i*0.7)%3,0,6.28);g.fill()}return c},0);
 /* soft contact shadows, merged into one mesh per batch */
 const SHADOW_TEX=dress(new THREE.CanvasTexture(shadowTex()));
 const shadowMats=[];
 function shadowBatch(items,ratio,y){if(!items.length)return null;const g=mergeGeos(items.map(it=>{const w=it.h*ratio;const p=new THREE.PlaneGeometry(w,w*0.42);p.rotateX(-Math.PI/2);p.translate(it.x,y,it.z);return p}));
   const m=new THREE.MeshBasicMaterial({map:SHADOW_TEX,transparent:true,depthWrite:false,opacity:0.9});shadowMats.push(m);const o=new THREE.Mesh(g,m);scene.add(o);return o}
 
-/* ---------- the beds: what is planted, from the game's own save ---------- */
-const SAVE=(()=>{try{return JSON.parse(localStorage.getItem('garden'))||null}catch(e){return null}})();
-const BLOOM=QS.get('bloom')==='1'||!SAVE||!SAVE.plants||!Object.keys(SAVE.plants).length;
-const PLANTED={};                      /* plot -> {t,g} */
-if(BLOOM){const r=rng(2026);for(let p=0;p<40;p++)PLANTED[p]={t:FLOWERS[Math.floor(r()*FLOWERS.length)],g:2}}
-else Object.entries(SAVE.plants).forEach(([k,p])=>{if(CAT[p.t])PLANTED[+k]={t:p.t,g:Math.min(2,p.g||0)}});
-const bedLabel={};
-{const byKind={};const seedSpots=[];const shadows=[];
- Object.entries(PLANTED).forEach(([k,p])=>{const plot=+k,b=BED[plot];const r=rng(900+plot);
-   const stage=p.g>=2?'in bloom':p.g>=1?'growing':'sown';bedLabel[plot]=CAT[p.t].n+' · '+stage;
-   if(p.g===0){for(let i=0;i<4;i++){seedSpots.push({x:b.cx+(r()-.5)*b.rmax*0.7,z:b.cz+(r()-.5)*b.rmax*0.5,y:0.10,h:0.26,flip:r()>.5})}return}
-   const full=p.g>=2,scale=full?1:0.55,want=Math.round(b.area/(full?0.9:1.6));
-   const got=[];let tries=0;
-   while(got.length<want&&tries<want*40){tries++;const x=b.cx+(r()-.5)*2*b.rmax,z=b.cz+(r()-.5)*2*b.rmax;
-     if(!inPoly(b.P,x,z))continue;const d=polyDist(b.P,true,x,z);if(d<0.5)continue;
-     let ok=true;for(const o of got){if(Math.hypot(o.x-x,o.z-z)<0.72){ok=false;break}}if(!ok)continue;
-     const inner=Math.min(1,d/1.6);const h=(1.05+0.45*inner+(r()-.5)*0.25)*scale;
-     got.push({x,z,y:0.10,h,flip:r()>.5})}
-   (byKind[p.t]=byKind[p.t]||[]).push(...got);shadows.push(...got)});
- Object.entries(byKind).forEach(([t,items])=>stand('garden-'+CAT[t].img+'-map.webp',()=>flowerCanvas(t),items,{sway:0.035}));
- if(seedSpots.length)stand('garden-seeds.webp',()=>{const c=cv(96,64),g=c.getContext('2d');for(let i=0;i<9;i++){g.fillStyle=i%2?'#5A3A22':'#3E2716';g.beginPath();g.ellipse(20+(i%3)*28,22+Math.floor(i/3)*12,11,6,(i*0.7)%3,0,6.28);g.fill()}return c},seedSpots,{});
- shadowBatch(shadows,0.95,0.115)}
+/* ---------- the beds: what is planted. ?bloom=1 is the showcase, every bed in flower; otherwise your own garden, live or local ---------- */
+const BLOOM=QS.get('bloom')==='1';
+const BLOOMSET={};if(BLOOM){const r=rng(2026);for(let p=0;p<40;p++)BLOOMSET[p]={t:FLOWERS[Math.floor(r()*FLOWERS.length)],g:2}}
+const bedLabel={};const BEDMESHES=[];let BEDSHADOW=null;
+function plantBeds(){
+  BEDMESHES.forEach(dropStand);BEDMESHES.length=0;if(BEDSHADOW){scene.remove(BEDSHADOW);BEDSHADOW.geometry.dispose();BEDSHADOW=null}
+  Object.keys(bedLabel).forEach(k=>delete bedLabel[k]);
+  const src=BLOOM?BLOOMSET:S.plants;const byKind={},seedSpots=[],shadows=[],day=today();
+  Object.entries(src).forEach(([k,p])=>{const plot=+k,b=BED[plot];if(!b||!CAT[p.t])return;const r=rng(900+plot);const g=Math.min(2,p.g||0);
+    const stage=g>=2?'in bloom':g>=1?'growing':'sown';bedLabel[plot]=CAT[p.t].p+' \u00B7 '+stage+(g<2&&p.wd===day?' \u00B7 watered today':'');
+    if(g===0){for(let i=0;i<4;i++){seedSpots.push({x:b.cx+(r()-.5)*b.rmax*0.7,z:b.cz+(r()-.5)*b.rmax*0.5,y:0.10,h:0.26,flip:r()>.5})}return}
+    const full=g>=2,scale=full?1:0.55,want=Math.round(b.area/(full?0.9:1.6));
+    const got=[];let tries=0;
+    while(got.length<want&&tries<want*40){tries++;const x=b.cx+(r()-.5)*2*b.rmax,z=b.cz+(r()-.5)*2*b.rmax;
+      if(!inPoly(b.P,x,z))continue;const d=polyDist(b.P,true,x,z);if(d<0.5)continue;
+      let ok=true;for(const o of got){if(Math.hypot(o.x-x,o.z-z)<0.72){ok=false;break}}if(!ok)continue;
+      const inner=Math.min(1,d/1.6);const h=(1.05+0.45*inner+(r()-.5)*0.25)*scale;
+      got.push({x,z,y:0.10,h,flip:r()>.5})}
+    (byKind[p.t]=byKind[p.t]||[]).push(...got);shadows.push(...got)});
+  Object.entries(byKind).forEach(([t,items])=>{const m=placeStand(flowerKind(t),items);if(m)BEDMESHES.push(m)});
+  if(seedSpots.length)BEDMESHES.push(placeStand(seedKind(),seedSpots));
+  BEDSHADOW=shadowBatch(shadows,0.95,0.115)}
 
 /* ---------- the wood round the garden ---------- */
 const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree-blossom.webp','blossom'],cherry:['g2-cherry-tree-blossom.webp','blossom'],
@@ -617,18 +713,22 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
  const add=(kind,x,z,h)=>{(put[kind]=put[kind]||[]).push({x,z,y:0,h,flip:r()>.5});all.push({x,z,h,kind});markDisk(x,z,kind==='cypress'?0.42:0.55,3)};
  /* the avenue: cypress pairs down both openings */
  [-1,1].forEach(side=>{for(let k=0;k<4;k++){const z=side*(HALF+3.4+k*4.1);add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}});
- /* the wood: three rings, thicker further out, the path corridors kept clear */
+ /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
  while(all.length<150&&tries<6000){tries++;const a=r()*6.28,d=HALF+3.6+Math.pow(r(),0.8)*31;const x=Math.cos(a)*d,z=Math.sin(a)*d;
    if(Math.abs(x)<5.2&&Math.abs(z)<HALF+20)continue;              /* the two paths out */
    if(Math.max(Math.abs(x),Math.abs(z))<HALF+2.6)continue;          /* inside the hedge */
+   if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
    const kind=kinds[Math.floor(r()*kinds.length)];const far=(d-HALF)/34;
    add(kind,x,z,kind==='cypress'?6.5+r()*3:6.2+r()*2.6+far*3)}
- Object.entries(put).forEach(([k,items])=>stand(TREES[k][0],()=>treeCanvas(TREES[k][1]),items,{sway:0.012}));
+ Object.entries(put).forEach(([k,items])=>placeStand(kindOf('tree-'+k,TREES[k][0],()=>treeCanvas(TREES[k][1]),0.012),items));
  shadowBatch(all.filter(t=>t.kind!=='cypress').map(t=>({x:t.x,z:t.z,h:t.h*0.9})),0.9,0.03);
  shadowBatch(all.filter(t=>t.kind==='cypress').map(t=>({x:t.x,z:t.z,h:t.h*0.28})),1.2,0.03)}
+/* the stand's wares: the sack on the counter and three potted flowers */
+{const [sx,sz]=SL(-1.15,1.15);placeStand(kindOf('sack','garden-sack.webp',()=>{const c=cv(88,96),g=c.getContext('2d');g.fillStyle='#C9B48A';g.beginPath();g.ellipse(44,60,36,34,0,0,6.28);g.fill();g.fillStyle='#8E7A52';g.fillRect(30,6,28,26);return c},0),[{x:sx,z:sz,y:1.30,h:0.55,flip:false}])}
+['rose','tulip','lavender'].forEach((t,i)=>{const [px,pz]=SL(-1.15,-1.1+i*0.62);placeStand(flowerKind(t),[{x:px,z:pz,y:1.18,h:0.34,flip:i===1}])});
 
 /* ======================================================================
    THE SKY
@@ -688,7 +788,7 @@ function flyer(kind,x,z,y,size,opts){
   const o=Object.assign({m,kind,hx:x,hz:z,hy:y,ph:Math.random()*6.28,sp:0.6+Math.random()*0.9,r:opts&&opts.r||3,flap:opts&&opts.flap||9,alive:true},opts||{});
   air.push(o);return o;
 }
-{const r=rng(53);const beds=Object.keys(PLANTED).map(k=>BED[+k]);const anyBed=()=>beds.length?beds[Math.floor(r()*beds.length)]:{cx:(r()-.5)*40,cz:(r()-.5)*40};
+{const r=rng(53);const beds=BED;const anyBed=()=>beds[Math.floor(r()*beds.length)];
  for(let i=0;i<10;i++){const b=anyBed();flyer(i%3?'bee':'bumble',b.cx+(r()-.5)*3,b.cz+(r()-.5)*3,0.9+r()*0.9,0.42,{r:1.8+r(),sp:1.6+r()})}
  for(let i=0;i<12;i++){const b=anyBed();flyer(['bfb','bfa','bfi'][i%3],b.cx+(r()-.5)*4,b.cz+(r()-.5)*4,1.0+r()*1.2,0.5,{r:3+r()*2,sp:1.0+r()*.5})}
  for(let i=0;i<4;i++)flyer('dfly',(r()-.5)*4,(r()-.5)*4,1.3+r()*0.8,0.5,{r:3.2,sp:2.4+r()});
@@ -723,6 +823,162 @@ const fireflies=new THREE.Points(ffGeo,ffMat);scene.add(fireflies);
 function fireflyTick(t){if(ffMat.opacity<=0)return;const a=ffGeo.attributes.position;for(let i=0;i<FFN;i++){const h=ffHome[i];a.setXYZ(i,h.x+Math.sin(t*0.6+h.ph)*1.2,h.y+Math.sin(t*1.3+h.ph*2)*0.35,h.z+Math.cos(t*0.5+h.ph)*1.2)}a.needsUpdate=true}
 
 /* ======================================================================
+   THE GARDEN, LIVE: the same save, the same purse, the same server as the 2D game.
+   Signed in on DEEDS: every buy, sow and watering is a rpc; the local save mirrors it.
+   Signed out: the local demo, exactly like the game.
+   ====================================================================== */
+const SB_URL='https://helqqdygwaihrliglbvw.supabase.co',SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
+let sb=null,LIVE=false,ADMIN=false,ME=null,BUSY=false;
+const APP=ON_SITE?'/':'https://deeds.fun/';
+const TESTING=false;                               /* demo watering: once a day, like live */
+const freeWater=()=>LIVE?ADMIN:TESTING;
+const TIERS=[0,10,50,100];
+const DEED_PAY=200,START_COINS=100;
+const today=()=>new Date().toISOString().slice(0,10);
+const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){this.g[k]=v}},get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):this.g[k]}catch(e){return this.g[k]}}};
+const fresh=()=>({deeds:0,coins:START_COINS,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[]});
+let S=store.get('garden')||null;
+if(!S||typeof S!=='object')S=fresh();
+if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined)S=fresh();
+if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
+if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};if(!S.ledger)S.ledger=[];
+if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
+function ledger(l,a,w,u){S.ledger.unshift({t:Date.now(),l,a,w:w||'',u:u||''});if(S.ledger.length>60)S.ledger.length=60}
+const sackTotal=()=>Object.values(S.sack).reduce((a,b)=>a+b,0);
+function save(){S.bank=sackTotal();store.set('garden',S)}
+const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 42 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
+let toastT;function toast(m){const t=$('#status');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3000)}
+const KINDW={deed:'a deed',seed_buy:'seed store',seed_sell:'seed store',send:'sent',receive:'received',return:'returned',starter:'the purse opens'};
+
+function hydrate(d){LIVE=true;ADMIN=!!d.admin;
+  (d.catalog||[]).forEach(c=>{if(CAT[c.t]){CAT[c.t].price=+c.price;CAT[c.t].tier=Math.max(0,TIERS.indexOf(+c.min_deeds))}});
+  S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
+  S.plants={};(d.plots||[]).forEach(p=>{if(CAT[p.t])S.plants[p.plot]={t:p.t,g:+p.g||0,wd:p.wd||undefined}});
+  S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
+  save();plantBeds();renderHud();if(STORE_ON)renderStore()}
+function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
+  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
+    return sb.rpc('garden_state').then(r2=>{if(r2.error){toast(rpcFail(r2.error,'The garden could not load your sack.'));return}hydrate(r2.data||{});
+      try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}})}).catch(()=>{})}
+if(!BLOOM){const c=document.createElement('script');c.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';c.onload=goLive;c.onerror=()=>{};document.head.appendChild(c)}
+
+/* ---------- the purse line ---------- */
+const COINIMG='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
+function renderHud(){const el=$('#purse');
+  if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';return}
+  el.innerHTML='Your sack \u00B7 '+(S.coins|0).toLocaleString()+' Deedcoins \u00B7 '+plural(sackTotal(),'seed')+'<br>'+Object.keys(S.plants).length+' of 40 beds'+(LIVE?'':' \u00B7 local until you sign in')}
+/* sounds, made in the browser: a chime when you buy, a tick when a seed goes in, a splash when you water */
+let AC=null;function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume().catch(()=>{});return AC}
+function tone(f,t0,dur,type,gain){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),T=a.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,T);
+  g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain||0.16,T+0.012);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);o.connect(g);g.connect(a.destination);o.start(T);o.stop(T+dur+0.05)}
+const SFX={
+  chime(){tone(880,0,0.4,'sine',0.14);tone(1318.5,0.13,0.5,'sine',0.12);tone(1760,0.26,0.7,'sine',0.07)},
+  tick(){tone(560,0,0.07,'triangle',0.1);tone(420,0.05,0.11,'triangle',0.07)},
+  splash(){const a=ac();if(!a)return;const n=Math.floor(a.sampleRate*0.4),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.2);
+    const src=a.createBufferSource();src.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=0.6;const g=a.createGain();g.gain.value=0.22;src.connect(f);f.connect(g);g.connect(a.destination);src.start()},
+  nope(){tone(240,0,0.16,'triangle',0.09)}};
+$('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
+  S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'a deed');save();renderHud();if(STORE_ON)renderStore();toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins. Sign in on DEEDS to log real ones.')};
+
+/* ---------- the stand: a basket, nothing charged until Checkout ---------- */
+let STORE_ON=false,CART={};
+const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*q,0);
+function openStore(){STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();if(document.exitPointerLock)document.exitPointerLock()}
+function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on')}
+function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.coins-total;
+  $('#stBal').innerHTML=COINIMG+'<b>'+left.toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total:'');$('#stBal').classList.toggle('short',left<0);
+  $('#stNote').textContent='Seeds are '+CAT.rose.price+' each. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'. Walk to a bed to sow them.';
+  let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
+    h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':c.price+' Deedcoins'+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
+    h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">\u2212</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
+  $('#stGrid').innerHTML=h;
+  const sack=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]);
+  $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.75">YOUR SACK</div>'+sack.map(([id,q])=>'<div class="srow"><span>'+plural(q,CAT[id].n.toLowerCase()+' seed')+'</span><button class="btn" data-sell="'+id+'">Return one. +'+CAT[id].price+'</button></div>').join(''):'';
+  $('#stBuy').textContent=total?'Checkout \u00B7 '+total+'.':'Checkout.';$('#stBuy').disabled=BUSY;
+  $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d));
+  $$('#stSack [data-sell]').forEach(b=>b.onclick=()=>sell(b.dataset.sell))}
+function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];renderStore()}
+function showShort(total){SFX.nope();$('#shBody').textContent='You have '+S.coins+' and these seeds come to '+total+'. Log a deed and '+DEED_PAY+' more arrive.';$('#short').classList.add('on')}
+$('#shKeep').onclick=()=>$('#short').classList.remove('on');
+$('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
+$('#stClose').onclick=closeStore;
+$('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
+  if(!items.length){toast('The basket is empty. Tap + on a packet.');return}
+  const total=cartTotal();if(total>S.coins){showShort(total);return}
+  if(LIVE){if(BUSY)return;BUSY=true;renderStore();
+    (async()=>{let got=0,fail=null;
+      for(const [id,q] of items){const c=CAT[id];let want=q;
+        while(want>0){const prev=S.sack[id]||0;let r;try{r=await sb.rpc('seed_buy',{p_type:id,p_qty:want})}catch(e){r={error:e||{message:'network'}}}
+          if(r.error){fail=r.error;break}
+          const d=r.data||{};const qty=+d.qty;const n=qty-prev;
+          if(!(n>0)){fail={message:'no change'};break}
+          S.coins=+d.balance;S.sack[id]=qty;ledger(plural(n,c.n.toLowerCase()+' seed'),-c.price*n,'seed store');got+=n;want-=n;CART[id]=Math.max(0,(CART[id]||0)-n);if(!CART[id])delete CART[id];save()}
+        if(fail)break}
+      BUSY=false;
+      if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough Deedcoins for all of those.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
+      renderHud();
+      if(got&&!fail){CART={};SFX.chime();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed.')}
+      renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
+  items.forEach(([id,q])=>{const c=CAT[id];S.coins-=c.price*q;S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*q,'seed store')});
+  CART={};save();renderHud();renderStore();SFX.chime();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed.')};
+function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to return.');return}
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
+    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
+
+/* ---------- sowing and watering, from where you stand ---------- */
+let SOWT=null;                                      /* the seed type picked for sowing */
+function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){toast('Bed '+(plot+1)+' is taken.');return}
+  if(!(S.sack[id]>0)){toast('Out of '+c.n.toLowerCase()+' seeds.');return}
+  if(LIVE){S.plants[plot]={t:id,g:0,pending:1};sb.rpc('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud()})}
+  else S.plants[plot]={t:id,g:0};
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SFX.tick();
+  const left=S.sack[id]||0;toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and come back tomorrow.');
+  if(!left)SOWT=null}
+function waterAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const k=today();
+  if((p.g||0)>=2){toast('Bed '+(plot+1)+' is in bloom.');return}
+  if(!freeWater()&&p.wd===k){toast('Bed '+(plot+1)+' was watered today. Come back tomorrow.');return}
+  const b=BED[plot];rain(b.cx,b.cz,b.rmax);SFX.splash();
+  if(LIVE){const g0=p.g||0,wd0=p.wd;sb.rpc('garden_water',{p_plot:plot,p_day:k}).then(r=>{const d=r.data;
+    if(r.error||!d||!d.ok){if(r.error)toast(rpcFail(r.error,'The water did not reach bed '+(plot+1)+'.'));if(d&&d.reason==='watered'){p.wd=k;save();plantBeds();renderHud()}else if(r.error){p.g=g0;p.wd=wd0;save();plantBeds();renderHud()}return}
+    p.g=+d.g;p.wd=k;save();plantBeds();renderHud()}).catch(()=>{})}
+  p.g=Math.min(2,(p.g||0)+1);p.wd=k;save();plantBeds();renderHud();
+  toast(p.g>=2?'In bloom. '+CAT[p.t].p+' in bed '+(plot+1)+'.':'Watered. Bed '+(plot+1)+' is growing. Come back tomorrow.')}
+/* a shower over a bed, sixty drops, gone in a second and a half */
+const RAINS=[];const rainMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xdff3ff,size:0.16,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2});
+function rain(cx,cz,r){const n=70,pos=new Float32Array(n*3),v=[];for(let i=0;i<n;i++){const a=Math.random()*6.28,d=Math.random()*r*0.7;pos[i*3]=cx+Math.cos(a)*d;pos[i*3+1]=1.4+Math.random()*0.9;pos[i*3+2]=cz+Math.sin(a)*d;v.push(1.5+Math.random()*1.5)}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,rainMat);scene.add(pts);RAINS.push({pts,v,t:0})}
+function rainTick(dt){for(let i=RAINS.length-1;i>=0;i--){const R=RAINS[i];R.t+=dt;const a=R.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){let y=a.getY(j)-R.v[j]*dt;if(y<0.12)y=1.9+Math.random()*0.4;a.setY(j,y)}a.needsUpdate=true;
+  if(R.t>1.5){scene.remove(R.pts);R.pts.geometry.dispose();RAINS.splice(i,1)}}}
+
+/* ---------- the act bar: what you can do from where you stand ---------- */
+let ACT=null;                                       /* {mode,plot} */
+const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
+function bedHere(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const near=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(near>2.5)continue;const d=inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z);if(d<bd){bd=d;best=b}}return best&&bd<0.9?best:null}
+function showAct(label,mode,plot,chips,say){ACT=mode?{mode,plot}:null;actMain.textContent=label;actMain.classList.toggle('quiet',!mode);
+  actChips.innerHTML=(chips||[]).map(t=>'<button class="chip'+(t===SOWT?' on':'')+'" data-t="'+t+'">'+CAT[t].n+' \u00B7 '+S.sack[t]+'</button>').join('');
+  $$('#actChips .chip').forEach(b=>b.onclick=e=>{e.stopPropagation();SOWT=b.dataset.t;updateAct()});
+  const key=mode&&!COARSE?'press E'+(chips&&chips.length>1?' \u00B7 Q picks the seed':''):'';
+  actKey.textContent=say?(say+(key?' \u00B7 '+key:'')):key;actEl.classList.add('on')}
+function hideAct(){ACT=null;actEl.classList.remove('on')}
+function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
+  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){showAct('Buy seeds.','stand',null,null,'\u201CSeeds are fifty. Water them and come back tomorrow.\u201D');return}
+  const b=bedHere();if(!b){hideAct();return}
+  const p=S.plants[b.plot];
+  if(!p){const types=FLOWERS.filter(t=>S.sack[t]>0);if(!types.length){showAct('Bed '+(b.plot+1)+' is empty. Seeds are at the stand by the gate.');return}
+    if(!SOWT||!(S.sack[SOWT]>0))SOWT=types[0];showAct('Sow '+CAT[SOWT].n.toLowerCase()+' seeds in bed '+(b.plot+1)+'.','sow',b.plot,types);return}
+  if(p.pending){hideAct();return}
+  if((p.g||0)>=2){showAct(CAT[p.t].p+' in bloom.');return}
+  if(!freeWater()&&p.wd===today()){showAct('Bed '+(b.plot+1)+' is watered. Come back tomorrow.');return}
+  showAct('Water bed '+(b.plot+1)+'.','water',b.plot)}
+function act(){if(!ACT)return;if(ACT.mode==='stand')openStore();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='water')waterAt(ACT.plot);updateAct()}
+function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
+actMain.addEventListener('click',e=>{e.stopPropagation();act()});
+actMain.addEventListener('pointerdown',e=>e.stopPropagation());
+
+/* ======================================================================
    YOU
    ====================================================================== */
 const EYE=1.62,SPEED=3.4,RUN=6.4,ACC=17,DRAG=11,STEP=0.28,GRAV=20,JUMPV=5.4;
@@ -754,14 +1010,18 @@ cvs.addEventListener('pointerdown',e=>{
 addEventListener('pointermove',e=>{if(locked||e.pointerId!==lId)return;lookDX+=(e.clientX-lx0);lookDY+=(e.clientY-ly0);lx0=e.clientX;ly0=e.clientY});
 function lookEnd(e){if(e.pointerId===lId)lId=null}
 addEventListener('pointerup',lookEnd);addEventListener('pointercancel',lookEnd);
-const HINT_LOCK='WASD or arrows to walk · shift to run · space to jump · esc to free the mouse';
-const HINT_FREE=COARSE?'Drag left to walk · drag right to look · Jump button to hop into a bed':'Click to look · WASD or arrows to walk · space to jump';
+const HINT_LOCK='WASD to walk · shift to run · space to jump · E to act · esc frees the mouse';
+const HINT_FREE=COARSE?'Drag left to walk · drag right to look · Jump to hop into a bed':'Click to look · WASD to walk · space to jump · E to act';
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cvs;$('#hint').textContent=locked?HINT_LOCK:HINT_FREE});
 document.addEventListener('mousemove',e=>{if(locked){lookDX+=e.movementX;lookDY+=e.movementY}});
 $('#hint').textContent=HINT_FREE;
 
 const keys={};
-addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k===' '&&!keys[' ']&&!e.repeat)jumpQ=true;keys[k]=1;if(/^arrow| $/.test(k))e.preventDefault()});
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+  if(k==='escape'){closeStore();return}
+  if(STORE_ON)return;
+  if(k==='e'&&!e.repeat){act();return}if(k==='q'&&!e.repeat){cycleSeed();return}
+  if(k===' '&&!keys[' ']&&!e.repeat)jumpQ=true;keys[k]=1;if(/^arrow| $/.test(k))e.preventDefault()});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
 addEventListener('blur',()=>{for(const k in keys)keys[k]=0});
 
@@ -793,11 +1053,6 @@ $('#music').onclick=()=>{
   if(playing){audio.pause();playing=false;$('#music').classList.remove('on')}
   else{if(!audio.src)nextTrack();else audio.play().catch(()=>{});playing=true;$('#music').classList.add('on')}};
 function nextTrack(){track=track%6+1;audio.src=BASE+'garden-music-'+track+'.mp3';audio.play().catch(()=>{})}
-(function(){const el=$('#purse');
-  const coin='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
-  if(!SAVE){el.innerHTML=coin+(BLOOM?'The parterre in bloom':'No garden saved on this device');return}
-  const seeds=Object.values(SAVE.sack||{}).reduce((a,b)=>a+b,0),planted=Object.keys(SAVE.plants||{}).length;
-  el.innerHTML=coin+(SAVE.coins|0).toLocaleString()+' Deedcoins<br>'+seeds+' seeds · '+planted+' of 40 beds'+(BLOOM?'<br>shown in bloom':'')})();
 
 /* ======================================================================
    THE LOOP
@@ -817,6 +1072,7 @@ let last=performance.now(),frame=0;
 const camDir=new THREE.Vector3();
 function loop(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;const t=now/1000;frame++;
+  if(STORE_ON){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0}
   if(lookDX||lookDY){you.yaw-=lookDX*(locked?0.0022:0.0042);you.pitch=Math.max(-0.7,Math.min(0.7,you.pitch-lookDY*(locked?0.0019:0.0032)));lookDX=lookDY=0}
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
@@ -851,18 +1107,21 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);airTick(t,dt,you.yaw);fireflyTick(t);
-  if(frame%6===0)labels();
+  tickDrops(t);airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
+  /* the Keeper: nods to whoever is close, waves as you arrive */
+  {const near=Math.hypot(you.x-STAND.x,you.z-STAND.z);KEEPER.head.rotation.x=near<6?Math.sin(t*2.2)*0.1:0;KEEPER.armR.rotation.x=near<4?-1.9+Math.sin(t*7)*0.35:-0.25}
+  if(frame%6===0){labels();updateAct()}
   renderer.render(scene,camera);
   requestAnimationFrame(loop);
 }
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.pitch=pitch||0;you.feet=floorAt(x,z);you.grounded=true},you,phase:n=>{ph=n;applyPhase()},floorAt};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.pitch=pitch||0;you.feet=floorAt(x,z);you.grounded=true},you,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,live:()=>LIVE,setSow:t=>{SOWT=t}};
 
 applyPhase();
-you.feet=floorAt(you.x,you.z);labels();
+you.feet=floorAt(you.x,you.z);plantBeds();renderHud();labels();updateAct();
+if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. The seed seller is at the end of the path behind you.'),1400)}
 $('#lbar').style.width='100%';$('#lmsg').textContent='Walk in';
 requestAnimationFrame(loop);
 setTimeout(()=>{const l=$('#load');l.style.opacity='0';setTimeout(()=>l.remove(),650)},350);
