@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="1.0">
+<meta name="world-build" content="1.1">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -18,6 +18,7 @@ canvas{display:block;touch-action:none}
 .btn{pointer-events:auto;background:rgba(21,19,14,.34);border:1px solid rgba(246,243,235,.75);color:var(--ivory);
      padding:8px 12px;border-radius:999px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;cursor:pointer;font-family:inherit}
 .btn.on{background:var(--ivory);color:var(--ink)}
+.dc{height:19px;width:auto;vertical-align:-5px;margin-right:5px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #place{text-shadow:0 1px 18px rgba(0,0,0,.55)}
 #place h1{margin:.1em 0 0;font-size:clamp(1.5rem,4.4vw,2.6rem);letter-spacing:-.035em;line-height:.95;font-weight:800}
@@ -50,7 +51,8 @@ canvas{display:block;touch-action:none}
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
       <div class="micro" id="purse" style="text-align:right;text-shadow:0 1px 12px rgba(0,0,0,.6)"></div>
       <button class="btn" id="music">Music</button>
-      <button class="btn" id="back">Leave</button>
+      <button class="btn" id="garden">Garden</button>
+      <button class="btn" id="back">&larr; DEEDS</button>
     </div>
   </div>
   <div class="row b">
@@ -492,8 +494,15 @@ const BPROF=boxProfile(0.56,0.42,0.15);
 mesh(mergeGeos(BED.map(b=>{markPoly(b.P,0.12);markBand(b.P,true,0.29,0.42);return sweepGeo(b.P,BPROF,true,0.9,1.2,0.016,200+b.plot)})),MAT.hedge,true);
 mesh(mergeGeos(BED.map(b=>flatGeo(b.P,0.10))),MAT.soil);
 
-/* the ring round the fountain */
-{const P=resample(ellipsePath(0,0,72*U,72*U,72),true,0.14);markBand(P,true,0.36,0.85);mesh(sweepGeo(P,QPROF,true,0.9,1.9,0.022,300),MAT.hedge,true)}
+/* the fountain court: a low planted ring hugs the basin, low enough to step over, so the whole court walks */
+const RPROF=boxProfile(0.62,0.26,0.30,5);
+{const P=resample(ellipsePath(0,0,3.76,3.76,72),true,0.14);markBand(P,true,0.31,0.2);mesh(sweepGeo(P,RPROF,true,0.9,1.0,0.02,300),MAT.hedge,true)}
+/* eight stone finials where the quadrant hedges end at the court, an urn on a plinth */
+{const urn=new THREE.LatheGeometry([[0,0],[0.24,0],[0.24,0.05],[0.13,0.08],[0.13,0.14],[0.22,0.24],[0.27,0.42],[0.24,0.55],[0.15,0.62],[0.17,0.68],[0.28,0.71],[0.28,0.75],[0,0.75]].map(p=>new THREE.Vector2(p[0],p[1])),24);
+ [[2.6,9.0],[-2.6,9.0],[2.6,-9.0],[-2.6,-9.0],[9.0,2.6],[9.0,-2.6],[-9.0,2.6],[-9.0,-2.6]].forEach(([x,z])=>{
+   const plinth=mesh(new THREE.BoxGeometry(0.56,0.62,0.56),MAT.ashlar,true);plinth.position.set(x,0.31,z);
+   const cap=mesh(new THREE.BoxGeometry(0.66,0.08,0.66),MAT.stone,true);cap.position.set(x,0.66,z);
+   const u=mesh(urn,MAT.stone,true);u.position.set(x,0.70,z);markDisk(x,z,0.42,1.4)})}
 
 /* the outer hedge, tall, in two runs so the north and south openings stay open */
 const OPROF=boxProfile(1.82,2.6,0.62,6);
@@ -516,11 +525,11 @@ const LANTERNS=[];
    THE FOUNTAIN
    ====================================================================== */
 const lathe=(pts,seg)=>new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg||56);
-mesh(lathe([[0,0.02],[3.95,0.02],[3.95,0.68],[4.05,0.72],[4.05,0.82],[3.62,0.82],[3.5,0.74],[3.5,0.6],[3.1,0.56],[0,0.56]]),MAT.stone,true);
-const water=mesh(new THREE.CircleGeometry(3.52,56),MAT.water);water.rotation.x=-Math.PI/2;water.position.y=0.66;
+mesh(lathe([[0,0.02],[3.2,0.02],[3.2,0.68],[3.3,0.72],[3.3,0.82],[2.92,0.82],[2.8,0.74],[2.8,0.6],[2.5,0.56],[0,0.56]]),MAT.stone,true);
+const water=mesh(new THREE.CircleGeometry(2.82,56),MAT.water);water.rotation.x=-Math.PI/2;water.position.y=0.66;
 mesh(lathe([[0,0.56],[0.62,0.56],[0.62,0.66],[0.46,0.76],[0.40,1.32],[0.56,1.42],[1.42,1.42],[1.52,1.5],[1.52,1.6],[1.12,1.66],[0.9,1.62],[0.3,1.58],[0.22,1.66],[0.22,2.08],[0.36,2.14],[0.36,2.26],[0.12,2.34],[0,2.4]],40),MAT.stone,true);
 const water2=mesh(new THREE.CircleGeometry(1.14,40),MAT.water);water2.rotation.x=-Math.PI/2;water2.position.y=1.56;
-markDisk(0,0,4.1,0.82);
+markDisk(0,0,3.36,0.82);
 /* the jet: a hundred drops on their own arcs, one draw */
 const DROPS=110,dropMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.045,6,5),new THREE.MeshBasicMaterial({color:0xeef8ff,transparent:true,opacity:0.85}),DROPS);
 scene.add(dropMesh);
@@ -776,7 +785,8 @@ function applyPhase(){const p=PH[ph];
   $('#phase').textContent=ph.charAt(0).toUpperCase()+ph.slice(1);
 }
 $('#phase').onclick=()=>{ph=ORDER[(ORDER.indexOf(ph)+1)%ORDER.length];applyPhase()};
-$('#back').onclick=()=>location.href=BASE;
+$('#back').onclick=()=>location.href=ON_SITE?'/':'https://deeds.fun/';
+$('#garden').onclick=()=>location.href=BASE;
 let audio=null,track=0,playing=false;
 $('#music').onclick=()=>{
   if(!audio){audio=new Audio();audio.volume=.55;audio.addEventListener('ended',nextTrack)}
@@ -784,9 +794,10 @@ $('#music').onclick=()=>{
   else{if(!audio.src)nextTrack();else audio.play().catch(()=>{});playing=true;$('#music').classList.add('on')}};
 function nextTrack(){track=track%6+1;audio.src=BASE+'garden-music-'+track+'.mp3';audio.play().catch(()=>{})}
 (function(){const el=$('#purse');
-  if(!SAVE){el.textContent=BLOOM?'The parterre in bloom':'No garden saved on this device';return}
+  const coin='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
+  if(!SAVE){el.innerHTML=coin+(BLOOM?'The parterre in bloom':'No garden saved on this device');return}
   const seeds=Object.values(SAVE.sack||{}).reduce((a,b)=>a+b,0),planted=Object.keys(SAVE.plants||{}).length;
-  el.innerHTML=(SAVE.coins|0)+' Deedcoins<br>'+seeds+' seeds · '+planted+' of 40 beds'+(BLOOM?'<br>shown in bloom':'')})();
+  el.innerHTML=coin+(SAVE.coins|0).toLocaleString()+' Deedcoins<br>'+seeds+' seeds · '+planted+' of 40 beds'+(BLOOM?'<br>shown in bloom':'')})();
 
 /* ======================================================================
    THE LOOP
@@ -795,7 +806,7 @@ const areaEl=$('#area'),nearEl=$('#near'),walkEl=$('#walkin');
 let areaNow='';
 function labels(){
   let name='The Parterre';const d0=Math.hypot(you.x,you.z);
-  if(d0<6.6)name='The Fountain';
+  if(d0<6.2)name='The Fountain';
   else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=Math.abs(you.x)<3.6?'The Avenue':'The Wood';
   if(name!==areaNow){areaNow=name;areaEl.innerHTML=name+'<span>.</span>'}
   let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const d=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(d<bd){bd=d;best=b}}
