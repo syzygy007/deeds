@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="1.4">
+<meta name="world-build" content="1.5">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -86,6 +86,7 @@ canvas{display:block;touch-action:none}
     <div id="place"><div class="micro" id="walkin">You are walking in</div><h1 id="area">The Parterre<span>.</span></h1><div class="micro" id="near"></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
       <div class="micro" id="purse" style="text-align:right;text-shadow:0 1px 12px rgba(0,0,0,.6)"></div>
+      <button class="btn" id="chimes">Chimes</button>
       <button class="btn" id="music">Music</button>
       <button class="btn" id="deed">Log a deed. +200</button>
       <button class="btn" id="garden">Garden</button>
@@ -869,23 +870,65 @@ const COINIMG='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
 function renderHud(){const el=$('#purse');
   if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';return}
   el.innerHTML='Your sack \u00B7 '+(S.coins|0).toLocaleString()+' Deedcoins \u00B7 '+plural(sackTotal(),'seed')+'<br>'+Object.keys(S.plants).length+' of 40 beds'+(LIVE?'':' \u00B7 local until you sign in')}
-/* sounds, made in the browser: a chime when you buy, a tick when a seed goes in, a splash when you water */
-let AC=null;function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume().catch(()=>{});return AC}
-function tone(f,t0,dur,type,gain){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),T=a.currentTime+t0;o.type=type||'sine';o.frequency.setValueAtTime(f,T);
-  g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain||0.16,T+0.012);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);o.connect(g);g.connect(a.destination);o.start(T);o.stop(T+dur+0.05)}
-const SFX={
-  chime(){tone(880,0,0.4,'sine',0.14);tone(1318.5,0.13,0.5,'sine',0.12);tone(1760,0.26,0.7,'sine',0.07)},
-  tick(){tone(560,0,0.07,'triangle',0.1);tone(420,0.05,0.11,'triangle',0.07)},
-  splash(){const a=ac();if(!a)return;const n=Math.floor(a.sampleRate*0.4),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.2);
-    const src=a.createBufferSource();src.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=0.6;const g=a.createGain();g.gain.value=0.22;src.connect(f);f.connect(g);g.connect(a.destination);src.start()},
-  nope(){tone(240,0,0.16,'triangle',0.09)}};
+/* ---------- the sounds: one family, synthesized in the browser. ticks for actions, bells for confirmations,
+   cascades for rewards that grow with the win. voice limited, under the music, muted with one tap (remembered). ---------- */
+const SND=(()=>{
+  let AC=null,BUS=null,NOISE=null,MUTE=false;try{MUTE=localStorage.getItem('garden_mute')==='1'}catch(e){}
+  const ctx=()=>{if(MUTE)return null;if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==='suspended')AC.resume().catch(()=>{});
+    if(!BUS){BUS=AC.createGain();BUS.gain.value=0.85;const c=AC.createDynamicsCompressor();c.threshold.value=-16;c.knee.value=12;c.ratio.value=4;c.attack.value=0.003;c.release.value=0.2;BUS.connect(c);c.connect(AC.destination)}return AC};
+  const noise=a=>{if(NOISE)return NOISE;const n=a.sampleRate,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;NOISE=b;return b};
+  const LAST={};const gate=(k,ms)=>{const t=performance.now();if(LAST[k]&&t-LAST[k]<ms)return false;LAST[k]=t;return true};
+  function tone(f,t0,dur,gain,type,f1){const a=ctx();if(!a)return;const T=a.currentTime+(t0||0),o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,T);if(f1)o.frequency.exponentialRampToValueAtTime(f1,T+dur);
+    g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain,T+0.006);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);o.connect(g);g.connect(BUS);o.start(T);o.stop(T+dur+0.05)}
+  /* a bell: four inharmonic partials, the high ones dying first */
+  function bell(f,t0,dur,gain){const a=ctx();if(!a)return;const T=a.currentTime+(t0||0);
+    [[1,1],[2.76,0.45],[5.4,0.2],[8.93,0.08]].forEach(([m,w])=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f*m;
+      g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain*w,T+0.005);g.gain.exponentialRampToValueAtTime(0.0001,T+dur/(1+m*0.3));o.connect(g);g.connect(BUS);o.start(T);o.stop(T+dur+0.1)})}
+  /* a run of bells up a pentatonic scale, the count set by the size of the win */
+  const PENTA=[0,2,4,7,9];
+  function cascade(n,base,gain,step,down){n=Math.max(1,Math.min(16,n|0));for(let i=0;i<n;i++){const k=down?n-1-i:i;const semi=PENTA[k%5]+12*Math.floor(k/5);bell(base*Math.pow(2,semi/12),i*(step||0.07),0.8,gain*(0.65+0.35*i/n))}}
+  function chord(fs,t0,dur,gain){fs.forEach((f,i)=>bell(f,(t0||0)+i*0.01,dur,gain))}
+  function puff(t0,dur,gain,lo,hi,q){const a=ctx();if(!a)return;const T=a.currentTime+(t0||0),s=a.createBufferSource();s.buffer=noise(a);const f=a.createBiquadFilter();f.type=lo?'bandpass':'lowpass';f.frequency.value=hi||1800;f.Q.value=q||0.7;
+    const g=a.createGain();g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain,T+0.01);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(T);s.stop(T+dur+0.05)}
+  const vibe=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
+  let combo=0,comboT=0;
+  return{
+    muted:()=>MUTE,
+    setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v)ctx()},
+    unlock(){ctx()},
+    /* small */
+    tickUp(i){if(!gate('tick',40))return;tone(740*Math.pow(2,((i||0)%10)/12),0,0.07,0.07,'triangle')},
+    tickDown(){if(!gate('tick',40))return;tone(520,0,0.07,0.06,'triangle')},
+    rustle(){puff(0,0.14,0.05,false,2600,0.5)},
+    sow(){const t=performance.now();combo=t-comboT<2500?combo+1:0;comboT=t;puff(0,0.09,0.09,false,600,0.8);tone(160,0,0.08,0.08,'sine',90);tone(880*Math.pow(2,PENTA[combo%5]/12+Math.floor(combo/5)),0.04,0.12,0.06,'triangle');vibe(10)},
+    lastSeed(){bell(1046.5,0,0.5,0.09);bell(1318.5,0.1,0.6,0.08)},
+    splash(){puff(0,0.4,0.16,true,2200,0.6)},
+    knock(){if(!gate('knock',120))return;puff(0,0.06,0.06,false,900,1);tone(190,0,0.09,0.07,'sine',120)},
+    nope(){tone(260,0,0.14,0.07,'triangle',200);tone(196,0.12,0.18,0.07,'triangle',150)},
+    /* medium */
+    open(){bell(1046.5,0,0.35,0.05)},
+    hello(){bell(880,0,0.45,0.07);bell(1174.7,0.13,0.55,0.07)},
+    clink(){bell(1568,0,0.3,0.08);bell(2093,0.05,0.25,0.04)},
+    grow(){bell(784,0,0.5,0.08);bell(987.8,0.12,0.6,0.08)},
+    buy(n){cascade(Math.min(12,(n|0)+1),659.3,0.09,0.065);vibe(15)},
+    /* big */
+    bloom(){cascade(6,523.3,0.1,0.08);chord([1046.5,1318.5,1568],0.5,1.2,0.07)},
+    allWatered(){cascade(8,659.3,0.09,0.07);chord([1318.5,1568,1975.5],0.6,1.1,0.06)},
+    deed(){cascade(12,523.3,0.11,0.06);chord([1046.5,1318.5,1568,2093],0.8,1.6,0.08);vibe([15,40,15])},
+    tier(){chord([523.3,659.3,784],0,0.9,0.09);cascade(10,784,0.1,0.06);chord([1046.5,1318.5,1568,2093],0.7,1.5,0.09);vibe([20,60,20])},
+    allPlanted(){cascade(16,523.3,0.1,0.06);chord([1046.5,1318.5,1568,2093,2637],1.1,1.8,0.09);vibe([20,60,20,60,20])},
+    undo(n){cascade(Math.min(12,(n|0)+1),1318.5,0.07,0.06,true)}
+  }})();
+addEventListener('pointerdown',()=>SND.unlock(),{once:true});
+addEventListener('keydown',()=>SND.unlock(),{once:true});
+
 $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
-  S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'a deed');save();renderHud();if(STORE_ON)renderStore();toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins. Sign in on DEEDS to log real ones.')};
+  const t0=tierOf(S.deeds);S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'a deed');save();renderHud();if(STORE_ON)renderStore();SND.deed();if(tierOf(S.deeds)>t0)setTimeout(()=>SND.tier(),1400);toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins. Sign in on DEEDS to log real ones.')};
 
 /* ---------- the stand: a basket, nothing charged until Checkout ---------- */
 let STORE_ON=false,CART={};
 const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*q,0);
-function openStore(){STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();if(document.exitPointerLock)document.exitPointerLock()}
+function openStore(){STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open();if(document.exitPointerLock)document.exitPointerLock()}
 function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on')}
 function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.coins-total;
   $('#stBal').innerHTML=COINIMG+'<b>'+left.toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total:'');$('#stBal').classList.toggle('short',left<0);
@@ -899,8 +942,8 @@ function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.coins-to
   $('#stBuy').textContent=total?'Checkout \u00B7 '+total+'.':'Checkout.';$('#stBuy').disabled=BUSY;
   $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d));
   $$('#stSack [data-sell]').forEach(b=>b.onclick=()=>sell(b.dataset.sell))}
-function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];renderStore()}
-function showShort(total){SFX.nope();$('#shBody').textContent='You have '+S.coins+' and these seeds come to '+total+'. Log a deed and '+DEED_PAY+' more arrive.';$('#short').classList.add('on')}
+function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
+function showShort(total){SND.nope();$('#shBody').textContent='You have '+S.coins+' and these seeds come to '+total+'. Log a deed and '+DEED_PAY+' more arrive.';$('#short').classList.add('on')}
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
 $('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
 $('#stClose').onclick=closeStore;
@@ -921,32 +964,34 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
       BUSY=false;
       if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough Deedcoins for all of those.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
       renderHud();
-      if(got&&!fail){CART={};SFX.chime();SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()}
+      if(got&&!fail){CART={};SND.buy(got);SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()}
       else renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
   items.forEach(([id,q])=>{const c=CAT[id];S.coins-=c.price*q;S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*q,'seed store')});
-  CART={};save();renderHud();SFX.chime();SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()};
+  CART={};save();renderHud();SND.buy(items.reduce((a,[id,q])=>a+q,0));SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()};
 function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to return.');return}
   if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
-    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
+    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
 
 /* ---------- sowing and watering, from where you stand ---------- */
 let SOWT=null;                                      /* the seed type picked for sowing */
-function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){toast('Bed '+(plot+1)+' is taken.');return}
-  if(!(S.sack[id]>0)){toast('Out of '+c.n.toLowerCase()+' seeds.');return}
+function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knock();toast('Bed '+(plot+1)+' is taken.');return}
+  if(!(S.sack[id]>0)){SND.knock();toast('Out of '+c.n.toLowerCase()+' seeds.');return}
   if(LIVE){S.plants[plot]={t:id,g:0,pending:1};sb.rpc('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud()})}
   else S.plants[plot]={t:id,g:0};
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SFX.tick();
-  const left=S.sack[id]||0;toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and come back tomorrow.');
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SND.sow();
+  if(Object.keys(S.plants).length>=40)setTimeout(()=>SND.allPlanted(),300);
+  const left=S.sack[id]||0;if(!left)setTimeout(()=>SND.lastSeed(),140);toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and come back tomorrow.');
   if(!left)SOWT=null}
 function waterAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const k=today();
-  if((p.g||0)>=2){toast('Bed '+(plot+1)+' is in bloom.');return}
-  if(!freeWater()&&p.wd===k){toast('Bed '+(plot+1)+' was watered today. Come back tomorrow.');return}
-  const b=BED[plot];rain(b.cx,b.cz,b.rmax);SFX.splash();
+  if((p.g||0)>=2){SND.knock();toast('Bed '+(plot+1)+' is in bloom.');return}
+  if(!freeWater()&&p.wd===k){SND.knock();toast('Bed '+(plot+1)+' was watered today. Come back tomorrow.');return}
+  const b=BED[plot];rain(b.cx,b.cz,b.rmax);SND.splash();
   if(LIVE){const g0=p.g||0,wd0=p.wd;sb.rpc('garden_water',{p_plot:plot,p_day:k}).then(r=>{const d=r.data;
     if(r.error||!d||!d.ok){if(r.error)toast(rpcFail(r.error,'The water did not reach bed '+(plot+1)+'.'));if(d&&d.reason==='watered'){p.wd=k;save();plantBeds();renderHud()}else if(r.error){p.g=g0;p.wd=wd0;save();plantBeds();renderHud()}return}
     p.g=+d.g;p.wd=k;save();plantBeds();renderHud()}).catch(()=>{})}
   p.g=Math.min(2,(p.g||0)+1);p.wd=k;save();plantBeds();renderHud();
+  setTimeout(()=>{if(p.g>=2)SND.bloom();else SND.grow();const left=Object.values(S.plants).filter(q=>(q.g||0)<2&&(freeWater()||q.wd!==k)).length;if(!left)setTimeout(()=>SND.allWatered(),700)},220);
   toast(p.g>=2?'In bloom. '+CAT[p.t].p+' in bed '+(plot+1)+'.':'Watered. Bed '+(plot+1)+' is growing. Come back tomorrow.')}
 /* a shower over a bed, sixty drops, gone in a second and a half */
 const RAINS=[];const rainMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xdff3ff,size:0.16,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2});
@@ -956,7 +1001,7 @@ function rainTick(dt){for(let i=RAINS.length-1;i>=0;i--){const R=RAINS[i];R.t+=d
   if(R.t>1.5){scene.remove(R.pts);R.pts.geometry.dispose();RAINS.splice(i,1)}}}
 
 /* ---------- the act bar: what you can do from where you stand ---------- */
-let ACT=null;                                       /* {mode,plot} */
+let ACT=null,ATSTAND=false;                         /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
 function bedHere(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const near=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(near>2.5)continue;const d=inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z);if(d<bd){bd=d;best=b}}return best&&bd<0.9?best:null}
 function showAct(label,mode,plot,chips,say){ACT=mode?{mode,plot}:null;actMain.textContent=label;actMain.classList.toggle('quiet',!mode);
@@ -966,7 +1011,8 @@ function showAct(label,mode,plot,chips,say){ACT=mode?{mode,plot}:null;actMain.te
   actKey.textContent=say?(say+(key?' \u00B7 '+key:'')):key;actEl.classList.add('on')}
 function hideAct(){ACT=null;actEl.classList.remove('on')}
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
-  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){showAct('Buy seeds.','stand',null,null,'\u201CSeeds are fifty. Water them and come back tomorrow.\u201D');return}
+  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are fifty. Water them and come back tomorrow.\u201D');return}
+  ATSTAND=false;
   const b=bedHere();if(!b){hideAct();return}
   const p=S.plants[b.plot];
   if(!p){const types=FLOWERS.filter(t=>S.sack[t]>0);if(!types.length){showAct('Bed '+(b.plot+1)+' is empty. Seeds are at the stand by the gate.');return}
@@ -1048,6 +1094,8 @@ function applyPhase(){const p=PH[ph];
 }
 $('#phase').onclick=()=>{ph=ORDER[(ORDER.indexOf(ph)+1)%ORDER.length];applyPhase()};
 $('#back').onclick=()=>location.href=ON_SITE?'/':'https://deeds.fun/';
+function paintChimes(){$('#chimes').classList.toggle('on',!SND.muted())}
+$('#chimes').onclick=()=>{SND.setMute(!SND.muted());paintChimes();if(!SND.muted())SND.open()};paintChimes();
 $('#garden').onclick=()=>location.href=BASE;
 let audio=null,track=0,playing=false;
 $('#music').onclick=()=>{
