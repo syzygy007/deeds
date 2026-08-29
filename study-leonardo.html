@@ -32,12 +32,17 @@ a:focus-visible{outline:2px solid var(--forest);outline-offset:4px}
 .wordmark.small{font-size:1.2rem}
 .measure{max-width:41rem;margin:0 auto;padding:0 1.5rem}
 .measure-wide{max-width:62rem;margin:0 auto;padding:0 1.5rem}
-.bar{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem 2.6rem;position:absolute;top:0;left:0;right:0;z-index:2;color:var(--ivory);background:linear-gradient(to bottom,rgba(21,19,14,.55) 0%,rgba(21,19,14,.25) 55%,rgba(21,19,14,0) 100%)}
-.bar .dot{color:var(--sage)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.15rem 1.5rem 2.4rem;position:fixed;top:0;left:0;right:0;z-index:20;color:var(--ink);background:linear-gradient(to bottom,rgba(246,243,235,.9) 0%,rgba(246,243,235,.55) 55%,rgba(246,243,235,0) 100%);transition:background .25s,padding .25s,box-shadow .25s}
+.bar.solid{padding:1.05rem 1.5rem;background:var(--ivory);box-shadow:0 1px 0 var(--rule)}
+#csent{display:block;position:absolute;bottom:0;left:0;width:1px;height:1px}
 .cover{position:relative;min-height:100vh;min-height:100svh;background-size:cover;background-position:center;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 4rem;background-color:var(--ink)}
 .cover::before{content:"";position:absolute;inset:0;pointer-events:none}
 .cover.dark{color:var(--ivory)}
+.cover.light{background-position:center 22%}
 .cover.dark::before{background:linear-gradient(to top,rgba(21,19,14,.92) 0%,rgba(21,19,14,.7) 28%,rgba(21,19,14,.25) 58%,rgba(21,19,14,0) 100%)}
+.cover.light::before{background:linear-gradient(to top,rgba(246,243,235,1) 0%,rgba(246,243,235,.995) 30%,rgba(246,243,235,.94) 40%,rgba(246,243,235,.5) 52%,rgba(246,243,235,.1) 66%,rgba(246,243,235,0) 78%)}
+.cover.light .cover-copy{padding-top:0}
+.cover.light .deck{opacity:1}
 .cover.dark .dot{color:var(--sage)}
 .cover-copy{position:relative;padding:22vh 1.5rem 0;max-width:80rem;margin:0 auto;width:100%}
 h1{font-family:var(--display);font-weight:700;letter-spacing:-.045em;line-height:.9;font-size:clamp(3.3rem,11.5vw,10.5rem);margin:0 0 1.6rem}
@@ -95,7 +100,6 @@ h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height
 }
 @media (max-width:640px){
   .bar{padding:1rem 1.2rem 2.2rem}
-  .bar .micro{display:none}
   .measure,.measure-wide,.pull{padding:0 1.2rem}
   .cover-copy{padding-top:30vh}
   .part{padding:5rem 0 2rem}
@@ -120,7 +124,7 @@ h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height
 .btn.ghost:hover{border-color:var(--forest);color:var(--forest)}
 .stoast{position:fixed;left:50%;bottom:2rem;transform:translateX(-50%) translateY(1rem);background:var(--ink);color:var(--ivory);font-family:var(--mono);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;padding:.9rem 1.4rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9}
 .stoast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-@media (max-width:640px){.barlinks a.micro{display:none}.shr{display:inline-flex}}
+@media (max-width:640px){.barlinks a.micro{display:none}.shr{display:inline-flex;white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -129,12 +133,13 @@ h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height
   <a class="wordmark" href="/" aria-label="DEEDS">DEEDS<span class="dot">.</span></a>
   <span class="barlinks"><a class="micro" href="/studies.html">The Collection</a><button class="micro shr" type="button" onclick="shareStudy()" aria-label="Share this study"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M12 4 7 9M12 4l5 5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>Share</button></span>
 </header>
-<section class="cover dark" style="background-image:url('study-leonardo-hero.webp')">
+<section class="cover light" style="background-image:url('study-leonardo-hero.webp')">
   <div class="cover-copy">
     <p class="micro eyebrow">The Art of Giving · Leonardo da Vinci · 1452 to 1519</p>
     <h1>The Eye<br>and the Hand<span class="dot">.</span></h1>
     <p class="deck">Leonardo finished fewer than twenty paintings. What he left instead was a way of seeing, and a way of seeing turns out to be the whole of giving.</p>
   </div>
+  <i id="csent" aria-hidden="true"></i>
 </section>
 <figure class="plate frontis">
   <img src="study-leonardo-plate01.webp" alt="Water falling into still water. The line of the pen chasing the line of the current." loading="lazy">
@@ -449,13 +454,24 @@ h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height
     <div class="colophon">
       <span class="wordmark small">DEEDS<span class="dot">.</span></span>
       <span class="micro">The Art of Giving · A collection of studies · deeds.fun</span>
-      <span class="micro">Plates made for this study, drawn in ink and red chalk on paper or rendered · nothing photographed, nothing reproduced</span>
+      <span class="micro">Cover · The Last Supper, Santa Maria delle Grazie, Milan · Plates made for this study, drawn in ink and red chalk on paper or rendered</span>
     </div>
   </div>
 </footer>
 <div class="stoast" id="stoast">Link copied</div>
 </main>
 <script>
+(function(){
+  var bar=document.querySelector('.bar'), cov=document.querySelector('.cover');
+  if(!bar) return;
+  var tick=function(){
+    var trip = cov ? cov.offsetHeight - 90 : 40;
+    bar.classList.toggle('solid', (window.pageYOffset||document.documentElement.scrollTop) > trip);
+  };
+  tick();
+  window.addEventListener('scroll', tick, {passive:true});
+  window.addEventListener('resize', tick);
+})();
 function shareStudy(){
   var og=function(p){var m=document.querySelector('meta[property="og:'+p+'"]');return m?m.content:'';};
   var d={title:(og('title')||document.title)+' on DEEDS.',url:og('url')||location.href};
