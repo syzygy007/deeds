@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="1.5">
+<meta name="world-build" content="1.7">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -54,6 +54,11 @@ canvas{display:block;touch-action:none}
 .sfoot .btn.on{background:var(--ivory);color:var(--ink)}
 .srow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(246,243,235,.12);font-size:14px}
 .srow .btn{padding:6px 12px;font-size:10px}
+.frow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 4px}
+.fm{border:1px solid rgba(246,243,235,.3);border-radius:14px;padding:10px 6px 8px;background:rgba(246,243,235,.06);color:var(--ivory);cursor:pointer;text-align:center}
+.fm svg{width:100%;height:64px;display:block}
+.fm .nm{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-top:4px}
+.fm:hover{border-color:var(--gold)}
 .lnk{background:none;border:0;color:var(--gold);font-weight:800;letter-spacing:.1em;font-size:11px;text-transform:uppercase;cursor:pointer;pointer-events:auto;padding:0}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #place{text-shadow:0 1px 18px rgba(0,0,0,.55)}
@@ -113,6 +118,11 @@ canvas{display:block;touch-action:none}
   <div id="stSack"></div>
   <div class="sfoot"><button class="btn" id="stClose">Close.</button><button class="btn on" id="stBuy">Checkout.</button></div>
 </div></div>
+<div id="forms" class="sheet"><div class="panel small">
+  <div class="micro">MARBLE &middot; 50 DEEDCOINS</div><h2>What will it become<span>?</span></h2><p>Set the block on this plinth, then chisel it three times and it takes shape.</p>
+  <div class="frow" id="formRow"></div>
+  <div class="sfoot"><button class="btn" id="fmClose">Close.</button></div>
+</div></div>
 <div id="short" class="sheet"><div class="panel small"><h2>Not enough Deedcoins<span>.</span></h2><p id="shBody"></p><div class="sfoot"><button class="btn" id="shKeep">Keep shopping.</button><button class="btn on" id="shDeed">Log a deed.</button></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -146,9 +156,9 @@ const BEDS=[
 const QT=[[140,140,.825,.825],[860,140,-.825,.825],[140,860,.825,-.825],[860,860,-.825,-.825]];
 /* n = the game's name (singular), p = the bed label (plural); price and tier are the game's defaults until garden_state hands down the catalog */
 const CAT={
- rose:{n:'Rose',p:'Roses',img:'rose',price:50,tier:0},lavender:{n:'Lavender',p:'Lavender',img:'lavender',price:50,tier:0},hydrangea:{n:'Hydrangea',p:'Hydrangeas',img:'hydrangea',price:50,tier:0},
- peony:{n:'Peony',p:'Peonies',img:'peony',price:50,tier:0},tulip:{n:'Tulip',p:'Tulips',img:'tulip',price:50,tier:0},daffodil:{n:'Daffodil',p:'Daffodils',img:'daffodil',price:50,tier:0},
- delphinium:{n:'Delphinium',p:'Delphiniums',img:'delphinium',price:50,tier:0},cosmos:{n:'Cosmos',p:'Cosmos',img:'cosmos',price:50,tier:0},hyacinth:{n:'Hyacinth',p:'Hyacinths',img:'hyacinth',price:50,tier:1}
+ rose:{n:'Rose',p:'Roses',img:'rose',price:30,tier:0},lavender:{n:'Lavender',p:'Lavender',img:'lavender',price:20,tier:0},hydrangea:{n:'Hydrangea',p:'Hydrangeas',img:'hydrangea',price:35,tier:0},
+ peony:{n:'Peony',p:'Peonies',img:'peony',price:50,tier:0},tulip:{n:'Tulip',p:'Tulips',img:'tulip',price:20,tier:0},daffodil:{n:'Daffodil',p:'Daffodils',img:'daffodil',price:15,tier:0},
+ delphinium:{n:'Delphinium',p:'Delphiniums',img:'delphinium',price:25,tier:0},cosmos:{n:'Cosmos',p:'Cosmos',img:'cosmos',price:10,tier:0},hyacinth:{n:'Hyacinth',p:'Hyacinths',img:'hyacinth',price:40,tier:1}
 };
 const FLOWERS=Object.keys(CAT);
 
@@ -436,6 +446,10 @@ function awningTex(){const c=cv(512,512),g=c.getContext('2d');for(let i=0;i<8;i+
   const r=rng(7);for(let i=0;i<900;i++){g.fillStyle='rgba(0,0,0,'+(r()*0.08)+')';g.fillRect(r()*512,r()*512,2,2)}return c}
 function signTex(t){const c=cv(512,160),g=c.getContext('2d');g.fillStyle='#15130E';g.fillRect(0,0,512,160);g.strokeStyle='#C9A227';g.lineWidth=4;g.strokeRect(10,10,492,140);
   g.fillStyle='#F6F3EB';g.font='800 92px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,256,86);return c}
+/* white marble with grey veins */
+function marbleTex(){const c=cv(512,512),g=c.getContext('2d');g.fillStyle='#F1EEE7';g.fillRect(0,0,512,512);const r=rng(21);
+  for(let i=0;i<26;i++){g.strokeStyle='rgba(120,118,112,'+(0.12+r()*0.28)+')';g.lineWidth=0.6+r()*1.8;g.beginPath();let x=r()*512,y=r()*512;g.moveTo(x,y);for(let k=0;k<7;k++){x+=(r()-.5)*160;y+=(r()-.5)*160;g.lineTo(x,y)}g.stroke()}
+  for(let i=0;i<900;i++){g.fillStyle='rgba(150,148,140,'+(r()*0.12)+')';g.fillRect(r()*512,r()*512,2+r()*3,2+r()*3)}return c}
 
 /* ======================================================================
    RENDERER, LIGHT, MATERIALS
@@ -476,6 +490,7 @@ const MAT={
   awning:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(awningTex()),[1,1]),roughness:0.9,metalness:0,side:THREE.DoubleSide}),
   sign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('SEEDS.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
   clay:new THREE.MeshStandardMaterial({color:0xB5643C,roughness:0.9,metalness:0}),
+  marble:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(marbleTex()),[1,1]),roughness:0.32,metalness:0.02}),
 };
 /* the gravel tile's grain reads at a larger scale: repeat set for 1.5 m */
 
@@ -603,38 +618,55 @@ function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0
 
 /* ======================================================================
    THE SEED STAND, at the end of the south avenue where the wood closes the way, its counter facing the garden.
-   Built in a local frame (front = local -x) and turned to face north; the Keeper stands behind the counter.
+   Built in a local frame (front = local -x, width along local z) and turned to face north; the Keeper stands behind the counter.
    ====================================================================== */
 const STAND={x:0,z:48.6,front:{x:0,z:46.3}};
 const KEEPER={};
 {const G=new THREE.Group();G.position.set(STAND.x,0,STAND.z);G.rotation.y=-Math.PI/2;scene.add(G);
  const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
- [[-1.55,-1.05],[1.55,-1.05],[-1.55,1.05],[1.55,1.05]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
+ [[-1.45,-1.55],[1.45,-1.55],[-1.45,1.55],[1.45,1.55]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
  gm(new THREE.BoxGeometry(0.85,0.92,3.2),MAT.wood,-1.15,0.46,0);
  gm(new THREE.BoxGeometry(1.0,0.06,3.36),MAT.wood,-1.15,0.95,0);
  gm(new THREE.BoxGeometry(0.42,1.7,3.2),MAT.wood,1.35,0.85,0);
  gm(new THREE.BoxGeometry(0.5,0.05,3.3),MAT.wood,1.35,1.72,0);
- const roof=gm(new THREE.BoxGeometry(3.9,0.05,2.6),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
- gm(new THREE.BoxGeometry(3.9,0.08,0.08),MAT.wood,-1.85,2.36,0);
- const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.sign);sign.position.set(-1.9,1.98,0);sign.rotation.y=-Math.PI/2;G.add(sign);
+ const roof=gm(new THREE.BoxGeometry(3.4,0.05,3.9),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
+ gm(new THREE.BoxGeometry(0.08,0.08,3.9),MAT.wood,-1.66,2.38,0);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.sign);sign.position.set(-1.72,1.98,0);sign.rotation.y=-Math.PI/2;G.add(sign);
  for(let i=0;i<3;i++)gm(new THREE.CylinderGeometry(0.15,0.11,0.22,12),MAT.clay,-1.15,1.09,-1.1+i*0.62);
  gm(new THREE.BoxGeometry(0.55,0.32,0.7),MAT.wood,-1.1,1.14,1.15);
- /* the Keeper: coat, head, straw hat, two arms; no face to get wrong */
+ /* the Keeper: a gardener, warm and plain. face toward the counter (local -x). */
  const K=new THREE.Group();K.position.set(0.15,0,0.25);G.add(K);KEEPER.g=K;
- const coat=new THREE.MeshStandardMaterial({color:0x8B7A5A,roughness:0.95}),skin=new THREE.MeshStandardMaterial({color:0xD9B68E,roughness:0.9}),straw=new THREE.MeshStandardMaterial({color:0xC9A64E,roughness:0.95});
+ const skin=new THREE.MeshStandardMaterial({color:0xD3A882,roughness:0.85}),shirt=new THREE.MeshStandardMaterial({color:0xE8E0CB,roughness:0.9}),apron=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.9}),
+   trouser=new THREE.MeshStandardMaterial({color:0x5A4634,roughness:0.95}),boot=new THREE.MeshStandardMaterial({color:0x2A211A,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x3B2A1E,roughness:0.9}),
+   straw=new THREE.MeshStandardMaterial({color:0xC9A64E,roughness:0.95}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6});
  const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||K).add(o);return o};
- km(new THREE.CylinderGeometry(0.2,0.26,1.05,14),coat,0,0.7,0);
- km(new THREE.CylinderGeometry(0.24,0.2,0.3,14),coat,0,1.35,0);
- const head=new THREE.Group();head.position.set(0,1.62,0);K.add(head);KEEPER.head=head;
- km(new THREE.SphereGeometry(0.16,16,12),skin,0,0,0,head);
- km(new THREE.CylinderGeometry(0.44,0.44,0.03,20),straw,0,0.12,0,head);
- km(new THREE.ConeGeometry(0.24,0.3,16),straw,0,0.27,0,head);
- const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.3,side*0.27);K.add(A);km(new THREE.CylinderGeometry(0.05,0.045,0.62,10),coat,0,-0.31,0,A);km(new THREE.SphereGeometry(0.06,10,8),skin,0,-0.64,0,A);return A};
- KEEPER.armL=arm(-1);KEEPER.armR=arm(1);KEEPER.armR.rotation.x=-0.25;KEEPER.armL.rotation.x=0.2;
+ [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.085,0.095,0.82,12),trouser,0,0.45,s*0.11);km(new THREE.BoxGeometry(0.28,0.1,0.15),boot,-0.03,0.05,s*0.11)});
+ km(new THREE.CylinderGeometry(0.19,0.22,0.64,16),shirt,0,1.18,0);
+ km(new THREE.BoxGeometry(0.03,0.58,0.34),apron,-0.2,0.98,0);km(new THREE.BoxGeometry(0.03,0.26,0.2),apron,-0.19,1.34,0);
+ km(new THREE.CylinderGeometry(0.07,0.075,0.12,10),skin,0,1.54,0);
+ const head=new THREE.Group();head.position.set(0,1.68,0);K.add(head);KEEPER.head=head;
+ km(new THREE.SphereGeometry(0.13,20,14),skin,0,0,0,head);
+ km(new THREE.SphereGeometry(0.137,20,14),hair,0.03,0.035,0,head);
+ [-1,1].forEach(s=>km(new THREE.SphereGeometry(0.016,8,6),dark,-0.118,0.02,s*0.046,head));
+ const smile=km(new THREE.TorusGeometry(0.034,0.005,6,14,Math.PI),dark,-0.122,-0.035,0,head);smile.rotation.set(0,-Math.PI/2,Math.PI);
+ km(new THREE.CylinderGeometry(0.36,0.36,0.02,24),straw,0,0.11,0,head);km(new THREE.CylinderGeometry(0.15,0.17,0.15,20),straw,0,0.19,0,head);
+ const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.44,side*0.24);K.add(A);
+   km(new THREE.SphereGeometry(0.075,10,8),shirt,0,0,0,A);km(new THREE.CylinderGeometry(0.06,0.055,0.3,10),shirt,0,-0.17,0,A);
+   const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.05,0.045,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.055,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
+ KEEPER.armL=arm(-1);KEEPER.armR=arm(1);KEEPER.armL.rotation.x=0.12;KEEPER.armL.fore.rotation.x=-0.6;KEEPER.armR.rotation.x=-0.1;KEEPER.armR.fore.rotation.x=-0.5;
+ KEEPER.torsoY=1.18;
  /* the stall footprint in world space: local x runs along world z, local z along world x */
- markRect(STAND.x-1.25,STAND.z-1.7,STAND.x+1.25,STAND.z+1.7,1.0)}
+ markRect(STAND.x-1.75,STAND.z-1.6,STAND.x+1.75,STAND.z+1.6,1.0)}
 /* the same points in world space for the billboard wares */
 const SL=(lx,lz)=>[STAND.x-lz,STAND.z+lx];
+
+/* ======================================================================
+   TWELVE PLINTHS for marble: by the gates, in the wood's corner clearings, and outside the east and west hedges
+   ====================================================================== */
+const SPOTS=[[-6,30.2],[6,30.2],[-6,-30.2],[6,-30.2],[34,34],[-34,34],[34,-34],[-34,-34],[33.5,8],[33.5,-8],[-33.5,8],[-33.5,-8]];
+const PLINTHS=[];
+SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);markDisk(x,z,0.62,1.0);PLINTHS.push({x,z,i})});
+
 
 /* the golden dot: where you start, facing the garden through the south gap */
 const SPAWN={x:0,z:HALF+1.6,yaw:0};
@@ -721,6 +753,7 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
    if(Math.abs(x)<5.2&&Math.abs(z)<HALF+20)continue;              /* the two paths out */
    if(Math.max(Math.abs(x),Math.abs(z))<HALF+2.6)continue;          /* inside the hedge */
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
+   if(SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<3.2))continue;     /* the plinths */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
    const kind=kinds[Math.floor(r()*kinds.length)];const far=(d-HALF)/34;
    add(kind,x,z,kind==='cypress'?6.5+r()*3:6.2+r()*2.6+far*3)}
@@ -856,9 +889,9 @@ const KINDW={deed:'a deed',seed_buy:'seed store',seed_sell:'seed store',send:'se
 function hydrate(d){LIVE=true;ADMIN=!!d.admin;
   (d.catalog||[]).forEach(c=>{if(CAT[c.t]){CAT[c.t].price=+c.price;CAT[c.t].tier=Math.max(0,TIERS.indexOf(+c.min_deeds))}});
   S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
-  S.plants={};(d.plots||[]).forEach(p=>{if(CAT[p.t])S.plants[p.plot]={t:p.t,g:+p.g||0,wd:p.wd||undefined}});
+  S.plants={};(d.plots||[]).forEach(p=>{if(CAT[p.t])S.plants[p.plot]={t:p.t,g:+p.g||0,wd:p.wd||undefined}});S.things={};
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
-  save();plantBeds();renderHud();if(STORE_ON)renderStore()}
+  save();plantBeds();renderHud();if(STORE_ON)renderStore();loadThings()}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
     return sb.rpc('garden_state').then(r2=>{if(r2.error){toast(rpcFail(r2.error,'The garden could not load your sack.'));return}hydrate(r2.data||{});
@@ -891,11 +924,18 @@ const SND=(()=>{
   function puff(t0,dur,gain,lo,hi,q){const a=ctx();if(!a)return;const T=a.currentTime+(t0||0),s=a.createBufferSource();s.buffer=noise(a);const f=a.createBiquadFilter();f.type=lo?'bandpass':'lowpass';f.frequency.value=hi||1800;f.Q.value=q||0.7;
     const g=a.createGain();g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain,T+0.01);g.gain.exponentialRampToValueAtTime(0.0001,T+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(T);s.stop(T+dur+0.05)}
   const vibe=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}};
+  /* the iPhone silent switch mutes everything the sound engine makes unless the page is also playing a media track;
+     a silent loop through a media element, made here in code, keeps the chimes audible with the music off. Off with the chimes. */
+  let KEEP=null;
+  function silentWav(){const rate=8000,n=800,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+    w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+    return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+  function keepAlive(on){try{if(on){if(MUTE)return;if(!KEEP){KEEP=new Audio(silentWav());KEEP.loop=true;KEEP.volume=0.01;KEEP.setAttribute('playsinline','')}KEEP.play().catch(()=>{})}else if(KEEP){KEEP.pause()}}catch(e){}}
   let combo=0,comboT=0;
   return{
     muted:()=>MUTE,
-    setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v)ctx()},
-    unlock(){ctx()},
+    setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v){ctx();keepAlive(true)}else keepAlive(false)},
+    unlock(){ctx();keepAlive(true)},
     /* small */
     tickUp(i){if(!gate('tick',40))return;tone(740*Math.pow(2,((i||0)%10)/12),0,0.07,0.07,'triangle')},
     tickDown(){if(!gate('tick',40))return;tone(520,0,0.07,0.06,'triangle')},
@@ -905,6 +945,8 @@ const SND=(()=>{
     splash(){puff(0,0.4,0.16,true,2200,0.6)},
     knock(){if(!gate('knock',120))return;puff(0,0.06,0.06,false,900,1);tone(190,0,0.09,0.07,'sine',120)},
     nope(){tone(260,0,0.14,0.07,'triangle',200);tone(196,0.12,0.18,0.07,'triangle',150)},
+    chip(){if(!gate('chip',60))return;puff(0,0.05,0.14,true,3400,1.4);tone(1480,0,0.045,0.05,'square');tone(3100,0.01,0.03,0.03,'square')},
+    carved(){cascade(7,659.3,0.1,0.075);chord([1318.5,1568,2093],0.55,1.3,0.07);vibe([15,40,15])},
     /* medium */
     open(){bell(1046.5,0,0.35,0.05)},
     hello(){bell(880,0,0.45,0.07);bell(1174.7,0.13,0.55,0.07)},
@@ -922,6 +964,8 @@ const SND=(()=>{
 addEventListener('pointerdown',()=>SND.unlock(),{once:true});
 addEventListener('keydown',()=>SND.unlock(),{once:true});
 
+
+
 $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
   const t0=tierOf(S.deeds);S.deeds++;S.coins+=DEED_PAY;S.earned+=DEED_PAY;ledger('Deed '+S.deeds,DEED_PAY,'a deed');save();renderHud();if(STORE_ON)renderStore();SND.deed();if(tierOf(S.deeds)>t0)setTimeout(()=>SND.tier(),1400);toast('Deed '+S.deeds+'. '+DEED_PAY+' Deedcoins. Sign in on DEEDS to log real ones.')};
 
@@ -929,10 +973,10 @@ $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
 let STORE_ON=false,CART={};
 const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*q,0);
 function openStore(){STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open();if(document.exitPointerLock)document.exitPointerLock()}
-function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on')}
+function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on');$('#forms').classList.remove('on')}
 function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.coins-total;
   $('#stBal').innerHTML=COINIMG+'<b>'+left.toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total:'');$('#stBal').classList.toggle('short',left<0);
-  $('#stNote').textContent='Seeds are '+CAT.rose.price+' each. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'. Walk to a bed to sow them.';
+  const pr=FLOWERS.map(id=>CAT[id].price);$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+'. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'. Walk to a bed to sow them.';
   let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
     h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':c.price+' Deedcoins'+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
     h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">\u2212</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
@@ -1000,6 +1044,49 @@ function rain(cx,cz,r){const n=70,pos=new Float32Array(n*3),v=[];for(let i=0;i<n
 function rainTick(dt){for(let i=RAINS.length-1;i>=0;i--){const R=RAINS[i];R.t+=dt;const a=R.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){let y=a.getY(j)-R.v[j]*dt;if(y<0.12)y=1.9+Math.random()*0.4;a.setY(j,y)}a.needsUpdate=true;
   if(R.t>1.5){scene.remove(R.pts);R.pts.geometry.dispose();RAINS.splice(i,1)}}}
 
+/* ---------- marble: buy a block on a plinth, chisel it three times, keep it forever ---------- */
+const MARBLE=50,FORMS={obelisk:'Obelisk',urn:'Urn',sphere:'Sphere',column:'Column'};
+if(!S.things)S.things={};
+let THINGS_LIVE=false;
+function loadThings(){if(!sb||!LIVE)return;sb.rpc('garden_things').then(r=>{if(r.error)return;THINGS_LIVE=true;S.things={};(r.data||[]).forEach(t=>{if(FORMS[t.kind])S.things[t.spot]={k:t.kind,st:+t.stage||0}});save();renderThings()}).catch(()=>{})}
+const THINGMESHES=[];
+function formGroup(kind){const G=new THREE.Group();const add=(g,y,rot)=>{const o=new THREE.Mesh(g,MAT.marble);o.castShadow=true;o.receiveShadow=true;o.position.y=y;if(rot)o.rotation.y=rot;G.add(o);return o};
+  if(kind==='obelisk'){add(new THREE.BoxGeometry(0.5,0.12,0.5),0.06);add(new THREE.CylinderGeometry(0.15,0.24,1.7,4),0.97,Math.PI/4);add(new THREE.ConeGeometry(0.15,0.24,4),1.94,Math.PI/4)}
+  else if(kind==='urn'){const pts=[[0,0],[0.26,0],[0.26,0.05],[0.14,0.09],[0.14,0.16],[0.24,0.3],[0.31,0.55],[0.28,0.78],[0.18,0.9],[0.2,0.98],[0.32,1.02],[0.32,1.07],[0,1.07]].map(p=>new THREE.Vector2(p[0],p[1]));add(new THREE.LatheGeometry(pts,32),0)}
+  else if(kind==='sphere'){add(new THREE.CylinderGeometry(0.2,0.24,0.3,20),0.15);add(new THREE.SphereGeometry(0.4,28,20),0.7)}
+  else{add(new THREE.BoxGeometry(0.5,0.1,0.5),0.05);add(new THREE.CylinderGeometry(0.15,0.17,1.5,20),0.85);add(new THREE.BoxGeometry(0.44,0.12,0.44),1.66)}
+  return G}
+const BLOCKGEO=new THREE.BoxGeometry(0.8,0.8,0.8);
+function renderThings(){THINGMESHES.forEach(o=>scene.remove(o));THINGMESHES.length=0;
+  Object.entries(S.things||{}).forEach(([k,t])=>{const sp=SPOTS[+k];if(!sp||!FORMS[t.k])return;const [x,z]=sp,st=Math.min(3,t.st|0);
+    if(st<3){const sc=1-st/3;const b=new THREE.Mesh(BLOCKGEO,MAT.marble);b.castShadow=true;b.receiveShadow=true;b.position.set(x,0.6+0.4*sc,z);b.scale.set(sc,sc,sc);b.rotation.y=0.2;scene.add(b);THINGMESHES.push(b)}
+    if(st>0){const g=formGroup(t.k);const sc=st/3;g.position.set(x,0.6,z);g.scale.set(sc,sc,sc);scene.add(g);THINGMESHES.push(g)}})}
+function plinthHere(){let best=null,bd=9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return best&&bd<2.3?best:null}
+let FORM_SPOT=-1;
+function openForms(spot){FORM_SPOT=spot;$('#formRow').innerHTML=Object.entries(FORMS).map(([k,n])=>'<button class="fm" data-k="'+k+'">'+FORMICON[k]+'<div class="nm">'+n+'</div></button>').join('');
+  $$('#formRow .fm').forEach(b=>b.onclick=()=>{$('#forms').classList.remove('on');buyThing(FORM_SPOT,b.dataset.k)});$('#forms').classList.add('on');SND.open();if(document.exitPointerLock)document.exitPointerLock()}
+const FORMICON={obelisk:'<svg viewBox="0 0 60 64"><path d="M26 10 L34 10 L38 52 L22 52 Z M30 2 L37 11 L23 11 Z" fill="#F1EEE7"/><rect x="16" y="52" width="28" height="6" fill="#D9D4C8"/></svg>',
+  urn:'<svg viewBox="0 0 60 64"><path d="M18 14 H42 L38 22 C46 30 44 46 30 50 C16 46 14 30 22 22 Z" fill="#F1EEE7"/><rect x="20" y="52" width="20" height="6" fill="#D9D4C8"/></svg>',
+  sphere:'<svg viewBox="0 0 60 64"><circle cx="30" cy="28" r="18" fill="#F1EEE7"/><rect x="22" y="46" width="16" height="6" fill="#E4E0D6"/><rect x="16" y="52" width="28" height="6" fill="#D9D4C8"/></svg>',
+  column:'<svg viewBox="0 0 60 64"><rect x="24" y="12" width="12" height="38" fill="#F1EEE7"/><rect x="18" y="6" width="24" height="7" fill="#E4E0D6"/><rect x="16" y="52" width="28" height="6" fill="#D9D4C8"/></svg>'};
+$('#fmClose').onclick=()=>$('#forms').classList.remove('on');
+$('#forms').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#forms').classList.remove('on')});
+function buyThing(spot,kind){if(S.things[spot]){SND.knock();toast('That plinth is taken.');return}
+  if(S.coins<MARBLE){showShort(MARBLE);return}
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('thing_buy',{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough Deedcoins. Marble is '+MARBLE+'.':'The stone did not come.').replace('patch 42','patch 43'));return}
+      const d=r.data||{};S.coins=+d.balance;S.things[spot]={k:kind,st:0};ledger('Marble block',-MARBLE,'the mason');save();renderThings();renderHud();SND.buy(1);toast('A block of marble. Chisel it.');updateAct()}).catch(()=>{BUSY=false;toast('The stone did not come.')});return}
+  S.coins-=MARBLE;S.things[spot]={k:kind,st:0};ledger('Marble block',-MARBLE,'the mason');save();renderThings();renderHud();SND.buy(1);toast('A block of marble. Chisel it.');updateAct()}
+function chipThing(spot){const t=S.things[spot];if(!t||t.st>=3)return;const [x,z]=SPOTS[spot];
+  const done=st=>{t.st=st;save();renderThings();if(st>=3){SND.carved();toast('Finished. '+FORMS[t.k]+' in marble, carved by you.')}else{SND.chip();toast('Chisel. '+st+' of 3.')}burst(x,1.1,z);updateAct()};
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('thing_chip',{p_spot:spot}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The chisel slipped.').replace('patch 42','patch 43'));return}done(Math.min(3,+(r.data&&r.data.stage)||t.st+1))}).catch(()=>{BUSY=false});return}
+  done(t.st+1)}
+/* chips flying off the stone */
+const CHIPS=[];const chipMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xffffff,size:0.11,transparent:true,opacity:0.95,depthWrite:false,alphaTest:0.2});
+function burst(x,y,z){const n=40,pos=new Float32Array(n*3),v=[];for(let i=0;i<n;i++){pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;const a=Math.random()*6.28,sp=1.2+Math.random()*2;v.push([Math.cos(a)*sp,1.5+Math.random()*2.5,Math.sin(a)*sp])}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,chipMat);scene.add(pts);CHIPS.push({pts,v,t:0})}
+function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=dt;const a=C.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){const v=C.v[j];v[1]-=9.8*dt;let y=a.getY(j)+v[1]*dt;if(y<0.05)y=0.05;a.setXYZ(j,a.getX(j)+v[0]*dt,y,a.getZ(j)+v[2]*dt)}a.needsUpdate=true;
+  if(C.t>0.9){scene.remove(C.pts);C.pts.geometry.dispose();CHIPS.splice(i,1)}}}
+
 /* ---------- the act bar: what you can do from where you stand ---------- */
 let ACT=null,ATSTAND=false;                         /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
@@ -1011,8 +1098,12 @@ function showAct(label,mode,plot,chips,say){ACT=mode?{mode,plot}:null;actMain.te
   actKey.textContent=say?(say+(key?' \u00B7 '+key:'')):key;actEl.classList.add('on')}
 function hideAct(){ACT=null;actEl.classList.remove('on')}
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
-  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are fifty. Water them and come back tomorrow.\u201D');return}
+  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are ten to fifty. Marble is fifty, on the plinths.\u201D');return}
   ATSTAND=false;
+  const pl=plinthHere();if(pl){const t=S.things[pl.i];
+    if(!t){showAct('Set a marble block here. '+MARBLE+' Deedcoins.','marble',pl.i);return}
+    if(t.st<3){showAct('Chisel the marble. '+t.st+' of 3.','chip',pl.i);return}
+    showAct(FORMS[t.k]+' in marble. Carved by you.');return}
   const b=bedHere();if(!b){hideAct();return}
   const p=S.plants[b.plot];
   if(!p){const types=FLOWERS.filter(t=>S.sack[t]>0);if(!types.length){showAct('Bed '+(b.plot+1)+' is empty. Seeds are at the stand by the gate.');return}
@@ -1021,7 +1112,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if((p.g||0)>=2){showAct(CAT[p.t].p+' in bloom.');return}
   if(!freeWater()&&p.wd===today()){showAct('Bed '+(b.plot+1)+' is watered. Come back tomorrow.');return}
   showAct('Water bed '+(b.plot+1)+'.','water',b.plot)}
-function act(){if(!ACT)return;if(ACT.mode==='stand')openStore();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='water')waterAt(ACT.plot);updateAct()}
+function act(){if(!ACT)return;if(ACT.mode==='stand')openStore();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(S.coins<MARBLE){SND.knock();toast('Marble is '+MARBLE+'. Log a deed for more.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 actMain.addEventListener('click',e=>{e.stopPropagation();act()});
 actMain.addEventListener('pointerdown',e=>e.stopPropagation());
@@ -1066,7 +1157,8 @@ $('#hint').textContent=HINT_FREE;
 
 const keys={};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
-  if(k==='escape'){closeStore();return}
+  if(k==='escape'){closeStore();$('#forms').classList.remove('on');return}
+  if($('#forms').classList.contains('on'))return;
   if(STORE_ON)return;
   if(k==='e'&&!e.repeat){act();return}if(k==='q'&&!e.repeat){cycleSeed();return}
   if(k===' '&&!keys[' ']&&!e.repeat)jumpQ=true;keys[k]=1;if(/^arrow| $/.test(k))e.preventDefault()});
@@ -1122,7 +1214,7 @@ let last=performance.now(),frame=0;
 const camDir=new THREE.Vector3();
 function loop(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;const t=now/1000;frame++;
-  if(STORE_ON){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0}
+  if(STORE_ON||$('#forms').classList.contains('on')){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0}
   if(lookDX||lookDY){you.yaw-=lookDX*(locked?0.0022:0.0042);you.pitch=Math.max(-0.7,Math.min(0.7,you.pitch-lookDY*(locked?0.0019:0.0032)));lookDX=lookDY=0}
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
@@ -1159,7 +1251,13 @@ function loop(now){
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
   tickDrops(t);airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
   /* the Keeper: nods to whoever is close, waves as you arrive */
-  {const near=Math.hypot(you.x-STAND.x,you.z-STAND.z);KEEPER.head.rotation.x=near<6?Math.sin(t*2.2)*0.1:0;KEEPER.armR.rotation.x=near<4?-1.9+Math.sin(t*7)*0.35:-0.25}
+  {const near=Math.hypot(you.x-STAND.x,you.z-STAND.z);
+   /* breathe, look at whoever is close (his face is on local -x; the stall frame is turned -90 about y), wave as you arrive */
+   KEEPER.g.scale.y=1+Math.sin(t*1.6)*0.006;
+   if(near<9){const target=Math.max(-0.9,Math.min(0.9,Math.atan2(-(you.x-STAND.x),-(you.z-STAND.z))));KEEPER.head.rotation.y+=(target-KEEPER.head.rotation.y)*Math.min(1,4*dt);KEEPER.head.rotation.y=Math.max(-0.9,Math.min(0.9,KEEPER.head.rotation.y));KEEPER.head.rotation.x=Math.sin(t*2.2)*0.04}
+   else{KEEPER.head.rotation.y*=1-Math.min(1,3*dt);KEEPER.head.rotation.x=0}
+   KEEPER.armR.rotation.x+=((near<4?-2.3:-0.1)-KEEPER.armR.rotation.x)*Math.min(1,5*dt);KEEPER.armR.fore.rotation.x=near<4?-0.2+Math.sin(t*7)*0.35:-0.5}
+  chipTick(dt);
   if(frame%6===0){labels();updateAct()}
   renderer.render(scene,camera);
   requestAnimationFrame(loop);
@@ -1167,10 +1265,10 @@ function loop(now){
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.pitch=pitch||0;you.feet=floorAt(x,z);you.grounded=true},you,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,live:()=>LIVE,setSow:t=>{SOWT=t}};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.pitch=pitch||0;you.feet=floorAt(x,z);you.grounded=true},you,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS};
 
 applyPhase();
-you.feet=floorAt(you.x,you.z);plantBeds();renderHud();labels();updateAct();
+you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderHud();labels();updateAct();
 if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. The seed seller is at the end of the path behind you.'),1400)}
 $('#lbar').style.width='100%';$('#lmsg').textContent='Walk in';
 requestAnimationFrame(loop);
