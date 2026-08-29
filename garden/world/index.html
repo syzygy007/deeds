@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="1.3">
+<meta name="world-build" content="1.4">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -110,7 +110,7 @@ canvas{display:block;touch-action:none}
   <div class="micro" id="stNote" style="opacity:.75"></div>
   <div class="grid" id="stGrid"></div>
   <div id="stSack"></div>
-  <div class="sfoot"><button class="btn" id="stClose">Not now.</button><button class="btn on" id="stBuy">Checkout.</button></div>
+  <div class="sfoot"><button class="btn" id="stClose">Close.</button><button class="btn on" id="stBuy">Checkout.</button></div>
 </div></div>
 <div id="short" class="sheet"><div class="panel small"><h2>Not enough Deedcoins<span>.</span></h2><p id="shBody"></p><div class="sfoot"><button class="btn" id="shKeep">Keep shopping.</button><button class="btn on" id="shDeed">Log a deed.</button></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -904,6 +904,8 @@ function showShort(total){SFX.nope();$('#shBody').textContent='You have '+S.coin
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
 $('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
 $('#stClose').onclick=closeStore;
+$('#store').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStore()});
+$('#short').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#short').classList.remove('on')});
 $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
   if(!items.length){toast('The basket is empty. Tap + on a packet.');return}
   const total=cartTotal();if(total>S.coins){showShort(total);return}
@@ -919,10 +921,10 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
       BUSY=false;
       if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough Deedcoins for all of those.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
       renderHud();
-      if(got&&!fail){CART={};SFX.chime();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed.')}
-      renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
+      if(got&&!fail){CART={};SFX.chime();SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()}
+      else renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
   items.forEach(([id,q])=>{const c=CAT[id];S.coins-=c.price*q;S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*q,'seed store')});
-  CART={};save();renderHud();renderStore();SFX.chime();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed.')};
+  CART={};save();renderHud();SFX.chime();SOWT=items[0][0];closeStore();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()};
 function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to return.');return}
   if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
     S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
