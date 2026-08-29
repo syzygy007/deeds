@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DEEDS. The Garden</title>
-<meta name="garden-build" content="6.2">
+<meta name="garden-build" content="6.2.1">
 <meta name="description" content="Your profile is a garden. Every deed sows it.">
 <meta property="og:title" content="Come see my garden.">
 <meta property="og:description" content="Grown one good deed at a time.">
@@ -679,7 +679,7 @@ function checkout(){const items=Object.entries(CART).filter(([id,q])=>q>0&&CAT[i
   if(LIVE){if(BUSY)return;BUSY=true;$('#dAlt').disabled=true;
     (async()=>{let got=0,fail=null;
       for(const [id,q] of items){const c=CAT[id];let want=q;
-        while(want>0){const prev=S.sack[id]||0;const r=await sb.rpc('seed_buy',{p_type:id,p_qty:want}).catch(e=>({error:e||{message:'network'}}));
+        while(want>0){const prev=S.sack[id]||0;let r;try{r=await sb.rpc('seed_buy',{p_type:id,p_qty:want})}catch(e){r={error:e||{message:'network'}}}
           if(r.error){fail=r.error;break}
           const d=r.data||{};const qty=+d.qty;const n=qty-prev; /* the answer is the truth; a server that counts one at a time gets topped up one call at a time */
           if(!(n>0)){fail={message:'no change'};break}
@@ -688,7 +688,7 @@ function checkout(){const items=Object.entries(CART).filter(([id,q])=>q>0&&CAT[i
       BUSY=false;
       if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough Deedcoins for all of those.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
       renderHud();
-      if(got&&!fail){CART={};DMODE='sack';renderDrawer();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack.')}else renderDrawer()})();return}
+      if(got&&!fail){CART={};DMODE='sack';renderDrawer();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack.')}else renderDrawer()})().catch(()=>{BUSY=false;renderDrawer();toast('The store did not answer.')});return}
   items.forEach(([id,q])=>{const c=CAT[id];S.coins-=c.price*q;S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*q,'seed store')});
   CART={};save();renderHud();DMODE='sack';renderDrawer();toast('Bought. '+plural(sackTotal(),'seed')+' in your sack.')}
 function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to sell.');return}
