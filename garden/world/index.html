@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="0.3">
+<meta name="world-build" content="0.41">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -53,6 +53,8 @@ canvas{display:block;touch-action:none}
 </div>
 
 <div id="stick"><div id="knob"><i></i></div></div>
+<div id="err" style="position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;background:#7A1F1F;
+  color:#fff;font:600 11px/1.5 ui-monospace,monospace;padding:10px 14px;white-space:pre-wrap"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -62,7 +64,12 @@ canvas{display:block;touch-action:none}
    props with world coordinates, MA size manifest, BEDS parterre plots.
    Nothing here authors a new map. It stands the existing one up.
    ====================================================================== */
-const BASE='../';
+/* absolute, not relative. a missing trailing slash in the address used to send
+   every asset request one folder too high and the whole world loaded empty. */
+const BASE='/garden/';
+const FAIL=[];
+function shout(m){const e=document.getElementById('err');e.style.display='block';e.textContent=String(m).slice(0,400)}
+addEventListener('error',e=>shout('ERROR: '+(e.message||e.error)));
 function rng(seed){let t=seed>>>0;return function(){t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
 const PATCH=[
  {cx:1600,cy:510,w:920,h:480,t:'gravel-warm-estate',hard:1},
@@ -167,6 +174,8 @@ const MA={"g2-balustrade-segment-straight.webp":[484,0.789],"g2-basin-still.webp
 /* ---------- scale ----------
    GSC  metres per world px for the ground plane
    PSC  metres per prop px, then a Wonderland multiplier by kind         */
+const bb=[];       /* everything that turns to face you */
+const blockers=[]; /* what you cannot walk through */
 const GSC=0.05, PSC=0.0092;
 const WPX=3200, HPX=2400;
 const WM=WPX*GSC, HM=HPX*GSC;
@@ -279,28 +288,48 @@ let pending=0, done=0;
 function tex(file,repeat){
   if(texCache.has(file))return texCache.get(file);
   pending++;
-  const t=TL.load(BASE+file,()=>{done++;progress()},undefined,()=>{done++;progress()});
+  const t=TL.load(BASE+file,()=>{done++;progress()},undefined,()=>{FAIL.push(file);done++;progress()});
   t.encoding=THREE.sRGBEncoding;
   t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy?renderer.capabilities.getMaxAnisotropy():4);
   if(repeat){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat[0],repeat[1])}
   texCache.set(file,t);return t;
+}
+/* a material that shows honest colour until its picture arrives, and keeps that
+   colour if the picture never arrives. nothing in this world renders as a black hole. */
+function skin(file,fallback,repeat,extra){
+  const m=new THREE.MeshBasicMaterial(Object.assign({color:fallback},extra||{}));
+  m.userData.base=fallback;
+  pending++;
+  TL.load(BASE+file,t=>{
+    t.encoding=THREE.sRGBEncoding;
+    t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy?renderer.capabilities.getMaxAnisotropy():4);
+    if(repeat){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat[0],repeat[1])}
+    m.map=t;m.userData.base=0xffffff;m.color.setHex(0xffffff);m.needsUpdate=true;
+    done++;progress();applyTint();
+  },undefined,()=>{FAIL.push(file);done++;progress()});
+  return m;
 }
 function progress(){
   const p=pending?done/pending:1;
   document.getElementById('lbar').style.width=(p*100).toFixed(0)+'%';
   if(p>=1)setTimeout(hideLoad,220);
 }
-function hideLoad(){const l=document.getElementById('load');l.style.opacity=0;setTimeout(()=>l.style.display='none',600)}
+function report(){
+  if(FAIL.length)shout(FAIL.length+' file(s) did not load, first: '+FAIL[0]+'\nExpected at '+BASE+FAIL[0]);
+}
+function hideLoad(){
+  report();const l=document.getElementById('load');l.style.opacity=0;setTimeout(()=>l.style.display='none',600)}
 
 /* ---------- ground ---------- */
 const groundGroup=new THREE.Group();scene.add(groundGroup);
+const GRASSY=/lawn|meadow|orchard|moss/;
 function plane(wpx,hpx,texfile,rx,ry,y){
   const g=new THREE.PlaneGeometry(wpx*GSC,hpx*GSC);
-  const m=new THREE.MeshBasicMaterial({map:tex(texfile,[rx,ry])});
+  const m=skin(texfile,GRASSY.test(texfile)?0x6C8F4E:0x9A8B72,[rx,ry]);
   const mesh=new THREE.Mesh(g,m);mesh.rotation.x=-Math.PI/2;mesh.position.y=y;return mesh;
 }
 /* the lawn under everything */
-const OVER=3.6;   /* the lawn runs well past the map so the world never shows an edge */
+const OVER=2.6;   /* the lawn runs well past the map so the world never shows an edge */
 /* the country beyond the garden rolls. inside the walls it stays dead flat,
    because every bed, patch and prop is placed on a flat plan. */
 function surroundH(X,Z){
@@ -310,12 +339,11 @@ function surroundH(X,Z){
   const ramp=Math.min(1,d/30), n=Math.sin(X*0.021)*Math.cos(Z*0.017)+0.5*Math.sin(X*0.041+1.7)*Math.cos(Z*0.033+.6);
   return ramp*ramp*(3.4+n*5.0);
 }
-const lawnGeo=new THREE.PlaneGeometry(WPX*OVER*GSC,HPX*OVER*GSC,110,84);
+const lawnGeo=new THREE.PlaneGeometry(WPX*OVER*GSC,HPX*OVER*GSC,96,72);
 (function(){const pos=lawnGeo.attributes.position;
   for(let i=0;i<pos.count;i++){const X=pos.getX(i),Y=pos.getY(i);pos.setZ(i,surroundH(X,-Y))}
   lawnGeo.computeVertexNormals()})();
-const lawn=new THREE.Mesh(lawnGeo,new THREE.MeshBasicMaterial({
-  map:tex('g2-tile-lawn-clipped.webp',[WPX*OVER/210,HPX*OVER/210])}));
+const lawn=new THREE.Mesh(lawnGeo,skin('g2-tile-lawn-clipped.webp',0x6C8F4E,[WPX*OVER/210,HPX*OVER/210]));
 lawn.rotation.x=-Math.PI/2;
 groundGroup.add(lawn);
 /* a scatter of trees out on the rise so the hills read as land, not as wallpaper */
@@ -354,8 +382,6 @@ for(let i=0;i<40;i++){
 }
 
 /* ---------- props: billboards standing on their own coordinates ---------- */
-const bb=[];      /* everything that turns to face you */
-const blockers=[];/* what you cannot walk through */
 const srcOf=f=>f.g?'g2-'+f.g+'.webp':'garden-'+f.img+'.webp';
 function addProp(f){
   const file=srcOf(f), meta=MA[file];
@@ -364,7 +390,7 @@ function addProp(f){
   const k=kindOf(file), mult=MULT[k];
   const wM=f.w*PSC*mult, hM=wM*aspect;
   const g=new THREE.PlaneGeometry(wM,hM);
-  const m=new THREE.MeshBasicMaterial({map:tex(file),transparent:false,alphaTest:0.42,side:THREE.DoubleSide});
+  const m=skin(file,0x5F7A4A,null,{alphaTest:0.42,side:THREE.DoubleSide});
   const mesh=new THREE.Mesh(g,m);
   const px=wx(f.x), pz=wz(f.y);
   if(f.flat||FLAT.test(file)){       /* art drawn top down lies on the ground */
@@ -557,13 +583,21 @@ function airTick(t,dt){
 }
 
 /* ---------- fog and tint ---------- */
+function applyTint(){
+  const c=new THREE.Color(PH[ph].tint);
+  scene.traverse(o=>{
+    if(!o.isMesh||!o.material||o===sky||o===orb||clouds.indexOf(o)>=0)return;
+    const b=o.material.userData&&o.material.userData.base;
+    if(b===undefined)return;
+    o.material.color.setHex(b).multiply(c);
+  });
+}
 function applyPhase(){
   const p=PH[ph];
   skyMat.map=skyTexture(p);skyMat.needsUpdate=true;
   scene.fog=new THREE.FogExp2(new THREE.Color(p.hz),p.fog);
   renderer.setClearColor(new THREE.Color(p.hz));
-  const c=new THREE.Color(p.tint);
-  scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.map&&o!==sky&&!clouds.includes(o))o.material.color.copy(c)});
+  applyTint();
   clouds.forEach(m=>{m.material.color.copy(c);m.material.opacity=ph==='night'?.30:.70});
   sMat.uniforms.vis.value=ph==='night'?1:(ph==='dusk'?.5:0);
   orb.material.map=tex(p.orb==='sun'?'g2-sun-disc-glow.webp':'g2-moon-waxing-gibbous.webp');
