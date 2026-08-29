@@ -88,6 +88,22 @@ input,textarea{font:inherit;color:var(--ink)}
 .mr-card .fbtn{margin-top:auto}
 .fbtn{color:var(--forest);border:1px solid var(--forest);font-size:11px;font-weight:800;letter-spacing:.06em;padding:6px 16px;border-radius:999px}
 .fbtn.on{background:var(--forest);color:var(--ivory)}
+/* explore page */
+.xsec{padding:12px 0 8px;border-bottom:1px solid var(--line)}
+.xlab{font-size:11px;letter-spacing:.18em;font-weight:800;color:var(--muted);padding:8px 18px 10px}
+.xsub{font-size:9px;letter-spacing:.16em;color:#A8A395;font-weight:700;padding:0 18px 8px;text-transform:uppercase;margin-top:-8px}
+.xgate{display:block;position:relative;margin:0 18px 12px;border-radius:18px;overflow:hidden;background:#1C2A1F;aspect-ratio:16/10;text-decoration:none;color:var(--ivory)}
+.xgate img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.xg-copy{position:absolute;left:0;right:0;bottom:0;padding:76px 20px 20px;background:linear-gradient(180deg,rgba(21,19,14,0) 0%,rgba(21,19,14,.8) 100%)}
+.xg-copy .micro{color:var(--ivory);opacity:.85}
+.xg-copy h2{font-size:30px;font-weight:800;letter-spacing:-.01em;margin:4px 0 4px;color:var(--ivory);line-height:1.05}
+.xg-copy h2 b{color:var(--gold)}
+.xg-sub{font-family:Georgia,'Times New Roman',serif;font-size:15px;opacity:.92}
+.xrow{display:flex;gap:10px;padding:0 18px 12px}
+.xcard{flex:1;border:1px solid var(--line);border-radius:14px;padding:14px;text-decoration:none;color:var(--ink);background:#FBF9F3;display:flex;flex-direction:column;gap:3px}
+.xcard b{font-size:15px;font-weight:800}
+.xcard span{font-size:12px;color:var(--muted)}
+.xsec .rline{padding:0 18px 14px}
 /* pages */
 .page{display:none}
 .page.on{display:block}
@@ -1342,7 +1358,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
     <nav class="dnav">
       <button data-go="feed" class="on">Deeds.</button>
       <button data-go="read">Read.</button>
-      <button data-go="meet">Meet.</button>
+      <button data-go="meet">Explore.</button>
       <button class="bell" id="dBell">Alerts.<span class="bdot"></span></button>
       <button data-go="profile">Profile.</button>
     </nav>
@@ -1370,7 +1386,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
     <nav class="lnav">
       <button data-go="feed" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
       <button data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
-      <button data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
+      <button data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Explore.</button>
       <button id="lBell" class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 0 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.4 20a2 2 0 0 0 3.2 0"/></svg>Alerts.<span class="bdot"></span></button>
       <button data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
     </nav>
@@ -1514,9 +1530,20 @@ body.gsky-on .tab.on{color:var(--ivory)}
       <div class="lgrid lib-only" id="wdLib"></div>
     </div>
     <div class="page" id="pg-meet">
-      <div class="pghead"><h1>Meet<b>.</b></h1><div class="micro">Surfaced By Deeds, Not By You</div></div>
-      <div class="rline" id="goodbar" style="cursor:pointer;font-weight:800">GOOD COMPANIES &#183; THE LIST.</div>
-      <div id="meetlist"></div>
+      <div class="pghead"><h1>Explore<b>.</b></h1><div class="micro">Games &middot; Good Companies &middot; People</div></div>
+      <div class="xsec">
+        <div class="xlab">GAMES</div>
+        <a class="xgate" href="garden/world/"><img src="gate.webp" alt="" onerror="this.onerror=null;this.src='garden-door.webp'"><div class="xg-copy"><div class="micro">THE GARDEN GATE</div><h2>Walk the garden<b>.</b></h2><div class="xg-sub">Your deeds, planted. Step through and look around.</div></div></a>
+        <div class="xrow"><a class="xcard" href="garden/"><b>My Garden.</b><span>Sow what your deeds earn.</span></a><a class="xcard" href="garden/world/?bloom=1"><b>In Bloom.</b><span>All forty beds, planted.</span></a></div>
+      </div>
+      <div class="xsec">
+        <div class="xlab">GOOD COMPANIES</div>
+        <div class="rline" id="goodbar" style="cursor:pointer;font-weight:800">THE LIST &#183; THE 2027 STANDARD.</div>
+      </div>
+      <div class="xsec">
+        <div class="xlab">PEOPLE</div><div class="xsub">Surfaced By Deeds, Not By You</div>
+        <div id="meetlist"></div>
+      </div>
     </div>
 
     <div class="page" id="pg-profile">
@@ -1729,7 +1756,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
   <button class="tab on" data-go="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
   <button class="tab" data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
   <button class="tab tab-log" id="tLog" aria-label="Log a Deed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-  <button class="tab" data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Meet.</button>
+  <button class="tab" data-go="meet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.4"/><path d="M2.8 20c.7-3.4 3.2-5.2 6.2-5.2s5.5 1.8 6.2 5.2"/><circle cx="17.3" cy="9.6" r="2.6"/><path d="M15.4 14.9c2.9.1 5 1.7 5.8 4.6"/></svg>Explore.</button>
   <button class="tab" data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2c1-4 3.8-6 7.2-6s6.2 2 7.2 6"/></svg>Profile.</button>
 </nav>
 </div>
@@ -3005,7 +3032,7 @@ return a.outerHTML}
 var postBaseHTML=postHTML;
 
 function meetRailHTML(){var h='<div class="meetrail"><div class="micro">Meet.</div><div class="sub">Surfaced By Deeds, Not By You</div><div class="mr-scroll">';
-MEET.slice(0,4).forEach(function(m){h+=meetCard(m)});return h+'</div></div>'}
+var real=xOthers();if(real.length)real.slice(0,6).forEach(function(p){h+=realMeetCard(p)});else MEET.slice(0,4).forEach(function(m){h+=meetCard(m)});return h+'</div></div>'}
 
 /* ---- the guest wall: curated examples, row-shaped, through the real renderer ---- */
 var EXNAMES={'exp-harbor':{handle:'HarborLight077',type:'nurse',v:false},'exp-ivy':{handle:'IvyGate303',type:'coach',v:false},'exp-lowtide':{handle:'LowTideRun228',type:'volunteer',v:false},'exp-goldfinch':{handle:'GoldfinchRow512',type:'deedhand',v:false},'exp-cedar':{handle:'CedarPost615',type:'neighbor',v:false},'exp-paper':{handle:'PaperCrane441',type:'student',v:false},'exp-maple':{handle:'MapleWard212',type:'teacher',v:false},'exp-slate':{handle:'SlateCreek969',type:'responder',v:false}};
@@ -4278,7 +4305,7 @@ if(r.error){el.innerHTML='<p class="remnote">That list could not load: '+esc(r.e
 var ids=(r.data||[]).map(function(x){return CXTAB==='followers'?x.follower_id:x.followed_id});
 if(!ids.length){el.innerHTML='<p class="remnote">'+(CXTAB==='followers'
 ?'No followers yet. Keep building.'
-:'Not following anyone yet. Meet. is a good place to start.')+'</p>';return}
+:'Not following anyone yet. Explore. is a good place to start.')+'</p>';return}
 fetchNames(ids.map(function(id){return{profile_id:id}})).then(function(){indexNames();
 var h='';ids.forEach(function(id){var nm=NAMES[id];if(!nm)return;
 h+='<div class="cxrow"><div data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
@@ -4777,6 +4804,34 @@ h+='</div>'});
 el.innerHTML=h;el.style.display='block';
 $$('#pplres [data-org]').forEach(function(rw){rw.onclick=function(){openOrgView(rw.getAttribute('data-org'))}});
 wireLive();wireCommon()}).catch(function(){})}
+
+/* ---- Explore: real people. One query at boot; the feed rail, the desktop rail and the PEOPLE list all draw from it ---- */
+var XPEOPLE=[];
+function xOthers(){return XPEOPLE.filter(function(p){return !PROFILE||p.id!==PROFILE.id})}
+function realMeetCard(p){var nm=NAMES[p.id];var f=MYFOLL[p.id];
+return '<div class="mr-card"><div data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,52,{verified:nm.v})+'</div><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+'<button class="fbtn'+(f?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(f?'Following':'Follow')+'</button></div>'}
+function realMeetRow(p){var nm=NAMES[p.id];var f=MYFOLL[p.id];
+var h='<div class="post" style="display:flex;align-items:center;gap:14px"><div data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,52,{verified:nm.v})+'</div>';
+h+='<div style="flex:1;min-width:0"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+'</div>';
+h+='<div class="p-time">MEMBER SINCE '+(p.created_at?esc(sinceStr(p.created_at).toUpperCase()):'')+'</div></div>';
+h+='<button class="fbtn'+(f?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(f?'Following':'Follow')+'</button>';
+return h+'</div>'}
+function loadPeople(){if(!sb)return;
+sb.from('profiles').select('id,handle,member_type,member_type_verified_at,created_at').order('created_at',{ascending:false}).limit(48).then(function(r){
+if(r.error||!r.data)return;XPEOPLE=r.data.filter(function(p){return p&&p.handle});
+XPEOPLE.forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id});
+paintRealPeople()},function(){})}
+function paintRail(){var rm=$('#rMeet');if(!rm)return;var real=xOthers();if(!real.length)return;var h='';
+real.slice(0,3).forEach(function(p){var nm=NAMES[p.id],f=MYFOLL[p.id];h+='<div class="rmeet"><div data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,42,{verified:nm.v})+'</div><div class="in"><div class="mono" data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+esc(nm.handle)+'</div>'+DeedsTypes.chip(nm.type,nm.v)+'</div><button class="fbtn'+(f?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(f?'Following':'Follow')+'</button></div>'});
+rm.innerHTML=h}
+function paintRealPeople(){var real=xOthers();if(!real.length)return;
+$$('.meetrail .mr-scroll').forEach(function(sc){var h='';real.slice(0,6).forEach(function(p){h+=realMeetCard(p)});sc.innerHTML=h});
+paintRail();if(curPage==='meet')renderMeet();wireLive();wireCommon()}
+var _renderRail0=renderRail;renderRail=function(){_renderRail0();paintRail();if(xOthers().length){wireLive();wireCommon()}};
+var _renderMeet0=renderMeet;renderMeet=function(){var el=$('#meetlist');if(!el)return;if(!sb){_renderMeet0();return}
+var real=xOthers();
+if(!real.length){el.innerHTML='<div class="post" style="color:var(--muted)">'+(XPEOPLE.length?'You are the first one here. Bring someone.':'Finding people.')+'</div>';if(!XPEOPLE.length)loadPeople();return}
+var h='';real.forEach(function(p){h+=realMeetRow(p)});el.innerHTML=h;wireLive();wireCommon()};
 
 function openOrgView(id){var o=OSTORE[id];if(!o)return;
 var own=!!(PROFILE&&o.owner_id===PROFILE.id);
@@ -5550,7 +5605,7 @@ if(s&&(!SESSION||!SESSION.user||s.user.id!==SESSION.user.id||!PROFILE)){SESSION=
 else if(s){SESSION=s}})}
 var cdn=document.createElement('script');
 cdn.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-cdn.onload=init;
+cdn.onload=function(){init();loadPeople()};
 cdn.onerror=function(){};
 document.head.appendChild(cdn);
 })();
