@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.8">
+<meta name="world-build" content="4.9">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -2075,7 +2075,10 @@ const _pv=new THREE.Vector3();
 function placeAct(){if(!ANCHOR||!actEl.classList.contains('on'))return;_pv.set(ANCHOR[0],ANCHOR[1],ANCHOR[2]).project(camera);
   if(_pv.z>1){actEl.style.opacity='0';return}
   const w=actEl.offsetWidth||220,h=actEl.offsetHeight||70,m=12;
-  const sx=Math.max(m+w/2,Math.min(innerWidth-m-w/2,(_pv.x+1)/2*innerWidth)),sy=Math.max(m+h,Math.min(innerHeight-96,(1-_pv.y)/2*innerHeight));
+  /* a saw hold pins the pill low, by the gardener's feet, where a thumb already rests (4.9) */
+  const low=ACT&&(ACT.mode==='wild'||ACT.mode==='saw');
+  const sx=low?innerWidth/2:Math.max(m+w/2,Math.min(innerWidth-m-w/2,(_pv.x+1)/2*innerWidth)),
+        sy=low?innerHeight-108:Math.max(m+h,Math.min(innerHeight-96,(1-_pv.y)/2*innerHeight));
   actEl.style.opacity='1';actEl.style.transform='translate('+sx.toFixed(1)+'px,'+sy.toFixed(1)+'px) translate(-50%,-100%)'}
 let PRESSED=false;
 actMain.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();PRESSED=true;actMain.classList.add('hit');setTimeout(()=>actMain.classList.remove('hit'),140);if(ACT&&(ACT.mode==='wild'||ACT.mode==='saw')){cutStart(ACT.mode,ACT.plot);return}act()});
