@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="3.1">
+<meta name="world-build" content="3.3">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -24,6 +24,8 @@ canvas{display:block;touch-action:none;cursor:default}
 #act.on{display:flex}
 .abtn{pointer-events:auto;background:var(--ivory);color:var(--ink);border:0;border-radius:999px;padding:14px 26px;min-height:50px;font-weight:800;font-size:16px;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.35);touch-action:none;user-select:none;-webkit-user-select:none;font-family:inherit}
 .abtn.quiet{background:rgba(21,19,14,.55);color:var(--ivory);border:1px solid rgba(246,243,235,.5);font-weight:700;cursor:default;box-shadow:none}
+.abtn{transition:transform .09s,opacity .12s}.abtn.hit{transform:scale(.93)}.abtn.busy{opacity:.78}.abtn.busy::after{content:" \2026"}
+@keyframes actShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}.abtn.shake{animation:actShake .28s}
 #actChips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
 .chip{background:rgba(21,19,14,.62);border:1px solid rgba(246,243,235,.55);color:var(--ivory);border-radius:999px;padding:9px 14px;min-height:36px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;font-family:inherit}
 .chip.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
@@ -81,6 +83,31 @@ canvas{display:block;touch-action:none;cursor:default}
 #load h2{margin:0;font-size:clamp(1.6rem,6vw,2.6rem);letter-spacing:-.04em;font-weight:800}
 #load h2 span{color:var(--gold)}
 @media(prefers-reduced-motion:reduce){#load{transition:none}}
+
+/* 3.3 · the game HUD: the sack as a chip and a gear top right, a hotbar of tools along the bottom, Sprint above Jump */
+#purse{pointer-events:auto;cursor:pointer;background:rgba(21,19,14,.42);border:1px solid rgba(246,243,235,.6);border-radius:999px;padding:8px 14px;color:var(--ivory);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;display:flex;gap:9px;align-items:center;white-space:nowrap;text-shadow:none}
+#purse b{font-weight:900;letter-spacing:.04em;font-size:.82rem}
+#purse .gc{display:inline-block;width:11px;height:11px;border-radius:50%;background:#2ECB7A;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25);margin-right:5px;vertical-align:-1px}
+#purse .dc{margin-right:4px}
+#gearBtn{pointer-events:auto;width:40px;height:40px;border-radius:50%;background:rgba(21,19,14,.42);border:1px solid rgba(246,243,235,.6);color:var(--ivory);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+#menu{position:fixed;right:18px;top:max(64px,calc(env(safe-area-inset-top) + 52px));z-index:26;display:none;flex-direction:column;gap:6px;background:rgba(21,19,14,.9);border:1px solid rgba(246,243,235,.3);border-radius:18px;padding:12px;min-width:210px;pointer-events:auto}
+#menu.on{display:flex}#menu .btn{width:100%;text-align:left;background:rgba(246,243,235,.06)}#menu .btn.on{background:var(--ivory);color:var(--ink)}#menu .mlabel{opacity:.55;margin:4px 0 2px;font-size:.56rem;letter-spacing:.2em}
+#bar{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:22;display:flex;gap:8px;pointer-events:none}
+.slot{pointer-events:auto;width:58px;height:58px;border-radius:14px;background:rgba(21,19,14,.5);border:1.5px solid rgba(246,243,235,.45);color:var(--ivory);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:inherit;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
+.slot svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.slot.on{background:var(--ivory);color:var(--ink);border-color:var(--ivory)}.slot.off{display:none}
+.slot i{position:absolute;left:6px;top:4px;font-style:normal;font-size:.5rem;opacity:.55}
+@media(pointer:coarse){.slot i{display:none}}
+#sprint{display:none;position:fixed;right:18px;bottom:max(156px,calc(env(safe-area-inset-bottom) + 142px));z-index:21;width:64px;height:64px;border-radius:50%;
+      pointer-events:auto;background:rgba(21,19,14,.34);border:1px solid rgba(246,243,235,.75);color:var(--ivory);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;touch-action:none;font-family:inherit}
+@media(pointer:coarse){#sprint{display:block}}
+#sprint.on{background:var(--ivory);color:var(--ink)}
+.srow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid rgba(246,243,235,.12);font-size:13px}
+.srow .micro{opacity:.7}.srow b{font-size:15px}
+.tabs{display:flex;gap:6px;margin:10px 0 0}
+.tool{border:1px solid rgba(246,243,235,.22);border-radius:14px;padding:12px;background:rgba(246,243,235,.05);display:flex;gap:12px;align-items:center;margin-top:10px}
+.tool svg{width:44px;height:44px;flex:none;fill:none;stroke:var(--ivory);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tool .nm{font-size:12px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}.tool .pr{font-size:12px;color:rgba(246,243,235,.7);margin:3px 0 8px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -90,24 +117,39 @@ canvas{display:block;touch-action:none;cursor:default}
 <div id="hud">
   <div class="row">
     <div id="place"><div class="micro" id="walkin">You are walking in</div><h1 id="area">The Parterre<span>.</span></h1><div class="micro" id="near"></div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
-      <div class="micro" id="purse" style="text-align:right;text-shadow:0 1px 12px rgba(0,0,0,.6)"></div>
-      <button class="btn" id="can">Water</button>
-      <button class="btn" id="chimes">Chimes</button>
-      <button class="btn" id="music">Music</button>
-      <button class="btn" id="deed">Log a deed. +200</button>
-      <button class="btn" id="garden">Garden</button>
-      <button class="btn" id="back">&larr; DEEDS</button>
+    <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center">
+      <div id="purse" role="button" aria-label="Your sack"></div>
+      <button id="gearBtn" aria-label="Menu">&#9881;</button>
     </div>
   </div>
   <div class="row b">
     <div class="micro" id="hint">Drag left to walk · drag right to look</div>
-    <button class="btn" id="phase">Day</button>
   </div>
 </div>
-
+<div id="menu">
+  <div class="micro mlabel">SOUND</div>
+  <button class="btn" id="chimes">Chimes</button>
+  <button class="btn" id="music">Music</button>
+  <div class="micro mlabel">THE DAY</div>
+  <button class="btn" id="phase">Day</button>
+  <div class="micro mlabel">LEAVE</div>
+  <button class="btn" id="garden">Garden map</button>
+  <button class="btn" id="back">&larr; DEEDS</button>
+</div>
+<div id="bar">
+  <button class="slot on" id="hand" data-tool="hand" aria-label="Hand"><i>1</i><svg viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4.5a1.5 1.5 0 0 1 3 0V11M14 10.5V6a1.5 1.5 0 0 1 3 0v6.5M17 12v-1a1.5 1.5 0 0 1 3 0v4.5c0 3.6-2.4 6.5-6.5 6.5h-1.2c-2.1 0-3.7-.9-4.8-2.4L5 15.4a1.6 1.6 0 0 1 2.5-2L8 14"/></svg>Hand</button>
+  <button class="slot" id="can" data-tool="can" aria-label="Watering can"><i>2</i><svg viewBox="0 0 24 24"><path d="M5 10h9v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM9 10V8a3 3 0 0 1 6 0M14 12l5-4M19 8l1-2"/><circle cx="19.6" cy="5.6" r="1"/></svg>Can</button>
+  <button class="slot off" id="rocket" data-tool="rocket" aria-label="Flower rocket"><i>3</i><svg viewBox="0 0 24 24"><path d="M12 3c3 2 4.5 6 4.5 10L14 15.5h-4L7.5 13C7.5 9 9 5 12 3zM10 15.5v3l2 2.5 2-2.5v-3M7.5 13l-3 2.5 2 1.5M16.5 13l3 2.5-2 1.5"/><circle cx="12" cy="10" r="1.6"/></svg>Rocket</button>
+  <button class="slot off" id="launcher" data-tool="launcher" aria-label="Water launcher"><i>4</i><svg viewBox="0 0 24 24"><path d="M3 11h9l3-3h3l2 2v3l-2 2h-3l-3-3M6 14v4h3v-4M12 14l1.5 4h3"/><circle cx="7" cy="8.5" r="2.5"/></svg>Launcher</button>
+</div>
+<div id="sack" class="sheet"><div class="panel small">
+  <div class="micro">YOUR SACK</div><h2>What you carry<span>.</span></h2>
+  <div id="sackRows"></div>
+  <div class="sfoot"><button class="btn" id="sackClose">Close.</button><button class="btn on" id="deed">Log a deed. +200</button></div>
+</div></div>
 <div id="stick"><div id="knob"><i></i></div></div>
 <button id="jump" aria-label="Jump">Jump</button>
+<button id="sprint" aria-label="Sprint">Run</button>
 <div id="err" style="position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;background:#7A1F1F;
   color:#fff;font:600 11px/1.5 ui-monospace,monospace;padding:10px 14px;white-space:pre-wrap"></div>
 
@@ -115,8 +157,10 @@ canvas{display:block;touch-action:none;cursor:default}
 <div id="status" class="micro"></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SEED STAND</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
-  <div class="micro" id="stNote" style="opacity:.75"></div>
+  <div class="tabs" id="stTabs"></div>
+  <div class="micro" id="stNote" style="opacity:.75;margin-top:8px"></div>
   <div class="grid" id="stGrid"></div>
+  <div id="stTools"></div>
   <div id="stSack"></div>
   <div class="sfoot"><button class="btn" id="stClose">Close.</button><button class="btn on" id="stBuy">Checkout.</button></div>
 </div></div>
@@ -510,6 +554,7 @@ const MAT={
   fsign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('FLOWERS.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
   hsign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('FISH.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
   zinc:new THREE.MeshStandardMaterial({color:0x9AA0A6,roughness:0.55,metalness:0.6}),
+  gold:new THREE.MeshStandardMaterial({color:0xD9AE3C,roughness:0.26,metalness:0.85,emissive:0x3a2606,emissiveIntensity:0.35}),
   clay:new THREE.MeshStandardMaterial({color:0xB5643C,roughness:0.9,metalness:0}),
   marble:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(marbleTex()),[1,1]),roughness:0.32,metalness:0.02}),
 };
@@ -634,7 +679,9 @@ const LANTERNS=[];
 const lathe=(pts,seg)=>new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg||56);
 mesh(lathe([[0,0.02],[3.2,0.02],[3.2,0.68],[3.3,0.72],[3.3,0.82],[2.92,0.82],[2.8,0.74],[2.8,0.6],[2.5,0.56],[0,0.56]]),MAT.stone,true);
 const water=mesh(new THREE.CircleGeometry(2.82,56),MAT.water);water.rotation.x=-Math.PI/2;water.position.y=0.66;
-mesh(lathe([[0,0.56],[0.62,0.56],[0.62,0.66],[0.46,0.76],[0.40,1.32],[0.56,1.42],[1.42,1.42],[1.52,1.5],[1.52,1.6],[1.12,1.66],[0.9,1.62],[0.3,1.58],[0.22,1.66],[0.22,2.08],[0.36,2.14],[0.36,2.26],[0.12,2.34],[0,2.4]],40),MAT.stone,true);
+const fountainTop=mesh(lathe([[0,0.56],[0.62,0.56],[0.62,0.66],[0.46,0.76],[0.40,1.32],[0.56,1.42],[1.42,1.42],[1.52,1.5],[1.52,1.6],[1.12,1.66],[0.9,1.62],[0.3,1.58],[0.22,1.66],[0.22,2.08],[0.36,2.14],[0.36,2.26],[0.12,2.34],[0,2.4]],40),MAT.stone,true);
+const rimGold=mesh(new THREE.TorusGeometry(3.05,0.07,10,72),MAT.gold,true);rimGold.rotation.x=Math.PI/2;rimGold.position.y=0.84;rimGold.visible=false;
+const springLight=new THREE.PointLight(0xffd27a,0,16,2);springLight.position.set(0,3.4,0);scene.add(springLight);let SPRUNG=false;
 const water2=mesh(new THREE.CircleGeometry(1.14,40),MAT.water);water2.rotation.x=-Math.PI/2;water2.position.y=1.56;
 markDisk(0,0,3.36,0.82);
 /* the jet: a hundred drops on their own arcs, one draw */
@@ -645,14 +692,23 @@ const dropM=new THREE.Matrix4();
 function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0)%1.6;let x=d.vx*u,y=2.38+d.vy*u-4.9*u*u,z=d.vz*u;
   if(y<1.6){u=(t+d.t0+0.8)%1.6;x=d.vx*u;y=2.38+d.vy*u-4.9*u*u;z=d.vz*u}
   dropM.makeTranslation(x,y,z);dropMesh.setMatrixAt(i,dropM)}dropMesh.instanceMatrix.needsUpdate=true}
-/* THE SPRING: once the parterre is full the fountain throws a second, taller plume from the top, and fish swim in the basin */
-const SDROPS=70,springMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.05,6,5),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.9}),SDROPS);springMesh.visible=false;scene.add(springMesh);
-const springSeed=[];{const r=rng(78);for(let i=0;i<SDROPS;i++){const a=r()*6.28,el=1.42+r()*0.12,sp=6.2+r()*1.4;springSeed.push({vx:Math.cos(a)*Math.cos(el)*sp,vy:Math.sin(el)*sp,vz:Math.sin(a)*Math.cos(el)*sp,t0:r()*1.5})}}
-function tickSpring(t){if(!springMesh.visible)return;for(let i=0;i<SDROPS;i++){const d=springSeed[i];const u=(t+d.t0)%1.5;dropM.makeTranslation(d.vx*u,2.4+d.vy*u-4.9*u*u,d.vz*u);springMesh.setMatrixAt(i,dropM)}springMesh.instanceMatrix.needsUpdate=true}
-const FISHES=[];{const body=new THREE.SphereGeometry(0.17,12,8);body.scale(1,0.5,0.42);const tail=new THREE.ConeGeometry(0.09,0.16,3);
- const fm=new THREE.MeshStandardMaterial({color:0xE8863A,roughness:0.55,metalness:0.25}),fm2=new THREE.MeshStandardMaterial({color:0xF3B26B,roughness:0.55});
- for(let i=0;i<3;i++){const G=new THREE.Group();G.add(new THREE.Mesh(body,fm));const T=new THREE.Mesh(tail,fm2);T.rotation.z=Math.PI/2;T.position.x=-0.22;G.add(T);G.visible=false;scene.add(G);FISHES.push({g:G,tail:T})}}
-function tickFish(t,n){FISHES.forEach((f,i)=>{const on=i<n;f.g.visible=on;if(!on)return;const a=t*0.55+i*2.1,r=1.35+0.55*Math.sin(t*0.27+i*1.3);f.g.position.set(Math.cos(a)*r,0.62+0.025*Math.sin(t*3+i),Math.sin(a)*r);f.g.rotation.y=-a-Math.PI/2+Math.sin(t*2+i)*0.15;f.tail.rotation.y=Math.sin(t*9+i)*0.45})}
+/* THE SPRING: once the parterre is full the fountain throws a tall plume from the top, high over the court, the stone turns gold and fish come to the basin */
+const SDROPS=260,springMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.062,6,5),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.88}),SDROPS);springMesh.visible=false;scene.add(springMesh);
+const springSeed=[];{const r=rng(78);for(let i=0;i<SDROPS;i++){const col=i<150;const a=r()*6.28,el=col?1.50+r()*0.07:1.22+r()*0.2,sp=col?9.6+r()*2.2:6.8+r()*2.0;
+  const vx=Math.cos(a)*Math.cos(el)*sp,vy=Math.sin(el)*sp,vz=Math.sin(a)*Math.cos(el)*sp,T=(vy+Math.sqrt(vy*vy+4*4.9*1.8))/9.8;   /* the flight from the crown at 2.4 m back to the water at 0.6 */
+  springSeed.push({vx,vy,vz,T,t0:r()*T})}}
+const springCore=mesh(new THREE.CylinderGeometry(0.05,0.17,5.6,10,1,true),new THREE.MeshBasicMaterial({color:0xeaf6ff,transparent:true,opacity:0.3,depthWrite:false}));springCore.position.y=5.2;springCore.visible=false;
+function tickSpring(t){if(!springMesh.visible)return;for(let i=0;i<SDROPS;i++){const d=springSeed[i];const u=(t+d.t0)%d.T;dropM.makeTranslation(d.vx*u,2.4+d.vy*u-4.9*u*u,d.vz*u);springMesh.setMatrixAt(i,dropM)}springMesh.instanceMatrix.needsUpdate=true;springCore.scale.y=0.95+0.05*Math.sin(t*7)}
+/* the sprung fountain: the plume, the gold, clearer water so the fish read, a warm light after dark */
+function setSprung(on){SPRUNG=!!on;springMesh.visible=SPRUNG;springCore.visible=SPRUNG;rimGold.visible=SPRUNG;fountainTop.material=SPRUNG?MAT.gold:MAT.stone;MAT.water.opacity=SPRUNG?0.62:0.9;springLight.intensity=SPRUNG?0.3+(PH[ph]?PH[ph].lamp:0)*0.9:0}
+const FISHES=[];{const body=new THREE.SphereGeometry(0.27,14,10);body.scale(1,0.52,0.4);const tail=new THREE.ConeGeometry(0.15,0.26,3),fin=new THREE.ConeGeometry(0.07,0.2,3);
+ const fm=new THREE.MeshStandardMaterial({color:0xF07A1F,roughness:0.42,metalness:0.3,emissive:0x4a2205,emissiveIntensity:0.3}),fm2=new THREE.MeshStandardMaterial({color:0xFFB347,roughness:0.5,side:THREE.DoubleSide});
+ const ring=new THREE.RingGeometry(0.28,0.46,28);
+ for(let i=0;i<9;i++){const G=new THREE.Group();G.add(new THREE.Mesh(body,fm));const T=new THREE.Mesh(tail,fm2);T.rotation.z=Math.PI/2;T.position.x=-0.36;G.add(T);const F=new THREE.Mesh(fin,fm2);F.position.set(0.02,0.17,0);G.add(F);
+   const R=new THREE.Mesh(ring,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.35,depthWrite:false}));R.rotation.x=-Math.PI/2;R.visible=false;scene.add(R);G.visible=false;scene.add(G);FISHES.push({g:G,tail:T,ring:R})}}
+function tickFish(t,n){FISHES.forEach((f,i)=>{const on=i<n;f.g.visible=on;f.ring.visible=on;if(!on)return;const a=t*(0.46+0.05*i)+i*0.7,r=1.55+0.55*Math.sin(t*0.23+i*1.3),x=Math.cos(a)*r,z=Math.sin(a)*r;
+  f.g.position.set(x,0.70+0.035*Math.sin(t*2.6+i),z);f.g.rotation.y=-a-Math.PI/2+Math.sin(t*2+i)*0.15;f.tail.rotation.y=Math.sin(t*9+i)*0.45;
+  const k=(t*0.9+i*0.37)%1,s=1+0.5*k;f.ring.position.set(x,0.672,z);f.ring.scale.set(s,s,1);f.ring.material.opacity=0.38*(1-k)})}
 
 /* ======================================================================
    THE MARKET ROW, on the lawn west of the south avenue, just outside the gate: the seed stand first, the florist beside it, a third place kept for the fish market.
@@ -800,6 +856,10 @@ const MONGER={};
    TWELVE PLINTHS for marble: by the gates, in the wood's corner clearings, and outside the east and west hedges
    ====================================================================== */
 const SPOTS=[[-6,30.2],[6,30.2],[-6,-30.2],[6,-30.2],[34,34],[-34,34],[34,-34],[-34,-34],[33.5,8],[33.5,-8],[-33.5,8],[-33.5,-8]];
+/* 3.3: the house site at the top of the north avenue, the twelve oaks in two groves beside it, the ten hiding places of the chest deep in the wood */
+const HOUSE={x:0,z:-61,front:{x:5.6,z:-53.4}};
+const OAKS=[[-9,-42],[-14,-45.5],[-20,-43],[-11,-49],[-17,-52],[-23,-49.5],[9,-42],[14,-45.5],[20,-43],[11,-49],[17,-52],[23,-49.5]];
+const CHEST_SPOTS=[[52,-36],[58,-12],[57,14],[48,42],[18,56],[-24,54],[-52,34],[-58,-8],[-50,-36],[-30,-52]];
 const PLINTHS=[];
 const CAPS=[];
 SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);CAPS.push(cap);markDisk(x,z,0.62,1.0);PLINTHS.push({x,z,i})});
@@ -902,7 +962,7 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
 {const r=rng(1234);const put={};const all=[];
  const add=(kind,x,z,h)=>{(put[kind]=put[kind]||[]).push({x,z,y:0,h,flip:r()>.5});all.push({x,z,h,kind});markDisk(x,z,kind==='cypress'?0.42:0.55,3)};
  /* the avenue: cypress pairs down both openings */
- [-1,1].forEach(side=>{for(let k=0;k<6;k++){const z=side*(HALF+3.4+k*4.1);if(!(side>0&&k<3))add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}});   /* no cypress in front of the market */
+ [-1,1].forEach(side=>{for(let k=0;k<6;k++){if(side<0&&k>=4)continue;const z=side*(HALF+3.4+k*4.1);if(!(side>0&&k<3))add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}});   /* no cypress in front of the market */
  /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
@@ -912,6 +972,9 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
    if(Math.hypot(x+6.0,z-43.2)<5.2)continue;                        /* the third stall, kept for the fish market */
+   if(Math.hypot(x-HOUSE.x,z-HOUSE.z)<17)continue;                   /* the house and its lawn */
+   if(OAKS.some(([ox,oz])=>Math.hypot(x-ox,z-oz)<3.6))continue;       /* the oak groves */
+   if(CHEST_SPOTS.some(([cx,cz])=>Math.hypot(x-cx,z-cz)<2.6))continue;/* room to stand at the chest */
    if(SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<3.2))continue;     /* the plinths */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
    const kind=kinds[Math.floor(r()*kinds.length)];const far=(d-HALF)/34;
@@ -1029,7 +1092,12 @@ const TESTING=false;                               /* demo watering: once a day,
 const freeWater=()=>LIVE?ADMIN:TESTING;
 const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
-let RATE=10;const FISH_WORTH=100,FISH_S=300,FISH_CAP=3,HELD_CAP=12,PLINTH_ORDER=[0,1,4,5,8,10,9,11,6,2,3,7];   /* patch 45's numbers; the server's win when signed in */
+let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
+const CHEST_GC=30,AXE_DC=30,CHOPS=5,REGROW_S=1800,HOUSE_TIERS=[5,10,50],STATUES_TO_WAKE=12;   /* the chest a tenth of a deed, the axe 45 gardencoin, five chops, half an hour to regrow, 5 / 10 / 50 bundles */
+const TOOLS={rocket:{n:'Flower rocket',dc:2000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:20000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'}};
+const TREEFREE=QS.get('trees')==='1';const HOUSE_PREVIEW=Math.max(0,Math.min(3,+QS.get('house')||0));const HELD_CAP=12,PLINTH_ORDER=[0,1,4,5,8,10,9,11,6,2,3,7];   /* a Deedcoin is 1.5 gardencoin (his call Aug 30), fish in threes at 15 each; the server's numbers win when signed in */
+const gcv=x=>Math.round(x*RATE);                  /* a Deedcoin price or worth in gardencoin, always a whole coin */
+const reach=()=>S.gc+Math.floor(S.coins*RATE);   /* the most you can pay: gardencoin, then every Deedcoin you hold */
 const today=()=>new Date().toISOString().slice(0,10);
 const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){this.g[k]=v}},get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):this.g[k]}catch(e){return this.g[k]}}};
 const fresh=()=>({deeds:0,coins:START_COINS,gc:0,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[],fountain:null});
@@ -1040,6 +1108,7 @@ if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
 if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};if(!S.ledger)S.ledger=[];
 if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
 if(!S.basket)S.basket={};if(!S.stats)S.stats={};if(!(S.gc>=0))S.gc=0;if(S.fountain===undefined)S.fountain=null;
+if(!S.tools)S.tools={};if(!S.trees)S.trees={};if(!(S.wood>=0))S.wood=0;if(!S.house)S.house={stage:0,wood:0};if(!S.chest)S.chest={};
 /* ---------- the clock: the server's ripening rule, mirrored here for drawing and for the signed out demo ---------- */
 let NOW_OFF=0;const snow=()=>Date.now()+NOW_OFF;
 function ripe(p,at){const c=CAT[p.t];if(!c)return {n:0,frac:0,next:0,stopped:false,value:0,flowers:0};const now=at||snow();
@@ -1058,19 +1127,19 @@ function takeFlowers(price){let paid=0,fl=0;const rows=Object.entries(S.basket).
   for(const [t,b] of rows){if(paid>=price)break;const need=price-paid,per=b.w/b.q;const k=Math.min(b.q,Math.max(1,Math.ceil(need/Math.max(per,0.0001))));const tw=k>=b.q?b.w:Math.round(b.w*k/b.q);paid+=tw;fl+=k;if(k>=b.q)delete S.basket[t];else{b.q-=k;b.w-=tw}}
   return {fl,paid}}
 /* the rule, mirrored for the signed out demo: gardencoin first, then whole Deedcoins for the rest, change back as gardencoin; null = not enough, nothing moved */
-function payGc(price){if(S.gc+S.coins*RATE<price)return null;const gc=Math.min(S.gc,price),rem=price-gc,dc=Math.ceil(rem/RATE),chg=dc*RATE-rem;S.gc=S.gc-gc+chg;S.coins-=dc;return {gc,dc,chg}}
+function payGc(price){if(reach()<price)return null;const gc=Math.min(S.gc,price),rem=price-gc,dc=Math.ceil(rem/RATE),chg=Math.floor(dc*RATE-rem);S.gc=S.gc-gc+chg;S.coins-=dc;return {gc,dc,chg}}
 const payWords=r=>r.dc?(r.gc?r.gc+' gardencoin and '+plural(r.dc,'Deedcoin'):plural(r.dc,'Deedcoin')):r.gc+' gardencoin';
-const gcWorth=()=>basketWorth()*RATE;
+const gcWorth=()=>gcv(basketWorth());
 const fishes=n=>n+' fish';
-/* the fountain, mirrored: springs at 40 beds, a fish every FISH_S seconds up to FISH_CAP; the server's numbers win when signed in */
+/* the fountain, mirrored: springs at 40 beds with FISH_BATCH fish, FISH_BATCH more every FISH_S seconds up to FISH_CAP; the server's numbers win when signed in */
 function fountainNow(){const f=S.fountain;if(!f||!f.sprung)return {sprung:false,fish:0,held:0,next:0};
-  if(LIVE){const el=(snow()-(f.at||snow()))/1000;let fish=f.fish,next=f.next_s;if(next!=null){if(el>=next){const more=1+Math.floor((el-next)/FISH_S);fish=Math.min(FISH_CAP,fish+more);next=fish>=FISH_CAP?null:FISH_S-((el-next)%FISH_S)}else next=next-el}
+  if(LIVE){const el=(snow()-(f.at||snow()))/1000;let fish=f.fish,next=f.next_s;if(next!=null){if(el>=next){const more=(1+Math.floor((el-next)/FISH_S))*FISH_BATCH;fish=Math.min(FISH_CAP,fish+more);next=fish>=FISH_CAP?null:FISH_S-((el-next)%FISH_S)}else next=next-el}
     return {sprung:true,fish,held:f.held||0,next:next==null?0:Math.ceil(next)}}
   let fish=f.fish||0,last=f.last||f.sprung;const el=(Date.now()-last)/1000;
-  if(fish<FISH_CAP){const n=Math.floor(el/FISH_S);if(n>0){fish=Math.min(FISH_CAP,fish+n);f.fish=fish;f.last=fish>=FISH_CAP?Date.now():last+n*FISH_S*1000}}
+  if(fish<FISH_CAP){const n=Math.floor(el/FISH_S);if(n>0){fish=Math.min(FISH_CAP,fish+n*FISH_BATCH);f.fish=fish;f.last=fish>=FISH_CAP?Date.now():last+n*FISH_S*1000}}
   return {sprung:true,fish,held:f.held||0,next:fish>=FISH_CAP?0:Math.ceil(FISH_S-(Date.now()-f.last)/1000)}}
 function fishNow(){return fountainNow().fish}
-function checkSpring(){if(LIVE||BLOOM)return;if(Object.keys(S.plants).length>=40&&!(S.fountain&&S.fountain.sprung)){S.fountain={sprung:Date.now(),fish:0,last:Date.now(),held:0};save();springMesh.visible=true;SND.allWatered();setTimeout(()=>toast('The fountain springs. Fish will come to the basin.'),900)}}
+function checkSpring(){if(LIVE||BLOOM)return;if(Object.keys(S.plants).length>=40&&!(S.fountain&&S.fountain.sprung)){S.fountain={sprung:Date.now(),fish:Math.min(FISH_CAP,FISH_BATCH),last:Date.now(),held:0};save();setSprung(true);SND.allWatered();setTimeout(()=>toast('The fountain springs. '+fishes(Math.min(FISH_CAP,FISH_BATCH))+' come to the basin.'),900)}}
 /* the plinth waves, mirrored: three wake per quadrant you fill, in the server's order */
 let PLINTHS_OPEN=null;
 function quadrantsFull(){let n=0;for(let q=0;q<4;q++){let k=0;for(let b=0;b<10;b++)if(S.plants[q*10+b])k++;if(k>=10)n++}return n}
@@ -1081,30 +1150,35 @@ const sackTotal=()=>Object.values(S.sack).reduce((a,b)=>a+b,0);
 function save(){S.bank=sackTotal();store.set('garden',S)}
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
-function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 45 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
+function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 46 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
 let toastT;function toast(m){const t=$('#status');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3000)}
 const KINDW={deed:'a deed',seed_buy:'seed store',seed_sell:'seed store',send:'sent',receive:'received',return:'returned',starter:'the purse opens'};
 
 let PATCH44=false,PATCH45=false;
 function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;PATCH45=!!d.rate;
   if(d.now){NOW_OFF=new Date(d.now).getTime()-Date.now()}
-  if(d.rate)RATE=+d.rate||10;S.gc=+(d.gc&&d.gc.balance)||0;PLINTHS_OPEN=d.plinths&&Array.isArray(d.plinths.open)?d.plinths.open.map(Number):null;
-  if(d.fountain){const f=d.fountain;S.fountain={sprung:!!f.sprung,fish:+f.fish||0,held:+f.held||0,caught:+f.caught||0,sold:+f.sold||0,next_s:f.next_s==null?null:+f.next_s,at:snow()}}else S.fountain=null;
+  if(+d.rate>0)RATE=+d.rate;S.gc=+(d.gc&&d.gc.balance)||0;PLINTHS_OPEN=d.plinths&&Array.isArray(d.plinths.open)?d.plinths.open.map(Number):null;
+  if(d.fountain){const f=d.fountain;S.fountain={sprung:!!f.sprung,fish:+f.fish||0,held:+f.held||0,caught:+f.caught||0,sold:+f.sold||0,next_s:f.next_s==null?null:+f.next_s,at:snow()};
+    if(+f.fish_s>0)FISH_S=+f.fish_s;if(+f.fish_cap>0)FISH_CAP=+f.fish_cap;if(+f.fish_worth>0)FISH_WORTH=+f.fish_worth;FISH_BATCH=+f.fish_batch>0?+f.fish_batch:1}else S.fountain=null;
+  PATCH46=+d.patch>=46;if(PATCH46){S.tools={};(d.tools||[]).forEach(t=>{if(TOOLS[t])S.tools[t]=1});S.chest={on:d.chest&&d.chest.opened_today?today():''};
+    S.trees={};(d.trees||[]).forEach(t=>{S.trees[+t.i]={st:+t.stage||0,cut:t.cut_at?new Date(t.cut_at).getTime()-NOW_OFF:0}});
+    S.wood=+(d.house&&d.house.carrying)||0;S.house={stage:+(d.house&&d.house.stage)||0,wood:+(d.house&&d.house.wood)||0};if(d.house&&+d.house.axe_dc>0)AXE_DCS=+d.house.axe_dc;if(d.chest&&+d.chest.coins>0)CHEST_GCS=+d.chest.coins}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
   S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
-  S.plants={};(d.plots||[]).forEach(p=>{if(!CAT[p.t])return;const q={t:p.t,g:+p.g||0,wd:p.wd||undefined};
+  const held=S.plants;S.plants={};(d.plots||[]).forEach(p=>{if(!CAT[p.t])return;if(PICKING.has(+p.plot)&&held[p.plot]){S.plants[p.plot]=held[p.plot];return}const q={t:p.t,g:+p.g||0,wd:p.wd||undefined};
     if(p.cycle_at){q.cy=new Date(p.cycle_at).getTime();q.est=!!p.established;q.boost=+p.boost_s||0;q.watered=!!p.watered;q.picks=+p.picks||0}
     else{const c=CAT[p.t];q.cy=snow()-(c.m+(c.cap-1)*c.r)*1000;q.est=false;q.boost=0;q.watered=false}
+    if(p.cycle_at&&p.next_s!=null)calibrate(q,!!p.stopped,+p.next_s);
     S.plants[p.plot]=q});
   S.basket={};(d.basket||[]).forEach(b=>{if(+b.qty>0)S.basket[b.t]={q:+b.qty,w:+b.worth||0}});S.stats=d.stats||{};S.things={};
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
-  save();plantBeds();renderPlinths();springMesh.visible=!!(S.fountain&&S.fountain.sprung);renderHud();if(STORE_ON)renderStore();loadThings()}
+  save();plantBeds();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));renderHud();paintBar();renderTrees();renderHouse();placeChest();if(STORE_ON)renderStore();loadThings()}
 /* a quiet refresh after a sale or a buy, so the sack, the basket and the fish are exactly the server's */
-function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc(PATCH45?'garden_state3':'garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
+function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc(PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
-    return sb.rpc('garden_state3').then(r2=>{
+    return sb.rpc('garden_state4').then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3')).then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
         if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
         toast(rpcFail(r2.error,'The garden could not load your sack.'));return}
@@ -1116,10 +1190,24 @@ if(!BLOOM){const c=document.createElement('script');c.src='https://cdn.jsdelivr.
 /* ---------- the purse line ---------- */
 const COINIMG='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
 function renderHud(){const el=$('#purse');
-  if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';$('#can').style.display='none';return}
-  const bq=basketQty();
-  const fn=fountainNow();
-  el.innerHTML=(bq?'Your basket \u00B7 '+plural(bq,'flower')+' \u00B7 worth '+gcWorth().toLocaleString()+' gardencoin<br>':'')+'Your sack \u00B7 '+(S.gc|0).toLocaleString()+' gardencoin \u00B7 '+(S.coins|0).toLocaleString()+' Deedcoins \u00B7 '+plural(sackTotal(),'seed')+' \u00B7 '+Object.keys(S.plants).length+' of 40 beds'+(fn.held?' \u00B7 '+fishes(fn.held)+' in hand':'')+(LIVE?'':' \u00B7 local until you sign in')}
+  if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';$('#bar').style.display='none';return}
+  const bq=basketQty(),fn=fountainNow();
+  el.innerHTML='<span><span class="gc"></span><b>'+(S.gc|0).toLocaleString()+'</b></span><span>'+COINIMG+'<b>'+(S.coins|0).toLocaleString()+'</b></span>'+
+    '<span>'+sackTotal()+' seeds</span>'+(bq?'<span>'+bq+' flowers</span>':'')+(fn.held?'<span>'+fn.held+' fish</span>':'')+(S.wood?'<span>wood</span>':'');
+  if($('#sack').classList.contains('on'))renderSack()}
+function renderSack(){const bq=basketQty(),fn=fountainNow();const row=(a,b,m)=>'<div class="srow"><span>'+a+(m?' <span class="micro">'+m+'</span>':'')+'</span><b>'+b+'</b></div>';
+  const seeds=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]).map(([id,q])=>q+' '+CAT[id].n.toLowerCase()).join(' \u00B7 ');
+  const tools=Object.keys(S.tools).filter(t=>TOOLS[t]).map(t=>TOOLS[t].n).join(' \u00B7 ');
+  $('#sackRows').innerHTML=row('Gardencoin',(S.gc|0).toLocaleString(),'what the garden pays')+row('Deedcoins',(S.coins|0).toLocaleString(),'a deed pays '+DEED_PAY)+row('Seeds',sackTotal(),seeds||'')+
+    row('Flowers',bq,bq?'worth '+gcWorth().toLocaleString()+' gardencoin at Flora':'')+row('Fish',fn.held,fn.held?'the market pays '+FISH_WORTH+' each':'')+
+    row('Tools',tools||'none',tools?'in your hotbar':'the Keeper sells them')+row('Wood',S.wood?'a bundle':'none',S.wood?'for the builder':'')+
+    (S.house.stage?row('The house',['','Fireplace wing','Main house','The mansion'][S.house.stage],S.house.stage<3?S.house.wood+' of '+HOUSE_TIERS[S.house.stage]+' bundles':'finished'):row('The house',S.house.wood+' of '+HOUSE_TIERS[0],'bundles at the builder'))+
+    (LIVE?'':'<div class="micro" style="opacity:.6;margin-top:10px">Local until you sign in on DEEDS.</div>')}
+function openSack(){renderSack();$('#sack').classList.add('on');SND.open()}
+function closeSack(){$('#sack').classList.remove('on')}
+$('#purse').onclick=()=>{if(BLOOM)return;if($('#sack').classList.contains('on'))closeSack();else openSack()};
+$('#sackClose').onclick=closeSack;$('#sack').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSack()});
+$('#gearBtn').onclick=e=>{e.stopPropagation();$('#menu').classList.toggle('on')};
 /* ---------- the sounds: one family, synthesized in the browser. ticks for actions, bells for confirmations,
    cascades for rewards that grow with the win. voice limited, under the music, muted with one tap (remembered). ---------- */
 const SND=(()=>{
@@ -1188,23 +1276,40 @@ $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
 
 /* ---------- the stand: a basket, nothing charged until Checkout ---------- */
 let STORE_ON=false,CART={},AT='stand';
-const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*RATE*q,0);
-function openStore(where){AT=where==='florist'?'florist':'stand';STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open()}
+const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+gcv(CAT[id].price)*q,0);
+let STAB='seeds';
+function openStore(where){AT=where==='florist'?'florist':'stand';STORE_ON=true;CART={};STAB='seeds';$('#store').classList.add('on');renderStore();SND.open()}
 function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on');$('#forms').classList.remove('on')}
-function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.gc+S.coins*RATE-total;
+function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=reach()-total;
   $('#stLabel').textContent='THE SEED STAND';$('#stTitle').innerHTML='Seeds<span>.</span>';
   $('#stBal').innerHTML='<b>'+(S.gc|0).toLocaleString()+'</b> gardencoin \u00B7 '+COINIMG+'<b>'+(S.coins|0).toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total.toLocaleString():'');$('#stBal').classList.toggle('short',left<0);
-  const pr=FLOWERS.map(id=>CAT[id].price*RATE);$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+' gardencoin. Gardencoin pays first, Deedcoins fill in. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'.';
+  const pr=FLOWERS.map(id=>gcv(CAT[id].price));$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+' gardencoin. Gardencoin pays first, Deedcoins fill in. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'.';
   let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
-    h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':(c.price*RATE)+' \u00B7 a bloom pays '+(c.w*RATE)+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
+    h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':gcv(c.price)+' \u00B7 a bloom pays '+gcv(c.w)+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
     h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">\u2212</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
   $('#stGrid').innerHTML=h;
   const sack=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]);
   $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.75">YOUR SACK \u00B7 '+sack.map(([id,q])=>plural(q,CAT[id].n.toLowerCase()+' seed')).join(' \u00B7 ')+'</div>':'';
   $('#stBuy').textContent=total?'Checkout \u00B7 '+total.toLocaleString()+'.':'Checkout.';$('#stBuy').disabled=BUSY;
-  $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d))}
+  $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d));
+  renderTabs()}
+/* the second tab at the Keeper's stand: the tools, bought once, then in your hotbar */
+function renderTabs(){$('#stTabs').innerHTML='<button class="btn'+(STAB==='seeds'?' on':'')+'" data-tab="seeds">Seeds</button><button class="btn'+(STAB==='tools'?' on':'')+'" data-tab="tools">Tools</button>';
+  $$('#stTabs .btn').forEach(b=>b.onclick=()=>{STAB=b.dataset.tab;renderStore()});const tools=STAB==='tools';
+  $('#stGrid').style.display=tools?'none':'';$('#stSack').style.display=tools?'none':'';$('#stBuy').style.display=tools?'none':'';
+  if(tools){$('#stTitle').innerHTML='Tools<span>.</span>';$('#stNote').textContent='Two guns for a big garden. Gardencoin first, Deedcoins fill in.';
+    $('#stTools').innerHTML=Object.entries(TOOLS).map(([k,t])=>'<div class="tool">'+TOOL_ICON[k]+'<div style="flex:1"><div class="nm">'+t.n+'</div><div class="pr">'+t.line+'</div>'+
+      (S.tools[k]?'<div class="micro" style="opacity:.7">YOURS \u00B7 SLOT '+t.slot+' IN YOUR HOTBAR</div>':'<button class="btn on" data-tool="'+k+'">Buy \u00B7 '+gcv(t.dc).toLocaleString()+' gardencoin.</button>')+'</div></div>').join('');
+    $$('#stTools .btn').forEach(b=>b.onclick=()=>buyTool(b.dataset.tool))}else $('#stTools').innerHTML=''}
+const TOOL_ICON={rocket:$('#rocket').querySelector('svg').outerHTML,launcher:$('#launcher').querySelector('svg').outerHTML};
+function buyTool(k){const t=TOOLS[k];if(!t||S.tools[k])return;const cost=gcv(t.dc);
+  const done=()=>{S.tools[k]=1;save();paintBar();renderHud();SND.buy(8);closeStore();setTool(k);toast('The '+t.n.toLowerCase()+' is yours. Slot '+t.slot+' in your hotbar.')};
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();sb.rpc('tool_buy',{p_kind:k}).then(r=>{BUSY=false;
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger(t.n,-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+  const pay=payGc(cost);if(!pay){showShort(cost);return}ledger(t.n,-cost,'the Keeper');done()}
 function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
-function showShort(total){SND.nope();const bq=basketQty();$('#shBody').textContent='You have '+S.gc.toLocaleString()+' gardencoin and '+S.coins.toLocaleString()+' Deedcoins (worth '+(S.coins*RATE).toLocaleString()+' more), and this comes to '+total.toLocaleString()+'. '+(bq?'Sell your '+plural(bq,'flower')+' to Flora, or log':'Grow and sell flowers, or log')+' a deed and '+DEED_PAY+' Deedcoins arrive.';$('#short').classList.add('on')}
+function showShort(total){SND.nope();const bq=basketQty();$('#shBody').textContent='You have '+S.gc.toLocaleString()+' gardencoin and '+S.coins.toLocaleString()+' Deedcoins (worth '+Math.floor(S.coins*RATE).toLocaleString()+' more), and this comes to '+total.toLocaleString()+'. '+(bq?'Sell your '+plural(bq,'flower')+' to Flora, or log':'Grow and sell flowers, or log')+' a deed and '+DEED_PAY+' Deedcoins arrive.';$('#short').classList.add('on')}
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
 $('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
 $('#stClose').onclick=closeStore;
@@ -1212,7 +1317,7 @@ $('#store').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStor
 $('#short').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#short').classList.remove('on')});
 $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
   if(!items.length){toast('The basket is empty. Tap + on a packet.');return}
-  const total=cartTotal();if(total>S.gc+S.coins*RATE){showShort(total);return}
+  const total=cartTotal();if(total>reach()){showShort(total);return}
   if(LIVE){if(BUSY)return;BUSY=true;renderStore();
     (async()=>{let got=0,fail=null,gc=0,dc=0;
       for(const [id,q] of items){const c=CAT[id];let want=q;
@@ -1229,7 +1334,7 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
       if(got&&!fail){CART={};SND.buy(got);SOWT=items[0][0];closeStore();toast('Bought for '+payWords({gc,dc})+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct();refresh()}
       else renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
   const pay=payGc(total);if(!pay){showShort(total);return}
-  items.forEach(([id,q])=>{const c=CAT[id];S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*RATE*q,'seed store')});
+  items.forEach(([id,q])=>{const c=CAT[id];S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-gcv(c.price)*q,'seed store')});
   CART={};save();renderHud();SND.buy(items.reduce((a,[id,q])=>a+q,0));SOWT=items[0][0];closeStore();toast('Bought for '+payWords(pay)+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()};
 
 /* ---------- Flora: one press sells everything you picked, for gardencoin. The fish market does the same for the fish in your hand ---------- */
@@ -1273,18 +1378,28 @@ function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knoc
   if(!left)SOWT=null}
 /* pick: tap, take it at whatever it is worth, the bed starts again. too soon = nothing happens */
 function nudgeFlorist(){if(S.flags.florist)return;if(basketQty()<1)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. Flora pays gardencoin, at the market by the south gate.'),1500)}
-function pickAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];const rp=ripe(p);
-  if(rp.flowers<1){SND.knock();toast('Not yet. '+c.n+' blooms in '+mmss(rp.next)+'.');return}
-  const apply=(fl,w,full)=>{p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(p.picks||0)+1;p.g=1;
-    const b=S.basket[p.t]||(S.basket[p.t]={q:0,w:0});b.q+=fl;b.w+=w;S.stats.flowers=(S.stats.flowers||0)+fl;S.stats.worth=(S.stats.worth||0)+w;S.stats.picks=(S.stats.picks||0)+1;
-    save();plantBeds();renderHud();
-    if(full>=c.cap)SND.allWatered();else if(full>0)SND.bloom();else SND.rustle();
+const PICKING=new Set();   /* beds the server is still answering for */
+const held=p=>p.hold>snow()?Math.ceil((p.hold-snow())/1000):0;   /* seconds a refused bed waits before it is offered again */
+/* the server's countdown wins: shift a plot's clock so the mirror agrees with next_s (and with a full bed) */
+function calibrate(p,stopped,next){if(!CAT[p.t])return;if(stopped){for(let k=0;k<4&&!ripe(p).stopped;k++)p.cy-=(ripe(p).next+1)*1000;return}
+  if(!(next>0))return;const rp=ripe(p);if(rp.stopped)p.cy+=(next+1)*1000;else if(Math.abs(rp.next-next)>1)p.cy-=(rp.next-next)*1000}
+function pickAt(plot){const p=S.plants[plot];if(!p||p.pending||PICKING.has(plot))return;const c=CAT[p.t];const rp=ripe(p);
+  if(rp.flowers<1||held(p)){SND.knock();toast('Not yet. '+c.n+' blooms in '+mmss(Math.max(rp.next,held(p)))+'.');return}
+  const bb=S.basket[p.t]||{},was={cy:p.cy,est:p.est,boost:p.boost,watered:p.watered,picks:p.picks,g:p.g,bq:bb.q||0,bw:bb.w||0,fl:S.stats.flowers||0,wo:S.stats.worth||0,pk:S.stats.picks||0};
+  const apply=(fl,w)=>{p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(was.picks||0)+1;p.g=1;
+    if(was.bq+fl>0)S.basket[p.t]={q:was.bq+fl,w:was.bw+w};else delete S.basket[p.t];S.stats.flowers=was.fl+fl;S.stats.worth=was.wo+w;S.stats.picks=was.pk+1;save();plantBeds();renderHud()};
+  const cheer=(fl,w,full)=>{if(full>=c.cap)SND.allWatered();else if(full>0)SND.bloom();else SND.rustle();
     toast((fl>1?fl+' '+c.p.toLowerCase():c.n)+' \u00B7 '+w+'.'+(full===0&&w<c.w?' A full bloom is '+c.w+'.':''));nudgeFlorist();updateAct()};
-  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('garden_pick',{p_plot:plot}).then(r=>{BUSY=false;const d=r.data||{};
-      if(r.error){toast(rpcFail(r.error,'The pick did not count.'));return}
-      if(!d.ok){SND.knock();if(d.reason==='empty'){delete S.plants[plot];save();plantBeds();renderHud();toast('Nothing planted there.')}else toast(d.reason==='too_soon'?'Not yet. Blooms in '+mmss(+d.next_s||0)+'.':'That did not pick.');updateAct();return}
-      apply(+d.flowers||0,+d.worth||0,+d.full||0)}).catch(()=>{BUSY=false;toast('The garden did not answer.')});return}
-  apply(rp.flowers,rp.value,rp.n)}
+  const undo=()=>{p.cy=was.cy;p.est=was.est;p.boost=was.boost;p.watered=was.watered;p.picks=was.picks;p.g=was.g;if(was.bq>0)S.basket[p.t]={q:was.bq,w:was.bw};else delete S.basket[p.t];
+    S.stats.flowers=was.fl;S.stats.worth=was.wo;S.stats.picks=was.pk;save();plantBeds();renderHud();updateAct()};
+  apply(rp.flowers,rp.value);cheer(rp.flowers,rp.value,rp.n);                   /* at once, on the press */
+  if(!LIVE)return;
+  PICKING.add(plot);sb.rpc('garden_pick',{p_plot:plot}).then(r=>{PICKING.delete(plot);const d=r.data||{};
+      if(r.error){undo();toast(rpcFail(r.error,'The pick did not count.'));return}
+      if(!d.ok){undo();SND.knock();if(d.reason==='empty'){delete S.plants[plot];save();plantBeds();renderHud();toast('Nothing planted there.')}
+        else if(d.reason==='too_soon'){calibrate(p,false,+d.next_s||0);p.hold=snow()+(+d.next_s||0)*1000;save();toast('Not yet. Blooms in '+mmss(+d.next_s||0)+'.')}else toast('That did not pick.');updateAct();return}
+      const fl=+d.flowers||0,w=+d.worth||0;if(fl!==rp.flowers||w!==rp.value){apply(fl,w);toast((fl>1?fl+' '+c.p.toLowerCase():c.n)+' \u00B7 '+w+'.');updateAct()}   /* the server's count is the truth */
+    }).catch(()=>{PICKING.delete(plot);undo();toast('The garden did not answer.')})}
 /* water: a boost, once per cycle, halving the wait to the next bloom */
 function waterAt(plot,fromCan){const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];const rp=ripe(p);
   if(rp.stopped){SND.knock();toast(c.p+' in bed '+(plot+1)+' are full. Pick them.');return}
@@ -1348,9 +1463,9 @@ const CANG=new THREE.Group();AV.armR.fore.add(CANG);CANG.visible=false;
  const h=add(new THREE.TorusGeometry(0.085,0.011,8,20,Math.PI),0.09,0.05,0,0,-0.35);h.rotation.y=Math.PI/2;   /* the handle */
  CANG.position.set(0.02,-0.4,-0.02);CANG.rotation.set(0,0,0)}   /* in the right hand, spout forward */
 function thirsty(){return Object.entries(S.plants).filter(([k,p])=>{if(p.pending||!CAT[p.t])return false;const rp=ripe(p);return !rp.stopped&&(freeWater()||!p.watered)}).map(([k])=>+k)}
-function setCan(on){CAN=!!on;CANG.visible=CAN;$('#can').classList.toggle('on',CAN);
+function setCan(on){CAN=!!on;TOOL=CAN?'can':(TOOL==='can'?'hand':TOOL);CANG.visible=CAN;paintBar();
   if(CAN){SND.rustle();const n=thirsty().length;toast(n?'The can is out. Walk past the beds; '+plural(n,'bed')+(n===1?' is':' are')+' thirsty.':'Nothing is thirsty right now.')}else toast('The can is away.');updateAct()}
-$('#can').onclick=()=>setCan(!CAN);
+$$('#bar .slot').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const t=b.dataset.tool;setTool(TOOL===t&&t!=='hand'?'hand':t)}));
 function canTick(){if(!CAN||BLOOM||STORE_ON)return;
   const th=thirsty();if(!th.length){setCan(false);setTimeout(()=>SND.allWatered(),150);toast('Everything is watered. The can goes away.');return}
   for(const plot of th){const b=BED[plot];const d=inPoly(b.P,you.x,you.z)?0:polyDist(b.P,true,you.x,you.z);if(d<1.7){waterAt(plot,true);POUR=performance.now()+900;return}}}
@@ -1370,7 +1485,7 @@ function rainTick(dt){for(let i=RAINS.length-1;i>=0;i--){const R=RAINS[i];R.t+=d
 const MARBLE=50,FORMS={obelisk:'Obelisk',urn:'Urn',sphere:'Sphere',column:'Column'};
 if(!S.things)S.things={};
 let THINGS_LIVE=false;
-function loadThings(){if(!sb||!LIVE)return;sb.rpc('garden_things').then(r=>{if(r.error)return;THINGS_LIVE=true;S.things={};(r.data||[]).forEach(t=>{if(FORMS[t.kind])S.things[t.spot]={k:t.kind,st:+t.stage||0}});save();renderThings();renderPlinths()}).catch(()=>{})}
+function loadThings(){if(!sb||!LIVE)return;sb.rpc('garden_things').then(r=>{if(r.error)return;THINGS_LIVE=true;S.things={};(r.data||[]).forEach(t=>{if(FORMS[t.kind])S.things[t.spot]={k:t.kind,st:+t.stage||0}});updateAct();save();renderThings();renderPlinths()}).catch(()=>{})}
 const THINGMESHES=[];
 function formGroup(kind){const G=new THREE.Group();const add=(g,y,rot)=>{const o=new THREE.Mesh(g,MAT.marble);o.castShadow=true;o.receiveShadow=true;o.position.y=y;if(rot)o.rotation.y=rot;G.add(o);return o};
   if(kind==='obelisk'){add(new THREE.BoxGeometry(0.5,0.12,0.5),0.06);add(new THREE.CylinderGeometry(0.15,0.24,1.7,4),0.97,Math.PI/4);add(new THREE.ConeGeometry(0.15,0.24,4),1.94,Math.PI/4)}
@@ -1395,7 +1510,7 @@ $('#fmClose').onclick=()=>$('#forms').classList.remove('on');
 $('#forms').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#forms').classList.remove('on')});
 function buyThing(spot,kind){if(S.things[spot]){SND.knock();toast('That plinth is taken.');return}
   if(plinthsOpen().indexOf(spot)<0){SND.knock();toast('That plinth is asleep. Fill a quadrant and three wake.');return}
-  const cost=MARBLE*RATE;if(S.gc+S.coins*RATE<cost){showShort(cost);return}
+  const cost=gcv(MARBLE);if(reach()<cost){showShort(cost);return}
   if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('thing_buy2',{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough. Marble is '+cost+' gardencoin.':/taken/.test(r.error.message||'')?'That plinth is taken.':/asleep/.test(r.error.message||'')?'That plinth is asleep. Fill a quadrant and three wake.':'The stone did not come.'));return}
       const d=r.data||{};S.gc=+d.balance||0;if(d.dc_balance!=null)S.coins=+d.dc_balance;S.things[spot]={k:kind,st:0};ledger('Marble block',-cost,'the mason');save();renderThings();renderPlinths();renderHud();SND.buy(1);toast('A block of marble, for '+payWords({gc:+d.gc_used||0,dc:+d.dc_used||0})+'. Chisel it.');updateAct();refresh()}).catch(()=>{BUSY=false;toast('The stone did not come.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}
@@ -1408,25 +1523,200 @@ function chipThing(spot){const t=S.things[spot];if(!t||t.st>=3)return;const [x,z
 const CHIPS=[];const chipMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xffffff,size:0.11,transparent:true,opacity:0.95,depthWrite:false,alphaTest:0.2});
 function burst(x,y,z){const n=40,pos=new Float32Array(n*3),v=[];for(let i=0;i<n;i++){pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;const a=Math.random()*6.28,sp=1.2+Math.random()*2;v.push([Math.cos(a)*sp,1.5+Math.random()*2.5,Math.sin(a)*sp])}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,chipMat);scene.add(pts);CHIPS.push({pts,v,t:0})}
-function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=dt;const a=C.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){const v=C.v[j];v[1]-=9.8*dt;let y=a.getY(j)+v[1]*dt;if(y<0.05)y=0.05;a.setXYZ(j,a.getX(j)+v[0]*dt,y,a.getZ(j)+v[2]*dt)}a.needsUpdate=true;
+function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=dt;const a=C.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){const v=C.v[j];if(!C.petal)v[1]-=9.8*dt;let y=a.getY(j)+v[1]*dt;if(y<0.05)y=0.05;a.setXYZ(j,a.getX(j)+v[0]*dt+(C.petal?Math.sin(C.t*3+j)*0.4*dt:0),y,a.getZ(j)+v[2]*dt)}a.needsUpdate=true;
   if(C.t>0.9){scene.remove(C.pts);C.pts.geometry.dispose();CHIPS.splice(i,1)}}}
+
+
+/* ======================================================================
+   3.3 · THE HOTBAR. What you hold is what the pill does: the hand picks, the can waters, the flower rocket picks a whole
+   quadrant in one shot, the water launcher waters half the garden in one shot. Slots 1 to 4, the guns show once bought.
+   ====================================================================== */
+let TOOL='hand';
+const owns=t=>!!(S.tools&&S.tools[t]);
+function paintBar(){$$('#bar .slot').forEach(b=>{const t=b.dataset.tool;b.classList.toggle('off',!!TOOLS[t]&&!owns(t));b.classList.toggle('on',TOOL===t)});ROCKETG.visible=TOOL==='rocket';LAUNCHG.visible=TOOL==='launcher'}
+function setTool(t){if(!t||(TOOLS[t]&&!owns(t)))t='hand';if(t==='can'){if(!CAN)setCan(true);return}if(CAN){setCan(false)}TOOL=t;paintBar();updateAct()}
+/* the guns in hand, on the right forearm like the can */
+const ROCKETG=new THREE.Group();AV.armR.fore.add(ROCKETG);ROCKETG.visible=false;
+{const red=new THREE.MeshStandardMaterial({color:0xB8332B,roughness:0.5,metalness:0.2}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6}),dk=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.6,metalness:0.4});
+ const tube=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.075,0.92,14),dk);tube.rotation.x=-Math.PI/2;tube.position.set(0.02,-0.3,0.18);ROCKETG.add(tube);
+ const nose=new THREE.Mesh(new THREE.ConeGeometry(0.075,0.22,14),red);nose.rotation.x=-Math.PI/2;nose.position.set(0.02,-0.3,0.75);ROCKETG.add(nose);
+ const band=new THREE.Mesh(new THREE.CylinderGeometry(0.082,0.082,0.1,14),iv);band.rotation.x=-Math.PI/2;band.position.set(0.02,-0.3,0.5);ROCKETG.add(band);
+ const grip=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.16,0.06),dk);grip.position.set(0.02,-0.4,0.02);ROCKETG.add(grip)}
+const LAUNCHG=new THREE.Group();AV.armR.fore.add(LAUNCHG);LAUNCHG.visible=false;
+{const blue=new THREE.MeshStandardMaterial({color:0x2E7FB8,roughness:0.45,metalness:0.25}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6}),dk=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.6,metalness:0.4});
+ const tank=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.42,16),blue);tank.rotation.x=-Math.PI/2;tank.position.set(0.02,-0.3,0.16);LAUNCHG.add(tank);
+ const barrel=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.6,12),dk);barrel.rotation.x=-Math.PI/2;barrel.position.set(0.02,-0.3,0.62);LAUNCHG.add(barrel);
+ const nz=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.1,12),iv);nz.rotation.x=Math.PI/2;nz.position.set(0.02,-0.3,0.95);LAUNCHG.add(nz);
+ const grip=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.16,0.06),dk);grip.position.set(0.02,-0.4,0.02);LAUNCHG.add(grip)}
+/* the quadrants: their centres, what is ripe in one, what is thirsty in a half (west x<0, east x>=0) */
+const QC=[0,1,2,3].map(q=>{const bs=BED.filter(b=>b.q===q);return {q,x:bs.reduce((a,b)=>a+b.cx,0)/bs.length,z:bs.reduce((a,b)=>a+b.cz,0)/bs.length}});
+function quadHere(){let best=null,bd=1e9;QC.forEach(c=>{const d=Math.hypot(c.x-you.x,c.z-you.z);if(d<bd){bd=d;best=c}});return bd<17?best.q:null}
+const ripeIn=q=>BED.filter(b=>b.q===q&&S.plants[b.plot]&&!S.plants[b.plot].pending&&!PICKING.has(b.plot)&&!held(S.plants[b.plot])&&ripe(S.plants[b.plot]).flowers>=1).map(b=>b.plot);
+const halfOf=x=>x<0?0:1,HALFN=['west','east'];
+const thirstyHalf=h=>thirsty().filter(pl=>halfOf(BED[pl].cx)===h);
+/* one bed harvested by the numbers, the same bookkeeping as a pick */
+function harvest(plot,fl,w){const p=S.plants[plot];if(!p)return;p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(p.picks||0)+1;p.g=1;
+  const b=S.basket[p.t]||(S.basket[p.t]={q:0,w:0});b.q+=fl;b.w+=w;S.stats.flowers=(S.stats.flowers||0)+fl;S.stats.worth=(S.stats.worth||0)+w;S.stats.picks=(S.stats.picks||0)+1}
+/* THE FLOWER ROCKET: it flies from your hands up over the quadrant, bursts into petals, and every ripe bed below is picked */
+const ROCKETS=[];const petalMat=new THREE.PointsMaterial({map:chipMat.map,color:0xFFB7C5,size:0.16,transparent:true,opacity:0.95,depthWrite:false,alphaTest:0.2});
+function petals(x,z,r,n){const pos=new Float32Array(n*3),v=[];for(let i=0;i<n;i++){const a=Math.random()*6.28,d=Math.sqrt(Math.random())*r;pos[i*3]=x+Math.cos(a)*d;pos[i*3+1]=8+Math.random()*3;pos[i*3+2]=z+Math.sin(a)*d;v.push([Math.cos(a)*0.4,-(1.6+Math.random()*1.4),Math.sin(a)*0.4])}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(g,petalMat);scene.add(pts);CHIPS.push({pts,v,t:-3.2,petal:true})}
+function rocketMesh(){const G=new THREE.Group();const red=new THREE.MeshStandardMaterial({color:0xB8332B,roughness:0.5}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6});
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.7,12),iv);G.add(body);const nose=new THREE.Mesh(new THREE.ConeGeometry(0.09,0.26,12),red);nose.position.y=0.48;G.add(nose);
+  [0,1,2].forEach(i=>{const f=new THREE.Mesh(new THREE.BoxGeometry(0.02,0.22,0.16),red);f.position.set(0,-0.3,0.12);f.rotation.y=i*2.094;const p=new THREE.Group();p.add(f);p.rotation.y=i*2.094;G.add(p)});
+  const flame=new THREE.Mesh(new THREE.ConeGeometry(0.07,0.3,8),new THREE.MeshBasicMaterial({color:0xFFC46B,transparent:true,opacity:0.9}));flame.rotation.x=Math.PI;flame.position.y=-0.5;G.add(flame);scene.add(G);return G}
+function fireRocket(q){if(q==null)return;const beds=ripeIn(q);if(!beds.length){SND.knock();toast('Nothing ripe in quadrant '+(q+1)+'.');return}
+  const c=QC[q];const R={g:rocketMesh(),t:0,from:[you.x,you.feet+1.3,you.z],to:[c.x,0.6,c.z],q,beds,answer:LIVE?null:{beds:beds.map(pl=>{const rp=ripe(S.plants[pl]);return {plot:pl,flowers:rp.flowers,worth:rp.value,full:rp.n}})},done:false};
+  ROCKETS.push(R);SND.sow(1);
+  if(LIVE){if(!PATCH46){R.fail='Run patch 46 on DEEDS first.';return}beds.forEach(pl=>PICKING.add(pl));
+    sb.rpc('garden_pick_quadrant',{p_q:q}).then(r=>{beds.forEach(pl=>PICKING.delete(pl));const d=r.data||{};if(r.error||!d.ok){R.fail=r.error?rpcFail(r.error,'The rocket fizzled.'):'The rocket fizzled.';return}R.answer={beds:d.beds||[]}}).catch(()=>{beds.forEach(pl=>PICKING.delete(pl));R.fail='The garden did not answer.'})}}
+function rocketBurst(R){const c=QC[R.q];petals(c.x,c.z,9,240);SND.bloom();let fl=0,w=0;R.answer.beds.forEach(b=>{if(!S.plants[b.plot])return;harvest(+b.plot,+b.flowers||0,+b.worth||0);fl+=+b.flowers||0;w+=+b.worth||0});
+  save();plantBeds();renderHud();setTimeout(()=>SND.allWatered(),350);toast('Quadrant '+(R.q+1)+' \u00B7 '+plural(fl,'flower')+' \u00B7 '+w+'.');nudgeFlorist();updateAct()}
+function tickRockets(dt){for(let i=ROCKETS.length-1;i>=0;i--){const R=ROCKETS[i];R.t=Math.min(1,R.t+dt/1.4);const u=R.t;const x=R.from[0]+(R.to[0]-R.from[0])*u,z=R.from[2]+(R.to[2]-R.from[2])*u,y=R.from[1]+(9-R.from[1])*Math.sin(u*Math.PI/2)*(u<0.5?1:1)+(u>0.5?-(u-0.5)*2*(9-6):0);
+    R.g.position.set(x,y,z);const dx=R.to[0]-R.from[0],dz=R.to[2]-R.from[2];R.g.rotation.set(0,Math.atan2(dx,dz),0);R.g.rotation.x=(u<0.5?-0.35:0.35)*Math.abs(dx+dz)>0?(u<0.5?-0.35:0.6):0;
+    if(R.t>=1&&!R.done){if(R.fail){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);SND.knock();toast(R.fail);continue}
+      if(R.answer){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);rocketBurst(R)}}}}
+/* THE WATER LAUNCHER: an arc of water over one half of the garden, then rain on every thirsty bed in it */
+const LAUNCH={t:-1};
+function fireLauncher(h){const beds=thirstyHalf(h);if(!beds.length){SND.knock();toast('The '+HALFN[h]+' half is watered.');return}
+  const done=(rows)=>{rows.forEach(r=>{const p=S.plants[r.plot];if(!p)return;p.boost=(p.boost||0)+(+r.boost||0);p.watered=true;p.wd=today()});save();plantBeds();renderHud();SND.allWatered();toast('The '+HALFN[h]+' half is watered \u00B7 '+plural(rows.length,'bed')+'.');updateAct()};
+  beds.forEach((pl,i)=>setTimeout(()=>{const b=BED[pl];rain(b.cx,b.cz,b.rmax)},220+i*70));LAUNCH.t=0;LAUNCH.h=h;SND.splash();
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('garden_water_half',{p_half:h,p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}done(d.beds||[])}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
+  setTimeout(()=>done(beds.map(pl=>({plot:pl,boost:Math.ceil(ripe(S.plants[pl]).next/2)}))),700)}
+const STREAM=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(90*3),3)),new THREE.PointsMaterial({map:chipMat.map,color:0xCFE9FF,size:0.22,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2}));STREAM.visible=false;scene.add(STREAM);
+function tickLauncher(dt){if(LAUNCH.t<0)return;LAUNCH.t+=dt;if(LAUNCH.t>1.6){LAUNCH.t=-1;STREAM.visible=false;return}STREAM.visible=true;const a=STREAM.geometry.attributes.position;const tx=(LAUNCH.h?1:-1)*17,tz=0;
+  for(let j=0;j<a.count;j++){const u=((LAUNCH.t*0.9)+j/a.count)%1;const x=you.x+(tx-you.x)*u,z=you.z+(tz-you.z)*u,y=you.feet+1.2+Math.sin(u*Math.PI)*7;a.setXYZ(j,x+Math.sin(j*7.1)*0.3,y,z+Math.cos(j*5.3)*0.3)}a.needsUpdate=true}
+
+
+/* ======================================================================
+   3.3 · THE CHEST deep in the wood (a new hiding place each day, once a day), THE OAKS you fell for wood once the twelfth
+   statue is carved, and THE HOUSE at the top of the north avenue that the builder raises in three stages: 5, 10 and 50 bundles.
+   ====================================================================== */
+let AXE_DCS=AXE_DC,CHEST_GCS=CHEST_GC;
+function chestSpot(){const d=today();let h=7;for(let i=0;i<d.length;i++)h=(h*31+d.charCodeAt(i))>>>0;return CHEST_SPOTS[h%CHEST_SPOTS.length]}
+const CHEST={x:0,z:0,open:false};
+const CHESTG=new THREE.Group();scene.add(CHESTG);
+{const wood=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.85}),iron=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.5,metalness:0.6}),gold=new THREE.MeshStandardMaterial({color:0xE8C24A,roughness:0.3,metalness:0.7,emissive:0x6a4a10,emissiveIntensity:0.5});
+ const box=new THREE.Mesh(new THREE.BoxGeometry(0.96,0.5,0.6),wood);box.position.y=0.25;box.castShadow=true;CHESTG.add(box);
+ [-0.3,0.3].forEach(x=>{const b=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.52,0.63),iron);b.position.set(x,0.25,0);CHESTG.add(b)});
+ const lid=new THREE.Group();lid.position.set(0,0.5,-0.3);CHESTG.add(lid);CHEST.lid=lid;
+ const top=new THREE.Mesh(new THREE.CylinderGeometry(0.31,0.31,0.96,14,1,false,0,Math.PI),wood);top.rotation.z=Math.PI/2;top.position.set(0,0,0.3);lid.add(top);
+ [-0.3,0.3].forEach(x=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(0.325,0.325,0.06,14,1,false,0,Math.PI),iron);b.rotation.z=Math.PI/2;b.position.set(x,0,0.3);lid.add(b)});
+ const coins=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.12,16),gold);coins.position.y=0.5;CHESTG.add(coins);CHEST.coins=coins;
+ const lock=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.14,0.05),gold);lock.position.set(0,0.42,0.33);CHESTG.add(lock)}
+function chestOpened(){return S.chest&&S.chest.on===today()}
+function placeChest(){const [x,z]=chestSpot();CHEST.x=x;CHEST.z=z;CHESTG.position.set(x,0,z);CHESTG.rotation.y=(x*7+z*3)%6.28;markDisk(x,z,0.55,0.6);CHEST.open=chestOpened();CHEST.lid.rotation.x=CHEST.open?-1.6:0;CHEST.coins.visible=CHEST.open}
+function openChest(){if(chestOpened()){SND.knock();toast('Opened today. It moves tomorrow.');return}
+  const done=(coins)=>{S.chest={on:today()};S.gc+=coins;ledger('The chest',coins,'deep in the wood');save();renderHud();CHEST.open=true;CHEST.lid.rotation.x=-1.6;CHEST.coins.visible=true;burst(CHEST.x,0.7,CHEST.z);SND.buy(6);toast('+'+coins+' gardencoin. It hides somewhere new tomorrow.');updateAct()};
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('chest_open',{p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The lid would not lift.'));return}
+    if(!d.ok){S.chest={on:today()};save();SND.knock();toast('Opened today. It moves tomorrow.');updateAct();return}if(d.balance!=null)S.gc=+d.balance-(+d.coins||0);done(+d.coins||0)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
+  done(CHEST_GCS)}
+/* the oaks */
+const statuesDone=()=>Object.values(S.things||{}).filter(t=>t&&t.st>=3).length;
+const treesAwake=()=>TREEFREE||ADMIN||statuesDone()>=STATUES_TO_WAKE;
+const regrowLeft=tr=>tr&&tr.cut?Math.max(0,Math.ceil(REGROW_S-(Date.now()-tr.cut)/1000)):0;
+const OAKG=[];
+{const bark=new THREE.MeshStandardMaterial({color:0x5A4030,roughness:0.95}),leaf=new THREE.MeshStandardMaterial({color:0x2E5A2A,roughness:0.9}),leaf2=new THREE.MeshStandardMaterial({color:0x3A6E33,roughness:0.9});
+ OAKS.forEach(([x,z],i)=>{const G=new THREE.Group();G.position.set(x,0,z);scene.add(G);const T=new THREE.Group();G.add(T);
+   const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.5,3.6,12),bark);trunk.position.y=1.8;trunk.castShadow=true;T.add(trunk);
+   [[0,4.9,0,2.3,leaf],[1.3,4.3,0.6,1.7,leaf2],[-1.2,4.4,-0.5,1.6,leaf2],[0.3,5.9,-0.9,1.5,leaf],[-0.4,4.2,1.3,1.4,leaf2]].forEach(([cx,cy,cz,r,m])=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,14,10),m);s.position.set(cx,cy,cz);s.castShadow=true;T.add(s)});
+   const stump=new THREE.Mesh(new THREE.CylinderGeometry(0.44,0.5,0.55,12),bark);stump.position.y=0.27;stump.visible=false;G.add(stump);
+   markDisk(x,z,0.62,3);OAKG.push({g:G,tree:T,stump,fall:-1})})}
+function renderTrees(){OAKG.forEach((o,i)=>{const tr=S.trees[i];const cut=regrowLeft(tr)>0;if(o.fall<0){o.tree.visible=!cut;o.tree.rotation.z=0;o.tree.rotation.x=0;o.stump.visible=cut}})}
+function chopTree(i){const tr=S.trees[i]||(S.trees[i]={st:0,cut:0});if(!treesAwake()||regrowLeft(tr)>0||S.wood)return;const [ox,oz]=OAKS[i];
+  const done=(stage,fell)=>{tr.st=stage;burst(ox,1.4,oz);SND.chip();
+    if(fell){tr.st=0;tr.cut=Date.now();S.wood=1;const o=OAKG[i];o.fall=0;o.dir=Math.atan2(ox-you.x,oz-you.z);setTimeout(()=>SND.rustle(),500);setTimeout(()=>SND.knock(),1150);toast('The oak comes down. Take the bundle to the builder at the house.')}
+    else toast('Chop \u00B7 '+stage+' of '+CHOPS+'.');save();renderHud();paintBundle();updateAct()};
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('tree_chop',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(gcv(AXE_DCS));else toast(rpcFail(r.error,'The axe slipped.'));return}
+      if(!d.ok){SND.knock();toast(d.reason==='asleep'?'The oaks are asleep.':d.reason==='regrowing'?'It is growing back.':d.reason==='carrying'?'Take your bundle to the builder first.':'That did not chop.');return}
+      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;done(+d.stage||0,!!d.fell)}).catch(()=>{BUSY=false;toast('The axe slipped.')});return}
+  if(!tr.st){const cost=gcv(AXE_DCS);const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('An axe',-cost,'the oak')}
+  const st=tr.st+1;done(st>=CHOPS?CHOPS:st,st>=CHOPS)}
+function tickTrees(dt){OAKG.forEach((o,i)=>{if(o.fall<0)return;o.fall+=dt;const u=Math.min(1,o.fall/1.2);const a=u*u*Math.PI/2;o.tree.rotation.set(Math.cos(o.dir)*a,0,-Math.sin(o.dir)*a);
+    if(o.fall>1.5){o.fall=-1;renderTrees()}})}
+/* the bundle on your shoulder */
+const BUNDLE=new THREE.Group();AV.torso.add(BUNDLE);BUNDLE.position.set(0,0.66,-0.2);BUNDLE.rotation.z=Math.PI/2;BUNDLE.rotation.y=0.35;BUNDLE.visible=false;
+{const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});[[0,0.09],[0.08,-0.06],[-0.08,-0.06]].forEach(([y,z])=>{const l=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.95,10),bark);l.position.set(0,y,z);BUNDLE.add(l)});
+ const tie=new THREE.Mesh(new THREE.TorusGeometry(0.16,0.015,6,16),new THREE.MeshStandardMaterial({color:0xB9A26B}));tie.rotation.x=Math.PI/2;BUNDLE.add(tie)}
+function paintBundle(){BUNDLE.visible=S.wood>0}
+/* the house: three stages on one site, the builder and his woodpile beside the front */
+const HG=new THREE.Group();HG.position.set(HOUSE.x,0,HOUSE.z);scene.add(HG);const STAGE=[[],[],[],[]];
+{const white=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.8}),slate=new THREE.MeshStandardMaterial({color:0x3a3f45,roughness:0.85}),brick=new THREE.MeshStandardMaterial({color:0x8a4b3a,roughness:0.9}),
+   green=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.85}),glass=new THREE.MeshStandardMaterial({color:0x1c2430,roughness:0.2,metalness:0.4}),col=new THREE.MeshStandardMaterial({color:0xFBF8F0,roughness:0.7});
+ const put=(st,g,m,x,y,z,ry)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);if(ry)o.rotation.y=ry;o.castShadow=true;o.receiveShadow=true;HG.add(o);STAGE[st].push(o);return o};
+ const win=(st,x,y,z,w,h)=>{put(st,new THREE.PlaneGeometry(w||0.9,h||1.3),glass,x,y,z+0.01);put(st,new THREE.BoxGeometry(0.22,(h||1.3)+0.1,0.05),green,x-(w||0.9)/2-0.13,y,z);put(st,new THREE.BoxGeometry(0.22,(h||1.3)+0.1,0.05),green,x+(w||0.9)/2+0.13,y,z)};
+ const apron=put(0,new THREE.PlaneGeometry(28,15),MAT.gravel,0,0.012,0.5);apron.rotation.x=-Math.PI/2;apron.castShadow=false;
+ /* stage 1: the fireplace wing, west of the centre */
+ put(1,new THREE.BoxGeometry(6.4,4.6,5.6),white,-7.6,2.3,0.5);const r1=put(1,new THREE.ConeGeometry(4.7,2.2,4),slate,-7.6,5.7,0.5,Math.PI/4);
+ put(1,new THREE.BoxGeometry(0.8,2.6,0.8),brick,-9.8,5.6,-0.6);win(1,-9.2,2.2,3.31);win(1,-6.2,2.2,3.31);win(1,-7.6,2.2,-2.31);
+ /* stage 2: the main house */
+ put(2,new THREE.BoxGeometry(12,4.8,7.4),white,0,2.4,0.3);STAGE[2].push(put(2,new THREE.ConeGeometry(8.3,2.6,4),slate,0,6.1,0.3,Math.PI/4));
+ put(2,new THREE.PlaneGeometry(1.3,2.5),glass,0,1.25,4.02);put(2,new THREE.BoxGeometry(1.7,0.12,0.16),white,0,2.56,4.06);[-4.3,-2.2,2.2,4.3].forEach(x=>win(2,x,2.3,4.01));
+ [0,1,2].forEach(i=>put(2,new THREE.BoxGeometry(4-i*0.4,0.18,0.5),MAT.stone,0,0.09+i*0.18,4.9-i*0.5));
+ [-3.4,-1.2,1.2,3.4].forEach(z=>win(2,-6.01,2.3,z,0.8,2.2));            /* the library wall, tall windows down the west side */
+ /* stage 3: the mansion: the upper floor, the portico, the balcony, the east wing */
+ put(3,new THREE.BoxGeometry(12,3.8,7.4),white,0,6.7,0.3);put(3,new THREE.ConeGeometry(8.3,2.6,4),slate,0,9.9,0.3,Math.PI/4);[-4.3,-2.2,0,2.2,4.3].forEach(x=>win(3,x,6.9,4.01));
+ [-4.2,-1.4,1.4,4.2].forEach(x=>put(3,new THREE.CylinderGeometry(0.26,0.3,8.4,14),col,x,4.2,5.9));put(3,new THREE.BoxGeometry(10.4,0.6,2.6),white,0,8.7,4.9);
+ {const s=new THREE.Shape();s.moveTo(-5.4,0);s.lineTo(5.4,0);s.lineTo(0,2.1);s.lineTo(-5.4,0);const g=new THREE.ExtrudeGeometry(s,{depth:2.6,bevelEnabled:false});g.translate(0,0,-1.3);put(3,g,white,0,9.0,4.9)}
+ put(3,new THREE.BoxGeometry(6,0.18,1.8),white,0,4.9,4.8);[-2.9,2.9].forEach(x=>put(3,new THREE.BoxGeometry(0.08,0.9,1.8),col,x,5.4,4.8));put(3,new THREE.BoxGeometry(6,0.08,0.08),col,0,5.85,5.66);
+ put(3,new THREE.BoxGeometry(6.4,4.6,5.6),white,7.6,2.3,0.5);put(3,new THREE.ConeGeometry(4.7,2.2,4),slate,7.6,5.7,0.5,Math.PI/4);put(3,new THREE.BoxGeometry(0.8,2.6,0.8),brick,9.8,5.6,-0.6);win(3,9.2,2.2,3.31);win(3,6.2,2.2,3.31);
+ markRect(HOUSE.x-11,HOUSE.z-3.5,HOUSE.x+11,HOUSE.z+4.1,4.6)}
+function renderHouse(){const st=LIVE?S.house.stage:Math.max(S.house.stage,HOUSE_PREVIEW);for(let k=1;k<=3;k++)STAGE[k].forEach(o=>o.visible=k<=st);STAGE[2].forEach((o,j)=>{if(o.geometry.type==='ConeGeometry')o.visible=st===2});renderPile()}
+/* the builder and his woodpile */
+const BUILDER={swing:-1};
+{const B=new THREE.Group();B.position.set(HOUSE.front.x,0,HOUSE.front.z-1.6);B.rotation.y=Math.PI;scene.add(B);BUILDER.g=B;
+ const skin=new THREE.MeshStandardMaterial({color:0xC99A6B,roughness:0.85}),denim=new THREE.MeshStandardMaterial({color:0x3E5A7D,roughness:0.95}),shirt=new THREE.MeshStandardMaterial({color:0xC9463D,roughness:0.9}),
+   cap=new THREE.MeshStandardMaterial({color:0xE9DCC0,roughness:0.9}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6}),boot=new THREE.MeshStandardMaterial({color:0x3A2A1E,roughness:0.8}),steel=new THREE.MeshStandardMaterial({color:0x9AA0A6,roughness:0.4,metalness:0.7}),wood=new THREE.MeshStandardMaterial({color:0x8B6A3F,roughness:0.9});
+ const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||B).add(o);return o};
+ [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.09,0.1,0.82,12),denim,0,0.41,s*0.12);km(new THREE.BoxGeometry(0.28,0.1,0.16),boot,-0.03,0.05,s*0.12)});
+ km(new THREE.CylinderGeometry(0.21,0.22,0.66,16),denim,0,1.15,0);km(new THREE.BoxGeometry(0.03,0.5,0.34),denim,-0.21,1.3,0);km(new THREE.CylinderGeometry(0.2,0.21,0.18,16),shirt,0,1.56,0);
+ km(new THREE.CylinderGeometry(0.07,0.075,0.12,10),skin,0,1.7,0);const head=new THREE.Group();head.position.set(0,1.84,0);B.add(head);BUILDER.head=head;
+ km(new THREE.SphereGeometry(0.13,20,14),skin,0,0,0,head);[-1,1].forEach(s=>km(new THREE.SphereGeometry(0.016,8,6),dark,-0.118,0.02,s*0.046,head));
+ const smile=km(new THREE.TorusGeometry(0.034,0.005,6,14,Math.PI),dark,-0.122,-0.035,0,head);smile.rotation.set(0,-Math.PI/2,Math.PI);
+ km(new THREE.SphereGeometry(0.135,16,10,0,Math.PI*2,0,Math.PI/2),cap,0,0.03,0,head);km(new THREE.BoxGeometry(0.16,0.02,0.2),cap,-0.17,0.03,0,head);
+ const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.58,side*0.25);B.add(A);km(new THREE.SphereGeometry(0.075,10,8),shirt,0,0,0,A);km(new THREE.CylinderGeometry(0.06,0.055,0.3,10),shirt,0,-0.17,0,A);
+   const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.05,0.045,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.055,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
+ BUILDER.armL=arm(-1);BUILDER.armR=arm(1);BUILDER.armL.rotation.x=0.15;BUILDER.armL.fore.rotation.x=-0.5;BUILDER.armR.rotation.x=-0.2;BUILDER.armR.fore.rotation.x=-0.9;
+ km(new THREE.CylinderGeometry(0.02,0.02,0.42,8),wood,0,-0.3,0.1,BUILDER.armR.fore);km(new THREE.BoxGeometry(0.16,0.07,0.07),steel,0,-0.3,0.3,BUILDER.armR.fore);
+ markDisk(HOUSE.front.x,HOUSE.front.z-1.6,0.4,1.2);
+ /* the woodpile */
+ const P=new THREE.Group();P.position.set(HOUSE.front.x+2.4,0,HOUSE.front.z-2.2);scene.add(P);BUILDER.pile=[];
+ const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});for(let k=0;k<12;k++){const row=k<5?0:k<9?1:2,c=k<5?k:k<9?k-5:k-9,n=k<5?5:k<9?4:3;const l=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,1.4,10),bark);l.rotation.z=Math.PI/2;l.position.set(0,0.16+row*0.3,(c-(n-1)/2)*0.36);l.castShadow=true;l.visible=false;P.add(l);BUILDER.pile.push(l)}
+ markRect(HOUSE.front.x+1.6,HOUSE.front.z-3.2,HOUSE.front.x+3.2,HOUSE.front.z-1.2,0.9)}
+function renderPile(){const n=Math.min(12,S.house.stage>=3?12:S.house.wood);BUILDER.pile.forEach((l,k)=>l.visible=k<n)}
+function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood from the oaks.');return}
+  const done=(wood,stage)=>{const was=S.house.stage;S.wood=0;S.house.wood=wood;S.house.stage=stage;save();renderHud();paintBundle();renderHouse();
+    if(stage>was){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast(['','The builder raises the fireplace wing.','The main house goes up, with the library.','The mansion. Portico, columns, the upper floor and your bedroom.'][stage])}
+    else{SND.clink();toast('Delivered \u00B7 '+wood+' of '+HOUSE_TIERS[stage]+' bundles.')}updateAct()};
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();toast('Bring a bundle of wood from the oaks.');return}done(+d.wood||0,+d.stage||0)}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
+  const wood=S.house.wood+1;let stage=S.house.stage;while(stage<3&&wood>=HOUSE_TIERS[stage])stage++;done(wood,stage)}
+function tickBuilder(t,dt){const B=BUILDER;const dx=you.x-B.g.position.x,dz=you.z-B.g.position.z,near=Math.hypot(dx,dz);
+  const look=near<9?localLook(dx,dz,Math.PI):0;B.head.rotation.y+=(Math.max(-1.1,Math.min(1.1,look))-B.head.rotation.y)*Math.min(1,4*dt);
+  if(B.swing>=0){B.swing+=dt;B.armR.rotation.x=-0.2-Math.abs(Math.sin(B.swing*9))*1.4;if(B.swing>2.4){B.swing=-1;B.armR.rotation.x=-0.2}}
+  else B.armR.rotation.x=-0.2+Math.sin(t*1.3)*0.04;
+  B.g.position.y=Math.sin(t*1.6)*0.01}
+function tickWorld(t,dt){tickRockets(dt);tickLauncher(dt);tickTrees(dt);tickBuilder(t,dt);CHEST.coins.rotation.y=t*0.6;if(CHEST.open)CHEST.coins.position.y=0.5+0.02*Math.sin(t*3)}
 
 /* ---------- the act bar: what you can do from where you stand ---------- */
 let ACT=null,ATSTAND=false,ATFLORIST=false,ATFISH=false;             /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
 let ANCHOR=null,CHIPSIG='',EXTRA=[],DIGSHOW=0;          /* the point the prompt floats over; the chips only rebuild when their words change */
 const LOCK={kind:null,id:-1};                             /* what the prompt is on. It lets go only past the exit range, so it never flickers at the edge */
-const ENTER={stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,bed:1.3},EXIT={stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,bed:2.1};
+const ENTER={stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,chest:2.6,tree:2.7,house:3.4,bed:1.3},EXIT={stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,chest:3.4,tree:3.5,house:4.4,bed:2.1};
 function bedDist(b){return inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z)}
 function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax>3.4)continue;const d=bedDist(b);if(d<bd){bd=d;best=b}}return {b:best,d:bd}}
 function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
 function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return {p:best,d:bd}}
 function distTo(kind,id){if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
   if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
-  if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}return bedDist(BED[id])}
+  if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
+  if(kind==='tree'){const [ox,oz]=OAKS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);return bedDist(BED[id])}
+function oakNear(){let best=-1,bd=1e9;OAKS.forEach(([ox,oz],i)=>{const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
 function nearest(){const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
   const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
-  const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};return null}
+  const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};
+  const ok=oakNear();if(ok.i>=0&&ok.d<ENTER.tree)return {kind:'tree',id:ok.i,d:ok.d};const dh2=distTo('house',0);if(dh2<ENTER.house)return {kind:'house',id:0,d:dh2};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};return null}
 function pickTarget(){const c=nearest();
   if(LOCK.kind){const dl=distTo(LOCK.kind,LOCK.id);
     /* hold on to it inside its exit range, unless you are standing in another bed or something is clearly nearer */
@@ -1440,7 +1730,7 @@ function setChips(chips,extra){EXTRA=extra||[];const sig=(chips||[]).map(t=>t+':
   $$('#actChips .chip[data-t]').forEach(b=>b.onpointerdown=e=>{e.preventDefault();e.stopPropagation();SOWT=b.dataset.t;updateAct()});
   $$('#actChips .chip[data-x]').forEach(b=>b.onpointerdown=e=>{e.preventDefault();e.stopPropagation();const x=EXTRA[+b.dataset.x];if(x)x.f()})}
 function showAct(label,mode,plot,chips,say,extra,at){ACT=mode?{mode,plot}:null;if(at)ANCHOR=at;
-  if(actMain.textContent!==label)actMain.textContent=label;actMain.classList.toggle('quiet',!mode);
+  if(actMain.textContent!==label)actMain.textContent=label;actMain.classList.toggle('quiet',!mode);actMain.classList.toggle('busy',LIVE&&BUSY&&!!mode);
   setChips(chips,extra);
   const key=mode&&!COARSE?'press E'+(chips&&chips.length>1?' \u00B7 Q picks the seed':''):'';
   const k2=say?(say+(key?' \u00B7 '+key:'')):key;if(actKey.textContent!==k2)actKey.textContent=k2;
@@ -1449,15 +1739,15 @@ function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
 const stallAt=s=>[s.x+1.72,2.7,s.z];
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   const T=pickTarget();
-  if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are a hundred to five hundred. Gardencoin first, Deedcoins fill in.\u201D',null,stallAt(STAND));return}
+  if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are '+gcv(Math.min(...FLOWERS.map(id=>CAT[id].price)))+' to '+gcv(Math.max(...FLOWERS.map(id=>CAT[id].price)))+'. Gardencoin first, Deedcoins fill in.\u201D',null,stallAt(STAND));return}
   ATSTAND=false;
   if(T.kind==='florist'){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();
     if(bq)showAct('Sell '+plural(bq,'flower')+' \u00B7 '+gcWorth().toLocaleString()+' gardencoin.','sell',null,null,'\u201CBring me what you grew. I pay in gardencoin.\u201D',null,stallAt(FLORIST));
     else showAct('Flora buys the flowers you pick.',null,null,null,'\u201CBring me what you grew. I pay in gardencoin.\u201D',null,stallAt(FLORIST));return}
   ATFLORIST=false;
   if(T.kind==='fish'){if(!ATFISH){ATFISH=true;SND.hello()}const fn=fountainNow();
-    if(fn.held)showAct('Sell '+fishes(fn.held)+' \u00B7 '+(fn.held*FISH_WORTH).toLocaleString()+' gardencoin.','fishsell',null,null,'\u201CA hundred a fish.\u201D',null,stallAt(MARKET3));
-    else if(fn.sprung)showAct('Bring the fish you catch at the fountain.',null,null,null,'\u201CA hundred a fish.\u201D',null,stallAt(MARKET3));
+    if(fn.held)showAct('Sell '+fishes(fn.held)+' \u00B7 '+(fn.held*FISH_WORTH).toLocaleString()+' gardencoin.','fishsell',null,null,'\u201C'+FISH_WORTH+' a fish.\u201D',null,stallAt(MARKET3));
+    else if(fn.sprung)showAct('Bring the fish you catch at the fountain.',null,null,null,'\u201C'+FISH_WORTH+' a fish.\u201D',null,stallAt(MARKET3));
     else showAct('Fish come when the fountain springs.',null,null,null,'at 40 beds \u00B7 '+Object.keys(S.plants).length+' planted',null,stallAt(MARKET3));return}
   ATFISH=false;
   if(T.kind==='fountain'){const fn=fountainNow(),at=[0,3.0,0];
@@ -1466,9 +1756,21 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
     else showAct('No fish yet.',null,null,null,'the next comes in '+mmss(fn.next)+(fn.held?' \u00B7 '+fishes(fn.held)+' in hand':''),null,at);return}
   if(T.kind==='plinth'){const pl=PLINTHS[T.id],t=S.things[pl.i],at=[pl.x,1.5,pl.z];
     if(!t&&plinthsOpen().indexOf(pl.i)<0){showAct('This plinth is asleep.',null,null,null,'three wake with every quadrant you fill \u00B7 '+quadrantsFull()+' of 4 full',null,at);return}
-    if(!t){showAct('Set a marble block here \u00B7 '+(MARBLE*RATE)+' gardencoin.','marble',pl.i,null,null,null,at);return}
+    if(!t){showAct('Set a marble block here \u00B7 '+gcv(MARBLE)+' gardencoin.','marble',pl.i,null,null,null,at);return}
     if(t.st<3){showAct('Chisel the marble. '+t.st+' of 3.','chip',pl.i,null,null,null,at);return}
     showAct(FORMS[t.k]+' in marble. Carved by you.',null,null,null,null,null,at);return}
+  if(TOOL==='rocket'){const q=quadHere();if(q==null){showAct('Walk into a quadrant to fire the rocket.',null,null,null,null,null,[you.x,you.feet+2.15,you.z]);return}
+    const n=ripeIn(q).length;if(n)showAct('Fire at quadrant '+(q+1)+' \u00B7 '+plural(n,'ripe bed')+'.','rocket',q,null,'every ripe bed in it, picked at once',null,[QC[q].x,2.2,QC[q].z]);else showAct('Nothing ripe in quadrant '+(q+1)+'.',null,null,null,null,null,[QC[q].x,2.2,QC[q].z]);return}
+  if(TOOL==='launcher'){const h=halfOf(you.x),n=thirstyHalf(h).length;if(n)showAct('Water the '+HALFN[h]+' half \u00B7 '+plural(n,'thirsty bed')+'.','launcher',h,null,'one shot waters them all',null,[you.x,you.feet+2.15,you.z]);else showAct('The '+HALFN[h]+' half is watered.',null,null,null,thirstyHalf(1-h).length?'the '+HALFN[1-h]+' half is still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
+  if(T.kind==='chest'){const at=[CHEST.x,1.4,CHEST.z];if(chestOpened())showAct('Opened today. It moves tomorrow.',null,null,null,null,null,at);else showAct('Open the chest.','chest',null,null,CHEST_GCS+' gardencoin, once a day',null,at);return}
+  if(T.kind==='tree'){const i=T.id,[ox,oz]=OAKS[i],at=[ox,3.2,oz],tr=S.trees[i]||{st:0,cut:0};
+    if(!treesAwake()){showAct('These oaks wake when the twelfth statue is carved.',null,null,null,statuesDone()+' of '+STATUES_TO_WAKE+' carved',null,at);return}
+    if(regrowLeft(tr)>0){showAct('A stump. The oak grows back in '+mmss(regrowLeft(tr))+'.',null,null,null,null,null,at);return}
+    if(S.wood){showAct('Take your bundle to the builder first.',null,null,null,'the house is at the top of the north avenue',null,at);return}
+    if(!tr.st)showAct('Take an axe to this oak \u00B7 '+gcv(AXE_DCS)+' gardencoin.','chop',i,null,CHOPS+' chops fell it',null,at);else showAct('Chop \u00B7 '+tr.st+' of '+CHOPS+'.','chop',i,null,null,null,at);return}
+  if(T.kind==='house'){const at=[HOUSE.front.x,2.3,HOUSE.front.z],st=S.house.stage;
+    if(S.wood)showAct('Give the wood to the builder.','wood',null,null,st<3?S.house.wood+' of '+HOUSE_TIERS[st]+' bundles':'',null,at);
+    else if(st>=3)showAct('Your house. Built by you.',null,null,null,null,null,at);else showAct('Bring wood \u00B7 '+S.house.wood+' of '+HOUSE_TIERS[st]+' bundles.',null,null,null,['the fireplace wing','the main house','the mansion'][st]+' comes next \u00B7 the oaks stand beside the avenue',null,at);return}
   if(CAN){const n=thirsty().length;showAct('Put the can away.','can',null,null,n?plural(n,'bed')+' still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
   if(T.kind!=='bed'){hideAct();return}
   const b=BED[T.id],at=[b.cx,1.55,b.cz];
@@ -1479,11 +1781,13 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   const c=CAT[p.t],rp=ripe(p);const extra=[];
   const canWater=!rp.stopped&&(freeWater()||!p.watered);
   if(DIGSHOW>performance.now())extra.push({l:'Dig up bed '+(b.plot+1)+'.',f:()=>digAt(b.plot)});
+  if(held(p)){showAct(c.n+' \u00B7 blooms in '+mmss(Math.max(rp.next,held(p)))+'.',null,null,null,p.watered?'watered':'',extra,at);return}
   if(rp.flowers>=1){if(canWater)extra.push({l:'Water.',f:()=>waterAt(b.plot)});if(canWater&&thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});
     showAct('Pick '+(rp.flowers>1?rp.flowers+' '+c.p.toLowerCase():c.n.toLowerCase())+' \u00B7 '+rp.value+'.','pick',b.plot,null,rp.stopped?'Full. Nothing more grows until you pick.':(rp.n>0?'the next opens in '+mmss(rp.next):'a full bloom is '+c.w),extra,at);return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
-function act(){if(!ACT)return;if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(S.gc+S.coins*RATE<MARBLE*RATE){SND.knock();toast('Marble is '+(MARBLE*RATE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);updateAct()}
+function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
+function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='wood')deliverWood();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -1492,9 +1796,10 @@ function placeAct(){if(!ANCHOR||!actEl.classList.contains('on'))return;_pv.set(A
   const w=actEl.offsetWidth||220,h=actEl.offsetHeight||70,m=12;
   const sx=Math.max(m+w/2,Math.min(innerWidth-m-w/2,(_pv.x+1)/2*innerWidth)),sy=Math.max(m+h,Math.min(innerHeight-96,(1-_pv.y)/2*innerHeight));
   actEl.style.opacity='1';actEl.style.transform='translate('+sx.toFixed(1)+'px,'+sy.toFixed(1)+'px) translate(-50%,-100%)'}
-let DOWNAT=0;
-actMain.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();DOWNAT=performance.now();act()});
-actMain.addEventListener('click',e=>{e.stopPropagation();if(performance.now()-DOWNAT>600)act()});
+let PRESSED=false;
+actMain.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();PRESSED=true;actMain.classList.add('hit');setTimeout(()=>actMain.classList.remove('hit'),140);act()});
+actMain.addEventListener('click',e=>{e.stopPropagation();if(!PRESSED)act();PRESSED=false});   /* a keyboard click still acts; a long press never acts twice */
+addEventListener('pointerup',()=>{setTimeout(()=>{PRESSED=false},0)});
 
 /* ======================================================================
    YOU · third person. The stick or the keys move you across what the camera sees, you turn yourself toward where you are going,
@@ -1521,11 +1826,12 @@ addEventListener('pointermove',e=>{if(e.pointerId!==sId)return;
 function stickEnd(e){if(e.pointerId!==sId)return;sId=null;mvX=mvZ=0;knob.style.display='none';knob.querySelector('i').style.transform=''}
 addEventListener('pointerup',stickEnd);addEventListener('pointercancel',stickEnd);
 $('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jumpQ=true});
+let RUNNING=false;$('#sprint').addEventListener('pointerdown',e=>{e.preventDefault();RUNNING=!RUNNING;$('#sprint').classList.toggle('on',RUNNING)});
 
 /* look: drag anywhere off the stick on a phone, drag with any mouse button on a desktop, the wheel zooms. A press that does not move is a tap. */
 let lookDX=0,lookDY=0,lId=null,lx0=0,ly0=0,dragged=0,lookAt=0;
 const cvs=renderer.domElement;
-cvs.addEventListener('pointerdown',e=>{lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;dragged=0});
+cvs.addEventListener('pointerdown',e=>{lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;dragged=0;$('#menu').classList.remove('on')});
 addEventListener('pointermove',e=>{if(e.pointerId!==lId)return;const dx=e.clientX-lx0,dy=e.clientY-ly0;lx0=e.clientX;ly0=e.clientY;dragged+=Math.abs(dx)+Math.abs(dy);if(dragged<6)return;lookDX+=dx;lookDY+=dy;lookAt=performance.now()});
 function lookEnd(e){if(e.pointerId===lId)lId=null}
 addEventListener('pointerup',lookEnd);addEventListener('pointercancel',lookEnd);
@@ -1565,10 +1871,10 @@ $('#hint').textContent=COARSE?'Drag left to walk \u00B7 drag right to look \u00B
 
 const keys={};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
-  if(k==='escape'){closeStore();$('#forms').classList.remove('on');return}
+  if(k==='escape'){closeStore();closeSack();$('#menu').classList.remove('on');$('#forms').classList.remove('on');return}
   if($('#forms').classList.contains('on'))return;
   if(STORE_ON)return;
-  if(k==='e'&&!e.repeat){act();return}if(k==='q'&&!e.repeat){cycleSeed();return}
+  if(k==='e'&&!e.repeat){act();return}if(k==='q'&&!e.repeat){cycleSeed();return}if(/^[1-4]$/.test(k)&&!e.repeat){setTool(['hand','can','rocket','launcher'][+k-1]);return}
   if(k===' '&&!keys[' ']&&!e.repeat)jumpQ=true;keys[k]=1;if(/^arrow| $/.test(k))e.preventDefault()});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
 addEventListener('blur',()=>{for(const k in keys)keys[k]=0});
@@ -1589,7 +1895,7 @@ function applyPhase(){const p=PH[ph];
   shadowMats.forEach(m=>m.opacity=Math.max(0.3,0.92-p.lamp*0.4));
   ffMat.opacity=p.lamp>=1.2?0.95:p.lamp>0.5?0.4:0;
   CLOUDS.forEach(c=>{c.s.material.color.set(p.cloud);c.s.material.opacity=ph==='night'?0.5:0.9});
-  MAT.water.color.set(ph==='night'?0x16324a:ph==='dusk'?0x35507c:0x2c7e98);
+  MAT.water.color.set(ph==='night'?0x16324a:ph==='dusk'?0x35507c:0x2c7e98);springLight.intensity=SPRUNG?0.3+p.lamp*0.9:0;
   $('#phase').textContent=ph.charAt(0).toUpperCase()+ph.slice(1);
 }
 $('#phase').onclick=()=>{ph=ORDER[(ORDER.indexOf(ph)+1)%ORDER.length];applyPhase()};
@@ -1627,7 +1933,7 @@ function loop(now){
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
   if(keys['a']||keys['arrowleft'])ix-=1;if(keys['d']||keys['arrowright'])ix+=1;
-  const run=keys['shift']?RUN:SPEED;let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
+  const run=(keys['shift']||RUNNING)?RUN:SPEED;let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
   const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
   const wantX=(iz*fx+ix*fz)*run,wantZ=(iz*fz-ix*fx)*run;
   const k=mag>0.02?ACC:DRAG;
@@ -1667,7 +1973,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);tickWorld(t,dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -1699,10 +2005,10 @@ function loop(now){
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,OAKG,ROCKETS,BUILDER,patch46:()=>PATCH46,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
 
 applyPhase();
-you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();springMesh.visible=!!(S.fountain&&S.fountain.sprung);renderHud();labels();updateAct();
+you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
 if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. The market is behind you, on your right.'),1400)}
 $('#lbar').style.width='100%';$('#lmsg').textContent='Walk in';
 requestAnimationFrame(loop);
