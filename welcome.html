@@ -197,7 +197,7 @@ h1 i{font-style:normal; color:var(--gold)}
       </div>
       <div class="herofoot">
         <b>deeds.fun</b>
-        <span id="foot">TILT THE SKY</span>
+        <span id="foot">SIGNED BY NO ONE</span>
       </div>
     </div>
   </div>
@@ -302,7 +302,7 @@ h1 i{font-style:normal; color:var(--gold)}
   });
   if (wide()) document.getElementById("foot").textContent = "SIGNED BY NO ONE";
   window.addEventListener("resize", function(){
-    document.getElementById("foot").textContent = wide() ? "SIGNED BY NO ONE" : "TILT THE SKY";
+    document.getElementById("foot").textContent = "SIGNED BY NO ONE";
   });
 
   /* ---------- the join sheet ---------- */
@@ -538,7 +538,7 @@ h1 i{font-style:normal; color:var(--gold)}
     }
   }
 
-  /* ---------- motion: pointer or tilt, plus ambient drift; scroll owns touch ---------- */
+  /* ---------- motion: pointer plus ambient drift, no device sensors; scroll owns touch ---------- */
   var L = {
     sky:  {el: document.getElementById("lSky"),  d: 5},
     moon: {el: document.getElementById("lMoon"), d: 8},
@@ -551,22 +551,7 @@ h1 i{font-style:normal; color:var(--gold)}
     tx = clamp((e.clientX/window.innerWidth  - 0.5) * 2);
     ty = clamp((e.clientY/window.innerHeight - 0.5) * 2);
   }, {passive:true});
-  var hero = document.getElementById("hero");
-  hero.addEventListener("touchend", function(){
-    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function"){
-      DeviceOrientationEvent.requestPermission().then(function(r){
-        if (r === "granted") window.addEventListener("deviceorientation", tilt);
-      }).catch(function(){});
-    }
-  }, {passive:true, once:true});
-  if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== "function"){
-    window.addEventListener("deviceorientation", tilt);
-  }
-  function tilt(e){
-    if (e.gamma == null) return;
-    tx = clamp(e.gamma/12);
-    ty = clamp((e.beta - 45)/12);
-  }
+  /* tilt and its motion permission prompt removed (4.1.1): the sky moves by pointer and ambient drift alone */
 
   var last = 0;
   function frame(t){
