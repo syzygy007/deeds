@@ -1356,6 +1356,37 @@ body.gsky-on .tab.on{color:var(--ivory)}
 .biblecov{display:flex;align-items:center;gap:18px}
 .biblecov .lb{width:104px}
 .biblecov .bc-txt{flex:1 1 auto;min-width:0}
+/* ---- handwriting: deeds as notes on torn paper ---- */
+@font-face{font-family:"HW Caveat";font-style:normal;font-weight:400;font-display:swap;src:url(hand-caveat.woff2) format("woff2")}
+@font-face{font-family:"HW Kalam";font-style:normal;font-weight:400;font-display:swap;src:url(hand-kalam.woff2) format("woff2")}
+@font-face{font-family:"HW Patrick";font-style:normal;font-weight:400;font-display:swap;src:url(hand-patrick.woff2) format("woff2")}
+@font-face{font-family:"HW Shadows";font-style:normal;font-weight:400;font-display:swap;src:url(hand-shadows.woff2) format("woff2")}
+@font-face{font-family:"HW Nothing";font-style:normal;font-weight:400;font-display:swap;src:url(hand-nothing.woff2) format("woff2")}
+@font-face{font-family:"HW Reenie";font-style:normal;font-weight:400;font-display:swap;src:url(hand-reenie.woff2) format("woff2")}
+@font-face{font-family:"HW Grace";font-style:normal;font-weight:400;font-display:swap;src:url(hand-grace.woff2) format("woff2")}
+@font-face{font-family:"HW Gloria";font-style:normal;font-weight:400;font-display:swap;src:url(hand-gloria.woff2) format("woff2")}
+@font-face{font-family:"HW Indie";font-style:normal;font-weight:400;font-display:swap;src:url(hand-indie.woff2) format("woff2")}
+@font-face{font-family:"HW Sunrise";font-style:normal;font-weight:400;font-display:swap;src:url(hand-sunrise.woff2) format("woff2")}
+.hwlab{color:var(--forest);font-size:10px;letter-spacing:.14em;font-weight:800;margin:0 0 10px}
+.hwpaper{position:relative;z-index:0;border:24px solid transparent;border-image:url(paper-deckle.webp) 96 round;background:#FBF9F3 url(paper-grain.webp);background-clip:padding-box;color:#1B1712}
+.hwpaper::before,.hwpaper::after{content:"";position:absolute;left:-13px;right:-13px;pointer-events:none;z-index:-1;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.hwpaper::before{top:56%;height:1px;background:rgba(255,255,255,.75)}
+.hwpaper::after{top:calc(56% + 1px);height:9px;background:linear-gradient(rgba(64,50,26,.12),rgba(64,50,26,0))}
+.hwnote{margin:2px -10px 4px;padding:2px 8px 4px;max-width:664px}
+.hwnote .hwin{min-height:24px}
+.hwsvg{display:block;width:100%;height:auto;overflow:visible}
+.hwsvg text{white-space:pre;user-select:text;-webkit-user-select:text;cursor:text}
+.hw-plain .hwsvg g{filter:none!important}
+.hwp{margin:0;white-space:pre-wrap;overflow-wrap:break-word;padding:2px 2px 0}
+.hwph{display:block;opacity:.76;font-size:.86em;line-height:1.15;margin-bottom:.45em}
+.hwmore{display:block;margin:2px 0 0;padding:0;border:0;background:none;color:var(--forest);font-size:10px;letter-spacing:.14em;font-weight:800;cursor:pointer}
+#hwc{position:relative}
+#logsheet.hwd #hwc{margin:2px -10px 0;padding:0 6px 2px}
+.hwc-head{display:none}
+#logsheet.hwd .hwc-head{display:flex;justify-content:space-between;gap:12px;color:rgba(27,23,18,.76);padding:2px 4px 0;line-height:1.2}
+#logsheet.hwd #logtext{border:0;background:none;color:#1B1712;padding:6px 4px 8px;min-height:124px}
+#logsheet.hwd #logtext::placeholder{color:rgba(27,23,18,.36)}
+#logsheet.inv #hwc{display:none!important}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -3014,12 +3045,17 @@ return '<svg viewBox="0 0 48 48" width="'+px+'" height="'+px+'" aria-hidden="tru
 function saveBlk(){safeSet('deeds_blk',JSON.stringify(BLK))}
 
 /* ---- names cache (separate profiles lookup, never an embedded join) ---- */
-function fetchNames(rows){var need={};(rows||[]).forEach(function(r){var id=r&&r.profile_id;if(id&&!NAMES[id])need[id]=1});
+var HWNOHAND=false;
+function fetchNames(rows){var need={};(rows||[]).forEach(function(r){var id=r&&r.profile_id;if(id&&(!NAMES[id]||(NAMES[id].hand===undefined&&/^[0-9a-f-]{36}$/i.test(id))))need[id]=1});
 var ids=Object.keys(need);if(!ids.length||!sb)return Promise.resolve();
-return sb.from('profiles').select('id,handle,member_type,member_type_verified_at').in('id',ids).then(function(r){
-if(r.error){return sb.from('profiles').select('id,handle').in('id',ids).then(function(r2){
-(r2.data||[]).forEach(function(p){NAMES[p.id]={handle:p.handle,type:'doer',v:false}})}).catch(function(){})}
-(r.data||[]).forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at}})}).catch(function(){})}
+function keep(list){(list||[]).forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at,hand:p.hand||''}})}
+function bare(){return sb.from('profiles').select('id,handle').in('id',ids).then(function(r2){
+(r2.data||[]).forEach(function(p){NAMES[p.id]={handle:p.handle,type:'doer',v:false,hand:''}})}).catch(function(){})}
+var cols='id,handle,member_type,member_type_verified_at'+(HWNOHAND?'':',hand');
+return sb.from('profiles').select(cols).in('id',ids).then(function(r){
+if(r.error&&!HWNOHAND&&/hand/i.test(r.error.message||'')){HWNOHAND=true;return sb.from('profiles').select('id,handle,member_type,member_type_verified_at').in('id',ids).then(function(r3){if(r3.error)return bare();keep(r3.data)}).catch(function(){})}
+if(r.error)return bare();
+keep(r.data)}).catch(function(){})}
 
 /* ---- live post card: real content, escaped, Share plus report or block ---- */
 var CHAINSVG='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"/><path d="M7.5 11 5 13.5a3.5 3.5 0 0 0 5 5L12.5 16"/><path d="M16.5 13 19 10.5a3.5 3.5 0 0 0-5-5L11.5 8"/></svg>';
@@ -3033,7 +3069,7 @@ var mine=PROFILE&&r.profile_id===PROFILE.id;
 if(r.mod_status&&r.mod_status!=='live'&&!mine)return'';
 var isPost=r._k==='post';
 var body=isPost?(r.body||''):(r.story||r.title||'');
-var h='<article class="post" data-lid="'+esc(r.id)+'">';
+var h='<article class="post'+(isPost?'':' deedrow')+'" data-lid="'+esc(r.id)+'">'+(isPost?'':'<div class="hwlab">A DEED.</div>');
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
 h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+((!isPost&&r.origin_id)?'<span class="chip pk">REDEED</span>':'')+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+(r.mod_status==='hold'?'<span class="privchip">IN REVIEW</span>':(r.mod_status==='removed'?'<span class="privchip">REMOVED</span>':''))+'</div>';
 h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
@@ -3074,6 +3110,7 @@ var real=xOthers();if(real.length)real.slice(0,6).forEach(function(p){h+=realMee
 var EXNAMES={'exp-harbor':{handle:'HarborLight077',type:'nurse',v:false},'exp-ivy':{handle:'IvyGate303',type:'coach',v:false},'exp-lowtide':{handle:'LowTideRun228',type:'volunteer',v:false},'exp-goldfinch':{handle:'GoldfinchRow512',type:'deedhand',v:false},'exp-cedar':{handle:'CedarPost615',type:'neighbor',v:false},'exp-paper':{handle:'PaperCrane441',type:'student',v:false},'exp-maple':{handle:'MapleWard212',type:'teacher',v:false},'exp-slate':{handle:'SlateCreek969',type:'responder',v:false}};
 Object.keys(EXNAMES).forEach(function(k){if(!NAMES[k])NAMES[k]=EXNAMES[k]});
 function exAgo(h){return new Date(Date.now()-h*3600e3).toISOString()}
+var EXNO={'ex-01':12,'ex-05':3,'ex-07':27,'ex-09':8,'ex-12':5,'ex-14':2,'ex-16':11,'ex-18':1};
 var EXPOSTS=[
 {id:'ex-01',_k:'deed',profile_id:'exp-paper',story:'Where I go to call my dad. Same spot every Sunday, before the light goes.',media_path:'/ex-cliff.jpg',media_kind:'image',media_w:960,media_h:1200,h:2},
 {id:'ex-02',_k:'post',profile_id:'exp-ivy',body:'You found it. Now go be somebody\u2019s good day.',presentation_type:'golden_egg',egg_filling:'treat',egg_treat_style:'chocolate',h:3},
@@ -3093,7 +3130,7 @@ var EXPOSTS=[
 {id:'ex-16',_k:'deed',profile_id:'exp-paper',story:'Paid for the groceries of the person behind me. She had exact change ready and a kid on her hip.',origin_id:'ex-00',h:28},
 {id:'ex-17',_k:'post',profile_id:'exp-cedar',body:'Nobody knows which neighbor shovels the three driveways. Keep it that way.',h:31},
 {id:'ex-18',_k:'deed',profile_id:'exp-slate',story:'Off shift. Changed a tire for a stranger in the rain. He tried to pay me. I told him to get someone else\u2019s tire.',h:34}
-].map(function(r){r._ex=true;r.created_at=exAgo(r.h);return r});
+].map(function(r){r._ex=true;r.created_at=exAgo(r.h);if(r._k==='deed'&&EXNO[r.id])r.deed_no=EXNO[r.id];return r});
 function exLiveHTML(r){var t=document.createElement('div');t.innerHTML=livePostHTML(r);var a=t.firstChild;if(!a)return'';
 a.classList.add('expost');a.classList.add('exlive');
 var hd=a.querySelector('.p-handle');if(hd){var c=document.createElement('span');c.className='chip ex';c.textContent='EXAMPLE';hd.appendChild(c)}
@@ -3740,7 +3777,7 @@ closeSheets();
 if(PROFILE&&hd===PROFILE.handle){go('profile');return}
 sb.from('profiles').select('*').eq('handle',hd).maybeSingle().then(function(r){
 if(r.error||!r.data){toast('That member could not load.');return}
-var p=r.data;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id;
+var p=r.data;NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at,hand:p.hand||''};IDBY[p.handle]=p.id;
 var dq=sb.from('deeds').select('*').eq('profile_id',p.id).eq('is_private',false).order('created_at',{ascending:false}).limit(30);
 var pq=sb.from('posts').select('*').eq('profile_id',p.id).order('created_at',{ascending:false}).limit(30);
 Promise.all([dq,pq,countFollows(p.id),sb.from('deeds').select('id',{count:'exact',head:true}).eq('profile_id',p.id).eq('is_private',false)]).then(function(res){
@@ -4003,7 +4040,7 @@ if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.me
 sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
 if(r.error){toast('Could not log it: '+r.error.message);return}
-if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id});
+if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id,no:(r.data.deed_no||0)});
 if(DAILYLOG){DAILYN++;DAILYLOG=0;var _ld=$('#logdaily');if(_ld)_ld.style.display='none'}
 if(chainParentLive){chainParentLive=null;chainLinkLive=0;var _lc=$('#logchain');if(_lc)_lc.style.display='none'}
 if(CAMPLOG){CAMPLOG=null;CAMPTITLE='';var _lp=$('#logcamp');if(_lp)_lp.style.display='none'}
@@ -4181,7 +4218,7 @@ if(!r.data){if(tries<4){setTimeout(function(){loadProfile(tries+1)},900)}
 else authProblem('Your profile was not created in time. Sign in once more and it will be there.');return}
 PROFILE=r.data;applyProfile()}).catch(function(){})}
 function loadMyDeeds(cb){sb.from('deeds').select('*').eq('profile_id',PROFILE.id).order('created_at',{ascending:true}).then(function(r){
-if(!r.error)my.deeds=(r.data||[]).map(function(d){return{body:d.story||d.title||'',when:whenStr(d),priv:!!d.is_private,dbid:d.id}});
+if(!r.error)my.deeds=(r.data||[]).map(function(d){return{body:d.story||d.title||'',when:whenStr(d),priv:!!d.is_private,dbid:d.id,no:d.deed_no||0}});
 cb&&cb()}).catch(function(){cb&&cb()})}
 /* ---- the invite line: claim once, then show the reach ---- */
 function clearChallenger(){try{localStorage.removeItem('deeds_challenger')}catch(e){}}
@@ -4855,7 +4892,7 @@ return h+'</div>'}
 function loadPeople(){if(!sb)return;
 sb.from('profiles').select('id,handle,member_type,member_type_verified_at,created_at').order('created_at',{ascending:false}).limit(48).then(function(r){
 if(r.error||!r.data)return;XPEOPLE=r.data.filter(function(p){return p&&p.handle});
-XPEOPLE.forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at};IDBY[p.handle]=p.id});
+XPEOPLE.forEach(function(p){NAMES[p.id]={handle:p.handle,type:p.member_type||'doer',v:!!p.member_type_verified_at,hand:NAMES[p.id]?NAMES[p.id].hand:undefined};IDBY[p.handle]=p.id});
 paintRealPeople()},function(){})}
 function paintRail(){var rm=$('#rMeet');if(!rm)return;var real=xOthers();if(!real.length)return;var h='';
 real.slice(0,3).forEach(function(p){var nm=NAMES[p.id],f=MYFOLL[p.id];h+='<div class="rmeet"><div data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,42,{verified:nm.v})+'</div><div class="in"><div class="mono" data-lmember="'+esc(nm.handle)+'" style="cursor:pointer">'+esc(nm.handle)+'</div>'+DeedsTypes.chip(nm.type,nm.v)+'</div><button class="fbtn'+(f?' on':'')+'" data-follow="'+esc(nm.handle)+'">'+(f?'Following':'Follow')+'</button></div>'});
@@ -5413,8 +5450,115 @@ var EGGART={treat_candy:'egg-treat-candy.webp',treat_chocolate:'egg-treat-chocol
 function presEggArtSrc(r){if(r.egg_filling==='treat')return r.egg_treat_style==='chocolate'?EGGART.treat_chocolate:EGGART.treat_candy;return EGGART[r.egg_filling]||EGGART.surprise}
 var EGGARTLOADED={};function preloadEggArt(r){var src=(r.egg_filling==='photo'&&r.media_path&&(!r.media_status||r.media_status==='live'))?mediaURL(r.media_path):presEggArtSrc(r);if(EGGARTLOADED[src])return;EGGARTLOADED[src]=1;var i=new Image();i.src=src}
 function presPick(a){return a[Math.floor(Math.random()*a.length)]}
+/* ---- HANDWRITING: a deed posts as a note in the member's hand, real text on torn paper (Aug 30) ---- */
+var HWFONTS={
+caveat:{fam:'HW Caveat',size:28,lh:36,feat:'"calt","salt"'},
+kalam:{fam:'HW Kalam',size:23,lh:34},
+patrick:{fam:'HW Patrick',size:25,lh:35},
+shadows:{fam:'HW Shadows',size:22,lh:34},
+nothing:{fam:'HW Nothing',size:28,lh:38},
+reenie:{fam:'HW Reenie',size:26,lh:33},
+grace:{fam:'HW Grace',size:24,lh:34},
+gloria:{fam:'HW Gloria',size:22,lh:34},
+indie:{fam:'HW Indie',size:24,lh:36},
+sunrise:{fam:'HW Sunrise',size:26,lh:32}};
+var HWKEYS=Object.keys(HWFONTS),HWCAP=9,HWINK='#1B1712',HWOPEN={},HWREADY={},HWQ={},HWCV=null,HWRAF=0,HWRT=0;
+var HWMON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function hwHash(s){s=String(s||'');var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function hwHandOf(nm){var k=nm&&nm.hand;if(k&&HWFONTS[k])return k;return HWKEYS[hwHash((nm&&nm.handle)||'')%HWKEYS.length]}
+function hwRng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
+function hwDate(r){var s=r&&(r.done_on||r.created_at);if(!s)return'';s=String(s);var m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/),d;
+if(m)d={y:+m[1],mo:+m[2]-1,d:+m[3]};else{var dt=new Date(s);if(isNaN(dt.getTime()))return'';d={y:dt.getFullYear(),mo:dt.getMonth(),d:dt.getDate()}}
+return HWMON[d.mo]+' '+d.d+', '+d.y}
+function hwFont(k,sz){return (sz||HWFONTS[k].size)+'px "'+HWFONTS[k].fam+'"'}
+function hwEnsure(k,cb){if(HWREADY[k]){cb();return}
+if(HWQ[k]){HWQ[k].push(cb);return}HWQ[k]=[cb];
+function done(){if(HWREADY[k])return;HWREADY[k]=1;hwWarm(k);var q=HWQ[k]||[];HWQ[k]=null;q.forEach(function(f){try{f()}catch(e){}})}
+var p=null;try{if(document.fonts&&document.fonts.load)p=document.fonts.load(hwFont(k))}catch(e){p=null}
+if(!p){setTimeout(done,900);return}
+var t=setTimeout(done,6000);p.then(function(){clearTimeout(t);done()},function(){clearTimeout(t);done()})}
+/* keep every loaded hand in use on the page, so canvas measures with the real face (Safari) */
+function hwWarm(k){try{var w=document.getElementById('hwwarm');if(!w)return;var sp=document.createElement('span');sp.style.fontFamily='"'+HWFONTS[k].fam+'"';sp.textContent='Aa';w.appendChild(sp)}catch(e){}}
+function hwCtx(){if(!HWCV)HWCV=document.createElement('canvas');return HWCV.getContext('2d')}
+/* wrap real words to the paper width, measured in the hand itself */
+function hwWrap(text,k,W){var ctx=hwCtx();ctx.font=hwFont(k);var sp=ctx.measureText(' ').width,lines=[];W=Math.max(40,W);
+function mw(s){return ctx.measureText(s).width*1.035}
+String(text||'').replace(/\r/g,'').split('\n').forEach(function(p){var words=p.split(/[ \t]+/).filter(Boolean);if(!words.length){lines.push({w:[],blank:true});return}
+var cur=[],cw=0;
+function push(w,ww){if(cur.length&&cw+sp+ww>W){lines.push({w:cur});cur=[w];cw=ww}else{cw=cur.length?cw+sp+ww:ww;cur.push(w)}}
+words.forEach(function(w){var ww=mw(w);if(ww<=W){push(w,ww);return}
+var seg='';for(var i=0;i<w.length;i++){var t=seg+w.charAt(i);if(mw(t)>W&&seg){push(seg,mw(seg));seg=w.charAt(i)}else seg=t}if(seg)push(seg,mw(seg))});
+lines.push({w:cur})});
+return lines}
+/* one written line: per glyph baseline wander, tilt and spacing; per word pressure and size */
+function hwLine(words,x,y,size,rnd,anchor,op){
+var A1=size*.03,A2=size*.016,P1=8+rnd()*8,P2=2.8+rnd()*2.6,ph1=rnd()*6.283,ph2=rnd()*6.283,R=1.6+rnd()*1.4,P3=4+rnd()*6,ph3=rnd()*6.283;
+var tilt=((rnd()-.5)*1.2).toFixed(2);
+var s='<text x="'+x+'" y="'+y+'" font-size="'+size+'" text-anchor="'+anchor+'" xml:space="preserve" transform="rotate('+tilt+' '+x+' '+y+')">';
+var i=0,prev=0;
+words.forEach(function(w,wi){var txt=w+(wi<words.length-1?' ':''),dx=[],dy=[],rot=[];
+for(var c=0;c<txt.length;c++,i++){var yy=A1*Math.sin(6.283*i/P1+ph1)+A2*Math.sin(6.283*i/P2+ph2)+(rnd()-.5)*size*.016;
+dy.push((yy-prev).toFixed(2));prev=yy;
+dx.push(((rnd()-.5)*size*.028+(txt.charAt(c)===' '?(rnd()-.4)*size*.07:0)).toFixed(2));
+rot.push((R*Math.sin(6.283*i/P3+ph3)+(rnd()-.5)*2.6).toFixed(1))}
+var pr=(.84+rnd()*.16)*op,sz=1+(rnd()-.5)*.05;
+s+='<tspan fill-opacity="'+pr.toFixed(2)+'"'+(Math.abs(sz-1)>.012?' font-size="'+(size*sz).toFixed(1)+'"':'')+' dx="'+dx.join(' ')+'" dy="'+dy.join(' ')+'" rotate="'+rot.join(' ')+'">'+esc(txt)+'</tspan>'});
+return s+'</text>'}
+/* the whole note as one svg: heading in the same hand, then the words */
+function hwSVG(o){var f=HWFONTS[o.k],rnd=hwRng(hwHash(o.id)),size=f.size,lh=f.lh,hs=Math.round(size*.86),W=Math.round(o.W);
+var lines=hwWrap(o.text,o.k,W-6);
+var fold=!o.open&&lines.length>HWCAP+1,shown=fold?lines.slice(0,HWCAP):lines;
+var head=!!(o.no||o.date),yH=head?Math.round(hs*.92):0,yB=head?yH+Math.round(lh*1.02):Math.round(size*.86);
+var H=yB+(shown.length-1)*lh+Math.round(size*.46);
+var s='<svg class="hwsvg" xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="font-family:\''+f.fam+'\',cursive'+(f.feat?';font-feature-settings:'+f.feat.replace(/"/g,'&quot;'):'')+'"><g fill="'+HWINK+'" filter="url(#hwink)">';
+if(head){if(o.no)s+=hwLine(['Deed','#'+o.no],2,yH,hs,rnd,'start',.78);if(o.date)s+=hwLine(o.date.split(' '),W-2,yH,hs,rnd,'end',.78)}
+shown.forEach(function(ln,i){if(ln.blank||!ln.w.length)return;s+=hwLine(ln.w,2,yB+i*lh,size,rnd,'start',1)});
+s+='</g></svg>';return{svg:s,fold:fold,h:H}}
+/* width the note will get in the feed column, so a loaded hand draws in one pass with no swap */
+function hwGuessW(){var d=document.querySelector('.hwnote.hw-drawn[data-w]');if(d)return +d.getAttribute('data-w')||0;
+var fe=document.getElementById('feed');if(!fe||!fe.clientWidth)return 0;var pad=window.innerWidth>=1080?64:36;return fe.clientWidth-pad+20-48-16}
+function hwNoteHTML(r,body,nm){var k=hwHandOf(nm),f=HWFONTS[k],no=+(r.deed_no||0)||0,dt=hwDate(r),W=hwGuessW(),d=null;
+if(HWREADY[k]&&W>=60){try{d=hwSVG({id:r.id,k:k,text:body,no:no,date:dt,W:W,open:!!HWOPEN[r.id]})}catch(e){d=null}}
+var inner=d?d.svg:('<p class="hwp" style="font:'+f.size+'px/'+f.lh+'px \''+f.fam+'\',cursive">'+(dt?'<span class="hwph">'+(no?'Deed #'+no+'  ':'')+esc(dt)+'</span>':'')+esc(body)+'</p>');
+return '<div class="hwnote hwpaper'+(d?' hw-drawn':'')+'" data-hw="'+esc(r.id)+'" data-hand="'+k+'" data-no="'+no+'" data-date="'+esc(dt)+'" data-body="'+esc(body)+'"'+(d?' data-w="'+W+'"':'')+'><div class="hwin">'+inner+'</div><button class="hwmore" type="button"'+((d&&d.fold)?'':' style="display:none"')+'>Unfold It.</button></div>'}
+function hwDrawEl(el){var W=el.clientWidth-16;if(W<60)return;if(el.classList.contains('hw-drawn')&&Math.abs(W-(+el.getAttribute('data-w')||0))<3)return;
+var k=el.getAttribute('data-hand');if(!HWFONTS[k])k=HWKEYS[0];el.setAttribute('data-w',W);
+hwEnsure(k,function(){if(!el.isConnected)return;var W2=el.clientWidth-16;if(W2<60)return;var id=el.getAttribute('data-hw');
+var d=hwSVG({id:id,k:k,text:el.getAttribute('data-body')||'',no:+el.getAttribute('data-no')||0,date:el.getAttribute('data-date')||'',W:W2,open:!!HWOPEN[id]});
+var box=el.querySelector('.hwin');if(box)box.innerHTML=d.svg;el.setAttribute('data-w',W2);el.classList.add('hw-drawn');
+var mb=el.querySelector('.hwmore');if(mb)mb.style.display=d.fold?'':'none'})}
+function hwPaint(){var els=document.querySelectorAll('.hwnote');for(var i=0;i<els.length;i++)hwDrawEl(els[i])}
+function hwSched(){if(HWRAF)return;HWRAF=requestAnimationFrame(function(){HWRAF=0;hwPaint()})}
+(function(){if(document.getElementById('hwink'))return;var d=document.createElement('div');d.id='hwwarm';d.style.cssText='position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden';d.setAttribute('aria-hidden','true');
+try{if(localStorage.getItem('deeds_hwplain')==='1')document.documentElement.classList.add('hw-plain')}catch(e){}
+d.innerHTML='<svg width="0" height="0" focusable="false"><defs><filter id="hwink" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="1.05" numOctaves="1" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation=".16" result="b"/><feComponentTransfer in="b"><feFuncA type="table" tableValues="0 .42 .96 1"/></feComponentTransfer></filter></defs></svg>';
+document.body.appendChild(d);
+try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].addedNodes&&ms[i].addedNodes.length){hwSched();return}}}).observe(document.body,{childList:true,subtree:true})}catch(e){}
+window.addEventListener('resize',function(){clearTimeout(HWRT);HWRT=setTimeout(hwPaint,180)});
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.hwmore'):null;if(!b)return;e.preventDefault();var n=b.closest('.hwnote');if(!n)return;
+HWOPEN[n.getAttribute('data-hw')]=1;n.classList.remove('hw-drawn');hwDrawEl(n)});
+var _hwGo=window.go;if(typeof _hwGo==='function')window.go=function(){var r=_hwGo.apply(this,arguments);hwSched();return r}})();
+/* ---- the composer types on the same paper, in your own hand ---- */
+(function(){var ta=$('#logtext');if(!ta||$('#hwc'))return;var w=document.createElement('div');w.id='hwc';
+w.innerHTML='<div class="hwc-head" id="hwcHead"><span id="hwcNo"></span><span id="hwcDate"></span></div>';
+ta.parentNode.insertBefore(w,ta);w.appendChild(ta)})();
+function hwMyHand(){var P=window.PROFILE;var nm=(P&&P.handle)?{handle:P.handle,hand:P.hand}:{handle:(typeof my!=='undefined'&&my&&my.handle)||''};return hwHandOf(nm)}
+function hwNextNo(){var mx=0,n=0;try{(my.deeds||[]).forEach(function(d){n++;var v=+(d.no||0);if(v>mx)mx=v})}catch(e){}if(!n)return 1;return mx?mx+1:0}
+function hwComposerPaint(){var ls=$('#logsheet'),w=$('#hwc'),ta=$('#logtext'),hd=$('#hwcHead');if(!ls||!w)return;var on=composeMode==='deed';
+ls.classList.toggle('hwd',on);w.classList.toggle('hwpaper',on);
+if(!on){if(ta){ta.style.font='';ta.style.fontFeatureSettings=''}if(hd){hd.style.fontFamily='';hd.style.fontSize=''}return}
+var k=hwMyHand(),f=HWFONTS[k];hwEnsure(k,function(){});
+if(ta){ta.style.font=f.size+'px/'+f.lh+'px "'+f.fam+'",cursive';ta.style.fontFeatureSettings=f.feat||''}
+if(hd){hd.style.fontFamily='"'+f.fam+'",cursive';hd.style.fontSize=Math.round(f.size*.86)+'px'}
+var no=hwNextNo(),en=$('#hwcNo');if(en)en.textContent=no?'Deed #'+no:'';
+var chip=$('#logdates .lchip.on'),t=chip?chip.textContent:'Today.',d=new Date();
+if(t.indexOf('Yesterday')===0)d.setDate(d.getDate()-1);else if(t.indexOf('Earlier')===0)d=new Date(d.getFullYear(),d.getMonth(),1);
+var ed=$('#hwcDate');if(ed)ed.textContent=HWMON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()}
+var hwBaseSwitch=switchMode;switchMode=function(m){hwBaseSwitch(m);try{hwComposerPaint()}catch(e){}};
+(function(){var ld=$('#logdates');if(ld)ld.addEventListener('click',function(){setTimeout(hwComposerPaint,0)})})();
 /* ---- feed card bodies ---- */
 function presBodyHTML(r,body,mine,nm){
+if(r._k!=='post')return hwNoteHTML(r,body,nm);
 if(r._k!=='post'||!r.presentation_type||r.presentation_type==='standard'||r.presentation_type==='photo')return '<p class="p-body">'+esc(body)+'</p>';
 if(r.presentation_type==='golden_egg'){preloadEgg(presCont(r));
 if(EGGSEEN[r.id])return presEggOpenHTML(r,body,mine);
