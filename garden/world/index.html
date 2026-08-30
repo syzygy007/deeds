@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="3.0">
+<meta name="world-build" content="3.0.1">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -710,16 +710,20 @@ const FLORA={};
  /* three zinc buckets along the counter, the cut flowers stand in them (billboards, placed below); none in front of her */
  [-1.25,-0.55,1.25].forEach(z=>gm(new THREE.CylinderGeometry(0.17,0.14,0.32,14),MAT.zinc,-1.15,1.14,z));
  gm(new THREE.BoxGeometry(0.4,0.22,0.5),MAT.wood,-1.05,1.09,0.55);
- /* the Florist: tall and slim, an ivory linen dress to mid calf, a forest sash, a wide straw hat with a mulberry ribbon, hair in a low bun. face toward the counter (local -x). */
+ /* the Florist: a curvy figure in simple geometry, tight white trousers and a fitted white shirt, a forest belt, a wide straw hat with a mulberry ribbon, hair in a low bun.
+    Face toward the counter (local -x). The body is two lathes, elliptical in plan (scale.x 0.85, front to back is local x), so the curve reads from the front. */
  const K=new THREE.Group();K.position.set(0.18,0,0.2);K.scale.set(1.04,1.07,1.04);K.rotation.z=0.03;G.add(K);FLORA.g=K;   /* a touch taller, weight on one hip */
  const skin=new THREE.MeshStandardMaterial({color:0xD9B091,roughness:0.85}),linen=new THREE.MeshStandardMaterial({color:0xEFE4CC,roughness:0.9}),sash=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.9}),
    shoe=new THREE.MeshStandardMaterial({color:0x6B4A36,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x4A2E1E,roughness:0.9}),straw=new THREE.MeshStandardMaterial({color:0xD8B86A,roughness:0.95}),
    ribbon=new THREE.MeshStandardMaterial({color:0x6E3A48,roughness:0.7}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6}),lip=new THREE.MeshStandardMaterial({color:0xB8656C,roughness:0.7}),steel=new THREE.MeshStandardMaterial({color:0xC8CCD0,roughness:0.35,metalness:0.8});
  const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||K).add(o);return o};
- [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.045,0.05,0.34,10),skin,0,0.19,s*0.07);km(new THREE.BoxGeometry(0.22,0.06,0.1),shoe,-0.03,0.03,s*0.07)});
- km(new THREE.CylinderGeometry(0.15,0.36,0.74,24),linen,0,0.71,0);          /* the skirt, an A line */
- km(new THREE.CylinderGeometry(0.155,0.128,0.5,18),linen,0,1.31,0);        /* the bodice, wider at the shoulder than the waist */
- km(new THREE.CylinderGeometry(0.14,0.15,0.08,18),sash,0,1.07,0);          /* the sash, at the waist */
+ const white=new THREE.MeshStandardMaterial({color:0xF5F2EC,roughness:0.82});
+ const lathe=(pts,m)=>{const o=km(new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),28),m,0,0,0);o.scale.x=0.85;return o};
+ /* the legs: thighs up into the hips, calves to the ankle, low brown shoes */
+ [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.09,0.066,0.46,12),white,0,0.66,s*0.09);km(new THREE.CylinderGeometry(0.064,0.044,0.42,12),white,0,0.24,s*0.09);km(new THREE.BoxGeometry(0.2,0.05,0.09),shoe,-0.03,0.025,s*0.09)});
+ lathe([[0.18,0.86],[0.215,0.94],[0.222,1.0],[0.208,1.08],[0.16,1.14],[0.14,1.17]],white);                                   /* the hips and the seat, in the trousers */
+ km(new THREE.CylinderGeometry(0.138,0.146,0.045,20),sash,0,1.18,0).scale.x=0.85;                                              /* the belt at the waist */
+ lathe([[0.13,1.19],[0.125,1.24],[0.15,1.31],[0.19,1.4],[0.182,1.46],[0.16,1.52],[0.125,1.57],[0.07,1.6]],white);          /* the shirt: waist, bust, shoulders */
  km(new THREE.CylinderGeometry(0.05,0.055,0.1,10),skin,0,1.6,0);
  const head=new THREE.Group();head.position.set(0,1.75,0);K.add(head);FLORA.head=head;
  km(new THREE.SphereGeometry(0.115,22,16),skin,0,0,0,head);
@@ -730,7 +734,7 @@ const FLORA={};
  const hat=new THREE.Group();hat.rotation.z=0.09;head.add(hat);   /* the hat sits a touch off square */
  km(new THREE.CylinderGeometry(0.42,0.42,0.014,28),straw,0,0.1,0,hat);km(new THREE.CylinderGeometry(0.135,0.15,0.13,20),straw,0,0.17,0,hat);km(new THREE.CylinderGeometry(0.152,0.152,0.03,20),ribbon,0,0.135,0,hat);
  const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.52,side*0.19);K.add(A);
-   km(new THREE.SphereGeometry(0.06,10,8),linen,0,0,0,A);km(new THREE.CylinderGeometry(0.045,0.04,0.3,10),linen,0,-0.17,0,A);
+   km(new THREE.SphereGeometry(0.06,10,8),white,0,0,0,A);km(new THREE.CylinderGeometry(0.045,0.04,0.3,10),white,0,-0.17,0,A);   /* the sleeves */
    const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.038,0.034,0.27,10),skin,0,-0.13,0,F);km(new THREE.SphereGeometry(0.045,10,8),skin,0,-0.29,0,F);A.fore=F;return A};
  FLORA.armL=arm(-1);FLORA.armR=arm(1);FLORA.armL.rotation.x=0.4;FLORA.armL.fore.rotation.x=-1.2;FLORA.armR.rotation.x=-0.3;FLORA.armR.fore.rotation.x=-0.9;
  /* the shears in her right hand */
