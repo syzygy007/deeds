@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="2.3">
+<meta name="world-build" content="3.0">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#0f1a12;font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;color:var(--ivory)}
-canvas{display:block;touch-action:none}
+canvas{display:block;touch-action:none;cursor:default}
 .micro{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;font-weight:800}
 #hud{position:fixed;inset:0;z-index:20;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;
      padding:max(14px,env(safe-area-inset-top)) 18px max(14px,env(safe-area-inset-bottom))}
@@ -19,12 +19,13 @@ canvas{display:block;touch-action:none}
      padding:8px 12px;border-radius:999px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;cursor:pointer;font-family:inherit}
 .btn.on{background:var(--ivory);color:var(--ink)}
 .dc{height:19px;width:auto;vertical-align:-5px;margin-right:5px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
-#act{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:8px;z-index:24;pointer-events:none;text-align:center}
+#act{position:fixed;left:0;top:0;display:none;flex-direction:column;align-items:center;gap:8px;z-index:24;pointer-events:none;text-align:center;will-change:transform;transform:translate(-50%,-100%);padding-bottom:16px}
+#act::after{content:"";position:absolute;left:50%;bottom:0;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--ivory);box-shadow:0 2px 8px rgba(0,0,0,.45)}
 #act.on{display:flex}
-.abtn{pointer-events:auto;background:var(--ivory);color:var(--ink);border:0;border-radius:999px;padding:12px 22px;font-weight:800;font-size:15px;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.abtn{pointer-events:auto;background:var(--ivory);color:var(--ink);border:0;border-radius:999px;padding:14px 26px;min-height:50px;font-weight:800;font-size:16px;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.35);touch-action:none;user-select:none;-webkit-user-select:none;font-family:inherit}
 .abtn.quiet{background:rgba(21,19,14,.55);color:var(--ivory);border:1px solid rgba(246,243,235,.5);font-weight:700;cursor:default;box-shadow:none}
 #actChips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
-.chip{background:rgba(21,19,14,.55);border:1px solid rgba(246,243,235,.55);color:var(--ivory);border-radius:999px;padding:6px 12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;cursor:pointer}
+.chip{background:rgba(21,19,14,.62);border:1px solid rgba(246,243,235,.55);color:var(--ivory);border-radius:999px;padding:9px 14px;min-height:36px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;font-family:inherit}
 .chip.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
 #status{position:fixed;left:50%;top:15%;transform:translateX(-50%);background:rgba(21,19,14,.86);color:var(--ivory);padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .25s;z-index:40;max-width:86vw;text-align:center;pointer-events:none}
 #status.on{opacity:1}
@@ -66,7 +67,7 @@ canvas{display:block;touch-action:none}
 #place h1 span{color:var(--gold)}
 #near{margin-top:.55em;opacity:.92;min-height:1em}
 #hint{opacity:.8;text-shadow:0 1px 12px rgba(0,0,0,.6);max-width:60vw}
-#stick{position:fixed;left:0;bottom:0;width:52%;height:58%;z-index:15;touch-action:none}
+#stick{position:fixed;left:0;bottom:0;width:46%;height:52%;z-index:15;touch-action:none}
 #knob{position:absolute;width:132px;height:132px;border-radius:50%;border:1.5px solid rgba(246,243,235,.32);
       background:rgba(21,19,14,.14);display:none;transform:translate(-50%,-50%);transition:opacity .18s}
 #knob i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;
@@ -128,7 +129,8 @@ canvas{display:block;touch-action:none}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ======================================================================
-   THE GARDEN · world 2.2 · the parterre, built; the florist, the basket, ripening beds, tap a bed to pick, openings in the quadrant hedges, the watering can
+   THE GARDEN · world 3.0 · third person: the gardener you walk as, the camera behind and above, the market row by the south gate,
+   prompts that float over what you are near and act on the press, nothing locks the mouse
    The 2D game's own plan (BEDS x QT, the parterre SVG) is turned into real
    geometry here: hedges, beds, soil, gravel, piers and the fountain are
    meshes with a collision grid, so nothing floats and nothing can trap you.
@@ -558,7 +560,8 @@ const HALF=28.9;                 /* the outer hedge's outer face */
 const lawn=mesh(new THREE.PlaneGeometry(360,360),MAT.lawn);lawn.rotation.x=-Math.PI/2;
 const gravelG=[];
 {const g=new THREE.PlaneGeometry(HALF*2,HALF*2);g.rotateX(-Math.PI/2);g.translate(0,0.012,0);gravelG.push(g);
- [[0,-(HALF+9)],[0,HALF+9]].forEach(([x,z])=>{const p=new THREE.PlaneGeometry(4.2,18);p.rotateX(-Math.PI/2);p.translate(x,0.012,z);gravelG.push(p)})}
+ [[0,-(HALF+9)],[0,HALF+9]].forEach(([x,z])=>{const p=new THREE.PlaneGeometry(4.2,18);p.rotateX(-Math.PI/2);p.translate(x,0.012,z);gravelG.push(p)});
+ {const p=new THREE.PlaneGeometry(3.0,13.4);p.rotateX(-Math.PI/2);p.translate(-3.55,0.012,38.6);gravelG.push(p)}}   /* the market apron, west of the south avenue */
 const gravelMesh=mesh(mergeGeos(gravelG),MAT.gravel);
 /* ShapeGeometry and PlaneGeometry carry uv 0..1 or metre uv; make gravel and lawn repeat in metres */
 {const fix=(m,per)=>{const a=m.geometry.attributes.position,uv=m.geometry.attributes.uv;for(let i=0;i<a.count;i++){uv.setXY(i,a.getX(i)/per*1,a.getZ(i)/per*1)}uv.needsUpdate=true};
@@ -641,12 +644,14 @@ function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0
   dropM.makeTranslation(x,y,z);dropMesh.setMatrixAt(i,dropM)}dropMesh.instanceMatrix.needsUpdate=true}
 
 /* ======================================================================
-   THE SEED STAND, at the end of the south avenue where the wood closes the way, its counter facing the garden.
-   Built in a local frame (front = local -x, width along local z) and turned to face north; the Keeper stands behind the counter.
+   THE MARKET ROW, on the lawn west of the south avenue, just outside the gate: the seed stand first, the florist beside it, a third place kept for the fish market.
+   Each stall is built in a local frame (front = local -x, width along local z) and turned by its rot to face the avenue; the seller stands behind the counter.
    ====================================================================== */
-const STAND={x:0,z:48.6,front:{x:0,z:46.3}};
+const STAND={x:-6.0,z:34.6,rot:Math.PI,front:{x:-3.5,z:34.6}};
+/* where someone stands, seen from a stall's own frame: the angle a seller turns the head by (the face is on local -x) */
+const localLook=(dx,dz,th)=>Math.atan2(Math.sin(th)*dx+Math.cos(th)*dz,-(Math.cos(th)*dx-Math.sin(th)*dz));
 const KEEPER={};
-{const G=new THREE.Group();G.position.set(STAND.x,0,STAND.z);G.rotation.y=-Math.PI/2;scene.add(G);
+{const G=new THREE.Group();G.position.set(STAND.x,0,STAND.z);G.rotation.y=STAND.rot;scene.add(G);
  const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
  [[-1.45,-1.55],[1.45,-1.55],[-1.45,1.55],[1.45,1.55]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
  gm(new THREE.BoxGeometry(0.85,0.92,3.2),MAT.wood,-1.15,0.46,0);
@@ -655,11 +660,12 @@ const KEEPER={};
  gm(new THREE.BoxGeometry(0.5,0.05,3.3),MAT.wood,1.35,1.72,0);
  const roof=gm(new THREE.BoxGeometry(3.4,0.05,3.9),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
  gm(new THREE.BoxGeometry(0.08,0.08,3.9),MAT.wood,-1.66,2.38,0);
- const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.sign);sign.position.set(-1.72,1.98,0);sign.rotation.y=-Math.PI/2;G.add(sign);
+ gm(new THREE.BoxGeometry(0.42,0.72,3.2),MAT.wood,1.35,2.06,0);   /* the back wall runs up to the roof; the sign hangs on it above the seller's head, never in front of the face */
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.sign);sign.position.set(1.13,2.12,0);sign.rotation.y=-Math.PI/2;G.add(sign);
  for(let i=0;i<3;i++)gm(new THREE.CylinderGeometry(0.15,0.11,0.22,12),MAT.clay,-1.15,1.09,-1.1+i*0.62);
  gm(new THREE.BoxGeometry(0.55,0.32,0.7),MAT.wood,-1.1,1.14,1.15);
  /* the Keeper: a gardener, warm and plain. face toward the counter (local -x). */
- const K=new THREE.Group();K.position.set(0.15,0,0.25);G.add(K);KEEPER.g=K;
+ const K=new THREE.Group();K.position.set(0.15,0,0.25);K.scale.y=1.03;G.add(K);KEEPER.g=K;
  const skin=new THREE.MeshStandardMaterial({color:0xD3A882,roughness:0.85}),shirt=new THREE.MeshStandardMaterial({color:0xE8E0CB,roughness:0.9}),apron=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.9}),
    trouser=new THREE.MeshStandardMaterial({color:0x5A4634,roughness:0.95}),boot=new THREE.MeshStandardMaterial({color:0x2A211A,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x3B2A1E,roughness:0.9}),
    straw=new THREE.MeshStandardMaterial({color:0xC9A64E,roughness:0.95}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6});
@@ -679,18 +685,18 @@ const KEEPER={};
    const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.05,0.045,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.055,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
  KEEPER.armL=arm(-1);KEEPER.armR=arm(1);KEEPER.armL.rotation.x=0.12;KEEPER.armL.fore.rotation.x=-0.6;KEEPER.armR.rotation.x=-0.1;KEEPER.armR.fore.rotation.x=-0.5;
  KEEPER.torsoY=1.18;
- /* the stall footprint in world space: local x runs along world z, local z along world x */
- markRect(STAND.x-1.75,STAND.z-1.6,STAND.x+1.75,STAND.z+1.6,1.0)}
+ /* the stall footprint in world space: turned by pi, local x runs back along world x, local z back along world z */
+ markRect(STAND.x-1.7,STAND.z-1.95,STAND.x+1.7,STAND.z+1.95,1.0)}
 /* the same points in world space for the billboard wares */
-const SL=(lx,lz)=>[STAND.x-lz,STAND.z+lx];
+const SL=(lx,lz)=>[STAND.x-lx,STAND.z-lz];
 
 /* ======================================================================
-   THE FLORIST, at the end of the north avenue, her counter facing the garden. She takes what you grew and pays in seeds.
-   Same stall, turned to face south (local -x = world +z); buckets of cut flowers on the counter.
+   THE FLORIST, beside the seed stand in the market row, her counter facing the avenue. She takes what you grew and pays in seeds.
+   Same stall, same turn; buckets of cut flowers on the counter.
    ====================================================================== */
-const FLORIST={x:0,z:-48.6,front:{x:0,z:-46.3}};
+const FLORIST={x:-6.0,z:38.9,rot:Math.PI,front:{x:-3.5,z:38.9}};
 const FLORA={};
-{const G=new THREE.Group();G.position.set(FLORIST.x,0,FLORIST.z);G.rotation.y=Math.PI/2;scene.add(G);
+{const G=new THREE.Group();G.position.set(FLORIST.x,0,FLORIST.z);G.rotation.y=FLORIST.rot;scene.add(G);
  const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
  [[-1.45,-1.55],[1.45,-1.55],[-1.45,1.55],[1.45,1.55]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
  gm(new THREE.BoxGeometry(0.85,0.92,3.2),MAT.wood,-1.15,0.46,0);
@@ -699,35 +705,38 @@ const FLORA={};
  gm(new THREE.BoxGeometry(0.5,0.05,3.3),MAT.wood,1.35,1.72,0);
  const roof=gm(new THREE.BoxGeometry(3.4,0.05,3.9),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
  gm(new THREE.BoxGeometry(0.08,0.08,3.9),MAT.wood,-1.66,2.38,0);
- const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.fsign);sign.position.set(-1.72,2.3,0);sign.rotation.y=-Math.PI/2;G.add(sign);
+ gm(new THREE.BoxGeometry(0.42,0.72,3.2),MAT.wood,1.35,2.06,0);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.fsign);sign.position.set(1.13,2.12,0);sign.rotation.y=-Math.PI/2;G.add(sign);
  /* three zinc buckets along the counter, the cut flowers stand in them (billboards, placed below); none in front of her */
  [-1.25,-0.55,1.25].forEach(z=>gm(new THREE.CylinderGeometry(0.17,0.14,0.32,14),MAT.zinc,-1.15,1.14,z));
  gm(new THREE.BoxGeometry(0.4,0.22,0.5),MAT.wood,-1.05,1.09,0.55);
  /* the Florist: tall and slim, an ivory linen dress to mid calf, a forest sash, a wide straw hat with a mulberry ribbon, hair in a low bun. face toward the counter (local -x). */
- const K=new THREE.Group();K.position.set(0.18,0,0.2);G.add(K);FLORA.g=K;
+ const K=new THREE.Group();K.position.set(0.18,0,0.2);K.scale.set(1.04,1.07,1.04);K.rotation.z=0.03;G.add(K);FLORA.g=K;   /* a touch taller, weight on one hip */
  const skin=new THREE.MeshStandardMaterial({color:0xD9B091,roughness:0.85}),linen=new THREE.MeshStandardMaterial({color:0xEFE4CC,roughness:0.9}),sash=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.9}),
    shoe=new THREE.MeshStandardMaterial({color:0x6B4A36,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x4A2E1E,roughness:0.9}),straw=new THREE.MeshStandardMaterial({color:0xD8B86A,roughness:0.95}),
    ribbon=new THREE.MeshStandardMaterial({color:0x6E3A48,roughness:0.7}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6}),lip=new THREE.MeshStandardMaterial({color:0xB8656C,roughness:0.7}),steel=new THREE.MeshStandardMaterial({color:0xC8CCD0,roughness:0.35,metalness:0.8});
  const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||K).add(o);return o};
  [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.045,0.05,0.34,10),skin,0,0.19,s*0.07);km(new THREE.BoxGeometry(0.22,0.06,0.1),shoe,-0.03,0.03,s*0.07)});
- km(new THREE.CylinderGeometry(0.17,0.33,0.72,20),linen,0,0.7,0);           /* the skirt */
- km(new THREE.CylinderGeometry(0.145,0.17,0.5,16),linen,0,1.3,0);          /* the bodice */
- km(new THREE.CylinderGeometry(0.175,0.175,0.09,18),sash,0,1.06,0);        /* the sash */
+ km(new THREE.CylinderGeometry(0.15,0.36,0.74,24),linen,0,0.71,0);          /* the skirt, an A line */
+ km(new THREE.CylinderGeometry(0.155,0.128,0.5,18),linen,0,1.31,0);        /* the bodice, wider at the shoulder than the waist */
+ km(new THREE.CylinderGeometry(0.14,0.15,0.08,18),sash,0,1.07,0);          /* the sash, at the waist */
  km(new THREE.CylinderGeometry(0.05,0.055,0.1,10),skin,0,1.6,0);
  const head=new THREE.Group();head.position.set(0,1.75,0);K.add(head);FLORA.head=head;
  km(new THREE.SphereGeometry(0.115,22,16),skin,0,0,0,head);
  km(new THREE.SphereGeometry(0.121,22,16),hair,0.028,0.03,0,head);km(new THREE.SphereGeometry(0.062,14,10),hair,0.11,-0.02,0,head);   /* the low bun */
+ km(new THREE.CylinderGeometry(0.011,0.007,0.17,6),hair,-0.075,-0.05,0.09,head).rotation.z=0.25;   /* one loose strand at her cheek */
  [-1,1].forEach(s=>km(new THREE.SphereGeometry(0.014,8,6),dark,-0.104,0.015,s*0.042,head));
  const lips=km(new THREE.TorusGeometry(0.026,0.006,6,14,Math.PI),lip,-0.108,-0.038,0,head);lips.rotation.set(0,-Math.PI/2,Math.PI);
- km(new THREE.CylinderGeometry(0.42,0.42,0.014,28),straw,0,0.1,0,head);km(new THREE.CylinderGeometry(0.135,0.15,0.13,20),straw,0,0.17,0,head);km(new THREE.CylinderGeometry(0.152,0.152,0.03,20),ribbon,0,0.135,0,head);
+ const hat=new THREE.Group();hat.rotation.z=0.09;head.add(hat);   /* the hat sits a touch off square */
+ km(new THREE.CylinderGeometry(0.42,0.42,0.014,28),straw,0,0.1,0,hat);km(new THREE.CylinderGeometry(0.135,0.15,0.13,20),straw,0,0.17,0,hat);km(new THREE.CylinderGeometry(0.152,0.152,0.03,20),ribbon,0,0.135,0,hat);
  const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.52,side*0.19);K.add(A);
    km(new THREE.SphereGeometry(0.06,10,8),linen,0,0,0,A);km(new THREE.CylinderGeometry(0.045,0.04,0.3,10),linen,0,-0.17,0,A);
    const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.038,0.034,0.27,10),skin,0,-0.13,0,F);km(new THREE.SphereGeometry(0.045,10,8),skin,0,-0.29,0,F);A.fore=F;return A};
  FLORA.armL=arm(-1);FLORA.armR=arm(1);FLORA.armL.rotation.x=0.4;FLORA.armL.fore.rotation.x=-1.2;FLORA.armR.rotation.x=-0.3;FLORA.armR.fore.rotation.x=-0.9;
  /* the shears in her right hand */
  const sh=new THREE.Group();sh.position.set(0,-0.32,0);FLORA.armR.fore.add(sh);km(new THREE.BoxGeometry(0.16,0.012,0.02),steel,-0.07,0,0,sh);km(new THREE.BoxGeometry(0.16,0.012,0.02),steel,-0.07,0,0.02,sh).rotation.y=0.35;
- markRect(FLORIST.x-1.75,FLORIST.z-1.6,FLORIST.x+1.75,FLORIST.z+1.6,1.0)}
-const FL=(lx,lz)=>[FLORIST.x+lz,FLORIST.z-lx];
+ markRect(FLORIST.x-1.7,FLORIST.z-1.95,FLORIST.x+1.7,FLORIST.z+1.95,1.0)}
+const FL=(lx,lz)=>[FLORIST.x-lx,FLORIST.z-lz];
 
 /* ======================================================================
    TWELVE PLINTHS for marble: by the gates, in the wood's corner clearings, and outside the east and west hedges
@@ -834,7 +843,7 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
 {const r=rng(1234);const put={};const all=[];
  const add=(kind,x,z,h)=>{(put[kind]=put[kind]||[]).push({x,z,y:0,h,flip:r()>.5});all.push({x,z,h,kind});markDisk(x,z,kind==='cypress'?0.42:0.55,3)};
  /* the avenue: cypress pairs down both openings */
- [-1,1].forEach(side=>{for(let k=0;k<4;k++){const z=side*(HALF+3.4+k*4.1);add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}});
+ [-1,1].forEach(side=>{for(let k=0;k<6;k++){const z=side*(HALF+3.4+k*4.1);if(!(side>0&&k<3))add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}});   /* no cypress in front of the market */
  /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
@@ -843,6 +852,7 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
    if(Math.max(Math.abs(x),Math.abs(z))<HALF+2.6)continue;          /* inside the hedge */
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
+   if(Math.hypot(x+6.0,z-43.2)<5.2)continue;                        /* the third stall, kept for the fish market */
    if(SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<3.2))continue;     /* the plinths */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
    const kind=kinds[Math.floor(r()*kinds.length)];const far=(d-HALF)/34;
@@ -1100,7 +1110,7 @@ $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
 /* ---------- the stand: a basket, nothing charged until Checkout ---------- */
 let STORE_ON=false,CART={},AT='stand';
 const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*q,0);
-function openStore(where){AT=where==='florist'?'florist':'stand';STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open();if(document.exitPointerLock)document.exitPointerLock()}
+function openStore(where){AT=where==='florist'?'florist':'stand';STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open()}
 function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on');$('#forms').classList.remove('on')}
 function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),bw=basketWorth(),bq=basketQty(),left=S.coins+bw-total;
   $('#stLabel').textContent=AT==='florist'?'THE FLORIST':'THE SEED STAND';$('#stTitle').innerHTML=AT==='florist'?'Flowers<span>.</span>':'Seeds<span>.</span>';
@@ -1159,7 +1169,7 @@ function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knoc
   const left=S.sack[id]||0;if(!left)setTimeout(()=>SND.lastSeed(),140);toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and it grows twice as fast.');
   if(!left)SOWT=null}
 /* pick: tap, take it at whatever it is worth, the bed starts again. too soon = nothing happens */
-function nudgeFlorist(){if(S.flags.florist)return;const cheapest=Math.min(...FLOWERS.map(t=>CAT[t].price));if(basketWorth()<cheapest)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. The florist is at the north gate.'),1500)}
+function nudgeFlorist(){if(S.flags.florist)return;const cheapest=Math.min(...FLOWERS.map(t=>CAT[t].price));if(basketWorth()<cheapest)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. The florist is at the market by the south gate.'),1500)}
 function pickAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];const rp=ripe(p);
   if(rp.flowers<1){SND.knock();toast('Not yet. '+c.n+' blooms in '+mmss(rp.next)+'.');return}
   const apply=(fl,w,full)=>{p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(p.picks||0)+1;p.g=1;
@@ -1188,9 +1198,44 @@ function waterAt(plot,fromCan){const p=S.plants[plot];if(!p||p.pending)return;co
       done(+d.boost||0)}).catch(()=>{p.watered=was;save()});return}
   done(Math.ceil(rp.next/2))}
 /* ---------- the watering can: take it out and walk; every thirsty bed you pass gets watered, and it goes away by itself when nothing is thirsty ---------- */
+/* ======================================================================
+   THE GARDENER · you. A plain figure in the same cloth as the Keeper, seen from behind most of the day, so the walk is the whole character.
+   Built facing local -z, the way the camera looks, so rotation.y is the way you face.
+   ====================================================================== */
+const AV={ph:0};
+{const G=new THREE.Group();scene.add(G);AV.g=G;
+ const skin=new THREE.MeshStandardMaterial({color:0xD8B08C,roughness:0.85}),shirt=new THREE.MeshStandardMaterial({color:0xF1EAD6,roughness:0.9}),vest=new THREE.MeshStandardMaterial({color:0x8A6A3F,roughness:0.9}),
+   trouser=new THREE.MeshStandardMaterial({color:0x3E4A57,roughness:0.95}),boot=new THREE.MeshStandardMaterial({color:0x3A2A1E,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x4A3222,roughness:0.9}),
+   straw=new THREE.MeshStandardMaterial({color:0xD2B15E,roughness:0.95}),band=new THREE.MeshStandardMaterial({color:0x2F4A34,roughness:0.8}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6});
+ const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||G).add(o);return o};
+ const leg=side=>{const L=new THREE.Group();L.position.set(side*0.11,0.86,0);G.add(L);km(new THREE.CylinderGeometry(0.085,0.095,0.8,12),trouser,0,-0.42,0,L);km(new THREE.BoxGeometry(0.15,0.1,0.28),boot,0,-0.81,-0.03,L);return L};
+ AV.legL=leg(-1);AV.legR=leg(1);
+ const torso=new THREE.Group();torso.position.set(0,0.86,0);G.add(torso);AV.torso=torso;
+ km(new THREE.CylinderGeometry(0.2,0.215,0.62,16),shirt,0,0.32,0,torso);
+ km(new THREE.CylinderGeometry(0.207,0.224,0.42,16),vest,0,0.25,0,torso);
+ km(new THREE.TorusGeometry(0.215,0.018,6,20),dark,0,0.03,0,torso).rotation.x=Math.PI/2;
+ km(new THREE.CylinderGeometry(0.07,0.075,0.12,10),skin,0,0.66,0,torso);
+ const head=new THREE.Group();head.position.set(0,0.82,0);torso.add(head);AV.head=head;
+ km(new THREE.SphereGeometry(0.13,20,14),skin,0,0,0,head);
+ km(new THREE.SphereGeometry(0.137,20,14),hair,0,0.035,0.03,head);
+ [-1,1].forEach(s=>km(new THREE.SphereGeometry(0.016,8,6),dark,s*0.046,0.02,-0.118,head));
+ const smile=km(new THREE.TorusGeometry(0.034,0.005,6,14,Math.PI),dark,0,-0.035,-0.122,head);smile.rotation.set(0,0,Math.PI);
+ km(new THREE.CylinderGeometry(0.34,0.34,0.02,24),straw,0,0.11,0,head);km(new THREE.CylinderGeometry(0.15,0.17,0.15,20),straw,0,0.19,0,head);km(new THREE.CylinderGeometry(0.172,0.172,0.03,20),band,0,0.145,0,head);
+ const arm=side=>{const A=new THREE.Group();A.position.set(side*0.25,0.58,0);torso.add(A);
+   km(new THREE.SphereGeometry(0.075,10,8),shirt,0,0,0,A);km(new THREE.CylinderGeometry(0.06,0.055,0.3,10),shirt,0,-0.17,0,A);
+   const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.05,0.045,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.055,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
+ AV.armL=arm(-1);AV.armR=arm(1);AV.armL.fore.rotation.x=-0.25;AV.armR.fore.rotation.x=-0.25}
+/* the walk: legs swing at the hip, arms the other way, a bob per stride, a tuck in the air; the right arm holds the can out when it is out */
+function avatarTick(t,dt,sp,mag){const walk=Math.min(1,sp/2.4);AV.ph+=dt*(1.4+sp*1.9);
+  const sw=Math.sin(AV.ph)*0.66*walk;
+  if(you.grounded){AV.legL.rotation.x=sw;AV.legR.rotation.x=-sw;AV.g.position.y+=Math.abs(Math.sin(AV.ph))*0.045*walk}
+  else{AV.legL.rotation.x=-0.55;AV.legR.rotation.x=0.45}
+  AV.armL.rotation.x=-sw*0.75;AV.armR.rotation.x+=((CAN?-0.75:sw*0.75)-AV.armR.rotation.x)*Math.min(1,10*dt);
+  AV.torso.scale.y=1+Math.sin(t*1.5)*0.006;
+  AV.head.rotation.x=walk>0.05?0:Math.sin(t*0.7)*0.03}
+
 let CAN=false,POUR=0;
-scene.add(camera);
-const CANG=new THREE.Group();camera.add(CANG);CANG.visible=false;
+const CANG=new THREE.Group();AV.armR.fore.add(CANG);CANG.visible=false;
 {const tin=new THREE.MeshStandardMaterial({color:0xD6DEDA,roughness:0.45,metalness:0.6});
  const add=(g,x,y,z,rx,rz)=>{const o=new THREE.Mesh(g,tin);o.position.set(x,y,z);if(rx)o.rotation.x=rx;if(rz)o.rotation.z=rz;CANG.add(o);return o};
  add(new THREE.CylinderGeometry(0.105,0.125,0.19,18),0,0,0);                     /* the body */
@@ -1198,7 +1243,7 @@ const CANG=new THREE.Group();camera.add(CANG);CANG.visible=false;
  add(new THREE.CylinderGeometry(0.013,0.02,0.28,10),0,0.06,-0.16,-1.05);         /* the spout, forward and up */
  add(new THREE.CylinderGeometry(0.036,0.02,0.04,12),0,0.16,-0.31,-1.05);         /* the rose */
  const h=add(new THREE.TorusGeometry(0.085,0.011,8,20,Math.PI),0.09,0.05,0,0,-0.35);h.rotation.y=Math.PI/2;   /* the handle */
- CANG.position.set(0.33,-0.34,-0.6);CANG.rotation.set(0,0.28,0.06)}
+ CANG.position.set(0.02,-0.4,-0.02);CANG.rotation.set(0,0,0)}   /* in the right hand, spout forward */
 function thirsty(){return Object.entries(S.plants).filter(([k,p])=>{if(p.pending||!CAT[p.t])return false;const rp=ripe(p);return !rp.stopped&&(freeWater()||!p.watered)}).map(([k])=>+k)}
 function setCan(on){CAN=!!on;CANG.visible=CAN;$('#can').classList.toggle('on',CAN);
   if(CAN){SND.rustle();const n=thirsty().length;toast(n?'The can is out. Walk past the beds; '+plural(n,'bed')+(n===1?' is':' are')+' thirsty.':'Nothing is thirsty right now.')}else toast('The can is away.');updateAct()}
@@ -1263,60 +1308,89 @@ function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=d
   if(C.t>0.9){scene.remove(C.pts);C.pts.geometry.dispose();CHIPS.splice(i,1)}}}
 
 /* ---------- the act bar: what you can do from where you stand ---------- */
-let ACT=null,ATSTAND=false;                         /* {mode,plot} */
+let ACT=null,ATSTAND=false,ATFLORIST=false;             /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
-function bedHere(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const near=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(near>2.5)continue;const d=inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z);if(d<bd){bd=d;best=b}}return best&&bd<1.3?best:null}
-let EXTRA=[],DIGSHOW=0;
-function showAct(label,mode,plot,chips,say,extra){ACT=mode?{mode,plot}:null;actMain.textContent=label;actMain.classList.toggle('quiet',!mode);
-  EXTRA=extra||[];
+let ANCHOR=null,CHIPSIG='',EXTRA=[],DIGSHOW=0;          /* the point the prompt floats over; the chips only rebuild when their words change */
+const LOCK={kind:null,id:-1};                             /* what the prompt is on. It lets go only past the exit range, so it never flickers at the edge */
+const ENTER={stand:2.8,florist:2.8,plinth:2.3,bed:1.3},EXIT={stand:3.7,florist:3.7,plinth:3.1,bed:2.1};
+function bedDist(b){return inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z)}
+function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax>3.4)continue;const d=bedDist(b);if(d<bd){bd=d;best=b}}return {b:best,d:bd}}
+function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
+function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return {p:best,d:bd}}
+function distTo(kind,id){if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
+  if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}return bedDist(BED[id])}
+function nearest(){const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
+  const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};return null}
+function pickTarget(){const c=nearest();
+  if(LOCK.kind){const dl=distTo(LOCK.kind,LOCK.id);
+    /* hold on to it inside its exit range, unless you are standing in another bed or something is clearly nearer */
+    if(dl<EXIT[LOCK.kind]&&(!c||(c.kind===LOCK.kind&&c.id===LOCK.id)||!(c.d<0||c.d<dl-0.6)))return LOCK}
+  if(c){LOCK.kind=c.kind;LOCK.id=c.id}else{LOCK.kind=null;LOCK.id=-1}
+  return LOCK}
+function setChips(chips,extra){EXTRA=extra||[];const sig=(chips||[]).map(t=>t+':'+S.sack[t]+(t===SOWT?'*':'')).join('|')+'#'+EXTRA.map(x=>x.l).join('|');
+  if(sig===CHIPSIG)return;CHIPSIG=sig;
   actChips.innerHTML=(chips||[]).map(t=>'<button class="chip'+(t===SOWT?' on':'')+'" data-t="'+t+'">'+CAT[t].n+' \u00B7 '+S.sack[t]+'</button>').join('')+
     EXTRA.map((x,i)=>'<button class="chip" data-x="'+i+'">'+x.l+'</button>').join('');
-  $$('#actChips .chip[data-t]').forEach(b=>b.onclick=e=>{e.stopPropagation();SOWT=b.dataset.t;updateAct()});
-  $$('#actChips .chip[data-x]').forEach(b=>b.onclick=e=>{e.stopPropagation();const x=EXTRA[+b.dataset.x];if(x)x.f()});
+  $$('#actChips .chip[data-t]').forEach(b=>b.onpointerdown=e=>{e.preventDefault();e.stopPropagation();SOWT=b.dataset.t;updateAct()});
+  $$('#actChips .chip[data-x]').forEach(b=>b.onpointerdown=e=>{e.preventDefault();e.stopPropagation();const x=EXTRA[+b.dataset.x];if(x)x.f()})}
+function showAct(label,mode,plot,chips,say,extra,at){ACT=mode?{mode,plot}:null;if(at)ANCHOR=at;
+  if(actMain.textContent!==label)actMain.textContent=label;actMain.classList.toggle('quiet',!mode);
+  setChips(chips,extra);
   const key=mode&&!COARSE?'press E'+(chips&&chips.length>1?' \u00B7 Q picks the seed':''):'';
-  actKey.textContent=say?(say+(key?' \u00B7 '+key:'')):key;actEl.classList.add('on')}
-function hideAct(){ACT=null;actEl.classList.remove('on')}
-let ATFLORIST=false;
+  const k2=say?(say+(key?' \u00B7 '+key:'')):key;if(actKey.textContent!==k2)actKey.textContent=k2;
+  if(!actEl.classList.contains('on')){actEl.classList.add('on');placeAct()}}
+function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
+const stallAt=s=>[s.x+1.72,2.7,s.z];
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
-  if(Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<2.8){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are ten to fifty. Your flowers pay first.\u201D');return}
+  const T=pickTarget();
+  if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are ten to fifty. Your flowers pay first.\u201D',null,stallAt(STAND));return}
   ATSTAND=false;
-  if(Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<2.8){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();showAct(bq?'Trade flowers.':'See the flowers.','florist',null,null,'\u201CBring me what you grew. I pay in seeds.\u201D'+(bq?' \u00B7 '+plural(bq,'flower')+' worth '+basketWorth():''));return}
+  if(T.kind==='florist'){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();showAct(bq?'Trade flowers.':'See the flowers.','florist',null,null,'\u201CBring me what you grew. I pay in seeds.\u201D'+(bq?' \u00B7 '+plural(bq,'flower')+' worth '+basketWorth():''),null,stallAt(FLORIST));return}
   ATFLORIST=false;
-  const pl=plinthHere();if(pl){const t=S.things[pl.i];
-    if(!t){showAct('Set a marble block here. '+MARBLE+'.','marble',pl.i);return}
-    if(t.st<3){showAct('Chisel the marble. '+t.st+' of 3.','chip',pl.i);return}
-    showAct(FORMS[t.k]+' in marble. Carved by you.');return}
-  if(CAN){const n=thirsty().length;showAct('Put the can away.','can',null,null,n?plural(n,'bed')+' still thirsty':'');return}
-  const b=bedHere();if(!b){hideAct();return}
+  if(T.kind==='plinth'){const pl=PLINTHS[T.id],t=S.things[pl.i],at=[pl.x,1.5,pl.z];
+    if(!t){showAct('Set a marble block here. '+MARBLE+'.','marble',pl.i,null,null,null,at);return}
+    if(t.st<3){showAct('Chisel the marble. '+t.st+' of 3.','chip',pl.i,null,null,null,at);return}
+    showAct(FORMS[t.k]+' in marble. Carved by you.',null,null,null,null,null,at);return}
+  if(CAN){const n=thirsty().length;showAct('Put the can away.','can',null,null,n?plural(n,'bed')+' still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
+  if(T.kind!=='bed'){hideAct();return}
+  const b=BED[T.id],at=[b.cx,1.55,b.cz];
   const p=S.plants[b.plot];
-  if(!p){const types=FLOWERS.filter(t=>S.sack[t]>0);if(!types.length){showAct('Bed '+(b.plot+1)+' is empty. Seeds are at the stand by the south gate.');return}
-    if(!SOWT||!(S.sack[SOWT]>0))SOWT=types[0];showAct('Sow '+CAT[SOWT].n.toLowerCase()+' seeds in bed '+(b.plot+1)+'.','sow',b.plot,types);return}
+  if(!p){const types=FLOWERS.filter(t=>S.sack[t]>0);if(!types.length){showAct('Bed '+(b.plot+1)+' is empty. Seeds are at the stand by the south gate.',null,null,null,null,null,at);return}
+    if(!SOWT||!(S.sack[SOWT]>0))SOWT=types[0];showAct('Sow '+CAT[SOWT].n.toLowerCase()+' seeds in bed '+(b.plot+1)+'.','sow',b.plot,types,null,null,at);return}
   if(p.pending){hideAct();return}
   const c=CAT[p.t],rp=ripe(p);const extra=[];
   const canWater=!rp.stopped&&(freeWater()||!p.watered);
   if(DIGSHOW>performance.now())extra.push({l:'Dig up bed '+(b.plot+1)+'.',f:()=>digAt(b.plot)});
   if(rp.flowers>=1){if(canWater)extra.push({l:'Water.',f:()=>waterAt(b.plot)});if(canWater&&thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});
-    showAct('Pick '+(rp.flowers>1?rp.flowers+' '+c.p.toLowerCase():c.n.toLowerCase())+' \u00B7 '+rp.value+'.','pick',b.plot,null,rp.stopped?'Full. Nothing more grows until you pick.':(rp.n>0?'the next opens in '+mmss(rp.next):'a full bloom is '+c.w),extra);return}
-  if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra);return}
-  showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra)}
+    showAct('Pick '+(rp.flowers>1?rp.flowers+' '+c.p.toLowerCase():c.n.toLowerCase())+' \u00B7 '+rp.value+'.','pick',b.plot,null,rp.stopped?'Full. Nothing more grows until you pick.':(rp.n>0?'the next opens in '+mmss(rp.next):'a full bloom is '+c.w),extra,at);return}
+  if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
+  showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function act(){if(!ACT)return;if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='florist')openStore('florist');else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(S.coins+basketWorth()<MARBLE){SND.knock();toast('Marble is '+MARBLE+'. Pick more flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
-/* hold the button on a planted bed and Dig up appears for a few seconds; the release after a hold does not act */
-let HOLDT=null,HELD=false;
-actMain.addEventListener('click',e=>{e.stopPropagation();if(HELD){HELD=false;return}act()});
-actMain.addEventListener('pointerdown',e=>{e.stopPropagation();clearTimeout(HOLDT);HELD=false;const b=bedHere();if(b&&S.plants[b.plot])HOLDT=setTimeout(()=>{HELD=true;DIGSHOW=performance.now()+5000;SND.knock();updateAct()},700)});
-['pointerup','pointercancel','pointerleave'].forEach(ev=>actMain.addEventListener(ev,()=>clearTimeout(HOLDT)));
+/* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
+const _pv=new THREE.Vector3();
+function placeAct(){if(!ANCHOR||!actEl.classList.contains('on'))return;_pv.set(ANCHOR[0],ANCHOR[1],ANCHOR[2]).project(camera);
+  if(_pv.z>1){actEl.style.opacity='0';return}
+  const w=actEl.offsetWidth||220,h=actEl.offsetHeight||70,m=12;
+  const sx=Math.max(m+w/2,Math.min(innerWidth-m-w/2,(_pv.x+1)/2*innerWidth)),sy=Math.max(m+h,Math.min(innerHeight-96,(1-_pv.y)/2*innerHeight));
+  actEl.style.opacity='1';actEl.style.transform='translate('+sx.toFixed(1)+'px,'+sy.toFixed(1)+'px) translate(-50%,-100%)'}
+let DOWNAT=0;
+actMain.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();DOWNAT=performance.now();act()});
+actMain.addEventListener('click',e=>{e.stopPropagation();if(performance.now()-DOWNAT>600)act()});
 
 /* ======================================================================
-   YOU
+   YOU · third person. The stick or the keys move you across what the camera sees, you turn yourself toward where you are going,
+   and the camera hangs behind and above you and eases round behind you as you walk on. Nothing locks the mouse.
    ====================================================================== */
-const EYE=1.62,SPEED=3.4,RUN=6.4,ACC=17,DRAG=11,STEP=0.28,GRAV=20,JUMPV=6.1;   /* a hop of 0.93 m clears a quadrant hedge, never the outer one */
-const you={x:SPAWN.x,z:SPAWN.z,yaw:SPAWN.yaw,pitch:-0.02,vx:0,vz:0,feet:0,vy:0,grounded:true,stepOff:0};
+const SPEED=4.5,RUN=7.0,ACC=22,DRAG=14,STEP=0.28,GRAV=20,JUMPV=6.1;   /* 16 studs a second; a hop of 0.93 m clears a quadrant hedge, never the outer one */
+const you={x:SPAWN.x,z:SPAWN.z,yaw:SPAWN.yaw,pitch:-0.36,face:SPAWN.yaw,dist:COARSE?5.2:4.6,vx:0,vz:0,feet:0,vy:0,grounded:true,stepOff:0,moving:0};
+let camDist=you.dist;
 camera.rotation.order='YXZ';
+const wrapA=a=>((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
 function blocked(x,z){return floorAt(x,z)>you.feet+(you.grounded?STEP:0.05)+1e-4}
 let mvX=0,mvZ=0,jumpQ=false;
 
-/* the phone stick: left half walks, the ring follows your thumb */
+/* the phone stick: the left half walks, the ring appears under your thumb wherever it lands */
 const stick=$('#stick'),knob=$('#knob');
 let sId=null,sx0=0,sy0=0;
 stick.addEventListener('pointerdown',e=>{sId=e.pointerId;sx0=e.clientX;sy0=e.clientY;knob.style.display='block';knob.style.left=sx0+'px';knob.style.top=sy0+'px'});
@@ -1330,24 +1404,25 @@ function stickEnd(e){if(e.pointerId!==sId)return;sId=null;mvX=mvZ=0;knob.style.d
 addEventListener('pointerup',stickEnd);addEventListener('pointercancel',stickEnd);
 $('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jumpQ=true});
 
-/* look: mouse lock on desktop, drag on the right on a phone */
-let locked=false,lookDX=0,lookDY=0,lId=null,lx0=0,ly0=0;
+/* look: drag anywhere off the stick on a phone, drag with any mouse button on a desktop, the wheel zooms. A press that does not move is a tap. */
+let lookDX=0,lookDY=0,lId=null,lx0=0,ly0=0,dragged=0,lookAt=0;
 const cvs=renderer.domElement;
-cvs.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='mouse'&&!locked){try{cvs.requestPointerLock&&cvs.requestPointerLock()}catch(x){}return}
-  lId=e.pointerId;lx0=e.clientX;ly0=e.clientY});
-addEventListener('pointermove',e=>{if(locked||e.pointerId!==lId)return;lookDX+=(e.clientX-lx0);lookDY+=(e.clientY-ly0);lx0=e.clientX;ly0=e.clientY});
+cvs.addEventListener('pointerdown',e=>{lId=e.pointerId;lx0=e.clientX;ly0=e.clientY;dragged=0});
+addEventListener('pointermove',e=>{if(e.pointerId!==lId)return;const dx=e.clientX-lx0,dy=e.clientY-ly0;lx0=e.clientX;ly0=e.clientY;dragged+=Math.abs(dx)+Math.abs(dy);if(dragged<6)return;lookDX+=dx;lookDY+=dy;lookAt=performance.now()});
 function lookEnd(e){if(e.pointerId===lId)lId=null}
 addEventListener('pointerup',lookEnd);addEventListener('pointercancel',lookEnd);
-/* tap the flowers: a tap (not a drag) on a bed picks it, or sows it when it is empty; a tap on a stand opens it; on a plinth it chisels.
-   On desktop the same click goes where you are looking. The finger goes where the eye is. */
+cvs.addEventListener('contextmenu',e=>e.preventDefault());
+cvs.addEventListener('wheel',e=>{e.preventDefault();you.dist=Math.max(2.2,Math.min(9,you.dist*(e.deltaY>0?1.1:0.91)))},{passive:false});
+/* the ray from a tap or a click, down to bed height */
 const _ray=new THREE.Vector3();
+function rayHit(cx,cy){_ray.set((cx/innerWidth)*2-1,-(cy/innerHeight)*2+1,0.5).unproject(camera).sub(camera.position).normalize();
+  if(_ray.y>-0.02)return null;const t=(0.6-camera.position.y)/_ray.y;if(t>18)return null;return [camera.position.x+_ray.x*t,camera.position.z+_ray.z*t]}
+function bedAt(hx,hz){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-hx,b.cz-hz)-b.rmax>1.4)continue;const d=inPoly(b.P,hx,hz)?-1:polyDist(b.P,true,hx,hz);if(d<bd){bd=d;best=b}}return best&&bd<0.8?best:null}
+/* tap the flowers: a tap on a bed picks it, or sows it when it is empty; a tap on a stall opens it; on a plinth it chisels */
 function tapAt(cx,cy){if(STORE_ON||BLOOM||$('#forms').classList.contains('on'))return false;
-  _ray.set((cx/innerWidth)*2-1,-(cy/innerHeight)*2+1,0.5).unproject(camera).sub(camera.position).normalize();
-  if(_ray.y>-0.02)return false;const t=(0.6-camera.position.y)/_ray.y;if(t>10)return false;
-  const hx=camera.position.x+_ray.x*t,hz=camera.position.z+_ray.z*t;
-  let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-hx,b.cz-hz)-b.rmax>1.4)continue;const d=inPoly(b.P,hx,hz)?-1:polyDist(b.P,true,hx,hz);if(d<bd){bd=d;best=b}}
-  if(best&&bd<0.8){const reach=inPoly(best.P,you.x,you.z)?0:polyDist(best.P,true,you.x,you.z);
+  const h=rayHit(cx,cy);if(!h)return false;const [hx,hz]=h;
+  const best=bedAt(hx,hz);
+  if(best){const reach=bedDist(best);
     if(reach>3.4){SND.knock();toast('Come closer to bed '+(best.plot+1)+'.');return true}
     const p=S.plants[best.plot];
     if(p){if(p.pending)return true;if(CAN){waterAt(best.plot,true);POUR=performance.now()+900}else pickAt(best.plot);return true}
@@ -1357,18 +1432,16 @@ function tapAt(cx,cy){if(STORE_ON||BLOOM||$('#forms').classList.contains('on'))r
   if(Math.hypot(hx-FLORIST.x,hz-FLORIST.z)<2.6&&Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<3.4){openStore('florist');return true}
   const pl=plinthHere();if(pl&&Math.hypot(hx-pl.x,hz-pl.z)<1.1&&ACT&&(ACT.mode==='marble'||ACT.mode==='chip')){act();return true}
   return false}
-let tapId=null,tx0=0,ty0=0,tt0=0,mouseMoved=0;
-cvs.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){if(!locked)return;tapId=e.pointerId;mouseMoved=0;tt0=performance.now();return}tapId=e.pointerId;tx0=e.clientX;ty0=e.clientY;tt0=performance.now()});
-addEventListener('pointerup',e=>{if(e.pointerId!==tapId)return;tapId=null;const dt=performance.now()-tt0;
-  if(e.pointerType==='mouse'){if(locked&&mouseMoved<6&&dt<400)tapAt(innerWidth/2,innerHeight/2);return}
+/* a tap is a press that neither moves nor lingers. A press held still on a planted bed brings up Dig, and its release does nothing. */
+let tapId=null,tx0=0,ty0=0,tt0=0,HOLDT=null;
+cvs.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;const id=e.pointerId;tapId=id;tx0=e.clientX;ty0=e.clientY;tt0=performance.now();
+  clearTimeout(HOLDT);HOLDT=setTimeout(()=>{if(tapId!==id||STORE_ON)return;const h=rayHit(tx0,ty0);const b=h&&bedAt(h[0],h[1]);
+    if(b&&S.plants[b.plot]&&bedDist(b)<3.4){tapId=null;DIGSHOW=performance.now()+5000;SND.knock();updateAct()}},700)});
+addEventListener('pointermove',e=>{if(e.pointerId===tapId&&Math.hypot(e.clientX-tx0,e.clientY-ty0)>10)clearTimeout(HOLDT)});
+addEventListener('pointerup',e=>{if(e.pointerId!==tapId)return;clearTimeout(HOLDT);tapId=null;const dt=performance.now()-tt0;
   if(dt<450&&Math.hypot(e.clientX-tx0,e.clientY-ty0)<10)tapAt(e.clientX,e.clientY)});
-addEventListener('pointercancel',e=>{if(e.pointerId===tapId)tapId=null});
-document.addEventListener('mousemove',e=>{if(locked)mouseMoved+=Math.abs(e.movementX)+Math.abs(e.movementY)});
-const HINT_LOCK='WASD to walk · shift to run · click a bed to pick · E to act · esc frees the mouse';
-const HINT_FREE=COARSE?'Drag left to walk · drag right to look · tap a bed to pick':'Click to look · WASD to walk · click a bed to pick · E to act';
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cvs;$('#hint').textContent=locked?HINT_LOCK:HINT_FREE});
-document.addEventListener('mousemove',e=>{if(locked){lookDX+=e.movementX;lookDY+=e.movementY}});
-$('#hint').textContent=HINT_FREE;
+addEventListener('pointercancel',e=>{if(e.pointerId===tapId){clearTimeout(HOLDT);tapId=null}});
+$('#hint').textContent=COARSE?'Drag left to walk \u00B7 drag right to look \u00B7 tap a bed to pick':'WASD to walk \u00B7 drag to look \u00B7 scroll to zoom \u00B7 click a bed to pick \u00B7 E to act';
 
 const keys={};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
@@ -1419,18 +1492,18 @@ let areaNow='';
 function labels(){
   let name='The Parterre';const d0=Math.hypot(you.x,you.z);
   if(d0<6.2)name='The Fountain';
-  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=Math.abs(you.x)<3.6?'The Avenue':'The Wood';
+  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(you.x<-2.2&&you.x>-9.5&&you.z>31&&you.z<46)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
   if(name!==areaNow){areaNow=name;areaEl.innerHTML=name+'<span>.</span>'}
   let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const d=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(d<bd){bd=d;best=b}}
   if(best&&bd<1.3){const inside=inPoly(best.P,you.x,you.z);nearEl.textContent='Bed '+(best.plot+1)+' · '+(bedLabel[best.plot]||'empty, waiting for a seed')+(inside?' · you are standing in it':'')}
   else nearEl.textContent='';
 }
-let last=performance.now(),frame=0;
-const camDir=new THREE.Vector3();
+let last=performance.now(),frame=0,SIM=false;   /* SIM: the checks step the loop by hand, no render, no next frame */
+const camDir=new THREE.Vector3(),lookV=new THREE.Vector3();
 function loop(now){
-  const dt=Math.min(0.05,(now-last)/1000);last=now;const t=now/1000;frame++;
+  const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now;const t=now/1000;frame++;   /* never a negative step */
   if(STORE_ON||$('#forms').classList.contains('on')){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0}
-  if(lookDX||lookDY){you.yaw-=lookDX*(locked?0.0022:0.0042);you.pitch=Math.max(-0.7,Math.min(0.7,you.pitch-lookDY*(locked?0.0019:0.0032)));lookDX=lookDY=0}
+  if(lookDX||lookDY){you.yaw-=lookDX*0.0046;you.pitch=Math.max(-1.1,Math.min(0.42,you.pitch-lookDY*0.0036));lookDX=lookDY=0}
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
   if(keys['a']||keys['arrowleft'])ix-=1;if(keys['d']||keys['arrowright'])ix+=1;
@@ -1440,6 +1513,9 @@ function loop(now){
   const k=mag>0.02?ACC:DRAG;
   you.vx+=(wantX-you.vx)*Math.min(1,k*dt);you.vz+=(wantZ-you.vz)*Math.min(1,k*dt);
   const sp=Math.hypot(you.vx,you.vz);
+  /* you face where you are going. The camera eases round behind you while you walk on ahead, never while you side step or come back toward it */
+  if(mag>0.02){you.face+=wrapA(Math.atan2(-wantX,-wantZ)-you.face)*Math.min(1,14*dt);you.moving+=dt}else you.moving=0;
+  if(you.moving>0.5&&now-lookAt>1400){const dA=wrapA(you.face-you.yaw);if(Math.abs(dA)<0.95)you.yaw+=dA*Math.min(1,1.8*dt)}
   if(sp>0.01){
     const nx=you.x+you.vx*dt,nz=you.z+you.vz*dt;
     if(!blocked(nx,you.z))you.x=nx;else you.vx*=0.2;
@@ -1452,9 +1528,16 @@ function loop(now){
   if(you.grounded){if(fl>you.feet+1e-3){you.stepOff-=(fl-you.feet);you.feet=fl}else if(fl<you.feet-1e-3)you.grounded=false}
   if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);you.feet=fl;you.vy=0;you.grounded=true}}
   you.stepOff+=(0-you.stepOff)*Math.min(1,12*dt);
-  const bob=you.grounded?Math.sin(t*(sp>4?11:8))*0.035*Math.min(1,sp/2.5):0;
-  camera.position.set(you.x,you.feet+EYE+bob+you.stepOff,you.z);
+  /* the body, then the camera: behind and above, pulled in when a hedge or a tree would come between */
+  AV.g.position.set(you.x,you.feet+you.stepOff,you.z);AV.g.rotation.y=you.face;avatarTick(t,dt,sp,mag);
+  const ty=you.feet+you.stepOff+1.45;
+  lookV.set(-Math.sin(you.yaw)*Math.cos(you.pitch),Math.sin(you.pitch),-Math.cos(you.yaw)*Math.cos(you.pitch));
+  let want=you.dist;for(let s=0.7;s<you.dist;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||floorAt(px,pz)>py-0.22){want=Math.max(1.3,s-0.3);break}}
+  camDist+=(want-camDist)*Math.min(1,(want<camDist?20:4)*dt);
+  camera.position.set(you.x-lookV.x*camDist,Math.max(0.32,ty-lookV.y*camDist),you.z-lookV.z*camDist);
   camera.rotation.y=you.yaw;camera.rotation.x=you.pitch;
+  camera.updateMatrixWorld(true);camera.matrixWorldInverse.copy(camera.matrixWorld).invert();   /* so the prompt is placed from this frame's camera, not the last one's */
+  placeAct();
 
   /* the sky rides with you, so the horizon never comes closer */
   sky.position.copy(camera.position);stars.position.copy(camera.position);
@@ -1465,35 +1548,36 @@ function loop(now){
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
   tickDrops(t);airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
-  /* the Keeper: nods to whoever is close, waves as you arrive */
-  {const near=Math.hypot(you.x-STAND.x,you.z-STAND.z);
-   /* breathe, look at whoever is close (his face is on local -x; the stall frame is turned -90 about y), wave as you arrive */
-   KEEPER.g.scale.y=1+Math.sin(t*1.6)*0.006;
-   if(near<9){const target=Math.max(-0.9,Math.min(0.9,Math.atan2(-(you.x-STAND.x),-(you.z-STAND.z))));KEEPER.head.rotation.y+=(target-KEEPER.head.rotation.y)*Math.min(1,4*dt);KEEPER.head.rotation.y=Math.max(-0.9,Math.min(0.9,KEEPER.head.rotation.y));KEEPER.head.rotation.x=Math.sin(t*2.2)*0.04}
+  /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
+  {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
+   KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
+   if(near<9){const target=Math.max(-0.9,Math.min(0.9,localLook(dx,dz,STAND.rot)));KEEPER.head.rotation.y+=(target-KEEPER.head.rotation.y)*Math.min(1,4*dt);KEEPER.head.rotation.y=Math.max(-0.9,Math.min(0.9,KEEPER.head.rotation.y));KEEPER.head.rotation.x=Math.sin(t*2.2)*0.04}
    else{KEEPER.head.rotation.y*=1-Math.min(1,3*dt);KEEPER.head.rotation.x=0}
    KEEPER.armR.rotation.x+=((near<4?-2.3:-0.1)-KEEPER.armR.rotation.x)*Math.min(1,5*dt);KEEPER.armR.fore.rotation.x=near<4?-0.2+Math.sin(t*7)*0.35:-0.5}
-  /* the Florist: trims stems at her counter, looks up at whoever is close, waves as you arrive (her frame is turned +90 about y) */
-  {const near=Math.hypot(you.x-FLORIST.x,you.z-FLORIST.z);
-   FLORA.g.scale.y=1+Math.sin(t*1.4+1)*0.005;
-   if(near<9){const target=Math.max(-0.9,Math.min(0.9,Math.atan2(you.x-FLORIST.x,you.z-FLORIST.z)));FLORA.head.rotation.y+=(target-FLORA.head.rotation.y)*Math.min(1,4*dt);FLORA.head.rotation.x=Math.sin(t*2)*0.03}
+  /* the Florist: trims stems, breathes, shifts her weight from hip to hip, tucks the strand back now and then, looks up at whoever is close, waves as you arrive */
+  {const dx=you.x-FLORIST.x,dz=you.z-FLORIST.z,near=Math.hypot(dx,dz);
+   FLORA.g.scale.y=1.07+Math.sin(t*1.4+1)*0.005;FLORA.g.rotation.z=0.03+Math.sin(t*0.45)*0.016;FLORA.g.position.z=0.2+Math.sin(t*0.45)*0.014;
+   FLORA.head.rotation.z=0.06+Math.sin(t*0.9)*0.012;
+   if(near<9){const target=Math.max(-0.9,Math.min(0.9,localLook(dx,dz,FLORIST.rot)));FLORA.head.rotation.y+=(target-FLORA.head.rotation.y)*Math.min(1,4*dt);FLORA.head.rotation.x=Math.sin(t*2)*0.03}
    else{FLORA.head.rotation.y*=1-Math.min(1,3*dt);FLORA.head.rotation.x=0}
+   const tuck=(t%11)<1.3;
+   FLORA.armL.rotation.x+=((tuck?-2.75:0.4)-FLORA.armL.rotation.x)*Math.min(1,4*dt);FLORA.armL.fore.rotation.x+=((tuck?-0.7:-1.2+Math.sin(t*2.6+1.5)*0.06)-FLORA.armL.fore.rotation.x)*Math.min(1,5*dt);
    if(near<4){FLORA.armR.rotation.x+=(-2.2-FLORA.armR.rotation.x)*Math.min(1,5*dt);FLORA.armR.fore.rotation.x=-0.2+Math.sin(t*6.5)*0.3}
-   else{FLORA.armR.rotation.x+=(-0.3-FLORA.armR.rotation.x)*Math.min(1,5*dt);FLORA.armR.fore.rotation.x=-0.9+Math.sin(t*2.6)*0.12;FLORA.armL.fore.rotation.x=-1.2+Math.sin(t*2.6+1.5)*0.06}}
+   else{FLORA.armR.rotation.x+=(-0.3-FLORA.armR.rotation.x)*Math.min(1,5*dt);FLORA.armR.fore.rotation.x=-0.9+Math.sin(t*2.6)*0.12}}
   chipTick(dt);
-  if(CAN){CANG.position.y=-0.34+bob*1.6;CANG.rotation.x+=((POUR>performance.now()?-0.7:0)-CANG.rotation.x)*Math.min(1,6*dt)}
+  if(CAN)CANG.rotation.x+=((POUR>performance.now()?-0.95:0)-CANG.rotation.x)*Math.min(1,6*dt);
   if(frame%6===0){labels();updateAct();canTick()}
   if(!BLOOM&&frame%240===0)plantBeds();
-  renderer.render(scene,camera);
-  requestAnimationFrame(loop);
+  if(!SIM){renderer.render(scene,camera);requestAnimationFrame(loop)}
 }
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.pitch=pitch||0;you.feet=floorAt(x,z);you.grounded=true},you,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderHud();labels();updateAct();
-if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. Seeds behind you at the south gate, the florist ahead at the north gate.'),1400)}
+if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. The market is behind you, on your right.'),1400)}
 $('#lbar').style.width='100%';$('#lmsg').textContent='Walk in';
 requestAnimationFrame(loop);
 setTimeout(()=>{const l=$('#load');l.style.opacity='0';setTimeout(()=>l.remove(),650)},350);
