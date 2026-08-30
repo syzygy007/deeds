@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="3.0.1">
+<meta name="world-build" content="3.1">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -121,7 +121,7 @@ canvas{display:block;touch-action:none;cursor:default}
   <div class="sfoot"><button class="btn" id="stClose">Close.</button><button class="btn on" id="stBuy">Checkout.</button></div>
 </div></div>
 <div id="forms" class="sheet"><div class="panel small">
-  <div class="micro">MARBLE &middot; 50 &middot; FLOWERS FIRST, DEEDCOINS FOR THE REST</div><h2>What will it become<span>?</span></h2><p>Set the block on this plinth, then chisel it three times and it takes shape.</p>
+  <div class="micro">MARBLE &middot; 500 GARDENCOIN &middot; DEEDCOINS FILL IN</div><h2>What will it become<span>?</span></h2><p>Set the block on this plinth, then chisel it three times and it takes shape.</p>
   <div class="frow" id="formRow"></div>
   <div class="sfoot"><button class="btn" id="fmClose">Close.</button></div>
 </div></div>
@@ -129,7 +129,9 @@ canvas{display:block;touch-action:none;cursor:default}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ======================================================================
-   THE GARDEN · world 3.0 · third person: the gardener you walk as, the camera behind and above, the market row by the south gate,
+   THE GARDEN · world 3.1 · gardencoin (patch 45): Flora pays coin on one press, the seed store in gardencoin with Deedcoins filling in,
+   the fish market, the fountain's spring at 40 beds with fish to catch, the plinth waves
+   world 3.0 · third person: the gardener you walk as, the camera behind and above, the market row by the south gate,
    prompts that float over what you are near and act on the press, nothing locks the mouse
    The 2D game's own plan (BEDS x QT, the parterre SVG) is turned into real
    geometry here: hedges, beds, soil, gravel, piers and the fountain are
@@ -506,6 +508,7 @@ const MAT={
   awning:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(awningTex()),[1,1]),roughness:0.9,metalness:0,side:THREE.DoubleSide}),
   sign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('SEEDS.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
   fsign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('FLOWERS.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
+  hsign:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(signTex('FISH.'))),roughness:0.8,metalness:0,side:THREE.DoubleSide}),
   zinc:new THREE.MeshStandardMaterial({color:0x9AA0A6,roughness:0.55,metalness:0.6}),
   clay:new THREE.MeshStandardMaterial({color:0xB5643C,roughness:0.9,metalness:0}),
   marble:new THREE.MeshStandardMaterial({map:dress(new THREE.CanvasTexture(marbleTex()),[1,1]),roughness:0.32,metalness:0.02}),
@@ -642,6 +645,14 @@ const dropM=new THREE.Matrix4();
 function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0)%1.6;let x=d.vx*u,y=2.38+d.vy*u-4.9*u*u,z=d.vz*u;
   if(y<1.6){u=(t+d.t0+0.8)%1.6;x=d.vx*u;y=2.38+d.vy*u-4.9*u*u;z=d.vz*u}
   dropM.makeTranslation(x,y,z);dropMesh.setMatrixAt(i,dropM)}dropMesh.instanceMatrix.needsUpdate=true}
+/* THE SPRING: once the parterre is full the fountain throws a second, taller plume from the top, and fish swim in the basin */
+const SDROPS=70,springMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.05,6,5),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.9}),SDROPS);springMesh.visible=false;scene.add(springMesh);
+const springSeed=[];{const r=rng(78);for(let i=0;i<SDROPS;i++){const a=r()*6.28,el=1.42+r()*0.12,sp=6.2+r()*1.4;springSeed.push({vx:Math.cos(a)*Math.cos(el)*sp,vy:Math.sin(el)*sp,vz:Math.sin(a)*Math.cos(el)*sp,t0:r()*1.5})}}
+function tickSpring(t){if(!springMesh.visible)return;for(let i=0;i<SDROPS;i++){const d=springSeed[i];const u=(t+d.t0)%1.5;dropM.makeTranslation(d.vx*u,2.4+d.vy*u-4.9*u*u,d.vz*u);springMesh.setMatrixAt(i,dropM)}springMesh.instanceMatrix.needsUpdate=true}
+const FISHES=[];{const body=new THREE.SphereGeometry(0.17,12,8);body.scale(1,0.5,0.42);const tail=new THREE.ConeGeometry(0.09,0.16,3);
+ const fm=new THREE.MeshStandardMaterial({color:0xE8863A,roughness:0.55,metalness:0.25}),fm2=new THREE.MeshStandardMaterial({color:0xF3B26B,roughness:0.55});
+ for(let i=0;i<3;i++){const G=new THREE.Group();G.add(new THREE.Mesh(body,fm));const T=new THREE.Mesh(tail,fm2);T.rotation.z=Math.PI/2;T.position.x=-0.22;G.add(T);G.visible=false;scene.add(G);FISHES.push({g:G,tail:T})}}
+function tickFish(t,n){FISHES.forEach((f,i)=>{const on=i<n;f.g.visible=on;if(!on)return;const a=t*0.55+i*2.1,r=1.35+0.55*Math.sin(t*0.27+i*1.3);f.g.position.set(Math.cos(a)*r,0.62+0.025*Math.sin(t*3+i),Math.sin(a)*r);f.g.rotation.y=-a-Math.PI/2+Math.sin(t*2+i)*0.15;f.tail.rotation.y=Math.sin(t*9+i)*0.45})}
 
 /* ======================================================================
    THE MARKET ROW, on the lawn west of the south avenue, just outside the gate: the seed stand first, the florist beside it, a third place kept for the fish market.
@@ -743,11 +754,55 @@ const FLORA={};
 const FL=(lx,lz)=>[FLORIST.x-lx,FLORIST.z-lz];
 
 /* ======================================================================
+   THE FISH MARKET, third in the row. The fish you catch at the fountain sell here for gardencoin, a hundred a fish.
+   ====================================================================== */
+const MARKET3={x:-6.0,z:43.2,rot:Math.PI,front:{x:-3.5,z:43.2}};
+const MONGER={};
+{const G=new THREE.Group();G.position.set(MARKET3.x,0,MARKET3.z);G.rotation.y=MARKET3.rot;scene.add(G);
+ const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
+ [[-1.45,-1.55],[1.45,-1.55],[-1.45,1.55],[1.45,1.55]].forEach(([dx,dz])=>gm(new THREE.BoxGeometry(0.13,2.5,0.13),MAT.wood,dx,1.25,dz));
+ gm(new THREE.BoxGeometry(0.85,0.92,3.2),MAT.wood,-1.15,0.46,0);
+ gm(new THREE.BoxGeometry(1.0,0.06,3.36),MAT.wood,-1.15,0.95,0);
+ gm(new THREE.BoxGeometry(0.42,1.7,3.2),MAT.wood,1.35,0.85,0);
+ gm(new THREE.BoxGeometry(0.5,0.05,3.3),MAT.wood,1.35,1.72,0);
+ const roof=gm(new THREE.BoxGeometry(3.4,0.05,3.9),MAT.awning,0,2.62,0);roof.rotation.z=0.14;
+ gm(new THREE.BoxGeometry(0.08,0.08,3.9),MAT.wood,-1.66,2.38,0);
+ gm(new THREE.BoxGeometry(0.42,0.72,3.2),MAT.wood,1.35,2.06,0);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.46),MAT.hsign);sign.position.set(1.13,2.12,0);sign.rotation.y=-Math.PI/2;G.add(sign);
+ /* two zinc tubs of ice with fish laid on top, and a scale */
+ const fm=new THREE.MeshStandardMaterial({color:0xE8863A,roughness:0.55,metalness:0.25}),ice=new THREE.MeshStandardMaterial({color:0xE9F3F7,roughness:0.9});
+ [-0.95,0.75].forEach(z=>{gm(new THREE.CylinderGeometry(0.34,0.28,0.26,16),MAT.zinc,-1.15,1.1,z);gm(new THREE.CylinderGeometry(0.31,0.31,0.05,16),ice,-1.15,1.24,z);
+   for(let k=0;k<3;k++){const f=gm(new THREE.SphereGeometry(0.12,10,7),fm,-1.15+(k-1)*0.12,1.29,z+(k-1)*0.16);f.scale.set(1,0.4,0.42);f.rotation.y=0.5+k*0.9}});
+ gm(new THREE.CylinderGeometry(0.16,0.2,0.08,14),MAT.iron,-1.15,1.02,-0.1);gm(new THREE.CylinderGeometry(0.02,0.02,0.5,8),MAT.iron,-1.15,1.3,-0.1);gm(new THREE.CylinderGeometry(0.2,0.2,0.03,14),MAT.zinc,-1.15,1.56,-0.1);
+ /* the fishmonger: the Keeper's cut in a navy apron and a flat cap; face toward the counter (local -x) */
+ const K=new THREE.Group();K.position.set(0.15,0,-0.25);K.scale.y=1.02;G.add(K);MONGER.g=K;
+ const skin=new THREE.MeshStandardMaterial({color:0xC98F6C,roughness:0.85}),shirt=new THREE.MeshStandardMaterial({color:0xE8E0CB,roughness:0.9}),apron=new THREE.MeshStandardMaterial({color:0x2B3A55,roughness:0.9}),
+   trouser=new THREE.MeshStandardMaterial({color:0x3E3A36,roughness:0.95}),boot=new THREE.MeshStandardMaterial({color:0x2A211A,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:0x2E2620,roughness:0.9}),
+   cap=new THREE.MeshStandardMaterial({color:0x4A4238,roughness:0.9}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6});
+ const km=(g,m,x,y,z,parent)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.position.set(x,y,z);(parent||K).add(o);return o};
+ [-1,1].forEach(s=>{km(new THREE.CylinderGeometry(0.09,0.1,0.82,12),trouser,0,0.45,s*0.12);km(new THREE.BoxGeometry(0.28,0.1,0.15),boot,-0.03,0.05,s*0.12)});
+ km(new THREE.CylinderGeometry(0.21,0.24,0.64,16),shirt,0,1.18,0);
+ km(new THREE.BoxGeometry(0.03,0.6,0.38),apron,-0.22,0.97,0);km(new THREE.BoxGeometry(0.03,0.28,0.22),apron,-0.21,1.35,0);
+ km(new THREE.CylinderGeometry(0.075,0.08,0.12,10),skin,0,1.54,0);
+ const head=new THREE.Group();head.position.set(0,1.68,0);K.add(head);MONGER.head=head;
+ km(new THREE.SphereGeometry(0.135,20,14),skin,0,0,0,head);
+ km(new THREE.SphereGeometry(0.14,20,14),hair,0.03,0.03,0,head);
+ [-1,1].forEach(s=>km(new THREE.SphereGeometry(0.016,8,6),dark,-0.122,0.02,s*0.048,head));
+ const smile=km(new THREE.TorusGeometry(0.036,0.005,6,14,Math.PI),dark,-0.126,-0.036,0,head);smile.rotation.set(0,-Math.PI/2,Math.PI);
+ km(new THREE.CylinderGeometry(0.15,0.15,0.06,20),cap,0,0.12,0,head);km(new THREE.BoxGeometry(0.14,0.02,0.16),cap,-0.16,0.1,0,head);   /* the flat cap and its peak */
+ const arm=(side)=>{const A=new THREE.Group();A.position.set(0,1.44,side*0.25);K.add(A);
+   km(new THREE.SphereGeometry(0.078,10,8),shirt,0,0,0,A);km(new THREE.CylinderGeometry(0.062,0.056,0.3,10),shirt,0,-0.17,0,A);
+   const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.052,0.046,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.058,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
+ MONGER.armL=arm(-1);MONGER.armR=arm(1);MONGER.armL.rotation.x=0.15;MONGER.armL.fore.rotation.x=-0.7;MONGER.armR.rotation.x=-0.1;MONGER.armR.fore.rotation.x=-0.5;
+ markRect(MARKET3.x-1.7,MARKET3.z-1.95,MARKET3.x+1.7,MARKET3.z+1.95,1.0)}
+
+/* ======================================================================
    TWELVE PLINTHS for marble: by the gates, in the wood's corner clearings, and outside the east and west hedges
    ====================================================================== */
 const SPOTS=[[-6,30.2],[6,30.2],[-6,-30.2],[6,-30.2],[34,34],[-34,34],[34,-34],[-34,-34],[33.5,8],[33.5,-8],[-33.5,8],[-33.5,-8]];
 const PLINTHS=[];
-SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);markDisk(x,z,0.62,1.0);PLINTHS.push({x,z,i})});
+const CAPS=[];
+SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);CAPS.push(cap);markDisk(x,z,0.62,1.0);PLINTHS.push({x,z,i})});
 
 
 /* the golden dot: where you start, facing the garden through the south gap */
@@ -974,16 +1029,17 @@ const TESTING=false;                               /* demo watering: once a day,
 const freeWater=()=>LIVE?ADMIN:TESTING;
 const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
+let RATE=10;const FISH_WORTH=100,FISH_S=300,FISH_CAP=3,HELD_CAP=12,PLINTH_ORDER=[0,1,4,5,8,10,9,11,6,2,3,7];   /* patch 45's numbers; the server's win when signed in */
 const today=()=>new Date().toISOString().slice(0,10);
 const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){this.g[k]=v}},get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):this.g[k]}catch(e){return this.g[k]}}};
-const fresh=()=>({deeds:0,coins:START_COINS,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[]});
+const fresh=()=>({deeds:0,coins:START_COINS,gc:0,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[],fountain:null});
 let S=store.get('garden')||null;
 if(!S||typeof S!=='object')S=fresh();
 if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined)S=fresh();
 if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
 if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};if(!S.ledger)S.ledger=[];
 if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
-if(!S.basket)S.basket={};if(!S.stats)S.stats={};
+if(!S.basket)S.basket={};if(!S.stats)S.stats={};if(!(S.gc>=0))S.gc=0;if(S.fountain===undefined)S.fountain=null;
 /* ---------- the clock: the server's ripening rule, mirrored here for drawing and for the signed out demo ---------- */
 let NOW_OFF=0;const snow=()=>Date.now()+NOW_OFF;
 function ripe(p,at){const c=CAT[p.t];if(!c)return {n:0,frac:0,next:0,stopped:false,value:0,flowers:0};const now=at||snow();
@@ -1001,22 +1057,39 @@ const basketQty=()=>Object.values(S.basket||{}).reduce((a,b)=>a+(b.q||0),0);
 function takeFlowers(price){let paid=0,fl=0;const rows=Object.entries(S.basket).filter(([t,b])=>b.q>0).sort((a,b)=>(b[1].w/b[1].q)-(a[1].w/a[1].q));
   for(const [t,b] of rows){if(paid>=price)break;const need=price-paid,per=b.w/b.q;const k=Math.min(b.q,Math.max(1,Math.ceil(need/Math.max(per,0.0001))));const tw=k>=b.q?b.w:Math.round(b.w*k/b.q);paid+=tw;fl+=k;if(k>=b.q)delete S.basket[t];else{b.q-=k;b.w-=tw}}
   return {fl,paid}}
-/* flowers first, Deedcoins for the rest; null = not enough, nothing moved */
-function payLocal(price){const total=basketWorth();if(total>=price){const r=takeFlowers(price);return {flowers:r.fl,worth:r.paid,coins:0}}
-  const fl=basketQty(),coins=price-total;if(S.coins<coins)return null;S.basket={};S.coins-=coins;return {flowers:fl,worth:total,coins}}
-const payWords=r=>r.coins?(r.flowers?plural(r.flowers,'flower')+' and '+r.coins+' Deedcoins':r.coins+' Deedcoins'):plural(r.flowers,'flower');
+/* the rule, mirrored for the signed out demo: gardencoin first, then whole Deedcoins for the rest, change back as gardencoin; null = not enough, nothing moved */
+function payGc(price){if(S.gc+S.coins*RATE<price)return null;const gc=Math.min(S.gc,price),rem=price-gc,dc=Math.ceil(rem/RATE),chg=dc*RATE-rem;S.gc=S.gc-gc+chg;S.coins-=dc;return {gc,dc,chg}}
+const payWords=r=>r.dc?(r.gc?r.gc+' gardencoin and '+plural(r.dc,'Deedcoin'):plural(r.dc,'Deedcoin')):r.gc+' gardencoin';
+const gcWorth=()=>basketWorth()*RATE;
+const fishes=n=>n+' fish';
+/* the fountain, mirrored: springs at 40 beds, a fish every FISH_S seconds up to FISH_CAP; the server's numbers win when signed in */
+function fountainNow(){const f=S.fountain;if(!f||!f.sprung)return {sprung:false,fish:0,held:0,next:0};
+  if(LIVE){const el=(snow()-(f.at||snow()))/1000;let fish=f.fish,next=f.next_s;if(next!=null){if(el>=next){const more=1+Math.floor((el-next)/FISH_S);fish=Math.min(FISH_CAP,fish+more);next=fish>=FISH_CAP?null:FISH_S-((el-next)%FISH_S)}else next=next-el}
+    return {sprung:true,fish,held:f.held||0,next:next==null?0:Math.ceil(next)}}
+  let fish=f.fish||0,last=f.last||f.sprung;const el=(Date.now()-last)/1000;
+  if(fish<FISH_CAP){const n=Math.floor(el/FISH_S);if(n>0){fish=Math.min(FISH_CAP,fish+n);f.fish=fish;f.last=fish>=FISH_CAP?Date.now():last+n*FISH_S*1000}}
+  return {sprung:true,fish,held:f.held||0,next:fish>=FISH_CAP?0:Math.ceil(FISH_S-(Date.now()-f.last)/1000)}}
+function fishNow(){return fountainNow().fish}
+function checkSpring(){if(LIVE||BLOOM)return;if(Object.keys(S.plants).length>=40&&!(S.fountain&&S.fountain.sprung)){S.fountain={sprung:Date.now(),fish:0,last:Date.now(),held:0};save();springMesh.visible=true;SND.allWatered();setTimeout(()=>toast('The fountain springs. Fish will come to the basin.'),900)}}
+/* the plinth waves, mirrored: three wake per quadrant you fill, in the server's order */
+let PLINTHS_OPEN=null;
+function quadrantsFull(){let n=0;for(let q=0;q<4;q++){let k=0;for(let b=0;b<10;b++)if(S.plants[q*10+b])k++;if(k>=10)n++}return n}
+function plinthsOpen(){if(LIVE&&PLINTHS_OPEN)return PLINTHS_OPEN;return PLINTH_ORDER.slice(0,3*quadrantsFull())}
+function renderPlinths(){const open=plinthsOpen();CAPS.forEach((c,i)=>{c.visible=open.indexOf(i)>=0||!!(S.things&&S.things[i])})}
 function ledger(l,a,w,u){S.ledger.unshift({t:Date.now(),l,a,w:w||'',u:u||''});if(S.ledger.length>60)S.ledger.length=60}
 const sackTotal=()=>Object.values(S.sack).reduce((a,b)=>a+b,0);
 function save(){S.bank=sackTotal();store.set('garden',S)}
 const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
-function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 44 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
+function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /not find|function|schema cache/i.test(m)?'Run patch 45 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
 let toastT;function toast(m){const t=$('#status');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3000)}
 const KINDW={deed:'a deed',seed_buy:'seed store',seed_sell:'seed store',send:'sent',receive:'received',return:'returned',starter:'the purse opens'};
 
-let PATCH44=false;
-function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;
+let PATCH44=false,PATCH45=false;
+function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;PATCH45=!!d.rate;
   if(d.now){NOW_OFF=new Date(d.now).getTime()-Date.now()}
+  if(d.rate)RATE=+d.rate||10;S.gc=+(d.gc&&d.gc.balance)||0;PLINTHS_OPEN=d.plinths&&Array.isArray(d.plinths.open)?d.plinths.open.map(Number):null;
+  if(d.fountain){const f=d.fountain;S.fountain={sprung:!!f.sprung,fish:+f.fish||0,held:+f.held||0,caught:+f.caught||0,sold:+f.sold||0,next_s:f.next_s==null?null:+f.next_s,at:snow()}}else S.fountain=null;
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
   S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});
@@ -1026,17 +1099,18 @@ function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;
     S.plants[p.plot]=q});
   S.basket={};(d.basket||[]).forEach(b=>{if(+b.qty>0)S.basket[b.t]={q:+b.qty,w:+b.worth||0}});S.stats=d.stats||{};S.things={};
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
-  save();plantBeds();renderHud();if(STORE_ON)renderStore();loadThings()}
-/* a quiet refresh after a trade or a marble buy, so the basket and the sack are exactly the server's */
-function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc('garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
+  save();plantBeds();renderPlinths();springMesh.visible=!!(S.fountain&&S.fountain.sprung);renderHud();if(STORE_ON)renderStore();loadThings()}
+/* a quiet refresh after a sale or a buy, so the sack, the basket and the fish are exactly the server's */
+function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc(PATCH45?'garden_state3':'garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
-    return sb.rpc('garden_state2').then(r2=>{
+    return sb.rpc('garden_state3').then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
-        if(/not find|function|schema cache/i.test(m)){toast('Run patch 44 on DEEDS first.');return sb.rpc('garden_state').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
+        if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
         toast(rpcFail(r2.error,'The garden could not load your sack.'));return}
       hydrate(r2.data||{});
-      try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}})}).catch(()=>{})}
+      try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}
+      try{sb.channel('garden-gc-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'garden_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w)return;S.gc=+w.balance;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}})}).catch(()=>{})}
 if(!BLOOM){const c=document.createElement('script');c.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';c.onload=goLive;c.onerror=()=>{};document.head.appendChild(c)}
 
 /* ---------- the purse line ---------- */
@@ -1044,7 +1118,8 @@ const COINIMG='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
 function renderHud(){const el=$('#purse');
   if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';$('#can').style.display='none';return}
   const bq=basketQty();
-  el.innerHTML=(bq?'Your basket \u00B7 '+plural(bq,'flower')+' \u00B7 worth '+basketWorth()+'<br>':'')+'Your sack \u00B7 '+(S.coins|0).toLocaleString()+' Deedcoins \u00B7 '+plural(sackTotal(),'seed')+' \u00B7 '+Object.keys(S.plants).length+' of 40 beds'+(LIVE?'':' \u00B7 local until you sign in')}
+  const fn=fountainNow();
+  el.innerHTML=(bq?'Your basket \u00B7 '+plural(bq,'flower')+' \u00B7 worth '+gcWorth().toLocaleString()+' gardencoin<br>':'')+'Your sack \u00B7 '+(S.gc|0).toLocaleString()+' gardencoin \u00B7 '+(S.coins|0).toLocaleString()+' Deedcoins \u00B7 '+plural(sackTotal(),'seed')+' \u00B7 '+Object.keys(S.plants).length+' of 40 beds'+(fn.held?' \u00B7 '+fishes(fn.held)+' in hand':'')+(LIVE?'':' \u00B7 local until you sign in')}
 /* ---------- the sounds: one family, synthesized in the browser. ticks for actions, bells for confirmations,
    cascades for rewards that grow with the win. voice limited, under the music, muted with one tap (remembered). ---------- */
 const SND=(()=>{
@@ -1113,24 +1188,23 @@ $('#deed').onclick=()=>{if(LIVE){location.href=APP+'?log=1';return}
 
 /* ---------- the stand: a basket, nothing charged until Checkout ---------- */
 let STORE_ON=false,CART={},AT='stand';
-const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*q,0);
+const cartTotal=()=>Object.entries(CART).reduce((a,[id,q])=>a+CAT[id].price*RATE*q,0);
 function openStore(where){AT=where==='florist'?'florist':'stand';STORE_ON=true;CART={};$('#store').classList.add('on');renderStore();SND.open()}
 function closeStore(){STORE_ON=false;CART={};$('#store').classList.remove('on');$('#short').classList.remove('on');$('#forms').classList.remove('on')}
-function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),bw=basketWorth(),bq=basketQty(),left=S.coins+bw-total;
-  $('#stLabel').textContent=AT==='florist'?'THE FLORIST':'THE SEED STAND';$('#stTitle').innerHTML=AT==='florist'?'Flowers<span>.</span>':'Seeds<span>.</span>';
-  $('#stBal').innerHTML=(bq?plural(bq,'flower')+' worth <b>'+bw+'</b> \u00B7 ':'')+COINIMG+'<b>'+(S.coins|0).toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total:'');$('#stBal').classList.toggle('short',left<0);
-  const pr=FLOWERS.map(id=>CAT[id].price);$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+'. Your flowers pay first, Deedcoins cover the rest. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'.';
+function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=S.gc+S.coins*RATE-total;
+  $('#stLabel').textContent='THE SEED STAND';$('#stTitle').innerHTML='Seeds<span>.</span>';
+  $('#stBal').innerHTML='<b>'+(S.gc|0).toLocaleString()+'</b> gardencoin \u00B7 '+COINIMG+'<b>'+(S.coins|0).toLocaleString()+'</b> Deedcoins'+(total?' \u00B7 basket '+total.toLocaleString():'');$('#stBal').classList.toggle('short',left<0);
+  const pr=FLOWERS.map(id=>CAT[id].price*RATE);$('#stNote').textContent='Seeds are '+Math.min(...pr)+' to '+Math.max(...pr)+' gardencoin. Gardencoin pays first, Deedcoins fill in. Tier '+(t+1)+(t<TIERS.length-1?' \u00B7 tier '+(t+2)+' opens at '+TIERS[t+1]+' deeds':'')+'.';
   let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
-    h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':c.price+' \u00B7 a bloom is '+c.w+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
+    h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':(c.price*RATE)+' \u00B7 a bloom pays '+(c.w*RATE)+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
     h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">\u2212</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
   $('#stGrid').innerHTML=h;
   const sack=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]);
-  $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.75">YOUR SACK</div>'+sack.map(([id,q])=>'<div class="srow"><span>'+plural(q,CAT[id].n.toLowerCase()+' seed')+'</span><button class="btn" data-sell="'+id+'">Return one. +'+CAT[id].price+'</button></div>').join(''):'';
-  $('#stBuy').textContent=total?'Checkout \u00B7 '+total+'.':'Checkout.';$('#stBuy').disabled=BUSY;
-  $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d));
-  $$('#stSack [data-sell]').forEach(b=>b.onclick=()=>sell(b.dataset.sell))}
+  $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.75">YOUR SACK \u00B7 '+sack.map(([id,q])=>plural(q,CAT[id].n.toLowerCase()+' seed')).join(' \u00B7 ')+'</div>':'';
+  $('#stBuy').textContent=total?'Checkout \u00B7 '+total.toLocaleString()+'.':'Checkout.';$('#stBuy').disabled=BUSY;
+  $$('#stGrid .stp button').forEach(b=>b.onclick=()=>cartAdd(b.dataset.id,+b.dataset.d))}
 function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();toast('Opens at '+TIERS[c.tier]+' deeds.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
-function showShort(total){SND.nope();const bw=basketWorth();$('#shBody').textContent='You have '+S.coins+' Deedcoins'+(bw?' and flowers worth '+bw:'')+', and this comes to '+total+'. Pick more flowers, or log a deed and '+DEED_PAY+' more arrive.';$('#short').classList.add('on')}
+function showShort(total){SND.nope();const bq=basketQty();$('#shBody').textContent='You have '+S.gc.toLocaleString()+' gardencoin and '+S.coins.toLocaleString()+' Deedcoins (worth '+(S.coins*RATE).toLocaleString()+' more), and this comes to '+total.toLocaleString()+'. '+(bq?'Sell your '+plural(bq,'flower')+' to Flora, or log':'Grow and sell flowers, or log')+' a deed and '+DEED_PAY+' Deedcoins arrive.';$('#short').classList.add('on')}
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
 $('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
 $('#stClose').onclick=closeStore;
@@ -1138,29 +1212,54 @@ $('#store').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStor
 $('#short').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#short').classList.remove('on')});
 $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
   if(!items.length){toast('The basket is empty. Tap + on a packet.');return}
-  const total=cartTotal();if(total>S.coins+basketWorth()){showShort(total);return}
+  const total=cartTotal();if(total>S.gc+S.coins*RATE){showShort(total);return}
   if(LIVE){if(BUSY)return;BUSY=true;renderStore();
-    (async()=>{let got=0,fail=null,fl=0,coins=0;
+    (async()=>{let got=0,fail=null,gc=0,dc=0;
       for(const [id,q] of items){const c=CAT[id];let want=q;
-        while(want>0){const prev=S.sack[id]||0;let r;try{r=await sb.rpc('florist_buy',{p_type:id,p_qty:want})}catch(e){r={error:e||{message:'network'}}}
+        while(want>0){const prev=S.sack[id]||0;let r;try{r=await sb.rpc('seed_buy2',{p_type:id,p_qty:want})}catch(e){r={error:e||{message:'network'}}}
           if(r.error){fail=r.error;break}
           const d=r.data||{};const qty=+d.qty;const n=qty-prev;
           if(!(n>0)){fail={message:'no change'};break}
-          if(+d.worth_used>0)takeFlowers(+d.worth_used);S.coins=+d.balance;S.sack[id]=qty;fl+=(+d.flowers_used||0);coins+=(+d.coins_used||0);
-          ledger(plural(n,c.n.toLowerCase()+' seed'),-(+d.coins_used||0),AT==='florist'?'the florist':'seed store');got+=n;want-=n;CART[id]=Math.max(0,(CART[id]||0)-n);if(!CART[id])delete CART[id];save()}
+          S.gc=+d.balance||0;if(d.dc_balance!=null)S.coins=+d.dc_balance;S.sack[id]=qty;gc+=(+d.gc_used||0);dc+=(+d.dc_used||0);
+          ledger(plural(n,c.n.toLowerCase()+' seed'),-(+d.cost||0),'seed store');got+=n;want-=n;CART[id]=Math.max(0,(CART[id]||0)-n);if(!CART[id])delete CART[id];save()}
         if(fail)break}
       BUSY=false;
-      if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough for all of those. Pick more flowers or log a deed.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
+      if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough for all of those. Sell flowers or log a deed.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
       renderHud();
-      if(got&&!fail){CART={};SND.buy(got);SOWT=items[0][0];closeStore();toast('Bought for '+payWords({flowers:fl,coins})+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct();refresh()}
+      if(got&&!fail){CART={};SND.buy(got);SOWT=items[0][0];closeStore();toast('Bought for '+payWords({gc,dc})+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct();refresh()}
       else renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
-  const pay=payLocal(total);if(!pay){showShort(total);return}
-  items.forEach(([id,q])=>{const c=CAT[id];S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-Math.round(pay.coins*c.price*q/total),AT==='florist'?'the florist':'seed store')});
+  const pay=payGc(total);if(!pay){showShort(total);return}
+  items.forEach(([id,q])=>{const c=CAT[id];S.sack[id]=(S.sack[id]||0)+q;ledger(plural(q,c.n.toLowerCase()+' seed'),-c.price*RATE*q,'seed store')});
   CART={};save();renderHud();SND.buy(items.reduce((a,[id,q])=>a+q,0));SOWT=items[0][0];closeStore();toast('Bought for '+payWords(pay)+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct()};
-function sell(id){const c=CAT[id];if(!S.sack[id]){toast('No '+c.n.toLowerCase()+' seeds to return.');return}
-  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('seed_sell',{p_type:id,p_qty:1}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That seed did not sell.'));return}
-    S.coins=+r.data.balance;S.sack[id]=+r.data.qty;if(!S.sack[id])delete S.sack[id];ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}).catch(()=>{BUSY=false;toast('The store did not answer.')});return}
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];S.coins+=c.price;ledger(c.n+' seed returned',c.price,'seed store');save();renderStore();renderHud();SND.clink();toast(c.n+' seed returned. '+c.price+' Deedcoins back.')}
+
+/* ---------- Flora: one press sells everything you picked, for gardencoin. The fish market does the same for the fish in your hand ---------- */
+function sellFlowers(){const types=Object.entries(S.basket).filter(([t,b])=>b.q>0);const bq=basketQty();
+  if(!bq){SND.knock();toast('Nothing to sell yet. Pick some flowers first.');return}
+  const done=(n,coins)=>{save();renderHud();SND.buy(Math.min(16,n));toast('Sold '+plural(n,'flower')+' \u00B7 '+coins.toLocaleString()+' gardencoin.');updateAct()};
+  if(LIVE){if(BUSY)return;BUSY=true;
+    (async()=>{let n=0,coins=0,fail=null;
+      for(const [t] of types){let r;try{r=await sb.rpc('florist_sell',{p_type:t})}catch(e){r={error:e||{message:'network'}}}
+        if(r.error){fail=r.error;break}
+        const d=r.data||{};n+=(+d.sold||0);coins+=(+d.coins||0);S.gc=+d.balance||S.gc;delete S.basket[t];ledger(plural(+d.sold||0,t),+d.coins||0,'the florist');save()}
+      BUSY=false;
+      if(fail)toast(rpcFail(fail,'Flora did not answer.'));
+      if(n)done(n,coins);refresh()})().catch(()=>{BUSY=false;toast('Flora did not answer.')});return}
+  const coins=gcWorth();S.gc+=coins;S.basket={};ledger(plural(bq,'flower'),coins,'the florist');done(bq,coins)}
+function sellFish(){const fn=fountainNow();if(!fn.held){SND.knock();toast('No fish in hand. Catch them at the fountain.');return}
+  const done=(n,coins)=>{save();renderHud();SND.buy(Math.min(16,n));toast('Sold '+fishes(n)+' \u00B7 '+coins.toLocaleString()+' gardencoin.');updateAct()};
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('fish_sell').then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The fish did not sell.'));return}const d=r.data||{};S.gc=+d.balance||S.gc;if(S.fountain){S.fountain.held=+d.held||0;S.fountain.sold=+d.sold||0}
+    ledger(fishes(+d.sold_now||0),+d.coins||0,'the fish market');done(+d.sold_now||0,+d.coins||0);refresh()}).catch(()=>{BUSY=false;toast('The fish did not sell.')});return}
+  const n=fn.held,coins=n*FISH_WORTH;S.gc+=coins;S.fountain.held=0;ledger(fishes(n),coins,'the fish market');done(n,coins)}
+function catchFish(){const fn=fountainNow();
+  if(!fn.sprung){SND.knock();toast('The fountain springs at 40 beds \u00B7 '+Object.keys(S.plants).length+' planted.');return}
+  if(fn.held>=HELD_CAP){SND.knock();toast('Your hands are full. Sell the fish at the market.');return}
+  const done=held=>{save();renderHud();SND.splash();setTimeout(()=>SND.clink(),260);rain(0,0,1.6);toast('Caught a fish \u00B7 '+fishes(held)+' in hand. The fish market pays '+FISH_WORTH+' each.');updateAct()};
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('fish_catch').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The fish got away.'));return}
+    if(d.fish!==undefined&&S.fountain){S.fountain.fish=+d.fish||0;S.fountain.held=+d.held||0;S.fountain.next_s=d.next_s==null?null:+d.next_s;S.fountain.at=snow();S.fountain.sprung=!!d.sprung}
+    if(!d.ok){SND.knock();toast(d.reason==='none'?'No fish yet \u00B7 the next comes in '+mmss(+d.next_s||0)+'.':d.reason==='full'?'Your hands are full. Sell the fish at the market.':'The fountain springs at 40 beds \u00B7 '+(+d.beds||0)+' planted.');save();renderHud();updateAct();return}
+    done(+d.held||0)}).catch(()=>{BUSY=false;toast('The fish got away.')});return}
+  if(!fn.fish){SND.knock();toast('No fish yet \u00B7 the next comes in '+mmss(fn.next)+'.');return}
+  const f=S.fountain;if(f.fish>=FISH_CAP)f.last=Date.now();f.fish=Math.max(0,f.fish-1);f.held=(f.held||0)+1;done(f.held)}
 
 /* ---------- sowing and watering, from where you stand ---------- */
 let SOWT=null;                                      /* the seed type picked for sowing */
@@ -1168,12 +1267,12 @@ function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knoc
   if(!(S.sack[id]>0)){SND.knock();toast('Out of '+c.n.toLowerCase()+' seeds.');return}
   if(LIVE){S.plants[plot]={t:id,g:0,pending:1,cy:snow(),est:false,boost:0,watered:false};sb.rpc('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud()})}
   else S.plants[plot]={t:id,g:0,cy:snow(),est:false,boost:0,watered:false};
-  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SND.sow();
-  if(Object.keys(S.plants).length>=40)setTimeout(()=>SND.allPlanted(),300);
+  S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SND.sow();renderPlinths();
+  if(Object.keys(S.plants).length>=40){setTimeout(()=>SND.allPlanted(),300);setTimeout(checkSpring,1200)}
   const left=S.sack[id]||0;if(!left)setTimeout(()=>SND.lastSeed(),140);toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and it grows twice as fast.');
   if(!left)SOWT=null}
 /* pick: tap, take it at whatever it is worth, the bed starts again. too soon = nothing happens */
-function nudgeFlorist(){if(S.flags.florist)return;const cheapest=Math.min(...FLOWERS.map(t=>CAT[t].price));if(basketWorth()<cheapest)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. The florist is at the market by the south gate.'),1500)}
+function nudgeFlorist(){if(S.flags.florist)return;if(basketQty()<1)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. Flora pays gardencoin, at the market by the south gate.'),1500)}
 function pickAt(plot){const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];const rp=ripe(p);
   if(rp.flowers<1){SND.knock();toast('Not yet. '+c.n+' blooms in '+mmss(rp.next)+'.');return}
   const apply=(fl,w,full)=>{p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(p.picks||0)+1;p.g=1;
@@ -1271,7 +1370,7 @@ function rainTick(dt){for(let i=RAINS.length-1;i>=0;i--){const R=RAINS[i];R.t+=d
 const MARBLE=50,FORMS={obelisk:'Obelisk',urn:'Urn',sphere:'Sphere',column:'Column'};
 if(!S.things)S.things={};
 let THINGS_LIVE=false;
-function loadThings(){if(!sb||!LIVE)return;sb.rpc('garden_things').then(r=>{if(r.error)return;THINGS_LIVE=true;S.things={};(r.data||[]).forEach(t=>{if(FORMS[t.kind])S.things[t.spot]={k:t.kind,st:+t.stage||0}});save();renderThings()}).catch(()=>{})}
+function loadThings(){if(!sb||!LIVE)return;sb.rpc('garden_things').then(r=>{if(r.error)return;THINGS_LIVE=true;S.things={};(r.data||[]).forEach(t=>{if(FORMS[t.kind])S.things[t.spot]={k:t.kind,st:+t.stage||0}});save();renderThings();renderPlinths()}).catch(()=>{})}
 const THINGMESHES=[];
 function formGroup(kind){const G=new THREE.Group();const add=(g,y,rot)=>{const o=new THREE.Mesh(g,MAT.marble);o.castShadow=true;o.receiveShadow=true;o.position.y=y;if(rot)o.rotation.y=rot;G.add(o);return o};
   if(kind==='obelisk'){add(new THREE.BoxGeometry(0.5,0.12,0.5),0.06);add(new THREE.CylinderGeometry(0.15,0.24,1.7,4),0.97,Math.PI/4);add(new THREE.ConeGeometry(0.15,0.24,4),1.94,Math.PI/4)}
@@ -1295,11 +1394,12 @@ const FORMICON={obelisk:'<svg viewBox="0 0 60 64"><path d="M26 10 L34 10 L38 52 
 $('#fmClose').onclick=()=>$('#forms').classList.remove('on');
 $('#forms').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#forms').classList.remove('on')});
 function buyThing(spot,kind){if(S.things[spot]){SND.knock();toast('That plinth is taken.');return}
-  if(S.coins+basketWorth()<MARBLE){showShort(MARBLE);return}
-  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('florist_thing',{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough. Marble is '+MARBLE+'.':/taken/.test(r.error.message||'')?'That plinth is taken.':'The stone did not come.'));return}
-      const d=r.data||{};if(+d.worth_used>0)takeFlowers(+d.worth_used);S.coins=+d.balance;S.things[spot]={k:kind,st:0};ledger('Marble block',-(+d.coins_used||0),'the mason');save();renderThings();renderHud();SND.buy(1);toast('A block of marble, for '+payWords({flowers:+d.flowers_used||0,coins:+d.coins_used||0})+'. Chisel it.');updateAct();refresh()}).catch(()=>{BUSY=false;toast('The stone did not come.')});return}
-  const pay=payLocal(MARBLE);if(!pay){showShort(MARBLE);return}
-  S.things[spot]={k:kind,st:0};ledger('Marble block',-pay.coins,'the mason');save();renderThings();renderHud();SND.buy(1);toast('A block of marble, for '+payWords(pay)+'. Chisel it.');updateAct()}
+  if(plinthsOpen().indexOf(spot)<0){SND.knock();toast('That plinth is asleep. Fill a quadrant and three wake.');return}
+  const cost=MARBLE*RATE;if(S.gc+S.coins*RATE<cost){showShort(cost);return}
+  if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('thing_buy2',{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough. Marble is '+cost+' gardencoin.':/taken/.test(r.error.message||'')?'That plinth is taken.':/asleep/.test(r.error.message||'')?'That plinth is asleep. Fill a quadrant and three wake.':'The stone did not come.'));return}
+      const d=r.data||{};S.gc=+d.balance||0;if(d.dc_balance!=null)S.coins=+d.dc_balance;S.things[spot]={k:kind,st:0};ledger('Marble block',-cost,'the mason');save();renderThings();renderPlinths();renderHud();SND.buy(1);toast('A block of marble, for '+payWords({gc:+d.gc_used||0,dc:+d.dc_used||0})+'. Chisel it.');updateAct();refresh()}).catch(()=>{BUSY=false;toast('The stone did not come.')});return}
+  const pay=payGc(cost);if(!pay){showShort(cost);return}
+  S.things[spot]={k:kind,st:0};ledger('Marble block',-cost,'the mason');save();renderThings();renderPlinths();renderHud();SND.buy(1);toast('A block of marble, for '+payWords(pay)+'. Chisel it.');updateAct()}
 function chipThing(spot){const t=S.things[spot];if(!t||t.st>=3)return;const [x,z]=SPOTS[spot];
   const done=st=>{t.st=st;save();renderThings();if(st>=3){SND.carved();toast('Finished. '+FORMS[t.k]+' in marble, carved by you.')}else{SND.chip();toast('Chisel. '+st+' of 3.')}burst(x,1.1,z);updateAct()};
   if(LIVE){if(BUSY)return;BUSY=true;sb.rpc('thing_chip',{p_spot:spot}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The chisel slipped.'));return}done(Math.min(3,+(r.data&&r.data.stage)||t.st+1))}).catch(()=>{BUSY=false});return}
@@ -1312,18 +1412,20 @@ function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=d
   if(C.t>0.9){scene.remove(C.pts);C.pts.geometry.dispose();CHIPS.splice(i,1)}}}
 
 /* ---------- the act bar: what you can do from where you stand ---------- */
-let ACT=null,ATSTAND=false,ATFLORIST=false;             /* {mode,plot} */
+let ACT=null,ATSTAND=false,ATFLORIST=false,ATFISH=false;             /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
 let ANCHOR=null,CHIPSIG='',EXTRA=[],DIGSHOW=0;          /* the point the prompt floats over; the chips only rebuild when their words change */
 const LOCK={kind:null,id:-1};                             /* what the prompt is on. It lets go only past the exit range, so it never flickers at the edge */
-const ENTER={stand:2.8,florist:2.8,plinth:2.3,bed:1.3},EXIT={stand:3.7,florist:3.7,plinth:3.1,bed:2.1};
+const ENTER={stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,bed:1.3},EXIT={stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,bed:2.1};
 function bedDist(b){return inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z)}
 function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax>3.4)continue;const d=bedDist(b);if(d<bd){bd=d;best=b}}return {b:best,d:bd}}
 function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
 function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return {p:best,d:bd}}
 function distTo(kind,id){if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
+  if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}return bedDist(BED[id])}
 function nearest(){const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
+  const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
   const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};return null}
 function pickTarget(){const c=nearest();
   if(LOCK.kind){const dl=distTo(LOCK.kind,LOCK.id);
@@ -1347,12 +1449,24 @@ function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
 const stallAt=s=>[s.x+1.72,2.7,s.z];
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   const T=pickTarget();
-  if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are ten to fifty. Your flowers pay first.\u201D',null,stallAt(STAND));return}
+  if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('Buy seeds.','stand',null,null,'\u201CSeeds are a hundred to five hundred. Gardencoin first, Deedcoins fill in.\u201D',null,stallAt(STAND));return}
   ATSTAND=false;
-  if(T.kind==='florist'){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();showAct(bq?'Trade flowers.':'See the flowers.','florist',null,null,'\u201CBring me what you grew. I pay in seeds.\u201D'+(bq?' \u00B7 '+plural(bq,'flower')+' worth '+basketWorth():''),null,stallAt(FLORIST));return}
+  if(T.kind==='florist'){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();
+    if(bq)showAct('Sell '+plural(bq,'flower')+' \u00B7 '+gcWorth().toLocaleString()+' gardencoin.','sell',null,null,'\u201CBring me what you grew. I pay in gardencoin.\u201D',null,stallAt(FLORIST));
+    else showAct('Flora buys the flowers you pick.',null,null,null,'\u201CBring me what you grew. I pay in gardencoin.\u201D',null,stallAt(FLORIST));return}
   ATFLORIST=false;
+  if(T.kind==='fish'){if(!ATFISH){ATFISH=true;SND.hello()}const fn=fountainNow();
+    if(fn.held)showAct('Sell '+fishes(fn.held)+' \u00B7 '+(fn.held*FISH_WORTH).toLocaleString()+' gardencoin.','fishsell',null,null,'\u201CA hundred a fish.\u201D',null,stallAt(MARKET3));
+    else if(fn.sprung)showAct('Bring the fish you catch at the fountain.',null,null,null,'\u201CA hundred a fish.\u201D',null,stallAt(MARKET3));
+    else showAct('Fish come when the fountain springs.',null,null,null,'at 40 beds \u00B7 '+Object.keys(S.plants).length+' planted',null,stallAt(MARKET3));return}
+  ATFISH=false;
+  if(T.kind==='fountain'){const fn=fountainNow(),at=[0,3.0,0];
+    if(!fn.sprung){showAct('The fountain springs at 40 beds.',null,null,null,Object.keys(S.plants).length+' of 40 planted',null,at);return}
+    if(fn.fish)showAct('Catch a fish \u00B7 '+fn.fish+' in the water.','fish',null,null,(fn.held?fishes(fn.held)+' in hand \u00B7 ':'')+(fn.next?'the next comes in '+mmss(fn.next):'the basin is full'),null,at);
+    else showAct('No fish yet.',null,null,null,'the next comes in '+mmss(fn.next)+(fn.held?' \u00B7 '+fishes(fn.held)+' in hand':''),null,at);return}
   if(T.kind==='plinth'){const pl=PLINTHS[T.id],t=S.things[pl.i],at=[pl.x,1.5,pl.z];
-    if(!t){showAct('Set a marble block here. '+MARBLE+'.','marble',pl.i,null,null,null,at);return}
+    if(!t&&plinthsOpen().indexOf(pl.i)<0){showAct('This plinth is asleep.',null,null,null,'three wake with every quadrant you fill \u00B7 '+quadrantsFull()+' of 4 full',null,at);return}
+    if(!t){showAct('Set a marble block here \u00B7 '+(MARBLE*RATE)+' gardencoin.','marble',pl.i,null,null,null,at);return}
     if(t.st<3){showAct('Chisel the marble. '+t.st+' of 3.','chip',pl.i,null,null,null,at);return}
     showAct(FORMS[t.k]+' in marble. Carved by you.',null,null,null,null,null,at);return}
   if(CAN){const n=thirsty().length;showAct('Put the can away.','can',null,null,n?plural(n,'bed')+' still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
@@ -1369,7 +1483,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
     showAct('Pick '+(rp.flowers>1?rp.flowers+' '+c.p.toLowerCase():c.n.toLowerCase())+' \u00B7 '+rp.value+'.','pick',b.plot,null,rp.stopped?'Full. Nothing more grows until you pick.':(rp.n>0?'the next opens in '+mmss(rp.next):'a full bloom is '+c.w),extra,at);return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
-function act(){if(!ACT)return;if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='florist')openStore('florist');else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(S.coins+basketWorth()<MARBLE){SND.knock();toast('Marble is '+MARBLE+'. Pick more flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);updateAct()}
+function act(){if(!ACT)return;if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(S.gc+S.coins*RATE<MARBLE*RATE){SND.knock();toast('Marble is '+(MARBLE*RATE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -1433,7 +1547,9 @@ function tapAt(cx,cy){if(STORE_ON||BLOOM||$('#forms').classList.contains('on'))r
     const types=FLOWERS.filter(k=>S.sack[k]>0);if(!types.length){SND.knock();toast('Bed '+(best.plot+1)+' is empty. Seeds are at the stand by the south gate.');return true}
     if(!SOWT||!(S.sack[SOWT]>0))SOWT=types[0];sowAt(best.plot,SOWT);updateAct();return true}
   if(Math.hypot(hx-STAND.x,hz-STAND.z)<2.6&&Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<3.4){openStore('stand');return true}
-  if(Math.hypot(hx-FLORIST.x,hz-FLORIST.z)<2.6&&Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<3.4){openStore('florist');return true}
+  if(Math.hypot(hx-FLORIST.x,hz-FLORIST.z)<2.6&&Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<3.4){sellFlowers();return true}
+  if(Math.hypot(hx-MARKET3.x,hz-MARKET3.z)<2.6&&Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z)<3.4){sellFish();return true}
+  if(Math.hypot(hx,hz)<3.1&&Math.hypot(you.x,you.z)<ENTER.fountain){catchFish();return true}
   const pl=plinthHere();if(pl&&Math.hypot(hx-pl.x,hz-pl.z)<1.1&&ACT&&(ACT.mode==='marble'||ACT.mode==='chip')){act();return true}
   return false}
 /* a tap is a press that neither moves nor lingers. A press held still on a planted bed brings up Dig, and its release does nothing. */
@@ -1551,7 +1667,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -1568,6 +1684,12 @@ function loop(now){
    FLORA.armL.rotation.x+=((tuck?-2.75:0.4)-FLORA.armL.rotation.x)*Math.min(1,4*dt);FLORA.armL.fore.rotation.x+=((tuck?-0.7:-1.2+Math.sin(t*2.6+1.5)*0.06)-FLORA.armL.fore.rotation.x)*Math.min(1,5*dt);
    if(near<4){FLORA.armR.rotation.x+=(-2.2-FLORA.armR.rotation.x)*Math.min(1,5*dt);FLORA.armR.fore.rotation.x=-0.2+Math.sin(t*6.5)*0.3}
    else{FLORA.armR.rotation.x+=(-0.3-FLORA.armR.rotation.x)*Math.min(1,5*dt);FLORA.armR.fore.rotation.x=-0.9+Math.sin(t*2.6)*0.12}}
+  /* the fishmonger: breathes, turns to whoever is close, waves as you arrive */
+  {const dx=you.x-MARKET3.x,dz=you.z-MARKET3.z,near=Math.hypot(dx,dz);
+   MONGER.g.scale.y=1.02+Math.sin(t*1.5+2)*0.006;MONGER.g.rotation.z=Math.sin(t*0.42+1)*0.012;
+   if(near<9){const target=Math.max(-0.9,Math.min(0.9,localLook(dx,dz,MARKET3.rot)));MONGER.head.rotation.y+=(target-MONGER.head.rotation.y)*Math.min(1,4*dt);MONGER.head.rotation.x=Math.sin(t*2.1)*0.04}
+   else{MONGER.head.rotation.y*=1-Math.min(1,3*dt);MONGER.head.rotation.x=0}
+   MONGER.armR.rotation.x+=((near<4?-2.3:-0.1)-MONGER.armR.rotation.x)*Math.min(1,5*dt);MONGER.armR.fore.rotation.x=near<4?-0.2+Math.sin(t*7+1)*0.35:-0.5}
   chipTick(dt);
   if(CAN)CANG.rotation.x+=((POUR>performance.now()?-0.95:0)-CANG.rotation.x)*Math.min(1,6*dt);
   if(frame%6===0){labels();updateAct();canTick()}
@@ -1577,10 +1699,10 @@ function loop(now){
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
 
 applyPhase();
-you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderHud();labels();updateAct();
+you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();springMesh.visible=!!(S.fountain&&S.fountain.sprung);renderHud();labels();updateAct();
 if(!BLOOM&&!S.flags.whello){S.flags.whello=1;save();setTimeout(()=>toast('Your garden. The market is behind you, on your right.'),1400)}
 $('#lbar').style.width='100%';$('#lmsg').textContent='Walk in';
 requestAnimationFrame(loop);
