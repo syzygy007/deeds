@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="3.3">
+<meta name="world-build" content="3.4">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -49,6 +49,7 @@ canvas{display:block;touch-action:none;cursor:default}
 .pk img{width:100%;aspect-ratio:1;object-fit:contain;display:block;margin:0 auto 6px}
 .pk .nm{font-size:11px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}
 .pk .pr{font-size:12px;color:rgba(246,243,235,.7);margin:2px 0 6px}
+.pk.sap .btn{width:100%;margin-top:2px;font-size:11px;padding:8px 6px}
 .stp{display:flex;justify-content:center;align-items:center;gap:6px}
 .stp button{width:32px;height:32px;border-radius:50%;border:1px solid rgba(246,243,235,.5);background:transparent;color:var(--ivory);font-size:18px;line-height:1;cursor:pointer}
 .stp b{min-width:22px;font-size:15px}
@@ -859,6 +860,8 @@ const SPOTS=[[-6,30.2],[6,30.2],[-6,-30.2],[6,-30.2],[34,34],[-34,34],[34,-34],[
 /* 3.3: the house site at the top of the north avenue, the twelve oaks in two groves beside it, the ten hiding places of the chest deep in the wood */
 const HOUSE={x:0,z:-61,front:{x:5.6,z:-53.4}};
 const OAKS=[[-9,-42],[-14,-45.5],[-20,-43],[-11,-49],[-17,-52],[-23,-49.5],[9,-42],[14,-45.5],[20,-43],[11,-49],[17,-52],[23,-49.5]];
+const RINGS=[[-9.5,-33.0],[-15.0,-32.0],[-21.0,-33.5],[-12.0,-38.0],[-18.0,-37.5],[-24.0,-39.0],[9.5,-33.0],[15.0,-32.0],[21.0,-33.5],[12.0,-38.0],[18.0,-37.5],[24.0,-39.0],[-27.0,-42.0],[-32.5,-44.5],[-38.0,-42.5],[-29.0,-48.0],[-34.5,-50.5],[-40.0,-47.5],[27.0,-42.0],[32.5,-44.5],[38.0,-42.5],[29.0,-48.0],[34.5,-50.5],[40.0,-47.5],[-27.0,-32.0],[-33.0,-30.0],[-39.0,-31.5],[-27.5,-37.0],[-32.5,-39.5],[-39.5,-37.0],[27.0,-32.0],[33.0,-30.0],[39.0,-31.5],[27.5,-37.0],[32.5,-39.5],[39.5,-37.0],[-27.0,-55.0],[-33.5,-54.5],[-39.0,-55.5],[-29.5,-59.5],[-35.5,-58.5],[-41.0,-60.0],[27.0,-55.0],[33.5,-54.5],[39.0,-55.5],[29.5,-59.5],[35.5,-58.5],[41.0,-60.0]];   /* 3.4: the preset tree rings, four groves of twelve (six west, six east) that fill in with saplings from the Keeper, one grove at a time */
+const TREEPOS=OAKS.concat(RINGS),RING_BLOCK=12,RING_NAMES=['the front grove','the outer grove','the south corner','the north corner'];
 const CHEST_SPOTS=[[52,-36],[58,-12],[57,14],[48,42],[18,56],[-24,54],[-52,34],[-58,-8],[-50,-36],[-30,-52]];
 const PLINTHS=[];
 const CAPS=[];
@@ -973,7 +976,7 @@ const TREES={green:['g2-magnolia-tree-green.webp','green'],apple:['g2-apple-tree
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
    if(Math.hypot(x+6.0,z-43.2)<5.2)continue;                        /* the third stall, kept for the fish market */
    if(Math.hypot(x-HOUSE.x,z-HOUSE.z)<17)continue;                   /* the house and its lawn */
-   if(OAKS.some(([ox,oz])=>Math.hypot(x-ox,z-oz)<3.6))continue;       /* the oak groves */
+   if(TREEPOS.some(([ox,oz])=>Math.hypot(x-ox,z-oz)<3.6))continue;    /* the oak groves and the tree rings */
    if(CHEST_SPOTS.some(([cx,cz])=>Math.hypot(x-cx,z-cz)<2.6))continue;/* room to stand at the chest */
    if(SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<3.2))continue;     /* the plinths */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
@@ -1093,7 +1096,7 @@ const freeWater=()=>LIVE?ADMIN:TESTING;
 const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
 let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
-const CHEST_GC=30,AXE_DC=30,CHOPS=5,REGROW_S=1800,HOUSE_TIERS=[5,10,50],STATUES_TO_WAKE=12;   /* the chest a tenth of a deed, the axe 45 gardencoin, five chops, half an hour to regrow, 5 / 10 / 50 bundles */
+const CHEST_GC=30,AXE_DC=30,CHOPS=5,HOUSE_TIERS=[5,10,50],STATUES_TO_WAKE=12;let REGROW_S=600,GROW_S=600,SAPLING_GC=300,PATCH47=false,RINGS_OPEN=null;   /* the chest a tenth of a deed, the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
 const TOOLS={rocket:{n:'Flower rocket',dc:2000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:20000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'}};
 const TREEFREE=QS.get('trees')==='1';const HOUSE_PREVIEW=Math.max(0,Math.min(3,+QS.get('house')||0));const HELD_CAP=12,PLINTH_ORDER=[0,1,4,5,8,10,9,11,6,2,3,7];   /* a Deedcoin is 1.5 gardencoin (his call Aug 30), fish in threes at 15 each; the server's numbers win when signed in */
 const gcv=x=>Math.round(x*RATE);                  /* a Deedcoin price or worth in gardencoin, always a whole coin */
@@ -1108,7 +1111,7 @@ if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
 if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};if(!S.ledger)S.ledger=[];
 if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
 if(!S.basket)S.basket={};if(!S.stats)S.stats={};if(!(S.gc>=0))S.gc=0;if(S.fountain===undefined)S.fountain=null;
-if(!S.tools)S.tools={};if(!S.trees)S.trees={};if(!(S.wood>=0))S.wood=0;if(!S.house)S.house={stage:0,wood:0};if(!S.chest)S.chest={};
+if(!S.tools)S.tools={};if(!S.trees)S.trees={};Object.values(S.trees).forEach(tr=>{if(tr&&tr.cut&&!tr.ready)tr.ready=tr.cut+REGROW_S*1000});if(!(S.wood>=0))S.wood=0;if(!S.house)S.house={stage:0,wood:0};if(!S.chest)S.chest={};
 /* ---------- the clock: the server's ripening rule, mirrored here for drawing and for the signed out demo ---------- */
 let NOW_OFF=0;const snow=()=>Date.now()+NOW_OFF;
 function ripe(p,at){const c=CAT[p.t];if(!c)return {n:0,frac:0,next:0,stopped:false,value:0,flowers:0};const now=at||snow();
@@ -1160,8 +1163,10 @@ function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;PATCH45=!!d.rate;
   if(+d.rate>0)RATE=+d.rate;S.gc=+(d.gc&&d.gc.balance)||0;PLINTHS_OPEN=d.plinths&&Array.isArray(d.plinths.open)?d.plinths.open.map(Number):null;
   if(d.fountain){const f=d.fountain;S.fountain={sprung:!!f.sprung,fish:+f.fish||0,held:+f.held||0,caught:+f.caught||0,sold:+f.sold||0,next_s:f.next_s==null?null:+f.next_s,at:snow()};
     if(+f.fish_s>0)FISH_S=+f.fish_s;if(+f.fish_cap>0)FISH_CAP=+f.fish_cap;if(+f.fish_worth>0)FISH_WORTH=+f.fish_worth;FISH_BATCH=+f.fish_batch>0?+f.fish_batch:1}else S.fountain=null;
-  PATCH46=+d.patch>=46;if(PATCH46){S.tools={};(d.tools||[]).forEach(t=>{if(TOOLS[t])S.tools[t]=1});S.chest={on:d.chest&&d.chest.opened_today?today():''};
-    S.trees={};(d.trees||[]).forEach(t=>{S.trees[+t.i]={st:+t.stage||0,cut:t.cut_at?new Date(t.cut_at).getTime()-NOW_OFF:0}});
+  PATCH46=+d.patch>=46;PATCH47=+d.patch>=47;if(PATCH46){S.tools={};(d.tools||[]).forEach(t=>{if(TOOLS[t])S.tools[t]=1});S.chest={on:d.chest&&d.chest.opened_today?today():''};
+    REGROW_S=+d.regrow_s>0?+d.regrow_s:(PATCH47?600:1800);GROW_S=+d.grow_s>0?+d.grow_s:600;if(+d.sapling_gc>0)SAPLING_GC=+d.sapling_gc;RINGS_OPEN=PATCH47&&d.rings&&+d.rings.open>=0?+d.rings.open:null;
+    S.trees={};(d.trees||[]).forEach(t=>{const cut=t.cut_at?new Date(t.cut_at).getTime()-NOW_OFF:0;const ready=t.next_s!=null?(+t.next_s>0?Date.now()+(+t.next_s)*1000:0):(cut?cut+REGROW_S*1000:0);
+      S.trees[+t.i]={st:+t.stage||0,cut,ready,pl:(+t.i<RING_BLOCK||t.planted)?1:0,wt:!!t.watered}});
     S.wood=+(d.house&&d.house.carrying)||0;S.house={stage:+(d.house&&d.house.stage)||0,wood:+(d.house&&d.house.wood)||0};if(d.house&&+d.house.axe_dc>0)AXE_DCS=+d.house.axe_dc;if(d.chest&&+d.chest.coins>0)CHEST_GCS=+d.chest.coins}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
@@ -1175,10 +1180,10 @@ function hydrate(d){LIVE=true;ADMIN=!!d.admin;PATCH44=!!d.now;PATCH45=!!d.rate;
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
   save();plantBeds();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));renderHud();paintBar();renderTrees();renderHouse();placeChest();if(STORE_ON)renderStore();loadThings()}
 /* a quiet refresh after a sale or a buy, so the sack, the basket and the fish are exactly the server's */
-function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc(PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
+function refresh(){if(!sb||!LIVE||!PATCH44)return;sb.rpc(PATCH47?'garden_state5':PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2').then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
-    return sb.rpc('garden_state4').then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3')).then(r2=>{
+    return sb.rpc('garden_state5').then(r5=>(!r5.error&&r5.data)?r5:sb.rpc('garden_state4')).then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3')).then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
         if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
         toast(rpcFail(r2.error,'The garden could not load your sack.'));return}
@@ -1287,7 +1292,8 @@ function renderStore(){const t=tierOf(S.deeds),total=cartTotal(),left=reach()-to
   let h='';FLOWERS.forEach(id=>{const c=CAT[id],n=CART[id]||0,locked=c.tier>t;
     h+='<div class="pk'+(locked?' locked':'')+(n?' in':'')+'" data-id="'+id+'"><img src="'+BASE+'garden-'+c.img+'-map.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+(locked?'Opens at '+TIERS[c.tier]+' deeds':gcv(c.price)+' \u00B7 a bloom pays '+gcv(c.w)+(S.sack[id]?' \u00B7 '+S.sack[id]+' in the sack':''))+'</div>';
     h+=locked?'':'<div class="stp"><button data-d="-1" data-id="'+id+'" aria-label="less">\u2212</button><b>'+n+'</b><button data-d="1" data-id="'+id+'" aria-label="more">+</button></div>';h+='</div>'});
-  $('#stGrid').innerHTML=h;
+  if(treesAwake()){const nr=nextRing(),np=ringsPlanted();h+='<div class="pk sap"><img src="'+SAP_IMG+'" alt=""><div class="nm">Oak sapling</div><div class="pr">'+SAPLING_GC.toLocaleString()+' \u00B7 grows in '+mmss(GROW_S)+', '+mmss(GROW_S/2)+' watered \u00B7 '+np+' of '+RINGS.length+' planted</div>'+(nr<0?'<div class="micro" style="opacity:.7">THE WOOD IS FULL</div>':'<button class="btn on" id="sapBuy">Plant one \u00B7 '+ringName(nr)+'.</button>')+'</div>'}
+  $('#stGrid').innerHTML=h;const sapB=$('#sapBuy');if(sapB)sapB.onclick=()=>plantTree(null);
   const sack=Object.entries(S.sack).filter(([id,q])=>q>0&&CAT[id]);
   $('#stSack').innerHTML=sack.length?'<div class="micro" style="margin-top:10px;opacity:.75">YOUR SACK \u00B7 '+sack.map(([id,q])=>plural(q,CAT[id].n.toLowerCase()+' seed')).join(' \u00B7 ')+'</div>':'';
   $('#stBuy').textContent=total?'Checkout \u00B7 '+total.toLocaleString()+'.':'Checkout.';$('#stBuy').disabled=BUSY;
@@ -1302,6 +1308,10 @@ function renderTabs(){$('#stTabs').innerHTML='<button class="btn'+(STAB==='seeds
       (S.tools[k]?'<div class="micro" style="opacity:.7">YOURS \u00B7 SLOT '+t.slot+' IN YOUR HOTBAR</div>':'<button class="btn on" data-tool="'+k+'">Buy \u00B7 '+gcv(t.dc).toLocaleString()+' gardencoin.</button>')+'</div></div>').join('');
     $$('#stTools .btn').forEach(b=>b.onclick=()=>buyTool(b.dataset.tool))}else $('#stTools').innerHTML=''}
 const TOOL_ICON={rocket:$('#rocket').querySelector('svg').outerHTML,launcher:$('#launcher').querySelector('svg').outerHTML};
+/* the sapling packet's picture, drawn: a soil ring, a whip of a trunk, four leaves */
+const SAP_IMG=(()=>{const c=cv(160,160),g=c.getContext('2d');g.fillStyle='#4A3524';g.beginPath();g.ellipse(80,140,44,12,0,0,6.283);g.fill();g.strokeStyle='#8E7A52';g.lineWidth=3;g.beginPath();g.ellipse(80,140,44,12,0,0,6.283);g.stroke();
+  g.strokeStyle='#7A5A3A';g.lineCap='round';g.lineWidth=7;g.beginPath();g.moveTo(80,138);g.lineTo(80,84);g.stroke();g.lineWidth=5;g.beginPath();g.moveTo(80,112);g.lineTo(60,94);g.moveTo(80,100);g.lineTo(100,80);g.stroke();
+  [[80,62,28],[58,84,18],[104,70,19],[72,84,14]].forEach(([x,y,r],i)=>{g.fillStyle=i%2?'#3A6E33':'#2E5A2A';g.beginPath();g.arc(x,y,r,0,6.283);g.fill()});return c.toDataURL()})();
 function buyTool(k){const t=TOOLS[k];if(!t||S.tools[k])return;const cost=gcv(t.dc);
   const done=()=>{S.tools[k]=1;save();paintBar();renderHud();SND.buy(8);closeStore();setTool(k);toast('The '+t.n.toLowerCase()+' is yours. Slot '+t.slot+' in your hotbar.')};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();sb.rpc('tool_buy',{p_kind:k}).then(r=>{BUSY=false;
@@ -1590,6 +1600,7 @@ function tickLauncher(dt){if(LAUNCH.t<0)return;LAUNCH.t+=dt;if(LAUNCH.t>1.6){LAU
 
 /* ======================================================================
    3.3 · THE CHEST deep in the wood (a new hiding place each day, once a day), THE OAKS you fell for wood once the twelfth
+   3.4 · THE RINGS: forty eight preset tree rings in four groves that fill in with saplings from the Keeper (300 gardencoin, ten minutes, five watered), one grove at a time; a felled oak grows back on the same clock
    statue is carved, and THE HOUSE at the top of the north avenue that the builder raises in three stages: 5, 10 and 50 bundles.
    ====================================================================== */
 let AXE_DCS=AXE_DC,CHEST_GCS=CHEST_GC;
@@ -1611,30 +1622,84 @@ function openChest(){if(chestOpened()){SND.knock();toast('Opened today. It moves
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('chest_open',{p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The lid would not lift.'));return}
     if(!d.ok){S.chest={on:today()};save();SND.knock();toast('Opened today. It moves tomorrow.');updateAct();return}if(d.balance!=null)S.gc=+d.balance-(+d.coins||0);done(+d.coins||0)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
   done(CHEST_GCS)}
-/* the oaks */
+/* the oaks and the rings (3.4): sixty trees in seven instanced meshes, the twelve oaks beside the avenue and the forty eight rings in four
+   groves that fill in with saplings from the Keeper. One rule for growing and growing back: GROW_S for a sapling, REGROW_S for a felled oak,
+   the time left halved once by water. Trees are drawn at a scale that follows their growth, so a sapling is a whip and an oak is an oak */
 const statuesDone=()=>Object.values(S.things||{}).filter(t=>t&&t.st>=3).length;
 const treesAwake=()=>TREEFREE||ADMIN||statuesDone()>=STATUES_TO_WAKE;
-const regrowLeft=tr=>tr&&tr.cut?Math.max(0,Math.ceil(REGROW_S-(Date.now()-tr.cut)/1000)):0;
-const OAKG=[];
-{const bark=new THREE.MeshStandardMaterial({color:0x5A4030,roughness:0.95}),leaf=new THREE.MeshStandardMaterial({color:0x2E5A2A,roughness:0.9}),leaf2=new THREE.MeshStandardMaterial({color:0x3A6E33,roughness:0.9});
- OAKS.forEach(([x,z],i)=>{const G=new THREE.Group();G.position.set(x,0,z);scene.add(G);const T=new THREE.Group();G.add(T);
-   const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.5,3.6,12),bark);trunk.position.y=1.8;trunk.castShadow=true;T.add(trunk);
-   [[0,4.9,0,2.3,leaf],[1.3,4.3,0.6,1.7,leaf2],[-1.2,4.4,-0.5,1.6,leaf2],[0.3,5.9,-0.9,1.5,leaf],[-0.4,4.2,1.3,1.4,leaf2]].forEach(([cx,cy,cz,r,m])=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,14,10),m);s.position.set(cx,cy,cz);s.castShadow=true;T.add(s)});
-   const stump=new THREE.Mesh(new THREE.CylinderGeometry(0.44,0.5,0.55,12),bark);stump.position.y=0.27;stump.visible=false;G.add(stump);
-   markDisk(x,z,0.62,3);OAKG.push({g:G,tree:T,stump,fall:-1})})}
-function renderTrees(){OAKG.forEach((o,i)=>{const tr=S.trees[i];const cut=regrowLeft(tr)>0;if(o.fall<0){o.tree.visible=!cut;o.tree.rotation.z=0;o.tree.rotation.x=0;o.stump.visible=cut}})}
-function chopTree(i){const tr=S.trees[i]||(S.trees[i]={st:0,cut:0});if(!treesAwake()||regrowLeft(tr)>0||S.wood)return;const [ox,oz]=OAKS[i];
-  const done=(stage,fell)=>{tr.st=stage;burst(ox,1.4,oz);SND.chip();
-    if(fell){tr.st=0;tr.cut=Date.now();S.wood=1;const o=OAKG[i];o.fall=0;o.dir=Math.atan2(ox-you.x,oz-you.z);setTimeout(()=>SND.rustle(),500);setTimeout(()=>SND.knock(),1150);toast('The oak comes down. Take the bundle to the builder at the house.')}
+const growLeft=tr=>tr&&tr.ready?Math.max(0,Math.ceil((tr.ready-Date.now())/1000)):0;
+const regrowLeft=growLeft;
+const isRing=i=>i>=RING_BLOCK;
+const planted=i=>!isRing(i)||!!(S.trees[i]&&S.trees[i].pl);
+const ringBlock=i=>Math.floor((i-RING_BLOCK)/RING_BLOCK);
+const ringName=i=>RING_NAMES[ringBlock(i)]+(TREEPOS[i][0]<0?', west side':', east side');
+/* the groves open one at a time: the next opens when the one before it is full. The server's count wins when signed in */
+function blocksDone(){let n=0;for(let b=0;b<RINGS.length/RING_BLOCK;b++){let full=true;for(let k=0;k<RING_BLOCK;k++)if(!planted(RING_BLOCK+b*RING_BLOCK+k)){full=false;break}if(!full)break;n++}return n}
+function ringsOpen(){if(LIVE&&PATCH47&&RINGS_OPEN!=null)return Math.min(RINGS.length,RINGS_OPEN);return Math.min(RINGS.length,RING_BLOCK*(blocksDone()+1))}
+const ringOpen=i=>isRing(i)&&(i-RING_BLOCK)<ringsOpen();
+function nextRing(){for(let i=RING_BLOCK;i<TREEPOS.length;i++)if(!planted(i)&&ringOpen(i))return i;return -1}
+const ringsPlanted=()=>{let n=0;for(let i=RING_BLOCK;i<TREEPOS.length;i++)if(planted(i))n++;return n};
+const TREE={n:TREEPOS.length,blobs:[],fall:{},marked:{}};
+{const bark=new THREE.MeshStandardMaterial({color:0x5A4030,roughness:0.95}),leaf=new THREE.MeshStandardMaterial({color:0x2E5A2A,roughness:0.9}),leaf2=new THREE.MeshStandardMaterial({color:0x3A6E33,roughness:0.9}),
+   soil=new THREE.MeshStandardMaterial({color:0x4A3524,roughness:1}),rim=new THREE.MeshStandardMaterial({color:0x8E7A52,roughness:1});
+ const inst=(g,m,sh)=>{const im=new THREE.InstancedMesh(g,m,TREE.n);im.castShadow=sh!==false;im.receiveShadow=true;im.frustumCulled=false;scene.add(im);return im};
+ const tg=new THREE.CylinderGeometry(0.34,0.5,3.6,12);tg.translate(0,1.8,0);TREE.trunk=inst(tg,bark);
+ [[0,4.9,0,2.3,leaf],[1.3,4.3,0.6,1.7,leaf2],[-1.2,4.4,-0.5,1.6,leaf2],[0.3,5.9,-0.9,1.5,leaf],[-0.4,4.2,1.3,1.4,leaf2]].forEach(([cx,cy,cz,r,m])=>{const g=new THREE.SphereGeometry(r,14,10);g.translate(cx,cy,cz);TREE.blobs.push(inst(g,m))});
+ const sg=new THREE.CylinderGeometry(0.44,0.5,0.55,12);sg.translate(0,0.27,0);TREE.stump=inst(sg,bark);
+ const dg=new THREE.CircleGeometry(0.95,24);dg.rotateX(-Math.PI/2);dg.translate(0,0.015,0);TREE.disc=inst(dg,soil,false);
+ const rg=new THREE.RingGeometry(0.95,1.12,24);rg.rotateX(-Math.PI/2);rg.translate(0,0.02,0);TREE.rim=inst(rg,rim,false);
+ OAKS.forEach(([x,z],i)=>{markDisk(x,z,0.62,3);TREE.marked[i]=1})}
+const _tm=new THREE.Matrix4(),_tq=new THREE.Quaternion(),_te=new THREE.Euler(),_tp=new THREE.Vector3(),_ts=new THREE.Vector3(),_tz=new THREE.Matrix4().makeScale(0,0,0);
+function treeMatrix(i,s,rx,rz){const [x,z]=TREEPOS[i];_te.set(rx||0,0,rz||0);_tq.setFromEuler(_te);_tp.set(x,0,z);_ts.set(s,s,s);_tm.compose(_tp,_tq,_ts);return _tm}
+function setTree(i,vis,s,rx,rz){const m=vis?treeMatrix(i,s,rx,rz):_tz;TREE.trunk.setMatrixAt(i,m);TREE.blobs.forEach(b=>b.setMatrixAt(i,m))}
+function setFlat(im,i,vis){im.setMatrixAt(i,vis?treeMatrix(i,1,0,0):_tz)}
+function treeDirty(){TREE.trunk.instanceMatrix.needsUpdate=true;TREE.blobs.forEach(b=>b.instanceMatrix.needsUpdate=true);TREE.stump.instanceMatrix.needsUpdate=true;TREE.disc.instanceMatrix.needsUpdate=true;TREE.rim.instanceMatrix.needsUpdate=true}
+/* how far along a growing tree is, 0 to 1; a felled oak and a fresh sapling grow the same way */
+function treeProg(tr){const left=growLeft(tr);if(!left)return 1;const total=tr&&tr.cut?REGROW_S:GROW_S;return Math.max(0,Math.min(1,1-left/Math.max(1,total)))}
+function renderTrees(){const awake=treesAwake();
+  for(let i=0;i<TREE.n;i++){const tr=S.trees[i];
+    if(!planted(i)){setTree(i,false);setFlat(TREE.stump,i,false);const show=awake&&ringOpen(i);setFlat(TREE.disc,i,show);setFlat(TREE.rim,i,show);continue}
+    setFlat(TREE.disc,i,false);setFlat(TREE.rim,i,false);
+    if(TREE.fall[i])continue;
+    const prog=treeProg(tr);const s=0.12+0.88*prog;setTree(i,true,s,0,0);setFlat(TREE.stump,i,!!(tr&&tr.cut)&&prog<0.35);
+    /* a planted ring gets its collider once you have stepped off it, so nothing ever stands you on top of your own sapling */
+    if(!TREE.marked[i]){const [x,z]=TREEPOS[i];if(Math.hypot(x-you.x,z-you.z)>1.05){markDisk(x,z,0.62,3);TREE.marked[i]=1}}}
+  treeDirty()}
+function chopTree(i){const tr=S.trees[i]||(S.trees[i]={st:0,cut:0,ready:0});if(!treesAwake()||!planted(i)||growLeft(tr)>0||S.wood)return;const [ox,oz]=TREEPOS[i];
+  const done=(stage,fell,nextS)=>{tr.st=stage;burst(ox,1.4,oz);SND.chip();
+    if(fell){tr.st=0;tr.cut=Date.now();tr.ready=Date.now()+(nextS||REGROW_S)*1000;tr.wt=false;S.wood=1;TREE.fall[i]={t:0,dir:Math.atan2(ox-you.x,oz-you.z)};setTimeout(()=>SND.rustle(),500);setTimeout(()=>SND.knock(),1150);toast('The oak comes down. Take the bundle to the builder at the house.')}
     else toast('Chop \u00B7 '+stage+' of '+CHOPS+'.');save();renderHud();paintBundle();updateAct()};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('tree_chop',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};
       if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(gcv(AXE_DCS));else toast(rpcFail(r.error,'The axe slipped.'));return}
-      if(!d.ok){SND.knock();toast(d.reason==='asleep'?'The oaks are asleep.':d.reason==='regrowing'?'It is growing back.':d.reason==='carrying'?'Take your bundle to the builder first.':'That did not chop.');return}
-      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;done(+d.stage||0,!!d.fell)}).catch(()=>{BUSY=false;toast('The axe slipped.')});return}
+      if(!d.ok){SND.knock();if((d.reason==='regrowing'||d.reason==='growing')&&+d.next_s>0){tr.ready=Date.now()+(+d.next_s)*1000;save();renderTrees()}
+        toast(d.reason==='asleep'?'The oaks are asleep.':d.reason==='regrowing'?'It is growing back.':d.reason==='growing'?'It is still growing.':d.reason==='carrying'?'Take your bundle to the builder first.':d.reason==='empty'?'Nothing is planted here.':'That did not chop.');updateAct();return}
+      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;done(+d.stage||0,!!d.fell,+d.next_s||0)}).catch(()=>{BUSY=false;toast('The axe slipped.')});return}
   if(!tr.st){const cost=gcv(AXE_DCS);const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('An axe',-cost,'the oak')}
-  const st=tr.st+1;done(st>=CHOPS?CHOPS:st,st>=CHOPS)}
-function tickTrees(dt){OAKG.forEach((o,i)=>{if(o.fall<0)return;o.fall+=dt;const u=Math.min(1,o.fall/1.2);const a=u*u*Math.PI/2;o.tree.rotation.set(Math.cos(o.dir)*a,0,-Math.sin(o.dir)*a);
-    if(o.fall>1.5){o.fall=-1;renderTrees()}})}
+  const st=tr.st+1;done(st>=CHOPS?CHOPS:st,st>=CHOPS,0)}
+/* a sapling from the Keeper, planted at the next open ring, or at the ring you stand at */
+function plantTree(i){if(!treesAwake()){SND.knock();toast('The oaks are asleep.');return}const n=i==null?nextRing():i;
+  if(n<0){SND.knock();toast('Every ring is planted. The wood is full.');return}
+  if(!isRing(n)||planted(n)){SND.knock();toast('Planted already.');return}
+  if(!ringOpen(n)){SND.knock();toast('That grove opens when the one before it is full.');return}
+  const cost=SAPLING_GC;
+  const done=(at,nextS)=>{const tr=S.trees[at]||(S.trees[at]={st:0,cut:0});tr.pl=1;tr.st=0;tr.cut=0;tr.wt=false;tr.ready=Date.now()+(nextS||GROW_S)*1000;const [x,z]=TREEPOS[at];
+    save();renderHud();renderTrees();SND.sow();burst(x,0.6,z);if(STORE_ON)renderStore();toast('A sapling, in '+ringName(at)+'. Water it and it grows in '+mmss((nextS||GROW_S)/2)+'.');updateAct()};
+  if(LIVE){if(!PATCH47){toast('Run patch 47 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('tree_plant',{p_tree:i==null?null:n}).then(r=>{BUSY=false;const d=r.data||{};
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,'The Keeper did not answer.'));return}
+      if(!d.ok){SND.knock();toast(d.reason==='taken'?'Planted already.':d.reason==='closed'?'That grove opens when the one before it is full.':d.reason==='full'?'Every ring is planted. The wood is full.':d.reason==='asleep'?'The oaks are asleep.':'That did not plant.');return}
+      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(d.rings_open!=null)RINGS_OPEN=+d.rings_open;ledger('An oak sapling',-cost,'the Keeper');done(d.tree!=null?+d.tree:n,+d.next_s||0)}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+  const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('An oak sapling',-cost,'the Keeper');done(n,GROW_S)}
+/* water a sapling or a felled oak: the time left is halved, once per growth */
+function waterTree(i){const tr=S.trees[i];if(!tr||!planted(i))return;const left=growLeft(tr);if(!left){SND.knock();toast('It is grown.');return}
+  if(!freeWater()&&tr.wt){SND.knock();toast('Watered already.');return}
+  const done=(nextS)=>{tr.wt=true;tr.ready=Date.now()+nextS*1000;save();renderTrees();SND.splash();toast((tr.cut?'The oak grows back':'The sapling grows')+' in '+mmss(nextS)+'.');updateAct()};
+  if(LIVE){if(!PATCH47){toast('Run patch 47 on DEEDS first.');return}if(BUSY)return;BUSY=true;sb.rpc('tree_water',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}
+      if(!d.ok){SND.knock();toast(d.reason==='watered'?'Watered already.':d.reason==='grown'?'It is grown.':'That did not water.');return}done(+d.next_s||0)}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
+  done(Math.ceil(left/2))}
+let GROWT=0;
+function tickTrees(dt){let any=false;Object.keys(TREE.fall).forEach(k=>{const i=+k,f=TREE.fall[k];f.t+=dt;const u=Math.min(1,f.t/1.2);const a=u*u*Math.PI/2;setTree(i,true,1,Math.cos(f.dir)*a,-Math.sin(f.dir)*a);any=true;
+    if(f.t>1.5){delete TREE.fall[k];renderTrees()}});
+  GROWT+=dt;if(GROWT>1){GROWT=0;renderTrees()}else if(any)treeDirty()}
 /* the bundle on your shoulder */
 const BUNDLE=new THREE.Group();AV.torso.add(BUNDLE);BUNDLE.position.set(0,0.66,-0.2);BUNDLE.rotation.z=Math.PI/2;BUNDLE.rotation.y=0.35;BUNDLE.visible=false;
 {const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});[[0,0.09],[0.08,-0.06],[-0.08,-0.06]].forEach(([y,z])=>{const l=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.95,10),bark);l.position.set(0,y,z);BUNDLE.add(l)});
@@ -1711,8 +1776,8 @@ function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypo
 function distTo(kind,id){if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
   if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
-  if(kind==='tree'){const [ox,oz]=OAKS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);return bedDist(BED[id])}
-function oakNear(){let best=-1,bd=1e9;OAKS.forEach(([ox,oz],i)=>{const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
+  if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);return bedDist(BED[id])}
+function oakNear(){let best=-1,bd=1e9;const awake=treesAwake();TREEPOS.forEach(([ox,oz],i)=>{if(isRing(i)&&(!awake||(!planted(i)&&!ringOpen(i))))return;const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
 function nearest(){const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
   const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
   const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};
@@ -1763,9 +1828,10 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
     const n=ripeIn(q).length;if(n)showAct('Fire at quadrant '+(q+1)+' \u00B7 '+plural(n,'ripe bed')+'.','rocket',q,null,'every ripe bed in it, picked at once',null,[QC[q].x,2.2,QC[q].z]);else showAct('Nothing ripe in quadrant '+(q+1)+'.',null,null,null,null,null,[QC[q].x,2.2,QC[q].z]);return}
   if(TOOL==='launcher'){const h=halfOf(you.x),n=thirstyHalf(h).length;if(n)showAct('Water the '+HALFN[h]+' half \u00B7 '+plural(n,'thirsty bed')+'.','launcher',h,null,'one shot waters them all',null,[you.x,you.feet+2.15,you.z]);else showAct('The '+HALFN[h]+' half is watered.',null,null,null,thirstyHalf(1-h).length?'the '+HALFN[1-h]+' half is still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
   if(T.kind==='chest'){const at=[CHEST.x,1.4,CHEST.z];if(chestOpened())showAct('Opened today. It moves tomorrow.',null,null,null,null,null,at);else showAct('Open the chest.','chest',null,null,CHEST_GCS+' gardencoin, once a day',null,at);return}
-  if(T.kind==='tree'){const i=T.id,[ox,oz]=OAKS[i],at=[ox,3.2,oz],tr=S.trees[i]||{st:0,cut:0};
-    if(!treesAwake()){showAct('These oaks wake when the twelfth statue is carved.',null,null,null,statuesDone()+' of '+STATUES_TO_WAKE+' carved',null,at);return}
-    if(regrowLeft(tr)>0){showAct('A stump. The oak grows back in '+mmss(regrowLeft(tr))+'.',null,null,null,null,null,at);return}
+  if(T.kind==='tree'){const i=T.id,[ox,oz]=TREEPOS[i],tr=S.trees[i]||{st:0,cut:0},left=growLeft(tr);const at=[ox,planted(i)?(left>0?1.2+2.0*treeProg(tr):3.2):1.1,oz];
+    if(!treesAwake()){if(isRing(i)){hideAct();return}showAct('These oaks wake when the twelfth statue is carved.',null,null,null,statuesDone()+' of '+STATUES_TO_WAKE+' carved',null,at);return}
+    if(!planted(i)){if(!ringOpen(i)){hideAct();return}showAct('Plant a sapling here \u00B7 '+SAPLING_GC.toLocaleString()+' gardencoin.','plant',i,null,'grows in '+mmss(GROW_S)+', '+mmss(GROW_S/2)+' watered \u00B7 '+ringsPlanted()+' of '+RINGS.length+' rings planted',null,at);return}
+    if(left>0){const what=tr.cut?'The oak grows back':'The sapling grows';if(freeWater()||!tr.wt)showAct('Water '+(tr.cut?'the stump':'the sapling')+'.','twater',i,null,what+' in '+mmss(left)+' \u00B7 water halves it',null,at);else showAct(what+' in '+mmss(left)+'.',null,null,null,'watered',null,at);return}
     if(S.wood){showAct('Take your bundle to the builder first.',null,null,null,'the house is at the top of the north avenue',null,at);return}
     if(!tr.st)showAct('Take an axe to this oak \u00B7 '+gcv(AXE_DCS)+' gardencoin.','chop',i,null,CHOPS+' chops fell it',null,at);else showAct('Chop \u00B7 '+tr.st+' of '+CHOPS+'.','chop',i,null,null,null,at);return}
   if(T.kind==='house'){const at=[HOUSE.front.x,2.3,HOUSE.front.z],st=S.house.stage;
@@ -1787,7 +1853,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='wood')deliverWood();updateAct()}
+function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='wood')deliverWood();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -2005,7 +2071,7 @@ function loop(now){
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
 /* a hand on the wheel for checks: __walk.go(x,z,yaw,pitch) */
-window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,OAKG,ROCKETS,BUILDER,patch46:()=>PATCH46,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
