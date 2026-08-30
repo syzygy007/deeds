@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.6">
+<meta name="world-build" content="4.7">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1629,6 +1629,36 @@ function tickKite(t,dt){const on=KITE.up||KITE.ease>0.01;if(!on){KITEG.visible=f
   KITE.tail.forEach((bow,k)=>{const d=0.28*(k+1);bow.position.set(Math.sin(t*3+k*0.9)*0.12*(k+1)*0.25,-1.05-d,Math.cos(t*2.6+k*0.7)*0.08*(k+1)*0.25);bow.rotation.z=Math.sin(t*4+k)*0.6});
   const hx=you.x-Math.sin(you.face)*0.4,hz=you.z-Math.cos(you.face)*0.4;const a=KITELINE.geometry.attributes.position;a.setXYZ(0,hx,you.feet+1.2,hz);a.setXYZ(1,KITE.x,KITE.y-0.9,KITE.z);a.needsUpdate=true;KITELINE.visible=true;
   if(KITE.up&&KITE.t<2.4)you.pitch+=(0.4-you.pitch)*Math.min(1,2.5*dt)}
+/* THE COMPASS (4.7): a brass compass on a stone pedestal behind the seed stand. Its needle always points at today's chest;
+   read it and a golden arrow floats above you, pointing the way with the distance, until the chest is opened. Near the chest,
+   a golden glimmer rises over the lid so the trees cannot hide it */
+const COMPASS={x:STAND.x-2.6,z:STAND.z,on:false};
+const COMPG=new THREE.Group();COMPG.position.set(COMPASS.x,0,COMPASS.z);scene.add(COMPG);
+{const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.44,1.06,12),MAT.stone);ped.position.y=0.53;ped.castShadow=true;ped.receiveShadow=true;COMPG.add(ped);
+ const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.36,0.1,12),MAT.stone);cap.position.y=1.1;COMPG.add(cap);
+ const brass=new THREE.MeshStandardMaterial({color:0xC9A64A,roughness:0.3,metalness:0.8}),ink=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.5});
+ const dial=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.05,24),brass);dial.position.y=1.17;COMPG.add(dial);
+ const face=new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.26,0.052,24),new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.55}));face.position.y=1.175;COMPG.add(face);
+ const nd=new THREE.Group();nd.position.y=1.22;COMPG.add(nd);COMPASS.needle=nd;
+ const p1=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.24,4),new THREE.MeshStandardMaterial({color:0xB8332B,roughness:0.4,metalness:0.3}));p1.rotation.x=Math.PI/2;p1.position.z=0.12;nd.add(p1);
+ const p2=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.24,4),ink);p2.rotation.x=-Math.PI/2;p2.position.z=-0.12;nd.add(p2);
+ const pin=new THREE.Mesh(new THREE.SphereGeometry(0.035,10,10),brass);nd.add(pin);
+ markDisk(COMPASS.x,COMPASS.z,0.5,1.1)}
+const GUIDE=new THREE.Group();scene.add(GUIDE);GUIDE.visible=false;
+{const gold=new THREE.MeshStandardMaterial({color:0xF3C64F,roughness:0.3,metalness:0.6,emissive:0x6a4a10,emissiveIntensity:0.6});
+ const shaft=new THREE.Mesh(new THREE.BoxGeometry(0.09,0.09,0.5),gold);shaft.position.z=0.05;GUIDE.add(shaft);
+ const tip=new THREE.Mesh(new THREE.ConeGeometry(0.13,0.3,10),gold);tip.rotation.x=Math.PI/2;tip.position.z=0.42;GUIDE.add(tip)}
+const GLIM={pts:null,v:[]};
+{const N=26,pos=new Float32Array(N*3);for(let i=0;i<N;i++){pos[i*3]=0;pos[i*3+1]=Math.random()*1.6;pos[i*3+2]=0;GLIM.v.push(Math.random())}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+ GLIM.pts=new THREE.Points(g,new THREE.PointsMaterial({color:0xF3C64F,size:0.14,transparent:true,opacity:0.85,depthWrite:false}));GLIM.pts.frustumCulled=false;scene.add(GLIM.pts);GLIM.pts.visible=false}
+function readCompass(){COMPASS.on=true;const d=Math.round(Math.hypot(CHEST.x-you.x,CHEST.z-you.z));SND.grow();toast('The needle settles. The chest lies that way \u00B7 '+d+' m.');updateAct()}
+function tickCompass(t,dt){const dx=CHEST.x-COMPASS.x,dz=CHEST.z-COMPASS.z;if(COMPASS.needle)COMPASS.needle.rotation.y=Math.atan2(dx,dz)+Math.sin(t*1.1)*0.03;
+  const show=COMPASS.on&&!chestOpened();if(show){const a=Math.atan2(CHEST.x-you.x,CHEST.z-you.z);GUIDE.position.set(you.x,you.feet+2.55+Math.sin(t*2.2)*0.08,you.z);GUIDE.rotation.y=a;GUIDE.visible=true}else GUIDE.visible=false;
+  if(COMPASS.on&&chestOpened())COMPASS.on=false;
+  const near=Math.hypot(CHEST.x-you.x,CHEST.z-you.z)<16&&!chestOpened();if(near){GLIM.pts.visible=true;const at=GLIM.pts.geometry.attributes.position;
+    for(let i=0;i<at.count;i++){let y=at.getY(i)+dt*(0.5+GLIM.v[i]*0.5);if(y>1.9)y=0.1;at.setXYZ(i,CHEST.x+Math.sin(t*1.3+i*2.4)*0.34,y,CHEST.z+Math.cos(t*1.1+i*1.9)*0.34)}at.needsUpdate=true}
+  else GLIM.pts.visible=false}
 /* the fountain trick: land in the basin and, once an hour, today's chest is yours again */
 const DIVE={t:0,local:0};
 function fountainDive(){if(DIVE.t>0)return;DIVE.t=1.2;SND.splash();setTimeout(()=>SND.splash(),180);rain(0,0,3.0);burst(you.x,1.2,you.z);
@@ -1917,26 +1947,26 @@ function tickBuilder(t,dt){const B=BUILDER;const dx=you.x-B.g.position.x,dz=you.
   if(B.swing>=0){B.swing+=dt;B.armR.rotation.x=-0.2-Math.abs(Math.sin(B.swing*9))*1.4;if(B.swing>2.4){B.swing=-1;B.armR.rotation.x=-0.2}}
   else B.armR.rotation.x=-0.2+Math.sin(t*1.3)*0.04;
   B.g.position.y=Math.sin(t*1.6)*0.01}
-function tickWorld(t,dt){tickRockets(dt);tickLauncher(dt);tickTrees(dt);tickWild(dt);tickBubbles(t,dt);tickKite(t,dt);tickDive(dt);tickBuilder(t,dt);tickSaw(dt);if(CHEST.saw&&CHEST.saw.visible)CHEST.saw.rotation.y=t*0.5;CHEST.coins.rotation.y=t*0.6;if(CHEST.open)CHEST.coins.position.y=0.5+0.02*Math.sin(t*3)}
+function tickWorld(t,dt){tickRockets(dt);tickLauncher(dt);tickTrees(dt);tickWild(dt);tickBubbles(t,dt);tickKite(t,dt);tickDive(dt);tickCompass(t,dt);tickBuilder(t,dt);tickSaw(dt);if(CHEST.saw&&CHEST.saw.visible)CHEST.saw.rotation.y=t*0.5;CHEST.coins.rotation.y=t*0.6;if(CHEST.open)CHEST.coins.position.y=0.5+0.02*Math.sin(t*3)}
 
 /* ---------- the act bar: what you can do from where you stand ---------- */
 let ACT=null,ATSTAND=false,ATFLORIST=false,ATFISH=false;             /* {mode,plot} */
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
 let ANCHOR=null,CHIPSIG='',EXTRA=[],DIGSHOW=0;          /* the point the prompt floats over; the chips only rebuild when their words change */
 const LOCK={kind:null,id:-1};                             /* what the prompt is on. It lets go only past the exit range, so it never flickers at the edge */
-const ENTER={wild:2.9,gate:1.6,stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,chest:2.6,tree:2.7,house:3.4,bed:1.3},EXIT={wild:3.7,gate:2.3,stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,chest:3.4,tree:3.5,house:4.4,bed:2.1};
+const ENTER={compass:2.3,wild:2.9,gate:1.6,stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,chest:2.6,tree:2.7,house:3.4,bed:1.3},EXIT={compass:3.1,wild:3.7,gate:2.3,stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,chest:3.4,tree:3.5,house:4.4,bed:2.1};
 function bedDist(b){return inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z)}
 function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax>3.4)continue;const d=bedDist(b);if(d<bd){bd=d;best=b}}return {b:best,d:bd}}
 function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
 function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return {p:best,d:bd}}
-function distTo(kind,id){if(kind==='wild'){const it=WILD[id];return it?Math.hypot(you.x-it.x,you.z-it.z):1e9}if(kind==='gate')return Math.hypot(you.x-GATE.x,you.z-GATE.z);if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
+function distTo(kind,id){if(kind==='compass')return Math.hypot(you.x-COMPASS.x,you.z-COMPASS.z);if(kind==='wild'){const it=WILD[id];return it?Math.hypot(you.x-it.x,you.z-it.z):1e9}if(kind==='gate')return Math.hypot(you.x-GATE.x,you.z-GATE.z);if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
   if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
   if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);return bedDist(BED[id])}
 function oakNear(){let best=-1,bd=1e9;const awake=treesAwake();TREEPOS.forEach(([ox,oz],i)=>{if(isRing(i)&&(!awake||(!planted(i)&&!ringOpen(i))))return;const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
 function nearest(){const dg=distTo('gate',0);if(dg<ENTER.gate)return {kind:'gate',id:0,d:dg};const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
   const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
-  const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};
+  const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};const dcm=distTo('compass',0);if(dcm<ENTER.compass)return {kind:'compass',id:0,d:dcm};
   const ok=oakNear();if(ok.i>=0&&ok.d<ENTER.tree)return {kind:'tree',id:ok.i,d:ok.d};const dh2=distTo('house',0);if(dh2<ENTER.house)return {kind:'house',id:0,d:dh2};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};if(TOOL==='chainsaw'&&owns('chainsaw')){const wn=wildNear();if(wn.i>=0&&wn.d<ENTER.wild)return {kind:'wild',id:wn.i,d:wn.d}}return null}
 function pickTarget(){const c=nearest();
   if(LOCK.kind){const dl=distTo(LOCK.kind,LOCK.id);
@@ -1988,6 +2018,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(TOOL==='launcher'){const h=halfOf(you.x),n=thirstyHalf(h).length;if(n)showAct('Water the '+HALFN[h]+' half \u00B7 '+plural(n,'thirsty bed')+'.','launcher',h,null,'one shot waters them all',null,[you.x,you.feet+2.15,you.z]);else showAct('The '+HALFN[h]+' half is watered.',null,null,null,thirstyHalf(1-h).length?'the '+HALFN[1-h]+' half is still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
   if(T.kind==='wild'){const it=WILD[T.id],at=[it.x,Math.min(2.6,it.h0*0.35),it.z];if(TOOL!=='chainsaw'||!owns('chainsaw')){hideAct();return}const left=wildLeft(T.id);
     if(WILDFALL[T.id]){hideAct();return}if(left>0)showAct('A stump. Grows back in '+mmss(left)+'.',null,null,null,null,null,at);else if(!wildOk(it))showAct('The saw cannot take this one yet.',null,null,null,WILD_NAME[it.kind]+' needs the house at level '+WILD_LVL[it.kind]+' \u00B7 you are at '+houseLvl(),null,at);else showAct('Saw it down.','wild',T.id,null,'just for fun \u00B7 no wood \u00B7 back in '+mmss(WILD_S),null,at);return}
+  if(T.kind==='compass'){const at=[COMPASS.x,1.9,COMPASS.z];if(chestOpened())showAct('The chest is open. The needle rests.',null,null,null,null,null,at);else if(COMPASS.on)showAct('The needle points to the chest \u00B7 '+Math.round(Math.hypot(CHEST.x-you.x,CHEST.z-you.z))+' m.',null,null,null,'follow the golden arrow',null,at);else showAct('Read the compass.','compass',null,null,'it knows where the chest hides',null,at);return}
   if(T.kind==='chest'){const at=[CHEST.x,1.4,CHEST.z];if(chestOpened())showAct('Opened today. It moves tomorrow.',null,null,null,null,null,at);else{const n=(S.chest&&S.chest.n)||0;showAct('Open the chest.','chest',null,null,n===0?FIRST_GC+' gardencoin the first time':n===1?SECOND_GC.toLocaleString()+' gardencoin the second time':CHEST_TOYS.some((k,j)=>n>=j+2&&!owns(k))?'something else is in there today':CHEST_GCS+' gardencoin, once a day',null,at)}return}
   if(T.kind==='tree'){const i=T.id,[ox,oz]=TREEPOS[i],tr=S.trees[i]||{st:0,cut:0},left=growLeft(tr);const at=[ox,planted(i)?(left>0?1.2+2.0*treeProg(tr):3.2):1.1,oz];
     if(!treesAwake()){if(isRing(i)){hideAct();return}showAct('These oaks wake when the twelfth statue is carved.',null,null,null,statuesDone()+' of '+STATUES_TO_WAKE+' carved',null,at);return}
@@ -2016,7 +2047,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild')sawWild(ACT.plot);else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();updateAct()}
+function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild')sawWild(ACT.plot);else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -2349,7 +2380,7 @@ function showAway(rows){if(!rows||!rows.length||VISIT)return;let since=0;try{sin
   const lines=Object.entries(by).map(([h,fns])=>h+' '+Object.entries(fns).map(([fn,n])=>{const w=NAME[fn]||[fn,fn+' N times'];return n===1?w[0]:w[1].replace('N',String(n))}).join(', '));
   setTimeout(()=>toast('While you were away: '+lines.join('. ')+'.'),2600)}
 
-window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,sawWild,wildNear,wildLeft,wildBoot,STUMPS,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,sawWild,wildNear,wildLeft,wildBoot,STUMPS,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
