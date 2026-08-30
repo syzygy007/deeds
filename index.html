@@ -1324,6 +1324,38 @@ body.gsky-on .tab.on{color:var(--ivory)}
 .pp-coins b{font-size:22px;letter-spacing:-.03em;line-height:1.1}
 .pp-coins small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:rgba(21,19,14,.6);margin-top:2px}
 .pp-coins.mine{opacity:.8}
+/* ---- leather covers for the reader (lb) ---- */
+.lb{position:relative;aspect-ratio:2/3;border-radius:2px 6px 6px 2px;overflow:hidden;color:#fff;flex:0 0 auto;width:100%;container-type:inline-size;box-shadow:0 14px 22px -12px rgba(21,19,14,.6),0 1px 2px rgba(21,19,14,.25),inset 0 0 0 1px rgba(255,255,255,.06)}
+.lb::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");mix-blend-mode:multiply;opacity:.55}
+.lb::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.08) 9%,rgba(255,255,255,.07) 30%,rgba(0,0,0,0) 55%,rgba(0,0,0,.12) 100%),radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.08),rgba(0,0,0,0) 60%)}
+.lb-sp{position:absolute;left:0;top:0;bottom:0;width:8%;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,.08) 60%,rgba(255,255,255,.06));z-index:2}
+.lb-sp i{position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.45))}
+.lb-sp i:nth-child(1){top:14%}.lb-sp i:nth-child(2){top:22%}.lb-sp i:nth-child(3){bottom:22%}.lb-sp i:nth-child(4){bottom:14%}
+.lb-fr{position:absolute;inset:11% 9% 11% 17%;z-index:2;border:1px solid rgba(0,0,0,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(255,255,255,.1)}
+.lb-fr::after{content:"";position:absolute;inset:4px;border:1px solid rgba(0,0,0,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.lb-face{position:absolute;inset:11% 9% 11% 17%;z-index:3;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:12% 7% 9%}
+.lb-g{background:linear-gradient(120deg,#8a6a2a 0%,#e9cf7c 32%,#b8913f 52%,#f3e1a2 74%,#8a6a2a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(0,0,0,.45))}
+.lb-k{font-family:ui-monospace,Menlo,monospace;font-size:3.6cqw;letter-spacing:.2em;text-transform:uppercase;font-weight:700;line-height:1.3}
+.lb-t{font-family:Georgia,"Times New Roman",serif;font-size:10.5cqw;line-height:1.08;letter-spacing:-.01em}
+.lb-a{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:5.2cqw;margin-top:2cqw;line-height:1.2}
+.lb-rl{width:34%;height:1px;margin:4cqw auto;background:linear-gradient(90deg,transparent,#e9cf7c,transparent)}
+.lb-w{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:5.6cqw;letter-spacing:.02em}
+.lb.bone{background:#E9E2D2;color:var(--ink)}
+.lb.bone .lb-fr,.lb.bone .lb-fr::after{border-color:rgba(60,45,20,.28)}
+.lb.bone .lb-g{background:linear-gradient(120deg,#6a4b14 0%,#b48d3a 30%,#7d5e1f 50%,#c9a54e 72%,#6a4b14 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(255,255,255,.55))}
+.lb.bone .lb-rl{background:linear-gradient(90deg,transparent,#a8822f,transparent)}
+.lb.forest{background:#1F4B3A}
+.lb.black{background:#17140F}
+.lcov.bk{padding:0;border:0;background:none;box-shadow:none;min-height:0;display:block;border-radius:0}
+.lcov.bk .lb{border-radius:3px 9px 9px 3px;box-shadow:0 22px 30px -18px rgba(21,19,14,.55),0 1px 2px rgba(21,19,14,.25),inset 0 0 0 1px rgba(255,255,255,.06)}
+.lcov.bk .bk-txt{padding:14px 2px 0}
+.lcov.bk .lm{color:var(--forest)}
+.lcov.bk .lt{color:var(--ink)}
+#wdClassics{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 16px}
+@media(min-width:900px){#pg-read #wdClassics{grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 18px}}
+.biblecov{display:flex;align-items:center;gap:18px}
+.biblecov .lb{width:104px}
+.biblecov .bc-txt{flex:1 1 auto;min-width:0}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1485,9 +1517,12 @@ body.gsky-on .tab.on{color:var(--ivory)}
       </div>
       <div class="wd-sec lib-only"><div class="micro">The Library</div><div class="mono" style="color:var(--muted)">FREE</div></div>
       <button class="biblecov lib-only" id="wdBible">
+        <div class="lb bone"><div class="lb-sp"><i></i><i></i><i></i><i></i></div><div class="lb-fr"></div><div class="lb-face"><div class="lb-k lb-g">Holy Scripture</div><div><div class="lb-t lb-g">The Holy Bible.</div><div class="lb-rl"></div><div class="lb-a lb-g">KJV &#183; WEB</div></div><div class="lb-w lb-g">DEEDS.</div></div></div>
+        <div class="bc-txt">
         <div class="bc-mic">HOLY SCRIPTURE &#183; 66 BOOKS &#183; WEB &amp; KJV</div>
         <div class="bc-title">The Holy Bible<b>.</b></div>
         <div class="bc-line" id="wdBibleLine">OPEN THE BOOKS</div>
+        </div>
       </button>
       <div class="wd-sec lib-only"><div class="micro">The Classics</div><div class="mono" style="color:var(--muted)">PUBLIC DOMAIN</div></div>
       <div class="lgrid lib-only" id="wdClassics" style="margin-bottom:6px"></div>
@@ -1512,6 +1547,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
       <div class="wd-sec lib-only"><div class="micro">The Collection</div><a class="mono" href="studies.html" style="color:var(--muted);text-decoration:none">THE ART OF GIVING</a></div>
       <div class="wd-sub lib-only" style="margin-bottom:8px">Long reads on the practice of generosity. Written to be kept.</div>
       <div class="lgrid lib-only" id="wdColl" style="margin-bottom:6px">
+        <a class="lcov fo" href="study-mozart.html"><img class="li" src="study-mozart-hero.webp" alt="" loading="lazy"><div><div class="lm">STUDY No. 12 &#183; 30 MIN</div><div class="lt">Something in the Air<b>.</b></div></div></a>
         <a class="lcov fo" href="study-leonardo.html"><img class="li" src="study-leonardo-hero.webp" alt="" loading="lazy"><div><div class="lm">LEONARDO DA VINCI &#183; 35 MIN</div><div class="lt">The Eye and the Hand<b>.</b></div></div></a>
         <a class="lcov fo" href="study-ledger.html"><img class="li" src="study-ledger-hero.jpg" alt="" loading="lazy"><div><div class="lm">STUDY No. 06 &#183; 5 MIN</div><div class="lt">Ledger A<b>.</b></div></div></a>
         <a class="lcov iv" href="study-permits.html"><div class="li" style="background:linear-gradient(135deg,#15130E 0%,#3A3A34 55%,#8C8880 100%)"></div><div><div class="lm">LEDGER B &#183; 12 MIN</div><div class="lt">Four permits a year<b>.</b></div></div></a>
@@ -6254,8 +6290,8 @@ var CLASSICS=[
 {id:'greatest-thing-in-the-world',slug:'greatest-thing',t:'The Greatest Thing in the World',sr:'THE GREATEST THING',a:'Henry Drummond',ch:1,min:35},
 {id:'sermon-on-the-mount-practical-exposition',slug:'sermon-mount',t:'The Sermon on the Mount',sr:'SERMON ON THE MOUNT',a:'Charles Gore',ch:10,min:240},
 {id:'meditations-marcus-aurelius',slug:'meditations',t:'Meditations',sr:'MEDITATIONS',a:'Marcus Aurelius',ch:12,min:300},
-{id:'imitation-of-christ',slug:'imitation',t:'The Imitation of Christ',sr:'THE IMITATION',a:'Thomas \u00e0 Kempis',ch:114,min:297},
-{id:'dark-night-of-the-soul',slug:'dark-night',t:'The Dark Night of the Soul',sr:'THE DARK NIGHT',a:'St. John of the Cross',ch:3,min:215},
+{id:'imitation-of-christ',slug:'imitation',lb:'black',t:'The Imitation of Christ',sr:'THE IMITATION',a:'Thomas \u00e0 Kempis',ch:114,min:297},
+{id:'dark-night-of-the-soul',slug:'dark-night',lb:'black',t:'The Dark Night of the Soul',sr:'THE DARK NIGHT',a:'St. John of the Cross',ch:3,min:215},
 {id:'all-of-grace',slug:'all-of-grace',t:'All of Grace',sr:'ALL OF GRACE',a:'C. H. Spurgeon',ch:20,min:170}];
 var CRL={},CRLK='deeds_crl',crlLs=false,crlDb=false,CVOL={},CVREQ={},CCUR=null;
 function crlKey(id,c){return id+':'+c}
@@ -6277,10 +6313,13 @@ CVREQ[slug]=[cb];
 fetch('deeds-work-'+slug+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
 .then(function(j){CVOL[slug]=j;var q=CVREQ[slug];CVREQ[slug]=null;for(var i=0;i<q.length;i++)q[i](j,null)})
 .catch(function(e){var q=CVREQ[slug]||[];CVREQ[slug]=null;var m=String(e&&e.message||e);for(var i=0;i<q.length;i++)q[i](null,m)})}
+function lbCover(w,kind){var col=w.lb||'forest';var t=String(w.t||'').replace(/\.$/,'');
+return '<div class="lb '+col+'"><div class="lb-sp"><i></i><i></i><i></i><i></i></div><div class="lb-fr"></div>'
++'<div class="lb-face"><div class="lb-k lb-g">'+(kind||'The Classics')+'</div><div><div class="lb-t lb-g">'+esc(t)+'.</div><div class="lb-rl"></div><div class="lb-a lb-g">'+esc(w.a||'')+'</div></div><div class="lb-w lb-g">DEEDS.</div></div></div>'}
 function renderClassics(){var el=J('wdClassics');if(!el)return;
 var h='';CLASSICS.forEach(function(w,i){var n=crlCount(w.id),pc=Math.round(n*100/w.ch),fo=i===1;
-h+='<button class="lcov '+(fo?'fo':'iv')+'" data-cl="'+i+'">'
-+'<div><div class="lm">CLASSIC \u00B7 '+w.a.toUpperCase()+' \u00B7 ~'+w.min+' MIN</div>'
+h+='<button class="lcov bk" data-cl="'+i+'">'
++lbCover(w)+'<div class="bk-txt"><div class="lm">CLASSIC \u00B7 '+w.a.toUpperCase()+' \u00B7 ~'+w.min+' MIN</div>'
 +'<div class="lt">'+w.t+'<b>.</b></div>'
 +'<div class="lm" style="margin-top:8px">'+(n>=w.ch?'READ \u2713':n+' / '+w.ch+' CHAPTERS')+'</div>'
 +'<div class="lcbar"><i style="width:'+pc+'%"></i></div></div></button>'});
