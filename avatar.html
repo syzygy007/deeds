@@ -18,7 +18,7 @@
   .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--quiet);margin:0 0 12px}
   h1{font-size:42px;font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0 0 14px}
   .coin{font-size:15px;margin:0 0 22px;min-height:1.4em}
-  .tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px;margin:0 -4px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 10px;margin:0 -4px}
   .tabs::-webkit-scrollbar{display:none}
   .tabs button{flex:0 0 auto;background:none;border:1px solid var(--mist);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;white-space:nowrap}
   .tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bone)}
@@ -45,7 +45,8 @@
   .hint{font-size:13px;color:var(--quiet);margin:0}
   .zoom{background:none;border:1px solid var(--mist);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
   .zoom:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
-  .toast{position:absolute;left:24px;bottom:24px;max-width:min(80%,420px);background:var(--ink);color:var(--bone);font-size:14px;padding:10px 14px;border-radius:6px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+  .toast{position:fixed;right:32px;bottom:88px;width:296px;background:var(--ink);color:var(--bone);font-size:14px;padding:10px 14px;border-radius:6px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:5}
+  .toast small{display:block;margin-top:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.35;color:rgba(255,255,255,.72);word-break:break-word}
   .toast.on{opacity:1;transform:none}
   @media (max-width:900px){
     .frame{grid-template-columns:1fr;grid-template-rows:48vh 1fr}
@@ -53,6 +54,7 @@
     h1{font-size:32px;margin-bottom:8px}
     .coin{margin-bottom:12px}
     .foot{padding-top:18px}
+    .toast{left:20px;right:20px;bottom:76px;width:auto}
   }
   @media (prefers-reduced-motion:reduce){.sw button,.toast{transition:none}}
 </style>
@@ -61,9 +63,9 @@
 <div class="frame">
   <div class="stage">
     <canvas id="c" tabindex="0" aria-label="Your avatar. Drag or use the arrow keys to turn it."></canvas>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
   <aside class="rail">
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <p class="eyebrow">The wardrobe</p>
     <h1>Dress your avatar.</h1>
     <p class="coin" id="coin"></p>
@@ -227,7 +229,7 @@
   var tabsEl = document.getElementById('tabs'), rowsEl = document.getElementById('rows'), coinEl = document.getElementById('coin');
   var colorBox = document.getElementById('colorBox'), colorsEl = document.getElementById('colors'), colorNote = document.getElementById('colorNote');
   var toastEl = document.getElementById('toast'), toastT = null;
-  function toast(s){ toastEl.textContent = s; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 2600); }
+  function toast(s, d){ toastEl.textContent = s; if (d){ var sm = document.createElement('small'); sm.textContent = String(d).slice(0, 240); toastEl.appendChild(sm); } toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, d ? 9000 : 2600); }
   SLOTS.forEach(function(s){
     var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.slot = s[0]; b.textContent = s[1];
     b.addEventListener('click', function(){ ACTIVE = s[0]; CONFIRM = null; paint(); });
@@ -296,34 +298,32 @@
     if (/unknown item/i.test(m)) return 'The wardrobe does not know that one.';
     return fallback;
   }
-  var ARGS = ['p_item', 'p_item_id', 'p_id', 'item'];
-  function door(fn, id, k){
-    k = k || 0; var args = {}; args[ARGS[k]] = id;
-    return Promise.resolve(sb.rpc(fn, args)).then(function(r){
-      if (r.error && k < ARGS.length - 1 && /could not find|schema cache|does not exist/i.test(String(r.error.message || ''))) return door(fn, id, k + 1);
-      return r;
-    });
+  function door(fn, id){
+    var call = Promise.resolve(sb.rpc(fn, {p_item: id}));
+    var wait = new Promise(function(res){ setTimeout(function(){ res({error:{message:'The door did not answer in 8 seconds.'}}); }, 8000); });
+    return Promise.race([call, wait]);
   }
+  function raw(err){ if (!err) return ''; return [err.code, err.message, err.details, err.hint].filter(Boolean).join(' | '); }
   function wear(it){
     if (!LIVE){ toast('Sign in on DEEDS to wear and buy.'); return; }
     BUSY = true; paint();
     door('avatar_equip', it.id).then(function(r){
       BUSY = false;
-      if (r.error){ toast(fail(r.error, 'Could not put it on.')); paint(); return; }
+      if (r.error){ toast(fail(r.error, 'Could not put it on.'), raw(r.error)); paint(); return; }
       EQ[it.slot] = it.id; if (it.slot === 'back' && it.id === 'back.none') EQ.attach = 'attach.none';
       CONFIRM = null; build(); paint(); toast('Wearing the ' + it.name.toLowerCase() + '.');
       loadMine();
-    }).catch(function(){ BUSY = false; toast('Could not put it on.'); paint(); });
+    }).catch(function(e){ BUSY = false; toast('Could not put it on.', raw(e) || String(e)); paint(); });
   }
   function buy(it){
     BUSY = true; paint();
     door('avatar_buy', it.id).then(function(r){
       BUSY = false; CONFIRM = null;
-      if (r.error){ toast(fail(r.error, 'Could not buy it.')); paint(); return; }
+      if (r.error){ toast(fail(r.error, 'Could not buy it.'), raw(r.error)); paint(); return; }
       OWNED[it.id] = true; GC = Math.max(0, GC - it.price); paint();
       toast('Yours for ' + it.price.toLocaleString() + ' gardencoin.');
       wear(it);
-    }).catch(function(){ BUSY = false; CONFIRM = null; toast('Could not buy it.'); paint(); });
+    }).catch(function(e){ BUSY = false; CONFIRM = null; toast('Could not buy it.', raw(e) || String(e)); paint(); });
   }
 
   // ---------- the live wardrobe ----------
