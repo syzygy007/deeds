@@ -164,7 +164,8 @@
   // ---------- garments on the body ----------
   // the torso in a garment colour, a hair wider than the skin
   function shell(c, hex, rough){
-    var d = c.dims, o = lathe([[0.95, d.top], [d.shoulder + 0.1, d.top - 0.42], [d.chest + 0.06, d.top - 0.98], [d.waist + 0.06, d.top - 1.95], [d.hips + 0.06, d.top - 2.55], [d.hips * 0.93, d.bottom - 0.02]], mat(hex, rough || 0.92), 48);
+    // profile runs bottom to top: r128 LatheGeometry winds a top to bottom profile inside out (normals inward), which culled the whole torso from the front
+    var d = c.dims, o = lathe([[d.hips * 0.93, d.bottom - 0.02], [d.hips + 0.06, d.top - 2.55], [d.waist + 0.06, d.top - 1.95], [d.chest + 0.06, d.top - 0.98], [d.shoulder + 0.1, d.top - 0.42], [0.95, d.top]], mat(hex, rough || 0.92), 48);
     o.scale.z = d.depth; return o;
   }
   function sleeve(c, i, hex, len){
