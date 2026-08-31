@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DEEDS · Pick a hat</title>
+<style>
+  :root{--bone:#EFEAE0;--ink:#1A1A17;--forest:#244233;--mist:#D9D3C6;--quiet:#7A7568}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bone);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+  .frame{display:grid;grid-template-columns:1fr 340px;height:100vh;height:100dvh}
+  .stage{position:relative;min-width:0;min-height:0}
+  canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+  canvas:active{cursor:grabbing}
+  canvas:focus-visible{box-shadow:inset 0 0 0 2px var(--forest)}
+  .rail{padding:44px 36px 36px;border-left:1px solid var(--mist);overflow:auto;min-height:0}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--quiet);margin:0 0 14px}
+  h1{font-size:46px;font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0 0 34px}
+  .lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--quiet);margin:28px 0 8px}
+  .rows{display:flex;flex-direction:column}
+  .rows button{display:flex;justify-content:space-between;align-items:baseline;width:100%;background:none;border:0;border-top:1px solid var(--mist);padding:13px 0;font:inherit;font-size:18px;color:var(--ink);text-align:left;cursor:pointer;letter-spacing:-.01em}
+  .rows button:last-child{border-bottom:1px solid var(--mist)}
+  .rows button em{font-style:normal;font-size:12px;color:var(--quiet);letter-spacing:.02em}
+  .rows button[aria-pressed="true"]{color:var(--forest);font-weight:700}
+  .rows button[aria-pressed="true"] em{color:var(--forest)}
+  .rows button:focus-visible{outline:2px solid var(--forest);outline-offset:-2px}
+  .sw{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}
+  .sw button{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.14);padding:0;cursor:pointer;transition:box-shadow .15s}
+  .sw button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bone),0 0 0 5px var(--forest)}
+  .sw button:focus-visible{outline:none;box-shadow:0 0 0 3px var(--bone),0 0 0 5px var(--ink)}
+  .sw.off{opacity:.28;pointer-events:none}
+  .note{font-size:15px;margin:12px 0 0;min-height:1.4em}
+  .hint{font-size:13px;color:var(--quiet);margin-top:40px}
+  @media (max-width:900px){
+    .frame{grid-template-columns:1fr;grid-template-rows:50vh 1fr}
+    .rail{border-left:0;border-top:1px solid var(--mist);padding:22px 22px 30px}
+    h1{font-size:36px;margin-bottom:18px}
+    .lab{margin-top:20px}
+    .hint{margin-top:24px}
+  }
+  @media (prefers-reduced-motion:reduce){.sw button{transition:none}}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="c" tabindex="0" aria-label="Your figure. Drag or use the arrow keys to turn it."></canvas></div>
+  <aside class="rail">
+    <p class="eyebrow">The wardrobe</p>
+    <h1>Pick a hat.</h1>
+    <p class="lab">Style</p>
+    <div class="rows" id="styles">
+      <button type="button" data-style="none" aria-pressed="false"><span>None.</span><em></em></button>
+      <button type="button" data-style="cap" aria-pressed="true"><span>Ball cap.</span><em>six colors</em></button>
+      <button type="button" data-style="bucket" aria-pressed="false"><span>Bucket hat.</span><em>six colors</em></button>
+      <button type="button" data-style="straw" aria-pressed="false"><span>Straw hat.</span><em>one color</em></button>
+    </div>
+    <p class="lab">Color</p>
+    <div class="sw" id="colors"></div>
+    <p class="note" id="note"></p>
+    <p class="hint">Drag the figure to turn it.</p>
+  </aside>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  // ---------- the wardrobe rows this page knows ----------
+  var COLORS = [
+    {id:'brown',  name:'Brown',  hex:'#3d2a1d'},
+    {id:'cream',  name:'Cream',  hex:'#e6ddd0'},
+    {id:'tan',    name:'Tan',    hex:'#a9703a'},
+    {id:'forest', name:'Forest', hex:'#22362d'},
+    {id:'black',  name:'Black',  hex:'#232323'},
+    {id:'white',  name:'White',  hex:'#f0efec'}
+  ];
+  var STYLES = {
+    none:  {name:'None',      colors:false},
+    cap:   {name:'Ball cap',  colors:true},
+    bucket:{name:'Bucket hat',colors:true},
+    straw: {name:'Straw hat', colors:false}
+  };
+  var S = {style:'cap', color:'tan'};
+
+  // ---------- colour helpers (materials live in linear, the page in sRGB) ----------
+  function col(hex, k){ var c = new THREE.Color(hex); if (k) c.multiplyScalar(k); return c.convertSRGBToLinear(); }
+  function mat(hex, rough, k){ return new THREE.MeshStandardMaterial({color:col(hex, k), roughness:rough, metalness:0}); }
+
+  // ---------- renderer, camera, light ----------
+  var canvas = document.getElementById('c');
+  var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.setClearColor(col('#EFEAE0'));
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  var TARGET = new THREE.Vector3(0, -0.15, 0);
+
+  scene.add(new THREE.HemisphereLight(col('#fbf6ea'), col('#8a7358'), 0.72));
+  var key = new THREE.DirectionalLight(col('#fff0d8'), 1.15);
+  key.position.set(3.2, 5.2, 4.6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.left = -4; key.shadow.camera.right = 4;
+  key.shadow.camera.top = 4;   key.shadow.camera.bottom = -5;
+  key.shadow.camera.near = 1;  key.shadow.camera.far = 20;
+  key.shadow.bias = -0.0006; key.shadow.normalBias = 0.03;
+  scene.add(key);
+  var fill = new THREE.DirectionalLight(col('#dde6f5'), 0.38); fill.position.set(-4.5, 1.6, 3); scene.add(fill);
+  var rim = new THREE.DirectionalLight(col('#ffffff'), 0.28); rim.position.set(0.5, 3, -5); scene.add(rim);
+
+  // ---------- the bust ----------
+  var bust = new THREE.Group(); scene.add(bust);
+  var skin = mat('#d9a377', 0.85), hairM = mat('#3a2a1e', 0.9), tee = mat('#f3f1eb', 0.95), ink = mat('#1f1b18', 0.6);
+  function add(geo, m, x, y, z, sx, sy, sz, parent){
+    var o = new THREE.Mesh(geo, m);
+    o.position.set(x || 0, y || 0, z || 0);
+    o.scale.set(sx || 1, sy || 1, sz || 1);
+    o.castShadow = true; o.receiveShadow = true;
+    (parent || bust).add(o); return o;
+  }
+  // a small part sitting on the head surface, its local z pointing outward
+  function onHead(geo, m, x, y, z, push){
+    var d = new THREE.Vector3(x, y, z).normalize();
+    var o = new THREE.Mesh(geo, m);
+    o.position.copy(d).multiplyScalar(1 + (push || 0));
+    o.lookAt(d.clone().multiplyScalar(3));
+    o.castShadow = false; o.receiveShadow = true;
+    bust.add(o); return o;
+  }
+  add(new THREE.SphereGeometry(1, 64, 40), skin);                                       // head
+  add(new THREE.SphereGeometry(0.17, 24, 16), skin, -0.98, -0.03, 0.02, 0.55, 1, 0.85);  // ears
+  add(new THREE.SphereGeometry(0.17, 24, 16), skin,  0.98, -0.03, 0.02, 0.55, 1, 0.85);
+  onHead(new THREE.SphereGeometry(0.1, 20, 14), skin, 0, -0.16, 0.99, -0.02).scale.set(0.9, 0.8, 0.7);  // nose
+  onHead(new THREE.SphereGeometry(0.085, 20, 14), ink, -0.34, 0.06, 0.94, -0.01).scale.set(1, 1.15, 0.35); // eyes
+  onHead(new THREE.SphereGeometry(0.085, 20, 14), ink,  0.34, 0.06, 0.94, -0.01).scale.set(1, 1.15, 0.35);
+  var smile = onHead(new THREE.TorusGeometry(0.17, 0.02, 8, 24, Math.PI), ink, 0, -0.42, 0.92, 0.004);
+  smile.rotateZ(Math.PI);
+  // hair: a cap on top, a shell round the back that stops at the ears
+  var hairTop = add(new THREE.SphereGeometry(1.045, 64, 32, 0, Math.PI * 2, 0, 1.08), hairM);
+  var hairBack = add(new THREE.SphereGeometry(1.045, 64, 32, Math.PI * 1.5 - 1.55, 3.1, 0.9, 0.55), hairM);
+  hairTop.castShadow = false; hairBack.castShadow = false;
+  // neck, collar, shoulders, chest
+  add(new THREE.CylinderGeometry(0.34, 0.4, 1.1, 40), skin, 0, -1.25, 0);
+  add(new THREE.TorusGeometry(0.45, 0.07, 10, 48), tee, 0, -1.44, 0).rotation.x = Math.PI / 2;
+  add(new THREE.SphereGeometry(1, 64, 32), tee, 0, -1.98, 0, 1.55, 0.56, 0.9);
+  add(new THREE.CylinderGeometry(1.45, 1.35, 1.8, 64), tee, 0, -2.95, 0, 1, 1, 0.6);
+
+  // ---------- the hats: pure builders, head radius 1 at the origin, band at y 0.31 ----------
+  var B = 0.40; // the band: where every hat meets the head
+  // the ball cap crown is a unit dome cut at y 0.15, lifted onto the band, flared so the band is its widest ring,
+  // and tipped forward so the peak sits over the brow (the A frame)
+  function warp(v){
+    var t = THREE.MathUtils.clamp((v.y - 0.15) / 0.85, 0, 1);
+    var hr = Math.hypot(v.x, v.z);
+    var r = 1.10 * Math.sqrt(Math.max(0, 1 - Math.pow(t, 2.3)));
+    var k = hr > 1e-6 ? r / hr : 0;
+    v.x *= k; v.z *= k;
+    v.y = B + t * 0.92 + 0.14 * v.z * t;
+  }
+  // a smooth indexed surface from a function of (u, v) in 0..1
+  function grid(fn, nu, nv){
+    var pos = [], idx = [];
+    for (var i = 0; i <= nu; i++) for (var j = 0; j <= nv; j++){ var p = fn(i / nu, j / nv); pos.push(p.x, p.y, p.z); }
+    for (i = 0; i < nu; i++) for (j = 0; j < nv; j++){ var a = i * (nv + 1) + j, b = a + nv + 1; idx.push(a, a + 1, b, b, a + 1, b + 1); }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx); g.computeVertexNormals(); return g;
+  }
+  // the crown material cuts the snapback arch out of the back and darkens what you see through it
+  function crownMat(hex){
+    var m = mat(hex, 0.93);
+    m.side = THREE.DoubleSide;
+    m.onBeforeCompile = function(s){
+      s.vertexShader = 'varying vec3 vObj;\n' + s.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vObj = position;');
+      s.fragmentShader = 'varying vec3 vObj;\n' + s.fragmentShader
+        .replace('#include <clipping_planes_fragment>', 'if (vObj.z < -0.35 && vObj.y < 0.40 + 0.55 * sqrt(max(0.0, 1.0 - (vObj.x * vObj.x) / 0.3844))) discard;\n#include <clipping_planes_fragment>')
+        .replace('#include <color_fragment>', '#include <color_fragment>\n if (!gl_FrontFacing) diffuseColor.rgb *= 0.28;');
+    };
+    return m;
+  }
+  function sph(R, s, phi){ return new THREE.Vector3(R * Math.sin(s) * Math.sin(phi), R * Math.cos(s), R * Math.sin(s) * Math.cos(phi)); }
+
+  function cap(hex){
+    var g = new THREE.Group();
+    var cloth = mat(hex, 0.93);
+    var dark = mat(hex, 0.9, 0.7);
+    var plastic = mat(hex, 0.5);
+    var R = 1.0, TH = 1.42;
+    // crown
+    var geo = new THREE.SphereGeometry(R, 72, 36, 0, Math.PI * 2, 0, TH);
+    var p = geo.attributes.position, v = new THREE.Vector3(), apex = new THREE.Vector3(0, -9, 0);
+    for (var i = 0; i < p.count; i++){
+      v.fromBufferAttribute(p, i); warp(v); p.setXYZ(i, v.x, v.y, v.z);
+      if (v.y > apex.y) apex.copy(v);
+    }
+    geo.computeVertexNormals();
+    g.add(new THREE.Mesh(geo, crownMat(hex)));
+    // six panel seams, meridians over the dome
+    for (var k = 0; k < 6; k++){
+      var phi = k * Math.PI / 3, pts = [];
+      for (var s = TH; s >= 0.05; s -= 0.08){ var q = sph(R, s, phi); warp(q); pts.push(q.multiplyScalar(1.006)); }
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 36, 0.012, 6, false), dark));
+    }
+    // one eyelet per panel
+    for (k = 0; k < 6; k++){
+      var e = sph(R, 0.62, Math.PI / 6 + k * Math.PI / 3); warp(e);
+      var n = e.clone().sub(new THREE.Vector3(0, 0.1, 0)).normalize();
+      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 20), dark);
+      ring.position.copy(e).addScaledVector(n, 0.006);
+      ring.lookAt(e.clone().addScaledVector(n, 2));
+      g.add(ring);
+    }
+    // the button on top
+    var btn = new THREE.Mesh(new THREE.SphereGeometry(0.085, 20, 14), cloth);
+    btn.position.copy(apex).y += 0.005; btn.scale.set(1, 0.55, 1); g.add(btn);
+    // the brim: a curved visor built as smooth sheets (top, underside, outer edge, two side edges)
+    var a = 0.98, ri = 1.0, rox = 1.32, roz = 1.95, TK = 0.05;
+    function visor(t, s){
+      var x = ri * Math.sin(t) + s * (rox - ri) * Math.sin(t);
+      var z = ri * Math.cos(t) + s * (roz - ri) * Math.cos(t);
+      var d = Math.max(0, Math.hypot(x, z) - ri);
+      return new THREE.Vector3(x, B + 0.035 - 0.13 * d - 0.45 * (x * x / (rox * rox)) * d, z);
+    }
+    var visorM = cloth.clone(); visorM.side = THREE.DoubleSide;
+    g.add(new THREE.Mesh(grid(function(u, v){ return visor(-a + 2 * a * u, v); }, 48, 12), visorM));
+    g.add(new THREE.Mesh(grid(function(u, v){ var q = visor(-a + 2 * a * u, v); q.y -= TK; return q; }, 48, 12), visorM));
+    g.add(new THREE.Mesh(grid(function(u, v){ var q = visor(-a + 2 * a * u, 1); q.y -= TK * v; return q; }, 48, 1), visorM));
+    g.add(new THREE.Mesh(grid(function(u, v){ var q = visor(-a, u); q.y -= TK * v; return q; }, 12, 1), visorM));
+    g.add(new THREE.Mesh(grid(function(u, v){ var q = visor(a, u); q.y -= TK * v; return q; }, 12, 1), visorM));
+    // the snap strap under the arch: a curved plastic band, six holes and two studs
+    plastic.side = THREE.DoubleSide;
+    var band = new THREE.Mesh(new THREE.CylinderGeometry(1.06, 1.06, 0.15, 64, 1, true, Math.PI - 0.95, 1.9), plastic);
+    band.position.y = B + 0.09; g.add(band);
+    var spots = [];
+    for (k = 0; k < 6; k++) spots.push({th: Math.PI - 0.44 + k * 0.12, hole:true});
+    spots.push({th: Math.PI + 0.40, hole:false}); spots.push({th: Math.PI + 0.53, hole:false});
+    spots.forEach(function(sp){
+      var o = new THREE.Mesh(sp.hole ? new THREE.TorusGeometry(0.026, 0.009, 6, 16) : new THREE.SphereGeometry(0.02, 10, 8), dark);
+      o.position.set(1.066 * Math.sin(sp.th), B + 0.09, 1.066 * Math.cos(sp.th));
+      o.rotation.y = sp.th;
+      g.add(o);
+    });
+    return g;
+  }
+
+  function bucket(hex){
+    var g = new THREE.Group();
+    var Bb = B + 0.08; // worn a touch higher than the cap so the eyes stay clear of the brim
+    var cloth = mat(hex, 0.93); cloth.side = THREE.DoubleSide;
+    var dark = mat(hex, 0.9, 0.7);
+    // crown: a short tapered drum with a flat top and a stitched top edge
+    var H = 0.78;
+    var crown = new THREE.Mesh(new THREE.CylinderGeometry(0.94, 1.09, H, 64, 1, false), cloth);
+    crown.position.y = Bb + H / 2; g.add(crown);
+    var rimT = new THREE.Mesh(new THREE.TorusGeometry(0.89, 0.05, 10, 96), cloth);
+    rimT.rotation.x = Math.PI / 2; rimT.position.y = Bb + H - 0.05; g.add(rimT);
+    var top = new THREE.Mesh(new THREE.TorusGeometry(0.955, 0.008, 6, 96), dark);
+    top.rotation.x = Math.PI / 2; top.position.y = Bb + H - 0.13; g.add(top);
+    // the seam where the crown meets the brim
+    var foot = new THREE.Mesh(new THREE.TorusGeometry(1.095, 0.009, 6, 96), dark);
+    foot.rotation.x = Math.PI / 2; foot.position.y = Bb + 0.02; g.add(foot);
+    // four seams down the crown, leaning with the taper
+    [0, Math.PI / 2, Math.PI, Math.PI * 1.5].forEach(function(phi){
+      var sub = new THREE.Group(); sub.rotation.y = phi;
+      var seam = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, H - 0.12, 6), dark);
+      seam.position.set(0, Bb + H / 2 - 0.05, 1.024); seam.rotation.x = -Math.atan(0.15 / H);
+      sub.add(seam); g.add(sub);
+    });
+    // brim: a short steep ring with five rows of stitching
+    var prof = [[1.05, Bb + 0.03], [1.09, Bb], [1.45, Bb - 0.34], [1.45, Bb - 0.37], [1.05, Bb - 0.03]].map(function(q){ return new THREE.Vector2(q[0], q[1]); });
+    g.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 96), cloth));
+    [1.15, 1.21, 1.27, 1.33, 1.39].forEach(function(r){
+      var y = Bb - (r - 1.09) * (0.34 / 0.36);
+      var ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.0065, 6, 128), dark);
+      ring.rotation.x = Math.PI / 2; ring.position.y = y + 0.004; g.add(ring);
+    });
+    // two eyelets a side, high on the crown
+    [1.32, 1.82, -1.32, -1.82].forEach(function(phi){
+      var r = 0.99, y = Bb + 0.55;
+      var n = new THREE.Vector3(Math.sin(phi), 0.18, Math.cos(phi)).normalize();
+      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 20), dark);
+      ring.position.set(r * Math.sin(phi), y, r * Math.cos(phi)).addScaledVector(n, 0.006);
+      ring.lookAt(ring.position.clone().addScaledVector(n, 2));
+      g.add(ring);
+    });
+    return g;
+  }
+
+  function weave(repU, repV){
+    var c = document.createElement('canvas'); c.width = 128; c.height = 128;
+    var x = c.getContext('2d');
+    x.fillStyle = '#cdb17c'; x.fillRect(0, 0, 128, 128);
+    x.lineWidth = 2;
+    x.strokeStyle = 'rgba(110,80,34,0.3)';
+    for (var i = -128; i <= 256; i += 8){ x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 128, 128); x.stroke(); }
+    x.strokeStyle = 'rgba(255,246,220,0.3)';
+    for (i = -128; i <= 256; i += 8){ x.beginPath(); x.moveTo(i + 128, 0); x.lineTo(i, 128); x.stroke(); }
+    var t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repU, repV);
+    t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+    return t;
+  }
+  function straw(){
+    var g = new THREE.Group();
+    var crownM = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.88, metalness:0, map:weave(18, 3), side:THREE.DoubleSide});
+    var brimM  = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.88, metalness:0, map:weave(28, 2), side:THREE.DoubleSide});
+    var ribbon = mat('#5c6538', 0.8); ribbon.side = THREE.DoubleSide;
+    var cp = [[1.0, B], [1.05, B + 0.16], [1.03, B + 0.36], [0.93, B + 0.55], [0.72, B + 0.68], [0.42, B + 0.76], [0, B + 0.78]].map(function(q){ return new THREE.Vector2(q[0], q[1]); });
+    g.add(new THREE.Mesh(new THREE.LatheGeometry(cp, 96), crownM));
+    var band = new THREE.Mesh(new THREE.CylinderGeometry(1.07, 1.075, 0.17, 96, 1, true), ribbon);
+    band.position.y = B + 0.14; g.add(band);
+    var bp = [[1.0, B + 0.03], [1.0, B], [1.6, B - 0.05], [2.0, B - 0.19], [2.15, B - 0.27], [2.15, B - 0.30], [2.0, B - 0.22], [1.6, B - 0.08], [1.0, B - 0.03]].map(function(q){ return new THREE.Vector2(q[0], q[1]); });
+    g.add(new THREE.Mesh(new THREE.LatheGeometry(bp, 128), brimM));
+    return g;
+  }
+  var BUILD = {cap:cap, bucket:bucket, straw:straw};
+
+  // ---------- state to scene ----------
+  var hat = null, dirty = true;
+  function disposeTree(o){
+    o.traverse(function(n){
+      if (n.geometry) n.geometry.dispose();
+      if (n.material){ [].concat(n.material).forEach(function(m){ if (m.map) m.map.dispose(); m.dispose(); }); }
+    });
+  }
+  function apply(){
+    if (hat){ bust.remove(hat); disposeTree(hat); hat = null; }
+    var hex = COLORS.filter(function(c){ return c.id === S.color; })[0].hex;
+    if (BUILD[S.style]){
+      hat = BUILD[S.style](hex);
+      hat.traverse(function(n){ if (n.isMesh){ n.castShadow = true; n.receiveShadow = true; } });
+      bust.add(hat);
+    }
+    dirty = true;
+    paint();
+  }
+
+  // ---------- the rail ----------
+  var stylesEl = document.getElementById('styles'), colorsEl = document.getElementById('colors'), noteEl = document.getElementById('note');
+  COLORS.forEach(function(c){
+    var b = document.createElement('button');
+    b.type = 'button'; b.dataset.color = c.id; b.title = c.name; b.setAttribute('aria-label', c.name);
+    b.style.background = c.hex;
+    b.addEventListener('click', function(){ S.color = c.id; apply(); });
+    colorsEl.appendChild(b);
+  });
+  stylesEl.addEventListener('click', function(ev){
+    var b = ev.target.closest('button'); if (!b) return;
+    S.style = b.dataset.style; apply();
+  });
+  function paint(){
+    Array.prototype.forEach.call(stylesEl.children, function(b){ b.setAttribute('aria-pressed', String(b.dataset.style === S.style)); });
+    Array.prototype.forEach.call(colorsEl.children, function(b){ b.setAttribute('aria-pressed', String(b.dataset.color === S.color)); });
+    var st = STYLES[S.style];
+    colorsEl.classList.toggle('off', !st.colors);
+    var name = COLORS.filter(function(c){ return c.id === S.color; })[0].name;
+    noteEl.textContent = S.style === 'none' ? 'No hat.' : (st.colors ? name + '.' : 'Comes in one color.');
+  }
+
+  // ---------- turn, size, draw ----------
+  var dragging = false, lastX = 0;
+  canvas.addEventListener('pointerdown', function(e){ dragging = true; lastX = e.clientX; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', function(e){ if (!dragging) return; bust.rotation.y += (e.clientX - lastX) * 0.011; lastX = e.clientX; dirty = true; });
+  canvas.addEventListener('pointerup', function(){ dragging = false; });
+  canvas.addEventListener('pointercancel', function(){ dragging = false; });
+  canvas.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft'){ bust.rotation.y -= 0.18; dirty = true; e.preventDefault(); }
+    if (e.key === 'ArrowRight'){ bust.rotation.y += 0.18; dirty = true; e.preventDefault(); }
+  });
+  var stage = canvas.parentNode;
+  function size(){
+    var w = stage.clientWidth || 1, h = stage.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    var dist = Math.max(7.6, 4.7 / (2 * Math.tan(camera.fov * Math.PI / 360) * camera.aspect));
+    camera.position.set(0, TARGET.y + 0.7 * (dist / 7.6), dist);
+    camera.lookAt(TARGET);
+    camera.updateProjectionMatrix();
+    dirty = true;
+  }
+  if (window.ResizeObserver) new ResizeObserver(size).observe(stage); else window.addEventListener('resize', size);
+  size();
+  function loop(){ if (dirty){ dirty = false; renderer.render(scene, camera); } requestAnimationFrame(loop); }
+  apply();
+  loop();
+
+  window.__hat = {
+    set: function(style, color){ if (style) S.style = style; if (color) S.color = color; apply(); },
+    turn: function(r){ bust.rotation.y = r; dirty = true; },
+    state: S, ready: true
+  };
+})();
+</script>
+</body>
+</html>
