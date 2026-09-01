@@ -33,6 +33,9 @@
   .rows button.wearing em{color:var(--forest)}
   .rows button.locked{color:var(--quiet)}
   .rows button.confirm em{color:var(--ink);font-weight:700}
+  .rows button.trying{color:var(--forest)}
+  .rows button.trying em{color:var(--ink);font-weight:700}
+  .tryon{position:absolute;left:22px;bottom:20px;margin:0;padding:8px 12px;border:1px solid var(--forest);border-radius:999px;background:rgba(239,234,224,.92);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--forest);pointer-events:none}
   .rows button:focus-visible{outline:2px solid var(--forest);outline-offset:-2px}
   .rows button[disabled]{cursor:default;opacity:.6}
   .lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--quiet);margin:22px 0 8px}
@@ -66,6 +69,7 @@
 <div class="frame">
   <div class="stage">
     <canvas id="c" tabindex="0" aria-label="Your avatar. Drag or use the arrow keys to turn it."></canvas>
+    <p class="tryon" id="tryon" hidden>Trying it on. Yours once you buy it.</p>
   </div>
   <aside class="rail">
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -115,7 +119,7 @@
     ['torso.tee','torso','T shirt',0,'signup',1,10,'Given at signup'],['torso.scrubs','torso','Scrubs',0,'signup',1,20,'Nurse starting look'],['torso.zip','torso','Zip hoodie',160,'wardrobe',0,45,null],['torso.hoodie','torso','Pullover hoodie',140,'wardrobe',0,46,null],['torso.pizza','torso','Pizza tee',90,'wardrobe',0,47,null],['torso.alien','torso','Alien tee',90,'wardrobe',0,48,null],['torso.track','torso','Track jacket',0,'signup',1,30,'Coach starting look'],['torso.apron','torso','Work apron',200,'wardrobe',0,40,null],['torso.field','torso','Field shirt',320,'wardrobe',0,50,null],['torso.overalls','torso','Overalls',380,'wardrobe',0,60,null]
   ];
   var SLOTS = [['body','Body'],['skin','Skin'],['hair','Hair'],['head','Hat'],['torso','Top'],['legs','Legs'],['feet','Feet'],['neck','Neck'],['ears','Ears'],['hands','In hand'],['back','Back'],['attach','Attach'],['topper','Topper']];
-  var CAT = {}, BYSLOT = {}, EQ = {}, OWNED = {}, GC = 0, ME = null, LIVE = false, sb = null, ACTIVE = 'head', CONFIRM = null, BUSY = false;
+  var CAT = {}, BYSLOT = {}, EQ = {}, OWNED = {}, GC = 0, ME = null, LIVE = false, sb = null, ACTIVE = 'head', CONFIRM = null, BUSY = false, TRY = {};
   var COLORWAY = {}; try { COLORWAY = JSON.parse(localStorage.getItem('avatar_colorway') || '{}') || {}; } catch (e) { COLORWAY = {}; }
   var BASE = null, PT = null;
 
@@ -293,7 +297,11 @@
     });
     return g;
   }
-  function build(){
+  // what the figure shows = what you own and wear, with anything you are trying on laid over it; TRY never touches a door
+  function shown(){ var o = {}; Object.keys(EQ).forEach(function(k){ o[k] = EQ[k]; }); Object.keys(TRY).forEach(function(k){ o[k] = TRY[k]; }); return o; }
+  function tryChip(){ var el = document.getElementById('tryon'); if (el) el.hidden = !Object.keys(TRY).length; undoState(); }
+  function build(){ var real = EQ; EQ = shown(); try { buildReal(); } finally { EQ = real; } tryChip(); }
+  function buildReal(){
     if (fig){ root.remove(fig); disposeTree(fig); fig = null; }
     fig = new THREE.Group(); root.add(fig);
     var d = dimsFor(EQ.body), s = d.spec, skinHex = W.skins[EQ.skin] || W.skins['skin.s3'];
@@ -386,6 +394,12 @@
   function stateOf(it){
     if (EQ[it.slot] === it.id) return {cls:'wearing', em:'Wearing.'};
     if (OWNED[it.id]) return {cls:'owned', em:'Yours.'};
+    if (TRY[it.slot] === it.id){
+      if (it.sold_in === 'wardrobe') return {cls:'trying', em:LIVE ? 'On you. Buy for ' + it.price.toLocaleString() + '? Tap again.' : 'On you. Sign in to buy.'};
+      if (it.sold_in === 'garden') return {cls:'trying', em:'On you. Sold at the garden stall.'};
+      if (it.sold_in === 'chest') return {cls:'trying', em:'On you. Found in the woodland chest.'};
+      return {cls:'trying', em:'On you. ' + (it.source || 'A starting look') + '.'};
+    }
     if (CONFIRM === it.id) return {cls:'confirm', em:'Buy for ' + it.price.toLocaleString() + '? Tap again.'};
     if (it.sold_in === 'wardrobe') return {cls:'buy', em:it.price.toLocaleString() + ' gardencoin'};
     if (it.sold_in === 'garden') return {cls:'locked', em:'At the garden stall.'};
@@ -408,7 +422,7 @@
       b.addEventListener('click', function(){ tap(it); });
       rowsEl.appendChild(b);
     });
-    var worn = EQ[ACTIVE], cw = worn && W.colorways[worn];
+    var worn = shown()[ACTIVE], cw = worn && W.colorways[worn];
     if (cw){
       colorBox.hidden = false; colorsEl.innerHTML = '';
       var cur = COLORWAY[worn] || W.defaultColorway[worn];
@@ -416,7 +430,7 @@
         var s = document.createElement('button'); s.type = 'button'; s.title = c.name; s.setAttribute('aria-label', c.name); s.style.background = c.hex;
         s.setAttribute('aria-pressed', String(c.id === cur));
         s.addEventListener('click', function(){ COLORWAY[worn] = c.id; try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {} build(); paint();
-          if (LIVE && sb) door('avatar_equip', worn, {p_colorway: c.id}).then(function(r){ if (r.error) toast('The colour did not save.', raw(r.error)); else portrait(); }).catch(function(){}); });
+          if (LIVE && sb && EQ[ACTIVE] === worn) door('avatar_equip', worn, {p_colorway: c.id}).then(function(r){ if (r.error) toast('The colour did not save.', raw(r.error)); else portrait(); }).catch(function(){}); });
         colorsEl.appendChild(s);
       });
       colorNote.textContent = (cw.filter(function(c){ return c.id === cur; })[0] || cw[0]).name + '. Colors save with the next patch.';
@@ -424,13 +438,12 @@
   }
   function tap(it){
     if (BUSY) return;
-    if (EQ[it.slot] === it.id) return;
+    if (EQ[it.slot] === it.id){ if (TRY[it.slot]){ delete TRY[it.slot]; CONFIRM = null; build(); paint(); } return; }
     if (OWNED[it.id]){ wear(it); return; }
-    if (!LIVE){ toast('Sign in on DEEDS to wear and buy.'); return; }
-    if (it.sold_in === 'wardrobe'){
-      if (CONFIRM !== it.id){ CONFIRM = it.id; paint(); return; }
-      buy(it); return;
-    }
+    // first tap on anything you do not own: try it on. second tap: buy it
+    if (TRY[it.slot] !== it.id){ TRY[it.slot] = it.id; CONFIRM = it.id; build(); paint(); return; }
+    if (!LIVE){ toast('Sign in on DEEDS to buy it.'); return; }
+    if (it.sold_in === 'wardrobe'){ buy(it); return; }
     if (it.sold_in === 'garden') toast('Sold at the garden stall.');
     else if (it.sold_in === 'chest') toast('Found in the woodland chest.');
     else toast((it.source || 'A starting look') + '.');
@@ -460,7 +473,7 @@
     door('avatar_equip', it.id, {p_colorway: (W.colorways[it.id] ? (COLORWAY[it.id] || W.defaultColorway[it.id] || null) : null)}).then(function(r){
       BUSY = false;
       if (r.error){ toast(fail(r.error, 'Could not put it on.'), raw(r.error)); paint(); return; }
-      EQ[it.slot] = it.id; if (it.slot === 'back' && it.id === 'back.none') EQ.attach = 'attach.none';
+      EQ[it.slot] = it.id; delete TRY[it.slot]; if (it.slot === 'back' && it.id === 'back.none') EQ.attach = 'attach.none';
       CONFIRM = null; build(); paint(); portrait();
       loadMine();
     }).catch(function(e){ BUSY = false; toast('Could not put it on.', raw(e) || String(e)); paint(); });
@@ -510,6 +523,7 @@
 
   // ---------- undo: back to what you walked in wearing ----------
   function changed(){
+    if (Object.keys(TRY).length) return true;
     if (!BASE) return false;
     var slots = Object.keys(BASE.eq);
     for (var i = 0; i < slots.length; i++){ var s = slots[i], id = EQ[s]; if (id !== BASE.eq[s]) return true; if (W.colorways[id] && (COLORWAY[id] || '') !== (BASE.cw[id] || '')) return true; }
@@ -517,10 +531,12 @@
   }
   function undoState(){ var u = document.getElementById('undo'); if (u) u.hidden = !changed(); }
   function undoAll(){
-    if (!BASE || BUSY || !LIVE) return;
+    if (BUSY) return;
+    if (Object.keys(TRY).length){ TRY = {}; CONFIRM = null; build(); paint(); }
+    if (!BASE || !LIVE){ undoState(); return; }
     var order = ['body', 'skin', 'hair', 'head', 'torso', 'legs', 'feet', 'neck', 'ears', 'hands', 'back', 'attach', 'topper'];
     var todo = order.filter(function(s){ var id = EQ[s], want = BASE.eq[s]; return want && (id !== want || (W.colorways[want] && (COLORWAY[want] || '') !== (BASE.cw[want] || ''))); });
-    if (!todo.length) return;
+    if (!todo.length){ undoState(); return; }
     BUSY = true; paint();
     var p = Promise.resolve();
     todo.forEach(function(s){ p = p.then(function(){ var want = BASE.eq[s]; return door('avatar_equip', want, {p_colorway: BASE.cw[want] || null}).then(function(r){ if (!r.error){ EQ[s] = want; if (BASE.cw[want]) COLORWAY[want] = BASE.cw[want]; else delete COLORWAY[want]; } }); }); });
@@ -543,12 +559,13 @@
   function shotCam(){ var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, 0.55, 8.0); cam.lookAt(0, 0.1, 0); return cam; }
   function shootPortrait(){
     if (!LIVE || !sb || !ME) return;
-    var S = 320, rot = root.rotation.y, url = null;
+    var S = 320, rot = root.rotation.y, url = null, had = Object.keys(TRY).length ? TRY : null;
+    if (had){ TRY = {}; build(); }
     try {
       var cam = shotCam();
       root.rotation.y = SHOT_TURN; renderer.setSize(S, S, false); renderer.render(scene, cam); url = looksLikeAFace(canvas) ? canvas.toDataURL('image/png') : null;
     } catch (e) { url = null; }
-    root.rotation.y = rot; size(); dirty = true;
+    root.rotation.y = rot; if (had){ TRY = had; build(); } size(); dirty = true;
     if (!url) return;
     fetch(url).then(function(r){ return r.blob(); }).then(function(blob){
       return Promise.resolve(sb.storage.from('avatars').upload(ME + '.png', blob, {upsert:true, contentType:'image/png', cacheControl:'0'}));
@@ -568,7 +585,8 @@
     face: function(o){ FACE = o || {}; build(); },
     portrait: function(){ var S = 320, rot = root.rotation.y, cam = shotCam(); root.rotation.y = SHOT_TURN; renderer.setSize(S, S, false); renderer.render(scene, cam); var ok = looksLikeAFace(canvas), u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return ok ? u : 'BLANK'; },
     tab: function(s){ ACTIVE = s; paint(); },
-    state: function(){ return {EQ:EQ, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
+    state: function(){ return {EQ:EQ, TRY:TRY, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
+    tryOn: function(slot, id){ if (id) TRY[slot] = id; else delete TRY[slot]; build(); paint(); },
     ready: true
   };
 })();
