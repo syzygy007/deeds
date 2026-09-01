@@ -104,6 +104,29 @@ input,textarea{font:inherit;color:var(--ink)}
 .xcard b{font-size:15px;font-weight:800}
 .xcard span{font-size:12px;color:var(--muted)}
 .xsec .rline{padding:0 18px 14px}
+.xonlab{display:flex;align-items:baseline;justify-content:space-between;padding:8px 18px 4px}
+.xonlab .xlab{padding:0}
+.xoncount{font-size:10px;letter-spacing:.14em;font-weight:800;color:#4C8B4F}
+.xoncount.zzz{color:#A8A395}
+.xonsub{font-family:Georgia,'Times New Roman',serif;font-size:13px;font-style:italic;color:var(--muted);padding:0 18px 10px}
+.xonwrap{padding:0 18px 14px}
+.xoncard{border:1px solid var(--line);border-radius:14px;background:#FBF9F3;overflow:hidden}
+.xonrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid rgba(21,19,14,.07)}
+.xonrow:first-child{border-top:0}
+.xonav{position:relative;width:44px;height:44px;flex:none;cursor:pointer}
+.xonav svg{width:44px;height:44px;display:block;border-radius:50%}
+.xonav img.pav{position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--bone);display:block}
+.xondot{position:absolute;right:-1px;bottom:0;width:12px;height:12px;border-radius:50%;background:#4C8B4F;border:2px solid #FBF9F3}
+.xondot.idle{background:#B9C0B2}
+.xonin{flex:1;min-width:0}
+.xonh{font-family:Georgia,'Times New Roman',serif;font-size:15px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xonw{font-size:11px;color:var(--muted);margin-top:2px}
+.xonb{flex:none;display:inline-block;background:var(--forest);color:var(--ivory);border:1px solid var(--forest);font-size:12px;font-weight:800;letter-spacing:.02em;padding:7px 15px;border-radius:999px;text-decoration:none;white-space:nowrap}
+.xonb.ghost{background:none;color:var(--forest)}
+.xonb.off{background:none;color:#9B9F94;border-color:var(--line)}
+.xonempty{padding:20px 16px;text-align:center}
+.xonempty b{display:block;font-family:Georgia,'Times New Roman',serif;font-size:15px;font-weight:400;color:var(--ink)}
+.xonempty span{display:block;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
 /* pages */
 .page{display:none}
 .page.on{display:block}
@@ -1612,6 +1635,11 @@ body.gsky-on .tab.on{color:var(--ivory)}
     </div>
     <div class="page" id="pg-meet">
       <div class="pghead"><h1>Explore<b>.</b></h1><div class="micro">Games &middot; Good Companies &middot; People</div></div>
+      <div class="xsec" id="xonsec" style="display:none">
+        <div class="xonlab"><div class="xlab">IN THE GARDEN NOW</div><div class="xoncount" id="xoncount"></div></div>
+        <div class="xonsub">Friends walking their gardens right now.</div>
+        <div class="xonwrap"><div class="xoncard" id="xonlist"></div></div>
+      </div>
       <div class="xsec">
         <div class="xlab">GAMES</div>
         <a class="xgate" href="garden/world/"><img src="gate.webp" alt="" onerror="this.onerror=null;this.src='garden-door.webp'"><div class="xg-copy"><div class="micro">THE GARDEN GATE</div><h2>Walk the garden<b>.</b></h2><div class="xg-sub">Your deeds, planted. Step through and look around.</div></div></a>
@@ -4956,6 +4984,62 @@ var _renderMeet0=renderMeet;renderMeet=function(){var el=$('#meetlist');if(!el)r
 var real=xOthers();
 if(!real.length){el.innerHTML='<div class="post" style="color:var(--muted)">'+(XPEOPLE.length?'You are the first one here. Bring someone.':'Finding people.')+'</div>';if(!XPEOPLE.length)loadPeople();return}
 var h='';real.forEach(function(p){h+=realMeetRow(p)});el.innerHTML=h;wireLive();wireCommon()};
+
+/* ---- WHO IS ONLINE, AND IN WHICH GAME (patch 61) ----
+   The games table is the registry: name, join link and seat cap all come
+   back from the door, so a second game needs no change in here. ---- */
+var ONLINE=[],ONLAST=0,ONTIMER=null,ONBOOT=false;
+function onGame(){return 'app'}
+function onRoom(){return null}
+function presencePing(){if(!sb||!PROFILE)return;
+try{sb.rpc('presence_ping',{p_game:onGame(),p_room:onRoom()}).then(function(){},function(){})}catch(e){}}
+function presenceLeave(){if(!sb||!PROFILE)return;
+try{sb.rpc('presence_leave',{}).then(function(){},function(){})}catch(e){}}
+function loadOnline(){if(!sb||!PROFILE)return;
+try{sb.rpc('friends_online',{p_secs:90}).then(function(r){
+if(r.error||!r.data||!r.data.ok)return;
+ONLINE=r.data.friends||[];ONLAST=Date.now();
+ONLINE.forEach(function(f){if(!NAMES[f.id])NAMES[f.id]={handle:f.handle,type:'doer',v:false};IDBY[f.handle]=f.id});
+paintOnline()},function(){})}catch(e){}}
+function onNoun(f){return String(f.game_name||f.game||'').replace(/^the\s+/i,'')}
+function onSeats(f){return(f.cap>0)?(' \u00B7 '+f.here+' of '+f.cap):''}
+function onWhere(f){
+if(!f.room)return(f.game==='app'||!f.game_name)?'On DEEDS':('In '+f.game_name);
+if(f.at_home)return 'In their '+onNoun(f)+onSeats(f);
+if(!f.can_visit)return 'In a '+onNoun(f)+' you cannot visit';
+return 'In '+f.room_handle+'\u2019s '+onNoun(f)+onSeats(f)}
+function onJoinURL(f){if(!f.join_path||!f.room_handle)return '';
+return f.join_path.replace('{room}',encodeURIComponent(f.room_handle))}
+function onRow(f){
+var nm=NAMES[f.id]||{type:'doer',v:false};
+var base=(typeof SB_URL==='string')?SB_URL:'https://helqqdygwaihrliglbvw.supabase.co';
+var art=DeedsTypes.svg(nm.type||'doer',44,{verified:false})+'<img class="pav" alt="" src="'+base+'/storage/v1/object/public/avatars/'+esc(f.id)+'.png" onerror="this.style.display=\'none\'">';
+var url=onJoinURL(f),full=(f.cap>0&&f.here>=f.cap),btn;
+if(url&&f.can_visit&&!full)btn='<a class="xonb" href="'+esc(url)+'">Join.</a>';
+else if(url&&f.can_visit&&full)btn='<span class="xonb off">Full.</span>';
+else btn='<button class="xonb ghost" data-onnote="'+esc(f.id)+'">Ask them in.</button>';
+return '<div class="xonrow"><div class="xonav" data-lmember="'+esc(f.handle)+'">'+art+'<span class="xondot'+(f.room?'':' idle')+'"></span></div>'+
+'<div class="xonin"><div class="xonh" data-lmember="'+esc(f.handle)+'" style="cursor:pointer">'+esc(f.handle)+'<b style="color:var(--forest)">.</b></div>'+
+'<div class="xonw">'+esc(onWhere(f))+'</div></div>'+btn+'</div>'}
+function paintOnline(){var sec=document.getElementById('xonsec');if(!sec)return;
+if(!PROFILE||!liveOn){sec.style.display='none';return}
+sec.style.display='';
+var c=document.getElementById('xoncount'),l=document.getElementById('xonlist'),n=ONLINE.length;
+if(c){c.textContent=n?(n+' ONLINE'):'NOBODY YET';c.className='xoncount'+(n?'':' zzz')}
+if(!l)return;
+if(!n){l.innerHTML='<div class="xonempty"><b>No friends out there right now.</b><span>Follow someone who follows you back and they show up here the moment they walk in.</span></div>';return}
+var h='';ONLINE.forEach(function(f){h+=onRow(f)});l.innerHTML=h;
+Array.prototype.slice.call(l.querySelectorAll('[data-onnote]')).forEach(function(b){b.onclick=function(){openNote(b.getAttribute('data-onnote'))}});
+wireLive();wireCommon()}
+function startPresence(){if(!sb||!PROFILE)return;
+presencePing();loadOnline();
+if(ONTIMER)clearInterval(ONTIMER);
+ONTIMER=setInterval(function(){if(document.hidden)return;presencePing();loadOnline()},45000);
+if(ONBOOT)return;ONBOOT=true;
+document.addEventListener('visibilitychange',function(){if(document.hidden){presenceLeave()}else{presencePing();loadOnline()}});
+window.addEventListener('pagehide',function(){presenceLeave()})}
+var _applyProfile0=applyProfile;applyProfile=function(){var r=_applyProfile0.apply(this,arguments);try{startPresence()}catch(e){}return r};
+var _renderMeet1=renderMeet;renderMeet=function(){var r=_renderMeet1.apply(this,arguments);try{paintOnline();if(Date.now()-ONLAST>20000)loadOnline()}catch(e){}return r};
 
 function openOrgView(id){var o=OSTORE[id];if(!o)return;
 var own=!!(PROFILE&&o.owner_id===PROFILE.id);
