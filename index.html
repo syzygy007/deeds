@@ -137,6 +137,10 @@ input,textarea{font:inherit;color:var(--ink)}
 .prof{padding:26px 18px}
 .prof-top{display:flex;align-items:center;gap:18px}
 .prof-av{width:88px;height:88px;flex:0 0 88px}
+.prof-av{position:relative}.prof-av img.pav{width:100%;height:100%;border-radius:50%;display:block;object-fit:cover;background:var(--bone)}
+.prof-av .pmark{position:absolute;right:-6px;bottom:-4px;width:34px;height:34px;border-radius:50%;background:var(--card);padding:2px;box-shadow:0 0 0 1px var(--line)}.prof-av .pmark svg{width:100%;height:100%;display:block}
+#profreal>.prof .prof-av .pmark svg{width:30px;height:30px}
+.dav img.pav{width:100%;height:100%;display:block;object-fit:cover}.dav .pmark{display:none}
 .prof-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .prof-name .mono{font-size:16px}
 .coinbadge{cursor:pointer;display:inline-flex;align-items:center}
@@ -2693,7 +2697,15 @@ if(p.media.kind==='photo')drawPlate(cv,p.media.plate);else drawVideo(cv.getConte
 wireFeed()}
 
 /* ============ PROFILE + STATUS ============ */
+/* the avatar portrait: the wardrobe saves a head shot, the profile shows it next to the handle (type mark becomes the badge) */
+function portraitInto(el,id,type){if(!sb||!id||!el)return;
+sb.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){if(r.error||!r.data)return;
+var img=document.createElement('img');img.className='pav';img.alt='';img.src=SB_URL+'/storage/v1/object/public/avatars/'+id+'.png?v='+encodeURIComponent(r.data.updated_at);
+img.onerror=function(){el.innerHTML=DeedsTypes.svg(type||'doer',88,{verified:false})};
+var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});
+el.innerHTML='';el.appendChild(img);el.appendChild(mk)}).catch(function(){})}
 function renderProfile(){$('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:false});
+portraitInto($('#myAv'),(typeof SESSION!=='undefined'&&SESSION&&SESSION.user)?SESSION.user.id:null,my.type);
 var n=deedCount(),m=monthCount(),ci=coinIdx(n);
 $('#myCoin').innerHTML=ci<0?'':coinSvg(ci,36);
 $('#rMonth').textContent=m>=4?'RHYTHM BUILT. KEEP GOING.':'JULY · '+m+(m===1?' DEED':' DEEDS')+'. KEEP BUILDING.';
@@ -6457,8 +6469,9 @@ var pb=J('pubbar');if(pb){pb.classList.toggle('on',PREVIEWING&&own);var pg2=J('p
 layout(function(){gotoPage(0)})}
 if(!left)build();
 else keys.forEach(function(k){var b=need[k];getBook(b.tr,b.b,function(){left--;if(!left)build()})})}}).catch(function(e){if(window.toast)toast('That study could not open.')})}
-function route(){var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m)openWork(m[1])}
-window.addEventListener('hashchange',route);
+function route(){if(location.hash==='#profile'){try{go('profile')}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}return}
+var m=(location.hash||'').match(/^#w=([0-9a-fA-F-]{36})$/);if(m)openWork(m[1])}
+window.addEventListener('hashchange',route);route();
 setTimeout(route,700);
 /* ---- the classics: public domain books with per book progress ---- */
 var CLASSICS=[

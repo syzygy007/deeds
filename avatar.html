@@ -43,6 +43,9 @@
   .note{font-size:13px;color:var(--quiet);margin:10px 0 0}
   .foot{margin-top:auto;padding-top:28px;display:flex;justify-content:space-between;align-items:center;gap:12px}
   .hint{font-size:13px;color:var(--quiet);margin:0}
+.back{display:inline-block;font-size:13px;color:var(--quiet);text-decoration:none;margin-bottom:16px}.back:hover{color:var(--ink)}
+.acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.done{background:var(--forest);color:#F6F3EB;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
   .zoom{background:none;border:1px solid var(--mist);border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
   .zoom:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
   .toast{position:fixed;right:32px;bottom:88px;width:296px;background:var(--ink);color:var(--bone);font-size:14px;padding:10px 14px;border-radius:6px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:5}
@@ -66,6 +69,7 @@
   </div>
   <aside class="rail">
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <a class="back" href="/#profile">&larr; Back to your profile</a>
     <p class="eyebrow">The wardrobe</p>
     <h1>Dress your avatar.</h1>
     <p class="coin" id="coin"></p>
@@ -77,8 +81,12 @@
       <p class="note" id="colorNote"></p>
     </div>
     <div class="foot">
-      <p class="hint">Drag to turn.</p>
-      <button type="button" class="zoom" id="zoom">Head.</button>
+      <p class="hint">Drag to turn. Picks save as you go.</p>
+      <div class="acts">
+        <button type="button" class="zoom" id="undo" hidden>Undo changes.</button>
+        <button type="button" class="zoom" id="zoom">Head.</button>
+        <a class="done" href="/#profile">Done.</a>
+      </div>
     </div>
   </aside>
 </div>
@@ -109,6 +117,7 @@
   var SLOTS = [['body','Body'],['skin','Skin'],['hair','Hair'],['head','Hat'],['torso','Top'],['legs','Legs'],['feet','Feet'],['neck','Neck'],['ears','Ears'],['hands','In hand'],['back','Back'],['attach','Attach'],['topper','Topper']];
   var CAT = {}, BYSLOT = {}, EQ = {}, OWNED = {}, GC = 0, ME = null, LIVE = false, sb = null, ACTIVE = 'head', CONFIRM = null, BUSY = false;
   var COLORWAY = {}; try { COLORWAY = JSON.parse(localStorage.getItem('avatar_colorway') || '{}') || {}; } catch (e) { COLORWAY = {}; }
+  var BASE = null, PT = null;
 
   function setCatalog(rows){
     CAT = {}; BYSLOT = {};
@@ -407,7 +416,7 @@
         var s = document.createElement('button'); s.type = 'button'; s.title = c.name; s.setAttribute('aria-label', c.name); s.style.background = c.hex;
         s.setAttribute('aria-pressed', String(c.id === cur));
         s.addEventListener('click', function(){ COLORWAY[worn] = c.id; try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {} build(); paint();
-          if (LIVE && sb) door('avatar_equip', worn, {p_colorway: c.id}).then(function(r){ if (r.error) toast('The colour did not save.', raw(r.error)); }).catch(function(){}); });
+          if (LIVE && sb) door('avatar_equip', worn, {p_colorway: c.id}).then(function(r){ if (r.error) toast('The colour did not save.', raw(r.error)); else portrait(); }).catch(function(){}); });
         colorsEl.appendChild(s);
       });
       colorNote.textContent = (cw.filter(function(c){ return c.id === cur; })[0] || cw[0]).name + '. Colors save with the next patch.';
@@ -452,7 +461,7 @@
       BUSY = false;
       if (r.error){ toast(fail(r.error, 'Could not put it on.'), raw(r.error)); paint(); return; }
       EQ[it.slot] = it.id; if (it.slot === 'back' && it.id === 'back.none') EQ.attach = 'attach.none';
-      CONFIRM = null; build(); paint();
+      CONFIRM = null; build(); paint(); portrait();
       loadMine();
     }).catch(function(e){ BUSY = false; toast('Could not put it on.', raw(e) || String(e)); paint(); });
   }
@@ -493,9 +502,49 @@
       (rs[1].data || []).forEach(function(row){ var id = row.item_id || row.item; if (id) OWNED[id] = true; });
       if (!rs[2].error && rs[2].data && rs[2].data[0]) GC = +rs[2].data[0].balance || 0;
       build(); paint();
+      if (!BASE){ BASE = {eq:JSON.parse(JSON.stringify(EQ)), cw:JSON.parse(JSON.stringify(COLORWAY))}; portrait(); }
+      undoState();
     }).catch(function(){ toast('Your wardrobe could not load.'); });
   }
   var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; sc.onload = goLive; sc.onerror = function(){}; document.head.appendChild(sc);
+
+  // ---------- undo: back to what you walked in wearing ----------
+  function changed(){
+    if (!BASE) return false;
+    var slots = Object.keys(BASE.eq);
+    for (var i = 0; i < slots.length; i++){ var s = slots[i], id = EQ[s]; if (id !== BASE.eq[s]) return true; if (W.colorways[id] && (COLORWAY[id] || '') !== (BASE.cw[id] || '')) return true; }
+    return false;
+  }
+  function undoState(){ var u = document.getElementById('undo'); if (u) u.hidden = !changed(); }
+  function undoAll(){
+    if (!BASE || BUSY || !LIVE) return;
+    var order = ['body', 'skin', 'hair', 'head', 'torso', 'legs', 'feet', 'neck', 'ears', 'hands', 'back', 'attach', 'topper'];
+    var todo = order.filter(function(s){ var id = EQ[s], want = BASE.eq[s]; return want && (id !== want || (W.colorways[want] && (COLORWAY[want] || '') !== (BASE.cw[want] || ''))); });
+    if (!todo.length) return;
+    BUSY = true; paint();
+    var p = Promise.resolve();
+    todo.forEach(function(s){ p = p.then(function(){ var want = BASE.eq[s]; return door('avatar_equip', want, {p_colorway: BASE.cw[want] || null}).then(function(r){ if (!r.error){ EQ[s] = want; if (BASE.cw[want]) COLORWAY[want] = BASE.cw[want]; else delete COLORWAY[want]; } }); }); });
+    p.then(function(){ BUSY = false; try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {} build(); paint(); undoState(); portrait(); }).catch(function(){ BUSY = false; paint(); });
+  }
+  var undoBtn = document.getElementById('undo'); if (undoBtn) undoBtn.addEventListener('click', undoAll);
+  // ---------- the portrait: a head shot saved to your profile after every change ----------
+  function portrait(){ undoState(); if (!LIVE || !sb || !ME) return; clearTimeout(PT); PT = setTimeout(shootPortrait, 1200); }
+  function shootPortrait(){
+    if (!LIVE || !sb || !ME) return;
+    var S = 320, rot = root.rotation.y, url = null;
+    try {
+      var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.15, 8.3); cam.lookAt(0, -0.7, 0);
+      root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); url = canvas.toDataURL('image/png');
+    } catch (e) { url = null; }
+    root.rotation.y = rot; size(); dirty = true;
+    if (!url) return;
+    fetch(url).then(function(r){ return r.blob(); }).then(function(blob){
+      return Promise.resolve(sb.storage.from('avatars').upload(ME + '.png', blob, {upsert:true, contentType:'image/png', cacheControl:'0'}));
+    }).then(function(r){
+      if (r && r.error) throw r.error;
+      return Promise.resolve(sb.from('avatar_portraits').upsert({profile_id: ME, updated_at: new Date().toISOString()}, {onConflict:'profile_id'}));
+    }).catch(function(){});
+  }
 
   build(); paint(); loop();
   window.__avatar = {
@@ -505,6 +554,7 @@
     turn: function(r){ root.rotation.y = r; dirty = true; },
     look: function(y, dist, up){ camera.position.set(0, y + (up || 0), dist); camera.lookAt(0, y, 0); camera.updateProjectionMatrix(); dirty = true; },
     face: function(o){ FACE = o || {}; build(); },
+    portrait: function(){ var S = 320, rot = root.rotation.y, cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.1, 7.6); cam.lookAt(0, -0.6, 0); root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); var u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return u; },
     tab: function(s){ ACTIVE = s; paint(); },
     state: function(){ return {EQ:EQ, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
     ready: true
