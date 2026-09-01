@@ -1357,16 +1357,16 @@ body.gsky-on .tab.on{color:var(--ivory)}
 .biblecov .lb{width:104px}
 .biblecov .bc-txt{flex:1 1 auto;min-width:0}
 /* ---- handwriting: deeds as notes on torn paper ---- */
-@font-face{font-family:"HW Caveat";font-style:normal;font-weight:400;font-display:swap;src:url(hand-caveat.woff2) format("woff2")}
-@font-face{font-family:"HW Kalam";font-style:normal;font-weight:400;font-display:swap;src:url(hand-kalam.woff2) format("woff2")}
-@font-face{font-family:"HW Patrick";font-style:normal;font-weight:400;font-display:swap;src:url(hand-patrick.woff2) format("woff2")}
-@font-face{font-family:"HW Shadows";font-style:normal;font-weight:400;font-display:swap;src:url(hand-shadows.woff2) format("woff2")}
+@font-face{font-family:"HW Rainbow";font-style:normal;font-weight:400;font-display:swap;src:url(hand-rainbow.woff2) format("woff2")}
 @font-face{font-family:"HW Nothing";font-style:normal;font-weight:400;font-display:swap;src:url(hand-nothing.woff2) format("woff2")}
 @font-face{font-family:"HW Reenie";font-style:normal;font-weight:400;font-display:swap;src:url(hand-reenie.woff2) format("woff2")}
-@font-face{font-family:"HW Grace";font-style:normal;font-weight:400;font-display:swap;src:url(hand-grace.woff2) format("woff2")}
-@font-face{font-family:"HW Gloria";font-style:normal;font-weight:400;font-display:swap;src:url(hand-gloria.woff2) format("woff2")}
-@font-face{font-family:"HW Indie";font-style:normal;font-weight:400;font-display:swap;src:url(hand-indie.woff2) format("woff2")}
-@font-face{font-family:"HW Sunrise";font-style:normal;font-weight:400;font-display:swap;src:url(hand-sunrise.woff2) format("woff2")}
+@font-face{font-family:"HW Zeyada";font-style:normal;font-weight:400;font-display:swap;src:url(hand-zeyada.woff2) format("woff2")}
+@font-face{font-family:"HW Aurore";font-style:normal;font-weight:400;font-display:swap;src:url(hand-aurore.woff2) format("woff2")}
+@font-face{font-family:"HW Dawning";font-style:normal;font-weight:400;font-display:swap;src:url(hand-dawning.woff2) format("woff2")}
+@font-face{font-family:"HW Apple";font-style:normal;font-weight:400;font-display:swap;src:url(hand-apple.woff2) format("woff2")}
+@font-face{font-family:"HW Cedarville";font-style:normal;font-weight:400;font-display:swap;src:url(hand-cedarville.woff2) format("woff2")}
+@font-face{font-family:"HW Glory";font-style:normal;font-weight:400;font-display:swap;src:url(hand-glory.woff2) format("woff2")}
+@font-face{font-family:"HW Justme";font-style:normal;font-weight:400;font-display:swap;src:url(hand-justme.woff2) format("woff2")}
 .hwlab{color:var(--forest);font-size:10px;letter-spacing:.14em;font-weight:800;margin:0 0 10px}
 .hwpaper{position:relative;z-index:0;border:24px solid transparent;border-image:url(paper-deckle.webp) 96 round;background:#FBF9F3 url(paper-grain.webp);background-clip:padding-box;color:#1B1712}
 .hwpaper::before,.hwpaper::after{content:"";position:absolute;left:-13px;right:-13px;pointer-events:none;z-index:-1;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
@@ -1387,6 +1387,11 @@ body.gsky-on .tab.on{color:var(--ivory)}
 #logsheet.hwd #logtext{border:0;background:none;color:#1B1712;padding:6px 4px 8px;min-height:124px}
 #logsheet.hwd #logtext::placeholder{color:rgba(27,23,18,.36)}
 #logsheet.inv #hwc{display:none!important}
+.handrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.handchip{border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;background:#FBF9F3;color:#1B1712;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;font-family:Helvetica,Arial,sans-serif}
+.handchip.on{border-color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest)}
+.handchip .hs{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.handchip .hn{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1709,6 +1714,11 @@ body.gsky-on .tab.on{color:var(--ivory)}
       <div class="sect">
         <div class="micro">What Describes You</div>
         <div class="pickgrid" id="pickgrid"></div>
+      </div>
+      <div class="sect">
+        <div class="micro">Your Hand</div>
+        <p class="remnote" style="margin:0 0 12px">Every deed you post is written in it.</p>
+        <div class="handrow" id="handrow"></div>
       </div>
       <div class="sect">
         <div class="micro">The Daily Dose</div>
@@ -5452,24 +5462,25 @@ var EGGARTLOADED={};function preloadEggArt(r){var src=(r.egg_filling==='photo'&&
 function presPick(a){return a[Math.floor(Math.random()*a.length)]}
 /* ---- HANDWRITING: a deed posts as a note in the member's hand, real text on torn paper (Aug 30) ---- */
 var HWFONTS={
-caveat:{fam:'HW Caveat',size:28,lh:36,feat:'"calt","salt"'},
-kalam:{fam:'HW Kalam',size:23,lh:34},
-patrick:{fam:'HW Patrick',size:25,lh:35},
-shadows:{fam:'HW Shadows',size:22,lh:34},
+rainbow:{fam:'HW Rainbow',size:26,lh:37},
 nothing:{fam:'HW Nothing',size:28,lh:38},
 reenie:{fam:'HW Reenie',size:26,lh:33},
-grace:{fam:'HW Grace',size:24,lh:34},
-gloria:{fam:'HW Gloria',size:22,lh:34},
-indie:{fam:'HW Indie',size:24,lh:36},
-sunrise:{fam:'HW Sunrise',size:26,lh:32}};
+zeyada:{fam:'HW Zeyada',size:30,lh:38},
+aurore:{fam:'HW Aurore',size:27,lh:38},
+dawning:{fam:'HW Dawning',size:30,lh:38},
+apple:{fam:'HW Apple',size:22,lh:42},
+cedarville:{fam:'HW Cedarville',size:26,lh:40},
+glory:{fam:'HW Glory',size:27,lh:36},
+justme:{fam:'HW Justme',size:31,lh:36}};
 var HWKEYS=Object.keys(HWFONTS),HWCAP=9,HWINK='#1B1712',HWOPEN={},HWREADY={},HWQ={},HWCV=null,HWRAF=0,HWRT=0;
 var HWMON=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function hwHash(s){s=String(s||'');var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-function hwHandOf(nm){var k=nm&&nm.hand;if(k&&HWFONTS[k])return k;return HWKEYS[hwHash((nm&&nm.handle)||'')%HWKEYS.length]}
+function hwHandOf(nm){var k=nm&&nm.hand;if(k&&HWFONTS[k])return k;return HWKEYS[0]}
 function hwRng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 function hwDate(r){var s=r&&(r.done_on||r.created_at);if(!s)return'';s=String(s);var m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/),d;
 if(m)d={y:+m[1],mo:+m[2]-1,d:+m[3]};else{var dt=new Date(s);if(isNaN(dt.getTime()))return'';d={y:dt.getFullYear(),mo:dt.getMonth(),d:dt.getDate()}}
 return HWMON[d.mo]+' '+d.d+', '+d.y}
+function hwShortDate(d){var m=String(d||'').match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);if(!m)return d;var mi=HWMON.indexOf(m[1]);return mi<0?d:(mi+1)+'.'+m[2]+'.'+m[3].slice(2)}
 function hwFont(k,sz){return (sz||HWFONTS[k].size)+'px "'+HWFONTS[k].fam+'"'}
 function hwEnsure(k,cb){if(HWREADY[k]){cb();return}
 if(HWQ[k]){HWQ[k].push(cb);return}HWQ[k]=[cb];
@@ -5511,7 +5522,9 @@ var fold=!o.open&&lines.length>HWCAP+1,shown=fold?lines.slice(0,HWCAP):lines;
 var head=!!(o.no||o.date),yH=head?Math.round(hs*.92):0,yB=head?yH+Math.round(lh*1.02):Math.round(size*.86);
 var H=yB+(shown.length-1)*lh+Math.round(size*.46);
 var s='<svg class="hwsvg" xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="font-family:\''+f.fam+'\',cursive'+(f.feat?';font-feature-settings:'+f.feat.replace(/"/g,'&quot;'):'')+'"><g fill="'+HWINK+'" filter="url(#hwink)">';
-if(head){if(o.no)s+=hwLine(['Deed','#'+o.no],2,yH,hs,rnd,'start',.78);if(o.date)s+=hwLine(o.date.split(' '),W-2,yH,hs,rnd,'end',.78)}
+if(head){var dS=o.date||'',noS=o.no?'Deed #'+o.no:'',cx=hwCtx();function wd(t,sz){cx.font=hwFont(o.k,sz);return cx.measureText(t).width*1.08}
+if(noS&&dS){var room=W-18,need=wd(noS,hs)+wd(dS,hs);if(need>room){var h2=Math.floor(hs*room/need);if(h2>=Math.round(size*.64))hs=h2;else{dS=hwShortDate(dS);need=wd(noS,hs)+wd(dS,hs);hs=need>room?Math.max(Math.round(size*.64),Math.floor(hs*room/need)):hs}}}
+if(noS)s+=hwLine(['Deed','#'+o.no],2,yH,hs,rnd,'start',.78);if(dS)s+=hwLine(dS.split(' '),W-2,yH,hs,rnd,'end',.78)}
 shown.forEach(function(ln,i){if(ln.blank||!ln.w.length)return;s+=hwLine(ln.w,2,yB+i*lh,size,rnd,'start',1)});
 s+='</g></svg>';return{svg:s,fold:fold,h:H}}
 /* width the note will get in the feed column, so a loaded hand draws in one pass with no swap */
@@ -5542,7 +5555,8 @@ var _hwGo=window.go;if(typeof _hwGo==='function')window.go=function(){var r=_hwG
 (function(){var ta=$('#logtext');if(!ta||$('#hwc'))return;var w=document.createElement('div');w.id='hwc';
 w.innerHTML='<div class="hwc-head" id="hwcHead"><span id="hwcNo"></span><span id="hwcDate"></span></div>';
 ta.parentNode.insertBefore(w,ta);w.appendChild(ta)})();
-function hwMyHand(){var P=window.PROFILE;var nm=(P&&P.handle)?{handle:P.handle,hand:P.hand}:{handle:(typeof my!=='undefined'&&my&&my.handle)||''};return hwHandOf(nm)}
+var HWPICK=null;
+function hwMyHand(){var P=window.PROFILE;var nm=(P&&P.handle)?{handle:P.handle,hand:P.hand}:{handle:(typeof my!=='undefined'&&my&&my.handle)||'',hand:HWPICK};return hwHandOf(nm)}
 function hwNextNo(){var mx=0,n=0;try{(my.deeds||[]).forEach(function(d){n++;var v=+(d.no||0);if(v>mx)mx=v})}catch(e){}if(!n)return 1;return mx?mx+1:0}
 function hwComposerPaint(){var ls=$('#logsheet'),w=$('#hwc'),ta=$('#logtext'),hd=$('#hwcHead');if(!ls||!w)return;var on=composeMode==='deed';
 ls.classList.toggle('hwd',on);w.classList.toggle('hwpaper',on);
@@ -5556,6 +5570,18 @@ if(t.indexOf('Yesterday')===0)d.setDate(d.getDate()-1);else if(t.indexOf('Earlie
 var ed=$('#hwcDate');if(ed)ed.textContent=HWMON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()}
 var hwBaseSwitch=switchMode;switchMode=function(m){hwBaseSwitch(m);try{hwComposerPaint()}catch(e){}};
 (function(){var ld=$('#logdates');if(ld)ld.addEventListener('click',function(){setTimeout(hwComposerPaint,0)})})();
+/* ---- your hand: the picker in Edit. (profiles.hand) ---- */
+var HWNAMES={rainbow:'Over the Rainbow',nothing:'Nothing You Could Do',reenie:'Reenie Beanie',zeyada:'Zeyada',aurore:'La Belle Aurore',dawning:'Dawning of a New Day',apple:'Homemade Apple',cedarville:'Cedarville Cursive',glory:'Give You Glory',justme:'Just Me Again Down Here'};
+function hwPickerPaint(){var row=$('#handrow');if(!row)return;var cur=hwMyHand();
+if(!row.children.length){var h='';HWKEYS.forEach(function(k){var f=HWFONTS[k];h+='<button type="button" class="handchip" data-hand="'+k+'" aria-label="Write in '+HWNAMES[k]+'"><span class="hs" style="font-family:\''+f.fam+'\',cursive;font-size:'+Math.round(f.size*.86)+'px;line-height:'+Math.round(f.lh*.86)+'px'+(f.feat?';font-feature-settings:'+f.feat:'')+'">Deed #1</span><span class="hn">'+HWNAMES[k]+'</span></button>';hwEnsure(k,function(){})});row.innerHTML=h;
+row.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.handchip'):null;if(!b)return;e.preventDefault();hwPickHand(b.getAttribute('data-hand'))})}
+$$('#handrow .handchip').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-hand')===cur)})}
+function hwPickHand(k){if(!HWFONTS[k])return;
+function apply(){if(PROFILE)PROFILE.hand=k;else HWPICK=k;try{if(PROFILE&&NAMES[PROFILE.id])NAMES[PROFILE.id].hand=k}catch(e){}
+hwPickerPaint();try{hwComposerPaint()}catch(e){}try{$$('.hwnote').forEach(function(n){n.classList.remove('hw-drawn')});renderFeed()}catch(e){}hwSched()}
+if(!(liveOn&&PROFILE&&sb)){apply();return}
+sb.from('profiles').update({hand:k}).eq('id',PROFILE.id).then(function(r){if(r.error){toast('Not saved: '+r.error.message);return}apply();toast('Your hand is set.')}).catch(function(){toast('Not saved.')})}
+(function(){var o=window.setEdit;if(typeof o!=='function')return;window.setEdit=function(on){var r=o.apply(this,arguments);if(on){try{hwPickerPaint()}catch(e){}}return r}})();
 /* ---- feed card bodies ---- */
 function presBodyHTML(r,body,mine,nm){
 if(r._k!=='post')return hwNoteHTML(r,body,nm);
