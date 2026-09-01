@@ -26,6 +26,19 @@
   ];
   W.colorways['head.cap'] = SIX; W.defaultColorway['head.cap'] = 'black';
   W.colorways['head.bucket'] = SIX; W.defaultColorway['head.bucket'] = 'black';
+  // the style and colour rule, extended from hats to clothes: one catalog row per style, the colour chosen after
+  W.colorways['torso.tee'] = SIX; W.defaultColorway['torso.tee'] = 'white';
+  W.colorways['legs.trousers'] = SIX; W.defaultColorway['legs.trousers'] = 'white';
+  var SHOE = [{id:'white', name:'White', hex:'#f4f4f2'}, {id:'gold', name:'Gold', hex:'#c9a43a'}, {id:'black', name:'Black', hex:'#232323'}, {id:'brown', name:'Brown', hex:'#6b4a2f'}];
+  W.colorways['feet.sneakers'] = SHOE; W.defaultColorway['feet.sneakers'] = 'white';
+  var TRACK = SIX.concat([{id:'navy', name:'Navy', hex:'#1f2a44'}]);
+  W.colorways['torso.track'] = TRACK; W.defaultColorway['torso.track'] = 'navy';
+  W.colorways['legs.track'] = TRACK; W.defaultColorway['legs.track'] = 'navy';
+  W.colorways['torso.zip'] = SIX; W.defaultColorway['torso.zip'] = 'black';
+  W.colorways['torso.hoodie'] = SIX; W.defaultColorway['torso.hoodie'] = 'black';
+  // hair styles are catalog rows, the colour is chosen after (the eight hair colours)
+  var HAIRCOL = [['h1', 'Ink'], ['h2', 'Brown'], ['h3', 'Chestnut'], ['h4', 'Sand'], ['h5', 'Rust'], ['h6', 'Ash'], ['h7', 'Moss'], ['h8', 'Plum']].map(function(p){ return {id:p[0], name:p[1], hex:W.hairs['hair.' + p[0]]}; });
+  ['hair.crop', 'hair.buzz', 'hair.side', 'hair.rows', 'hair.bob', 'hair.long', 'hair.bald', 'hair.sides'].forEach(function(id){ W.colorways[id] = HAIRCOL; W.defaultColorway[id] = 'h2'; });
 
   // ---------- helpers ----------
   function col(hex, k){ var c = new THREE.Color(hex); if (k) c.multiplyScalar(k); return c.convertSRGBToLinear(); }
@@ -98,6 +111,13 @@
   function ty(d, f){ return d.top - f * (d.top - d.bottom); }
   W.util = {col:col, mat:mat, glow:glow, mesh:mesh, grid:grid, lathe:lathe, capsule:capsule, tube:tube, rowAt:rowAt, loaf:loaf, smoothRows:smoothRows, ty:ty};
 
+  // ---------- neck and ears ----------
+  W.parts['neck.none'] = function(){ return null; };
+  W.parts['neck.gold'] = function(c){ return chain(c, '#d9a83c', 0.85, 0.3); };
+  W.parts['neck.white'] = function(c){ return chain(c, '#e6e9ee', 0.9, 0.22); };
+  W.parts['ears.none'] = function(){ return null; };
+  W.parts['ears.diamond'] = function(c){ var g = studs(c, '#ffffff', 0.4, 0.08, 0.08); g.children.forEach(function(o){ o.material.emissive = col('#9fb4ff'); o.material.emissiveIntensity = 0.35; }); return g; };
+  W.parts['ears.pearl'] = function(c){ return studs(c, '#f4ecdf', 0.05, 0.3, 0.09); };
   // ---------- hats ----------
   function warp(v){
     var t = THREE.MathUtils.clamp((v.y - 0.15) / 0.85, 0, 1);
@@ -237,14 +257,75 @@
     return s;
   }
   function collar(c, hex){ var d = c.dims, o = mesh(new THREE.TorusGeometry(d.neckR + 0.1, 0.035, 8, 48), mat(hex, 0.9), 0, d.collarY - 0.06, 0); o.rotation.x = Math.PI / 2; return o; }
+
+  // a sheet hugging the front of the garment carrying a canvas texture (prints)
+  function gridUV(fn, nu, nv){
+    var pos = [], uv = [], idx = [];
+    for (var i = 0; i <= nu; i++) for (var j = 0; j <= nv; j++){ var p = fn(i / nu, j / nv); pos.push(p.x, p.y, p.z); uv.push(i / nu, j / nv); }
+    for (i = 0; i < nu; i++) for (j = 0; j < nv; j++){ var a = i * (nv + 1) + j, b = a + nv + 1; idx.push(a, a + 1, b, b, a + 1, b + 1); }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx); g.computeVertexNormals(); return g;
+  }
+  function surfZ(d, x, y, out){ var r = rowAt(d.shell, y), q = Math.min(1, Math.abs(x) / (r.rx + 0.02)); return (r.rz + 0.02) * Math.pow(Math.max(0, 1 - Math.pow(q, d.n)), 1 / d.n) + (r.cy || 0) + (out || 0); }
+  function printSheet(c, tex, width, y0, y1){
+    var d = c.dims, m = new THREE.MeshStandardMaterial({map:tex, transparent:true, roughness:0.9, metalness:0, depthWrite:false}); m.side = THREE.DoubleSide;
+    var o = mesh(gridUV(function(u, v){ var y = y0 + v * (y1 - y0), x = (u - 0.5) * width; return new THREE.Vector3(x, y, surfZ(d, x, y, 0.04)); }, 24, 16), m); o.castShadow = false; return o;
+  }
+  var TEX = {};
+  function textTexture(key, draw){
+    if (TEX[key]) return TEX[key];
+    var cv = document.createElement('canvas'); cv.width = 512; cv.height = 384; var g = cv.getContext('2d'); g.clearRect(0, 0, 512, 384); draw(g);
+    var t = new THREE.CanvasTexture(cv); t.anisotropy = 4; t.needsUpdate = true; TEX[key] = t; return t;
+  }
+  function wordTexture(word, ufo){
+    return textTexture(word + (ufo ? '+ufo' : ''), function(g){
+      g.fillStyle = '#ffffff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = 'bold 118px "Helvetica Neue", Helvetica, Arial, sans-serif';
+      if (ufo){
+        g.fillText(word, 256, 250);
+        // a small saucer above the word
+        g.beginPath(); g.ellipse(256, 128, 92, 22, 0, 0, Math.PI * 2); g.fill();
+        g.beginPath(); g.ellipse(256, 104, 44, 30, 0, Math.PI, 0); g.fill();
+        g.fillStyle = '#232323'; [-52, 0, 52].forEach(function(dx){ g.beginPath(); g.arc(256 + dx, 132, 7, 0, Math.PI * 2); g.fill(); });
+      } else g.fillText(word, 256, 192);
+    });
+  }
+  // a hood lying down on the back and shoulders
+  function hood(c, hex){
+    var d = c.dims, g = new THREE.Group(), m = mat(hex, 0.92), y = d.collarY - 0.05, back = -(d.chestRz + 0.04);
+    var bag = mesh(new THREE.SphereGeometry(1, 32, 20), m, 0, y - 0.22, back - 0.12); bag.scale.set(d.neckR + 0.62, 0.42, 0.5); g.add(bag);
+    var ring = mesh(new THREE.TorusGeometry(d.neckR + 0.24, 0.16, 12, 48, Math.PI * 1.35), m, 0, y + 0.02, 0); ring.rotation.x = Math.PI / 2; ring.rotation.z = Math.PI * 0.325; g.add(ring);
+    return g;
+  }
+  function drawstrings(c, hex){
+    var d = c.dims, g = new THREE.Group(), m = mat(hex, 0.8);
+    [-1, 1].forEach(function(s){ var y0 = d.collarY - 0.1, L = 0.9, x = s * 0.22, str = mesh(new THREE.CylinderGeometry(0.03, 0.03, L, 8), m, x, y0 - L / 2, surfZ(d, x, y0 - L / 2, 0.05)); g.add(str); g.add(mesh(new THREE.SphereGeometry(0.05, 10, 8), m, x, y0 - L, surfZ(d, x, y0 - L, 0.05))); });
+    return g;
+  }
+  function stripeColour(hex){ return hex.toLowerCase() === '#f0efec' ? '#232323' : '#f3f1eb'; }
+  // a chain lying on the shirt: round the back of the neck and dipping to a V on the chest
+  function chain(c, hex, metalness, rough){
+    var d = c.dims, pts = [], n = 40, R = d.neckR + 0.16, m = new THREE.MeshStandardMaterial({color:col(hex), metalness:metalness, roughness:rough});
+    for (var i = 0; i < n; i++){ var a = (i / n) * Math.PI * 2 - Math.PI, f = (Math.cos(a) + 1) / 2, dip = Math.pow(f, 2.6), y = d.collarY - 0.1 - 0.95 * dip, x = (R + 0.3 * f) * Math.sin(a);
+      var behind = Math.abs(a) > Math.PI / 2, z = behind ? -surfZ(d, x, Math.min(y, d.collarY - 0.12), 0.05) + 0.02 : surfZ(d, x, Math.min(y, d.collarY - 0.12), 0.06);
+      pts.push(new THREE.Vector3(x, y, z)); }
+    var o = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 120, 0.042, 8, true), m); o.castShadow = false; return o;
+  }
+  function studs(c, hex, metalness, rough, r){
+    var g = new THREE.Group(), m = new THREE.MeshStandardMaterial({color:col(hex), metalness:metalness, roughness:rough});
+    [-1, 1].forEach(function(s){ var o = mesh(new THREE.SphereGeometry(r, 14, 10), m, s * 1.08, -0.24, 0.05); o.castShadow = false; o.receiveShadow = false; g.add(o); });
+    return g;
+  }
   // a sheet hugging the front of the garment between two heights
   function frontSheet(c, hex, width, y0, y1, out, x0){
     var d = c.dims, e = 2 / d.n, m = mat(hex, 0.9); m.side = THREE.DoubleSide;
-    return mesh(grid(function(u, v){
+    var o = mesh(grid(function(u, v){
       var y = y0 + v * (y1 - y0), r = rowAt(d.shell, y), x = (x0 || 0) + (u - 0.5) * width;
       var q = Math.min(1, Math.abs(x) / (r.rx + 0.02)), z = (r.rz + 0.02) * Math.pow(Math.max(0, 1 - Math.pow(q, d.n)), 1 / d.n) + (r.cy || 0) + (out || 0.05);
       return new THREE.Vector3(x, y, z);
     }, 16, 18), m);
+    o.receiveShadow = false; return o;
   }
   // a strap over one shoulder: a short arc over the top, a strip down the chest
   function strap(c, hex, x){
@@ -255,16 +336,33 @@
     return g;
   }
   function pocket(c, hex, x, y, w, h){ return frontSheet(c, hex, w, y, y - h, 0.09, x); }
-  W.parts['torso.tee'] = function(c){ var g = new THREE.Group(); g.add(shell(c, '#f3f1eb')); sleeve(c, 0, '#f3f1eb'); sleeve(c, 1, '#f3f1eb'); g.add(collar(c, '#eceae3')); return g; };
+  W.parts['torso.tee'] = function(c){ var hex = c.colorway || '#f3f1eb', rib = '#' + col(hex).lerp(col('#000000'), 0.08).getHexString(), g = new THREE.Group(); g.add(shell(c, hex)); sleeve(c, 0, hex); sleeve(c, 1, hex); g.add(collar(c, rib)); return g; };
   W.parts['torso.scrubs'] = function(c){ var g = new THREE.Group(), d = c.dims, S = d.S; g.add(shell(c, '#6aa2a0')); sleeve(c, 0, '#6aa2a0'); sleeve(c, 1, '#6aa2a0'); g.add(collar(c, '#5d918f')); g.add(pocket(c, '#5d918f', -0.55 * S, ty(d, 0.4), 0.55 * S, 0.5 * S)); return g; };
   W.parts['torso.track'] = function(c){
-    var g = new THREE.Group(), d = c.dims, S = d.S; g.add(shell(c, '#1f2a44', 0.85));
-    [0, 1].forEach(function(i){ sleeve(c, i, '#1f2a44', 'long');
-      [0.14, -0.14].forEach(function(dx){ var L = d.upper + d.fore - 0.45; var s = mesh(new THREE.BoxGeometry(0.07, L, 0.03), mat('#f3f1eb', 0.9), dx * S, -L / 2 + 0.05, d.upperR + 0.2); c.arms[i].add(s); }); });
+    var g = new THREE.Group(), d = c.dims, S = d.S, hex = c.colorway || '#1f2a44', st = stripeColour(hex); g.add(shell(c, hex, 0.85));
+    [0, 1].forEach(function(i){ sleeve(c, i, hex, 'long');
+      [0.14, -0.14].forEach(function(dx){ var L = d.upper + d.fore - 0.45; var s = mesh(new THREE.BoxGeometry(0.07, L, 0.03), mat(st, 0.9), dx * S, -L / 2 + 0.05, d.upperR + 0.2); c.arms[i].add(s); }); });
     g.add(frontSheet(c, '#8b93a6', 0.06, ty(d, 0.06), ty(d, 0.96), 0.07));
-    var cl = mesh(new THREE.CylinderGeometry(d.neckR + 0.12, d.neckR + 0.18, 0.3, 40, 1, true), mat('#1f2a44', 0.85), 0, d.collarY + 0.02, 0); cl.material.side = THREE.DoubleSide; g.add(cl);
+    var cl = mesh(new THREE.CylinderGeometry(d.neckR + 0.12, d.neckR + 0.18, 0.3, 40, 1, true), mat(hex, 0.85), 0, d.collarY + 0.02, 0); cl.material.side = THREE.DoubleSide; g.add(cl);
     return g;
   };
+  W.parts['torso.zip'] = function(c){
+    var g = new THREE.Group(), d = c.dims, S = d.S, hex = c.colorway || '#232323', dark = '#' + col(hex).lerp(col('#000000'), 0.08).getHexString();
+    g.add(shell(c, hex, 0.95)); [0, 1].forEach(function(i){ sleeve(c, i, hex, 'long'); });
+    g.add(hood(c, hex)); g.add(frontSheet(c, '#9a9a94', 0.05, ty(d, 0.02), ty(d, 0.98), 0.07));
+    g.add(pocket(c, hex, -0.62 * S, ty(d, 0.2), 0.7 * S, 0.62 * S)); g.add(pocket(c, hex, 0.62 * S, ty(d, 0.2), 0.7 * S, 0.62 * S));
+    return g;
+  };
+  W.parts['torso.hoodie'] = function(c){
+    var g = new THREE.Group(), d = c.dims, S = d.S, hex = c.colorway || '#232323', dark = '#' + col(hex).lerp(col('#000000'), 0.18).getHexString();
+    g.add(shell(c, hex, 0.95)); [0, 1].forEach(function(i){ sleeve(c, i, hex, 'long'); });
+    g.add(hood(c, hex)); g.add(drawstrings(c, '#e8e6e0'));
+    g.add(pocket(c, hex, 0, ty(d, 0.24), 1.5 * S, 0.5 * S));
+    return g;
+  };
+  function printedTee(c, word, ufo){ var g = new THREE.Group(), d = c.dims, hex = '#232323'; g.add(shell(c, hex)); sleeve(c, 0, hex); sleeve(c, 1, hex); g.add(collar(c, '#2c2c2c')); g.add(printSheet(c, wordTexture(word, ufo), 1.55 * d.S, ty(d, 0.56), ty(d, 0.06))); return g; }
+  W.parts['torso.pizza'] = function(c){ return printedTee(c, 'PIZZA', false); };
+  W.parts['torso.alien'] = function(c){ return printedTee(c, 'ALIEN', true); };
   W.parts['torso.apron'] = function(c){
     var g = new THREE.Group(), d = c.dims, S = d.S; g.add(shell(c, '#f3f1eb')); sleeve(c, 0, '#f3f1eb'); sleeve(c, 1, '#f3f1eb'); g.add(collar(c, '#eceae3'));
     g.add(frontSheet(c, '#7a6a55', 1.55 * S, ty(d, 0.17), d.bottom - 0.35 * S, 0.08));
@@ -305,8 +403,13 @@
     });
     return g;
   }
-  W.parts['legs.trousers'] = function(c){ return pants(c, '#f3f1eb'); };
+  W.parts['legs.trousers'] = function(c){ return pants(c, c.colorway || '#f3f1eb'); };
   W.parts['legs.scrubpant'] = function(c){ return pants(c, '#6aa2a0'); };
+  W.parts['legs.track'] = function(c){
+    var d = c.dims, P = d.pants, hex = c.colorway || '#1f2a44', st = stripeColour(hex), g = pants(c, hex);
+    [0, 1].forEach(function(i){ var side = i === 0 ? -1 : 1, top = P.crotchY + 0.15, L = top - P.hemY - 0.05; [0.09, -0.09].forEach(function(dz){ var s = mesh(new THREE.BoxGeometry(0.03, L, 0.06), mat(st, 0.9), side * (P.r[0] + 0.02), top - L / 2, dz); c.legs[i].add(s); }); });
+    return g;
+  };
   W.parts['legs.shorts'] = function(c){ return pants(c, '#c9b48a', 'short'); };
   W.parts['legs.work'] = function(c){ var g = pants(c, '#6b5238'), S = c.dims.S; c.legs.forEach(function(l){ l.add(mesh(new THREE.BoxGeometry(0.34 * S, 0.4 * S, 0.06), mat('#5e4731', 0.9), 0.32 * S, -0.9 * S, c.dims.pants.r[0] + 0.02)); }); return g; };
   W.parts['legs.denim'] = function(c){ return pants(c, '#4a6a9c'); };
@@ -325,9 +428,9 @@
   W.parts['feet.bare'] = function(c){ [0, 1].forEach(function(i){ var d = c.dims, y = -(d.thigh + d.shin) - d.foot.ankleUp; c.legs[i].add(plant(mesh(footLoaf(d, 0, -0.02), mat(c.skin, 0.85), 0, y, 0), c, i)); }); return null; };
   W.parts['feet.boots'] = function(c){ [0, 1].forEach(function(i){ foot(c, i, '#4f5b3b', {shaft:0.72, rough:0.6}); }); return null; };
   W.parts['feet.mud'] = function(c){ [0, 1].forEach(function(i){ var d = c.dims; foot(c, i, '#5a3f2b', {shaft:0.95, rough:0.6}); var band = mesh(new THREE.TorusGeometry(d.shinR2 + 0.24, 0.035, 8, 40), mat('#3f2b1c', 0.8), 0, -(d.thigh + d.shin) - d.foot.ankleUp + 0.82 * d.shin, 0); band.rotation.x = Math.PI / 2; c.legs[i].add(band); }); return null; };
-  W.parts['feet.sneakers'] = function(c){ [0, 1].forEach(function(i){ var d = c.dims, y = -(d.thigh + d.shin) - d.foot.ankleUp; foot(c, i, '#f4f4f2', {sole:'#e2ded4', rough:0.7});
+  W.parts['feet.sneakers'] = function(c){ var hex = c.colorway || '#f4f4f2'; [0, 1].forEach(function(i){ var d = c.dims, y = -(d.thigh + d.shin) - d.foot.ankleUp; foot(c, i, hex, {sole:'#e2ded4', rough:0.7});
     var line = plant(mesh(footLoaf(d, 0.1, -d.foot.h + 0.05), mat('#3f7a47', 0.7), 0, y + 0.16, 0), c, i); c.legs[i].add(line);
-    c.legs[i].add(mesh(tube([{y:y + d.foot.h - 0.1, rx:d.shinR2 + 0.12, rz:d.shinR2 + 0.16, cy:0.04}, {y:y + d.foot.h + 0.12, rx:d.shinR2 + 0.11, rz:d.shinR2 + 0.14, cy:0.04}, {y:y + d.foot.h + 0.15, rx:0.02, rz:0.02, cy:0.04}], {n:2.2, sub:2, seg:40}), mat('#f4f4f2', 0.7))); }); return null; };
+    c.legs[i].add(mesh(tube([{y:y + d.foot.h - 0.1, rx:d.shinR2 + 0.12, rz:d.shinR2 + 0.16, cy:0.04}, {y:y + d.foot.h + 0.12, rx:d.shinR2 + 0.11, rz:d.shinR2 + 0.14, cy:0.04}, {y:y + d.foot.h + 0.15, rx:0.02, rz:0.02, cy:0.04}], {n:2.2, sub:2, seg:40}), mat(hex, 0.7))); }); return null; };
 
   W.garment.pants = pants; W.garment.foot = foot; W.garment.footLoaf = footLoaf;
 

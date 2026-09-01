@@ -83,7 +83,7 @@
   </aside>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="wardrobe.js?v=2"></script>
+<script src="wardrobe.js?v=3"></script>
 <script>
 (function(){
   var W = window.Wardrobe, U = W.util;
@@ -94,16 +94,19 @@
     ['attach.none','attach','Nothing',0,'signup',1,10,null],['attach.rocket','attach','Rocket pack',1000,'garden',0,20,'The garden stall'],
     ['back.none','back','Nothing',0,'signup',1,10,null],['back.pack_basic','back','Backpack',1000,'garden',0,20,'The garden stall'],['back.pack_ivory','back','Ivory pack',1000,'garden',0,30,'The garden stall'],['back.pack_sun','back','Sun pack',1000,'garden',0,40,'The garden stall'],['back.pack_neon','back','Neon pack',1000,'garden',0,50,'The garden stall'],['back.pack_cyber','back','Cyber pack',1000,'garden',0,60,'The garden stall'],['back.pack_starlight','back','Starlight pack',1000,'garden',0,70,'The garden stall'],
     ['body.a','body','Body A',0,'signup',1,10,null],['body.b','body','Body B',0,'signup',1,20,null],
+    ['hair.crop','hair','Crop',0,'signup',1,1,null],['hair.buzz','hair','Buzz',0,'signup',0,2,null],['hair.side','hair','Side part',0,'signup',0,3,null],['hair.rows','hair','Cornrows',0,'signup',0,4,null],['hair.bob','hair','Mid',0,'signup',0,5,null],['hair.long','hair','Long',0,'signup',0,6,null],['hair.bald','hair','Bald',0,'signup',0,7,null],['hair.sides','hair','Hair on the sides',0,'signup',0,8,null],
+    ['neck.none','neck','Nothing',0,'signup',1,10,null],['neck.gold','neck','Gold chain',260,'wardrobe',0,20,null],['neck.white','neck','White gold chain',260,'wardrobe',0,30,null],
+    ['ears.none','ears','Nothing',0,'signup',1,10,null],['ears.diamond','ears','Diamond studs',220,'wardrobe',0,20,null],['ears.pearl','ears','Pearl studs',180,'wardrobe',0,30,null],
     ['feet.boots','feet','Rubber boots',0,'signup',1,10,'Given at signup'],['feet.bare','feet','Bare feet',0,'signup',1,20,null],['feet.mud','feet','Mud boots',120,'wardrobe',0,30,null],['feet.sneakers','feet','Sneakers',180,'wardrobe',0,40,null],
-    ['hair.h1','hair','Ink',0,'signup',1,10,null],['hair.h2','hair','Brown',0,'signup',1,20,null],['hair.h3','hair','Chestnut',0,'signup',1,30,null],['hair.h4','hair','Sand',0,'signup',1,40,null],['hair.h5','hair','Rust',0,'signup',1,50,null],['hair.h6','hair','Ash',0,'signup',1,60,null],['hair.h7','hair','Moss',120,'wardrobe',0,70,null],['hair.h8','hair','Plum',120,'wardrobe',0,80,null],
+    
     ['hands.none','hands','Empty hands',0,'signup',1,10,null],['hands.can','hands','Watering can',0,'signup',1,20,'The garden'],['hands.chainsaw','hands','Chainsaw',0,'garden',0,30,'The garden stall'],['hands.launcher','hands','Launcher',1000,'garden',0,40,'The garden stall'],['hands.bubbles','hands','Bubbles',0,'chest',0,50,'Found in the woodland chest'],
     ['head.bare','head','Bare head',0,'signup',1,10,null],['head.gardenhat','head','Garden hat',0,'signup',1,20,'Given at the gate'],['head.cap','head','Field cap',90,'wardrobe',0,30,null],['head.straw','head','Straw hat',120,'wardrobe',0,40,null],['head.sunhat','head','Wide sun hat',210,'wardrobe',0,50,null],
-    ['legs.trousers','legs','White trousers',0,'signup',1,10,null],['legs.scrubpant','legs','Scrub pants',0,'signup',1,20,'Nurse starting look'],['legs.shorts','legs','Shorts',120,'wardrobe',0,30,null],['legs.work','legs','Work pants',160,'wardrobe',0,40,null],['legs.denim','legs','Blue denim',160,'wardrobe',0,50,null],
+    ['legs.trousers','legs','White trousers',0,'signup',1,10,null],['legs.track','legs','Track pants',0,'signup',0,25,null],['legs.scrubpant','legs','Scrub pants',0,'signup',1,20,'Nurse starting look'],['legs.shorts','legs','Shorts',120,'wardrobe',0,30,null],['legs.work','legs','Work pants',160,'wardrobe',0,40,null],['legs.denim','legs','Blue denim',160,'wardrobe',0,50,null],
     ['skin.s1','skin','Skin 1',0,'signup',1,10,null],['skin.s2','skin','Skin 2',0,'signup',1,20,null],['skin.s3','skin','Skin 3',0,'signup',1,30,null],['skin.s4','skin','Skin 4',0,'signup',1,40,null],['skin.s5','skin','Skin 5',0,'signup',1,50,null],['skin.s6','skin','Skin 6',0,'signup',1,60,null],['skin.s7','skin','Skin 7',0,'signup',1,70,null],['skin.s8','skin','Skin 8',0,'signup',1,80,null],['skin.moss','skin','Moss',120,'wardrobe',0,90,null],['skin.teal','skin','Teal',120,'wardrobe',0,100,null],['skin.lilac','skin','Lilac',120,'wardrobe',0,110,null],['skin.clay','skin','Clay',120,'wardrobe',0,120,null],
     ['topper.none','topper','Nothing',0,'signup',1,10,null],['topper.kite','topper','Paper kite',0,'chest',0,20,'Found in the woodland chest'],['topper.bloom','topper','Peony behind the ear',90,'wardrobe',0,30,'Grown in the parterre'],
-    ['torso.tee','torso','White tee',0,'signup',1,10,'Given at signup'],['torso.scrubs','torso','Scrubs',0,'signup',1,20,'Nurse starting look'],['torso.track','torso','Track jacket',0,'signup',1,30,'Coach starting look'],['torso.apron','torso','Work apron',200,'wardrobe',0,40,null],['torso.field','torso','Field shirt',320,'wardrobe',0,50,null],['torso.overalls','torso','Overalls',380,'wardrobe',0,60,null]
+    ['torso.tee','torso','White tee',0,'signup',1,10,'Given at signup'],['torso.scrubs','torso','Scrubs',0,'signup',1,20,'Nurse starting look'],['torso.zip','torso','Zip hoodie',160,'wardrobe',0,45,null],['torso.hoodie','torso','Pullover hoodie',140,'wardrobe',0,46,null],['torso.pizza','torso','Pizza tee',90,'wardrobe',0,47,null],['torso.alien','torso','Alien tee',90,'wardrobe',0,48,null],['torso.track','torso','Track jacket',0,'signup',1,30,'Coach starting look'],['torso.apron','torso','Work apron',200,'wardrobe',0,40,null],['torso.field','torso','Field shirt',320,'wardrobe',0,50,null],['torso.overalls','torso','Overalls',380,'wardrobe',0,60,null]
   ];
-  var SLOTS = [['body','Body'],['skin','Skin'],['hair','Hair'],['head','Hat'],['torso','Top'],['legs','Legs'],['feet','Feet'],['hands','In hand'],['back','Back'],['attach','Attach'],['topper','Topper']];
+  var SLOTS = [['body','Body'],['skin','Skin'],['hair','Hair'],['head','Hat'],['torso','Top'],['legs','Legs'],['feet','Feet'],['neck','Neck'],['ears','Ears'],['hands','In hand'],['back','Back'],['attach','Attach'],['topper','Topper']];
   var CAT = {}, BYSLOT = {}, EQ = {}, OWNED = {}, GC = 0, ME = null, LIVE = false, sb = null, ACTIVE = 'head', CONFIRM = null, BUSY = false;
   var COLORWAY = {}; try { COLORWAY = JSON.parse(localStorage.getItem('avatar_colorway') || '{}') || {}; } catch (e) { COLORWAY = {}; }
 
@@ -160,7 +163,7 @@
       body:[[0.40, 0.05, 0.03], [0.41, 0.103, 0.062], [0.43, 0.118, 0.07], [0.48, 0.124, 0.072], [0.54, 0.118, 0.068], [0.60, 0.104, 0.064], [0.64, 0.115, 0.07, 0.004], [0.68, 0.125, 0.074, 0.006], [0.72, 0.128, 0.072, 0.002], [0.74, 0.135, 0.07], [0.752, 0.12, 0.066], [0.762, 0.095, 0.058], [0.77, 0.068, 0.05], [0.776, 0.05, 0.044], [0.778, 0.04, 0.04]],
       shell:[[0.51, 0.10, 0.06], [0.512, 0.13, 0.076], [0.55, 0.128, 0.075], [0.60, 0.115, 0.07], [0.64, 0.126, 0.078, 0.004], [0.68, 0.136, 0.084, 0.005], [0.72, 0.14, 0.082, 0.002], [0.74, 0.145, 0.078], [0.753, 0.135, 0.074], [0.763, 0.115, 0.066], [0.771, 0.09, 0.058], [0.778, 0.065, 0.052], [0.782, 0.05, 0.05], [0.784, 0.04, 0.04]],
       pants:{waistZ:0.49, waistR:0.132, hipR:0.134, crotchZ:0.39, crotchR:0.134, r:[0.06, 0.056, 0.056], hemZ:0.075},
-      eyeX:0.034, eyeZ:0.888, eyeR:0.19, noseZ:0.87, mouthZ:0.85, mouthR:0.25, blush:0, hair:'bob', ears:false, hatY:-0.1, hatScale:1.15, n:2.3, sleeveDome:0.1, sleevePad:0.13, collarLift:0.06}
+      eyeX:0.034, eyeZ:0.888, eyeR:0.19, noseZ:0.87, mouthZ:0.85, mouthR:0.25, blush:0, hair:'bob', ears:true, hatY:-0.1, hatScale:1.15, n:2.3, sleeveDome:0.1, sleevePad:0.13, collarLift:0.06}
   };
   var FACE = {};
   function dimsFor(body){
@@ -203,37 +206,91 @@
     var p = new THREE.Vector3(x, y, z), nrm = new THREE.Vector3(x, 0, z / (d.headRz * d.headRz)).normalize();
     var o = new THREE.Mesh(geo, m); o.position.copy(p).addScaledVector(nrm, push || 0); o.lookAt(p.clone().addScaledVector(nrm, 3)); o.receiveShadow = true; fig.add(o); return o;
   }
-  function hairCrop(d, hairM, hatted){
-    // a soft cap of hair: a rounded hairline at the forehead, over the ears, down to the nape
-    function edge(phi){ var a = Math.abs(phi); if (a < 0.7) return 0.44 + 0.04 * Math.cos(a / 0.7 * Math.PI); if (a < 1.4) return 0.40 - Math.pow((a - 0.7) / 0.7, 1.3) * 0.42; if (a < 2.1) return -0.02 - (a - 1.4) / 0.7 * 0.36; return -0.38 - (a - 2.1) / 1.04 * 0.3; }
-    var top = hatted ? 0.62 : d.headRy;
-    return U.mesh(U.grid(function(u, v){
-      var phi = u * Math.PI * 2 - Math.PI, y0 = edge(phi), ys = top + (y0 - top) * v, k = v > 0.94 ? 0.985 : 1.11 - 0.05 * v;
-      var th = Math.acos(Math.max(-1, Math.min(1, ys / d.headRy))), p = headPoint(d, phi, th, k); if (v < 0.001) p.set(0, d.headRy * k, 0);
-      if (hatted && v < 0.1) p.multiplyScalar(0.92);
-      return p;
-    }, 72, 24), hairM);
+  // ---------- hair: one parametric cap, nine styles ----------
+  // seven styles for either body: Crop, Buzz, Side part, Mid, Long, Bald, Hair on the sides (his cut Sep 1: no guy mid length, the girl's short is the crop)
+  // front/temple/ear/nape = hairline heights in head space (head radius 1, top at d.headRy); hem = where a hanging style ends;
+  // hang = how far the hanging sheet flares; open = the half angle of the face opening; part = side of a comb over; band = sides only
+  var HAIRSTYLE = {
+    'hair.crop':  {name:'Crop',            front:0.44, temple:0.0,  ear:-0.04, nape:-0.66, vol:1.11},
+    'hair.buzz':  {name:'Buzz',            front:0.40, temple:-0.02, ear:-0.06, nape:-0.62, vol:1.045},
+    'hair.side':  {name:'Side part',       front:0.42, temple:0.02, ear:-0.04, nape:-0.66, vol:1.13, part:1},
+    'hair.bald':  {name:'Bald'},
+    'hair.sides': {name:'Hair on the sides', front:0.6, temple:-0.12, ear:-0.16, nape:-0.66, vol:1.08, band:0.24},
+    'hair.rows':  {name:'Cornrows',        front:0.42, temple:-0.02, ear:-0.06, nape:-0.62, vol:1.025, rows:[-80, -60, -40, -20, 0, 20, 40, 60, 80], braid:0.068},
+    'hair.bob':   {name:'Mid',             front:0.46, temple:0.0,  ear:-0.3,  nape:-1.2, vol:1.12, hem:'chin', hang:1.22, open:0.6},
+    'hair.long':  {name:'Long',            front:0.46, temple:0.0,  ear:-0.3,  nape:-2.4, vol:1.12, hem:-2.45, hang:1.3, open:0.55, back:-0.18}
+  };
+  function hairStyle(d, hairM, o, hatted){
+    if (!o || !o.front) return null;
+    if (o.rows){ var gg = new THREE.Group(); gg.add(hairCap(d, hairM, o, hatted)); gg.add(braids(d, hairM, o, hatted)); return gg; }
+    return hairCap(d, hairM, o, hatted);
   }
-  function hairBob(d, hairM, hatted){
-    // a chin length bob: the face open at the front, hair hanging to the jaw round the sides and back, fullest mid way and tucked at the ends
-    var chin = d.chinY - 0.12;
-    function edge(phi){ var a = Math.abs(phi); if (a < 0.6) return 0.46 - 0.04 * Math.cos(a / 0.6 * Math.PI); if (a < 1.2){ var t = (a - 0.6) / 0.6; return 0.46 - Math.pow(t, 1.5) * (0.46 - chin); } return chin - 0.05 * Math.min(1, (a - 1.2) / 1.5); }
-    var top = hatted ? 0.62 : d.headRy, m = hairM.clone(); m.side = THREE.DoubleSide;
+  function hairCap(d, hairM, o, hatted){
+    var ry = d.headRy, top = hatted ? 0.62 : ry, hem = o.hem === 'chin' ? d.chinY - 0.12 : o.hem, hanging = hem != null, open = o.open || 0.6, part = o.part || 0;
+    var m = hairM; if (hanging || o.band){ m = hairM.clone(); m.side = THREE.DoubleSide; }
+    function sm(t){ t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+    function capEdge(phi){
+      var a = Math.abs(phi), fr = o.front, tm = o.temple;
+      if (part){ var sw = phi * part; fr += sw > 0 ? -0.12 * sm(sw / 0.9) : 0.14 * sm(-sw / 0.9); }
+      if (a < 0.7) return fr + 0.04 * Math.cos(a / 0.7 * Math.PI);
+      if (a < 1.4) return fr - 0.04 - Math.pow((a - 0.7) / 0.7, 1.3) * (fr - 0.04 - tm);
+      if (a < 2.1) return tm - (a - 1.4) / 0.7 * (tm - o.ear);
+      return o.ear - (a - 2.1) / 1.04 * (o.ear - o.nape);
+    }
+    function bottom(phi){
+      if (!hanging) return capEdge(phi);
+      var a = Math.abs(phi);
+      if (a < open) return capEdge(phi);
+      if (a < open + 0.6) return capEdge(phi) + (hem - capEdge(phi)) * Math.pow(sm((a - open) / 0.6), 1.3);
+      return hem - 0.05 * Math.min(1, (a - open - 0.6) / 1.5);
+    }
+    var topCut = o.band ? o.band : null;
     return U.mesh(U.grid(function(u, v){
-      var phi = u * Math.PI * 2 - Math.PI, a = Math.abs(phi), y0 = edge(phi), ys = top + (y0 - top) * v;
-      var yc = Math.max(-d.headRy * 0.999, Math.min(d.headRy * 0.999, ys)), th = Math.acos(yc / d.headRy), p = headPoint(d, phi, th, 1), r = Math.hypot(p.x, p.z);
-      var f = Math.max(0, Math.min(1, (0.3 - ys) / 1.4)), hang = 1.08 + 0.14 * Math.sin(Math.PI * Math.min(1, f * 1.15)) - 0.02 * f;
-      var tuck = v > 0.84 ? 1 - (0.1 + 0.16 * Math.max(0, 1 - a / 1.6)) * ((v - 0.84) / 0.16) : 1, wgt = Math.max(0, Math.min(1, (0.5 - ys) / 0.7)), hr = Math.max(r * (1.08 + 0.05 * (1 - v)), hang * wgt) * tuck;
-      var sc = hr / Math.max(1e-6, r), q = new THREE.Vector3(p.x * sc, ys, p.z * sc * 1.03 - 0.03);
-      if (v < 0.001) q.set(0, top * 1.1, 0);
+      var phi = u * Math.PI * 2 - Math.PI, a = Math.abs(phi), yTop = topCut != null ? topCut : top, y0 = Math.min(bottom(phi), yTop), ys = yTop + (y0 - yTop) * v;
+      var yc = Math.max(-ry * 0.999, Math.min(ry * 0.999, ys)), th = Math.acos(yc / ry), p = headPoint(d, phi, th, 1), r = Math.hypot(p.x, p.z);
+      var k = o.vol + (1 - o.vol) * Math.pow(v, 1.6);
+      if (part){ var sw = phi * part; k += 0.17 * sm(sw / 0.8) * sm((ys - 0.05) / 0.5) * (1 - v * 0.4); }
+      if (topCut != null){ k = 1 + (o.vol - 1) * Math.min(1, v / 0.25) * (1 - Math.pow(v, 3)); if (y0 >= yTop - 1e-6) k = 1; }
+      else if (!hanging) k = Math.max(k, v > 0.94 ? 0.985 : k);
+      var hr = r * k, q;
+      if (hanging){
+        var f = Math.max(0, Math.min(1, (0.3 - ys) / Math.max(0.6, (0.3 - hem) * 0.75))), flare = 1.06 + (o.hang - 1.06) * Math.sin(Math.PI * Math.min(1, f * 1.1)) + (o.hang - 1.06) * 0.35 * f;
+        var wgt = sm((0.5 - ys) / 0.7), tuck = v > 0.86 ? 1 - (0.1 + 0.14 * Math.max(0, 1 - a / 1.6)) * ((v - 0.86) / 0.14) : 1;
+        hr = Math.max(r * k, flare * wgt) * tuck;
+        var earZone = Math.max(0, 1 - Math.abs(a - Math.PI / 2) / 0.42) * Math.max(0, 1 - Math.abs(ys + 0.12) / 0.4); hr *= 1 - 0.16 * earZone;
+      }
+      var sc = hr / Math.max(1e-6, r), lift = (hr / Math.max(1e-6, r) - 1) * ry * sm((ys - 0.35) / 0.7);
+      q = new THREE.Vector3(p.x * sc, ys + (ys > 0.35 ? lift : 0), p.z * sc * 1.03 - 0.03 + (hanging && ys < -0.6 ? (o.back || 0) * Math.min(1, (-0.6 - ys) / 1.2) : 0));
+      if (v < 0.001 && topCut == null) q.set(0, top * (hanging ? 1.1 : o.vol), 0);
       if (hatted && v < 0.1) q.multiplyScalar(0.92);
       return q;
-    }, 80, 30), m);
+    }, 80, 32), m);
+  }
+  function braids(d, hairM, o, hatted){
+    // each braid follows the scalp in a plane through the front-back axis, from the hairline to the nape
+    var g = new THREE.Group(), y0 = -0.1, rz = d.headRz;
+    function onHead(dir){ var lo = 0.2, hi = 1.6; for (var i = 0; i < 18; i++){ var R = (lo + hi) / 2, x = dir.x * R, y = y0 + dir.y * R, z = dir.z * R, pr = y >= d.headRy || y <= -d.headRy ? 0 : headProfile(d, y); if (pr <= 0 || x * x + (z / rz) * (z / rz) > pr * pr) hi = R; else lo = R; } return (lo + hi) / 2; }
+    function hairline(phi){ var a = Math.abs(phi); if (a < 0.7) return o.front + 0.04 * Math.cos(a / 0.7 * Math.PI); if (a < 1.4) return o.front - 0.04 - Math.pow((a - 0.7) / 0.7, 1.3) * (o.front - 0.04 - o.temple); if (a < 2.1) return o.temple - (a - 1.4) / 0.7 * (o.temple - o.ear); return o.ear - (a - 2.1) / 1.04 * (o.ear - o.nape); }
+    o.rows.forEach(function(deg){
+      var lam = deg * Math.PI / 180, dx = Math.sin(lam), dy = Math.cos(lam), pts = [];
+      for (var t = -75; t <= 125; t += 5){
+        var th = t * Math.PI / 180, dir = new THREE.Vector3(dx * Math.cos(th), dy * Math.cos(th), Math.sin(th) * -1);
+        var R = onHead(dir), p = new THREE.Vector3(dir.x * R, y0 + dir.y * R, dir.z * R), phi = Math.atan2(p.x, p.z);
+        if (p.y < hairline(phi) - 0.02){ if (pts.length) break; else continue; }
+        if (hatted && p.y > 0.55) continue;
+        pts.push(p.clone().addScaledVector(dir, o.braid * 0.55));
+      }
+      if (pts.length > 3) g.add(U.mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 36, o.braid, 8, false), hairM));
+    });
+    return g;
   }
   function build(){
     if (fig){ root.remove(fig); disposeTree(fig); fig = null; }
     fig = new THREE.Group(); root.add(fig);
-    var d = dimsFor(EQ.body), s = d.spec, skinHex = W.skins[EQ.skin] || W.skins['skin.s3'], hairHex = W.hairs[EQ.hair] || W.hairs['hair.h1'];
+    var d = dimsFor(EQ.body), s = d.spec, skinHex = W.skins[EQ.skin] || W.skins['skin.s3'];
+    var hid = EQ.hair || '', hst = HAIRSTYLE[hid], hairHex;
+    if (hst){ var hcw = W.colorways[hid], hpick = hcw && (hcw.filter(function(c){ return c.id === COLORWAY[hid]; })[0] || hcw.filter(function(c){ return c.id === W.defaultColorway[hid]; })[0] || hcw[0]); hairHex = hpick ? hpick.hex : W.hairs['hair.h2']; }
+    else { hst = HAIRSTYLE[s.hair === 'bob' ? 'hair.bob' : 'hair.crop']; hairHex = W.hairs[hid] || W.hairs['hair.h1']; }
     var skin = U.mat(skinHex, 0.88), hairM = U.mat(hairHex, 0.92), ink = U.mat('#2b2320', 0.55), white = U.mat('#ffffff', 0.5), mouthM = U.mat('#8a5443', 0.85);
     var blushM = U.mat('#' + U.col(skinHex).lerp(U.col('#e8786e'), s.blush || 0).getHexString(), 0.9), eyeR = s.eyeR || 0.16, mouthR = s.mouthR || 0.3;
     ground.position.y = d.ground;
@@ -250,7 +307,7 @@
     onFace(fig, d, new THREE.SphereGeometry(0.085, 18, 12), skin, 0, d.Y(s.noseZ), 0.02).scale.set(0.85, 0.9, 0.6);
     var mouth = onFace(fig, d, new THREE.TorusGeometry(mouthR, 0.032, 8, 22, 1.5), mouthM, 0, d.Y(s.mouthZ) + 0.4 * mouthR, 0.02); mouth.rotateZ(Math.PI / 2 - 0.75 + Math.PI);
     var hatted = EQ.head && EQ.head !== 'head.bare' && !!W.parts[EQ.head];
-    var hair = s.hair === 'bob' ? hairBob(d, hairM, hatted) : hairCrop(d, hairM, hatted); hair.castShadow = false; fig.add(hair);
+    var hair = hairStyle(d, hairM, hst, hatted); if (hair){ hair.castShadow = false; fig.add(hair); }
     // neck and torso, one soft body
     fig.add(U.mesh(new THREE.CylinderGeometry(d.neckR, d.neckR + 0.08, (d.chinY - d.neckY) + 0.9, 40), skin, 0, (d.chinY + d.neckY) / 2 - 0.15, -0.02));
     fig.add(U.mesh(U.tube(d.body, {n:d.n}), skin));
@@ -267,7 +324,7 @@
     });
     var ctx = {dims:d, arms:arms, legs:legs, skin:skinHex, hair:hairHex, colorway:null};
     var hatG = new THREE.Group(); hatG.position.y = d.hatY; var hs = s.hatScale || 1; hatG.scale.set(hs, hs, hs); fig.add(hatG);
-    ['torso', 'legs', 'feet', 'hands', 'back', 'attach', 'head', 'topper'].forEach(function(slot){
+    ['torso', 'legs', 'feet', 'neck', 'ears', 'hands', 'back', 'attach', 'head', 'topper'].forEach(function(slot){
       var id = EQ[slot], part = id && W.parts[id]; if (!part) return;
       var cw = W.colorways[id], pick = cw && (cw.filter(function(c){ return c.id === COLORWAY[id]; })[0] || cw.filter(function(c){ return c.id === W.defaultColorway[id]; })[0] || cw[0]);
       ctx.colorway = pick ? pick.hex : null;
@@ -349,7 +406,8 @@
       cw.forEach(function(c){
         var s = document.createElement('button'); s.type = 'button'; s.title = c.name; s.setAttribute('aria-label', c.name); s.style.background = c.hex;
         s.setAttribute('aria-pressed', String(c.id === cur));
-        s.addEventListener('click', function(){ COLORWAY[worn] = c.id; try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {} build(); paint(); });
+        s.addEventListener('click', function(){ COLORWAY[worn] = c.id; try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {} build(); paint();
+          if (LIVE && sb) door('avatar_equip', worn, {p_colorway: c.id}).then(function(r){ if (r.error) toast('The colour did not save.', raw(r.error)); }).catch(function(){}); });
         colorsEl.appendChild(s);
       });
       colorNote.textContent = (cw.filter(function(c){ return c.id === cur; })[0] || cw[0]).name + '. Colors save with the next patch.';
@@ -380,8 +438,9 @@
     if (/unknown item/i.test(m)) return 'The wardrobe does not know that one.';
     return fallback;
   }
-  function door(fn, id){
-    var call = Promise.resolve(sb.rpc(fn, {p_item: id}));
+  function door(fn, id, extra){
+    var args = {p_item: id}; if (extra) Object.keys(extra).forEach(function(k){ args[k] = extra[k]; });
+    var call = Promise.resolve(sb.rpc(fn, args));
     var wait = new Promise(function(res){ setTimeout(function(){ res({error:{message:'The door did not answer in 8 seconds.'}}); }, 8000); });
     return Promise.race([call, wait]);
   }
@@ -389,7 +448,7 @@
   function wear(it){
     if (!LIVE){ toast('Sign in on DEEDS to wear and buy.'); return; }
     BUSY = true; paint();
-    door('avatar_equip', it.id).then(function(r){
+    door('avatar_equip', it.id, {p_colorway: (W.colorways[it.id] ? (COLORWAY[it.id] || W.defaultColorway[it.id] || null) : null)}).then(function(r){
       BUSY = false;
       if (r.error){ toast(fail(r.error, 'Could not put it on.'), raw(r.error)); paint(); return; }
       EQ[it.slot] = it.id; if (it.slot === 'back' && it.id === 'back.none') EQ.attach = 'attach.none';
@@ -422,13 +481,14 @@
   function loadMine(){
     if (!sb || !ME) return Promise.resolve();
     return Promise.all([
-      Promise.resolve(sb.from('avatar_equipped').select('slot,item_id').eq('profile_id', ME)),
+      Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id', ME)),
       Promise.resolve(sb.from('avatar_inventory').select('*').eq('profile_id', ME)),
       Promise.resolve(sb.from('garden_wallets').select('balance').eq('profile_id', ME).limit(1))
     ]).then(function(rs){
       if (rs[0].error || rs[1].error){ toast('Your wardrobe could not load.'); return; }
       var eq = defaults();
-      (rs[0].data || []).forEach(function(row){ if (row.slot && row.item_id && CAT[row.item_id]) eq[row.slot] = row.item_id; });
+      (rs[0].data || []).forEach(function(row){ if (row.slot && row.item_id && CAT[row.item_id]) eq[row.slot] = row.item_id; if (row.item_id && row.colorway) COLORWAY[row.item_id] = row.colorway; });
+      try { localStorage.setItem('avatar_colorway', JSON.stringify(COLORWAY)); } catch (e) {}
       EQ = eq; OWNED = {};
       (rs[1].data || []).forEach(function(row){ var id = row.item_id || row.item; if (id) OWNED[id] = true; });
       if (!rs[2].error && rs[2].data && rs[2].data[0]) GC = +rs[2].data[0].balance || 0;
