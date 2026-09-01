@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.20">
+<meta name="world-build" content="4.21">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -381,9 +381,8 @@ function dressWindows(){WINS.forEach(w=>{const F=local(w.axis,w.c,w.a),h=w.y1-w.
 function dressDoors(){DOORS.forEach(d=>{const F=local(d.axis,d.c,d.a),sd=d.side;
  at(d.fl,1,3);
  [-1,1].forEach(q=>F(q*(d.w/2+0.05),d.y+d.h/2,0,0.11,d.h+0.1,0.36,'trim'));F(0,d.y+d.h+0.05,0,d.w+0.32,0.11,0.36,'trim');
- if(d.front){F(0,d.y+d.h/2,sd*0.17,d.w-0.04,d.h-0.04,0.06,'green');[[-0.38,0.5],[0.38,0.5],[-0.38,1.15],[0.38,1.15],[-0.38,1.8],[0.38,1.8]].forEach(([px,py])=>F(px,d.y+py,sd*0.21,0.5,0.5,0.02,'green'));F(0.12,d.y+1.05,sd*0.24,0.06,0.06,0.06,'brass');F(0,d.y+d.h/2,sd*0.2,0.04,d.h,0.05,'trim')}
- else if(d.locked){F(0,d.y+d.h/2,sd*0.17,d.w-0.04,d.h-0.04,0.06,'walnut');F(0.12,d.y+1.05,sd*0.24,0.06,0.06,0.06,'brass')}
- else{const hx=-(d.w/2-0.03),open=1.35;const lx=hx+Math.cos(open)*(d.w/2)*0.98,lz=sd*Math.sin(open)*(d.w/2)*0.98;F(lx,d.y+d.h/2,lz,d.w-0.06,d.h-0.04,0.05,'walnut',-sd*open);[0.5,1.55].forEach(py=>F(lx+Math.sin(open)*0.03*sd*0,d.y+py,lz,d.w-0.3,0.72,0.07,'wood',-sd*open));F(lx+Math.cos(open)*0.36,d.y+1.05,lz+sd*Math.sin(open)*0.36,0.05,0.05,0.1,'brass',-sd*open)}})}
+ /* 4.21: no shut doors in the house. Every doorway is frame and trim only; the front door alone keeps its green leaf, swung open against the hall wall, so you see the way out */
+ if(d.front){const hx=-(d.w/2-0.03),open=1.45;const lx=hx+Math.cos(open)*(d.w/2)*0.98,lz=-sd*Math.sin(open)*(d.w/2)*0.98;F(lx,d.y+d.h/2,lz,d.w-0.06,d.h-0.04,0.06,'green',sd*open);[[-0.38,0.5],[0.38,0.5],[-0.38,1.15],[0.38,1.15],[-0.38,1.8],[0.38,1.8]].forEach(([px,py])=>F(lx+px*Math.cos(open),d.y+py,lz-sd*px*Math.sin(open),0.5,0.5,0.1,'green',sd*open));F(lx+Math.cos(open)*0.36,d.y+1.05,lz-sd*Math.sin(open)*0.36,0.06,0.06,0.14,'brass',sd*open)}})}
 /* ---------- furniture. Every piece stands on the floor of the current tag (Y) ---------- */
 const Y=()=>TAG.fl?UF:GF;
 function table(x,z,w,d,h,part,ry){part=part||'wood';const y=Y();box(part,x,y+h-0.03,z,w,0.06,d,ry);const dx=w/2-0.1,dz=d/2-0.1;const c=Math.cos(ry||0),s=Math.sin(ry||0);[[-dx,-dz],[dx,-dz],[-dx,dz],[dx,dz]].forEach(([lx,lz])=>box(part,x+lx*c+lz*s,y+(h-0.06)/2,z-lx*s+lz*c,0.08,h-0.06,0.08,ry));mark(x-w/2,z-d/2,x+w/2,z+d/2,y+h)}
@@ -429,12 +428,15 @@ function desk(x,z,ry,fine){const c=Math.cos(ry),s=Math.sin(ry),y=Y();const L=(lx
  L(0,0.74,0,1.6,0.06,0.8,fine?'walnut':'wood');[-1,1].forEach(q=>L(q*0.62,0.36,0,0.34,0.72,0.7,fine?'walnut':'wood'));if(fine){L(0,0.79,0,1.4,0.02,0.6,'leather');[-1,1].forEach(q=>[0.2,0.4,0.6].forEach(py=>L(q*0.62,py,0.36,0.26,0.14,0.02,'brass')))}
  chair(x+0.75*s,z+0.75*c,ry+Math.PI,fine?'leather':'wood',fine?'walnut':'wood');mark(x-0.85*Math.abs(c)-0.45*Math.abs(s),z-0.85*Math.abs(s)-0.45*Math.abs(c),x+0.85*Math.abs(c)+0.45*Math.abs(s),z+0.85*Math.abs(s)+0.45*Math.abs(c),y+0.8)}
 function wainscot(room){const r=R[room];at(r.fl,3,3);const y=r.fl?UF:GF;const H=1.2,t=0.05;
- const doorsOn=(axis,c)=>DOORS.filter(d=>d.axis===axis&&Math.abs(d.c-c)<0.01&&d.fl===r.fl).map(d=>({a:d.a,w:d.w+0.2,y0:y,y1:y+H,kind:'door'}));
+ const doorsOn=(axis,c,top)=>DOORS.filter(d=>d.axis===axis&&Math.abs(d.c-c)<0.01&&d.fl===r.fl&&d.a>=(axis==='x'?r.x0:r.z0)&&d.a<=(axis==='x'?r.x1:r.z1)).map(d=>({a:d.a,w:d.w+0.2,y0:y,y1:top||(y+H),kind:'door'}));
  wall('x',r.z0+WT/2+t/2+0.01,r.x0+WT/2,r.x1-WT/2,y,y+H,doorsOn('x',r.z0),{part:'walnut',t,nomark:true,nodress:true});
  wall('x',r.z1-WT/2-t/2-0.01,r.x0+WT/2,r.x1-WT/2,y,y+H,doorsOn('x',r.z1),{part:'walnut',t,nomark:true,nodress:true});
  wall('z',r.x0+WT/2+t/2+0.01,r.z0+WT/2,r.z1-WT/2,y,y+H,doorsOn('z',r.x0),{part:'walnut',t,nomark:true,nodress:true});
  wall('z',r.x1-WT/2-t/2-0.01,r.z0+WT/2,r.z1-WT/2,y,y+H,doorsOn('z',r.x1),{part:'walnut',t,nomark:true,nodress:true});
- [r.z0+WT/2+0.08,r.z1-WT/2-0.08].forEach(z=>box('trim',(r.x0+r.x1)/2,y+H+0.03,z,r.x1-r.x0-WT,0.06,0.09));[r.x0+WT/2+0.08,r.x1-WT/2-0.08].forEach(x=>box('trim',x,y+H+0.03,(r.z0+r.z1)/2,0.09,0.06,r.z1-r.z0-WT))}
+ /* 4.21: doorsOn keeps to doors within this room's span (the dining room's locked side door used to stretch the great room's panelling 26 m across the house); the dado cap rail stops at every doorway like the panelling under it (it used to run unbroken across the doors and the front door) */
+ const CT=y+H+0.06,cap={part:'trim',t:0.09,nomark:true,nodress:true};
+ wall('x',r.z0+WT/2+0.08,r.x0+WT/2,r.x1-WT/2,y+H,CT,doorsOn('x',r.z0,CT),cap);wall('x',r.z1-WT/2-0.08,r.x0+WT/2,r.x1-WT/2,y+H,CT,doorsOn('x',r.z1,CT),cap);
+ wall('z',r.x0+WT/2+0.08,r.z0+WT/2,r.z1-WT/2,y+H,CT,doorsOn('z',r.x0,CT),cap);wall('z',r.x1-WT/2-0.08,r.z0+WT/2,r.z1-WT/2,y+H,CT,doorsOn('z',r.x1,CT),cap)}
 function floorSlab(room,tex,lv0,lv1,y){const r=R[room];at(r.fl,lv0,lv1);const w=r.x1-r.x0,d=r.z1-r.z0;const t=tex.clone();t.needsUpdate=true;t.repeat.set(w/2.2,d/1.3);
  const m=new THREE.MeshStandardMaterial({map:t,roughness:.75});const f=mesh(new THREE.PlaneGeometry(w,d),m,(r.x0+r.x1)/2,y+0.001,(r.z0+r.z1)/2,0,-Math.PI/2);f.castShadow=false;return f}
 function ceiling(room,y,thick){const r=R[room];at(r.fl,0,3);thick=thick||0.32;box('plaster',(r.x0+r.x1)/2,y+thick/2,(r.z0+r.z1)/2,r.x1-r.x0+0.3,thick,r.z1-r.z0+0.3);
@@ -463,7 +465,7 @@ function shell(){
  wall('z',-3,-5.1,6,GF,GH,[ID(0.9)],{h:9,side:1});
  wall('z',3,-5.1,6,GF,GH,[ID(4.8)],{h:9,side:-1});
  wall('x',4.95,-16.2,-9,GF,GH,[GW(-13.65),GW(-10.5)],{h:9,side:-1});wall('x',-3.45,-16.2,-9,GF,GH,[GW(-12.6)],{h:9,side:1});wall('z',-16.2,-3.45,4.95,GF,GH,[],{h:9,side:1});
- wall('x',4.95,9,16.2,GF,GH,[GW(14.6),door(11.4,1.6,GF+3.4,{locked:true})],{h:9,side:-1});wall('x',-3.45,9,16.2,GF,GH,[GW(12.6)],{h:9,side:1});wall('z',16.2,-3.45,4.95,GF,GH,[],{h:9,side:-1});
+ wall('x',4.95,9,16.2,GF,GH,[GW(14.6),GW(11.4)],{h:9,side:-1});wall('x',-3.45,9,16.2,GF,GH,[GW(12.6)],{h:9,side:1});wall('z',16.2,-3.45,4.95,GF,GH,[],{h:9,side:-1});
  at(1,0,3);
  wall('x',6,-9,9,UF,UH,[{a:0,w:1.6,y0:UF+0.6,y1:UF+3.6,kind:'fixed'},UW(-4.2),UW(-6.9),UW(4.2),UW(6.9)],{h:UH,side:-1});
  wall('x',-5.1,-9,9,UF,UH,[UW(-4.5),UW(4.5)],{h:UH,side:1});
@@ -2558,7 +2560,7 @@ function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g)
 function insideAct(){const L=roomLevels();
   if(you.feet<1&&!owns('sword')&&Math.hypot(you.x-SWORD_AT.x,you.z-SWORD_AT.z)<2.8){showAct('Take the sword.','takesword',null,null,'it hangs over the hearth',null,[SWORD_AT.x+0.4,2.6,SWORD_AT.z]);return}
   if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<2.0){showAct('Go outside.','leave',null,null,'the front door',null,[0,3.0,INTERIOR.DOOR.z+0.3]);return}
-    if(L[0]>=2){const dk=Math.hypot(you.x-INTERIOR.DESK.x,you.z-INTERIOR.DESK.z);if(dk<1.7){showAct('Read.','read',null,null,'the Library on DEEDS',null,[INTERIOR.DESK.x,1.7,INTERIOR.DESK.z]);return}}}
+    }
   hideAct()}
 function openLibrary(){window.open('../../','_blank')}
 function tickBuilder(t,dt){const B=BUILDER;const dx=you.x-B.g.position.x,dz=you.z-B.g.position.z,near=Math.hypot(dx,dz);
