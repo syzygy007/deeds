@@ -149,6 +149,11 @@ input,textarea{font:inherit;color:var(--ink)}
 .rline{font-size:13px;letter-spacing:.12em;font-weight:800;color:var(--forest)}
 .rline+.rline{margin-top:9px;color:var(--ink)}
 .prof-log{margin-top:20px}
+.avrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px}
+.avgo{background:var(--forest);color:var(--ivory);font-weight:800;font-size:12.5px;padding:9px 17px;border-radius:999px;text-decoration:none;white-space:nowrap}
+.avgo:hover{opacity:.92}
+.avswap{font-size:10px;letter-spacing:.12em;font-weight:800;text-transform:uppercase;color:var(--muted);background:none;border:0;padding:4px 0;cursor:pointer;white-space:nowrap}
+.avswap:hover{color:var(--forest)}
 .pedit{margin-left:auto;align-self:flex-start;border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .pedit.on{background:var(--forest);color:var(--ivory);border-color:var(--forest)}
 .pbio{font-size:14px;line-height:1.6;color:#4A463C;margin-top:16px;max-width:460px;white-space:pre-wrap}
@@ -1647,6 +1652,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
           <div>
             <div class="prof-name"><span class="mono" id="myHandle">TrueWren601</span><span class="coinbadge" id="myCoin" title="Status"></span></div>
             <div class="prof-since" id="mySince">Member Since July 2026</div>
+            <div class="avrow" id="avrow"><a class="avgo" href="avatar.html">Dress your avatar.</a><button class="avswap" id="avSwap" type="button">Use the type mark.</button></div>
           </div>
           <button class="pedit" id="pEdit">Edit.</button>
         </div>
@@ -1671,11 +1677,6 @@ body.gsky-on .tab.on{color:var(--ivory)}
             <button class="gdoor-share" id="gdoorShare" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m8 7 4-4 4 4"/><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/></svg><span>Share</span></button>
           </div>
         </div>
-      </div>
-      <div class="sect" id="dresssect">
-        <div class="micro">My Avatar</div>
-        <div class="wd-sub" style="margin-bottom:14px">Hair, clothes, hats and chains. The look you carry into the garden.</div>
-        <a class="gdoor-enter" href="avatar.html" style="display:inline-block">Dress your avatar.</a>
       </div>
       <div class="sect" id="deskrow" style="display:none"><button class="wbtn" id="deskgo" style="width:100%">The Desk. &#183; Admin</button></div>
       <div class="sect" id="advsect" style="display:none">
@@ -2698,14 +2699,37 @@ wireFeed()}
 
 /* ============ PROFILE + STATUS ============ */
 /* the avatar portrait: the wardrobe saves a head shot, the profile shows it next to the handle (type mark becomes the badge) */
-function portraitInto(el,id,type){try{var c=window.sb;if(!c||!id||!el)return;
-c.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){if(r.error||!r.data)return;
+/* which picture you want next to your handle: your avatar (the default) or the plain type mark */
+function picPref(){try{return localStorage.getItem('deeds_pic')==='mark'?'mark':'avatar'}catch(e){return 'avatar'}}
+function setPicPref(v){try{localStorage.setItem('deeds_pic',v)}catch(e){}}
+/* a member with no portrait yet (or one saved by the old blank-canvas build) gets one made
+   quietly: the wardrobe page draws it and saves it the moment it loads */
+var AVSHOOT=0;
+function makePortrait(id){if(AVSHOOT||!id)return;AVSHOOT=1;
+try{var f=document.createElement('iframe');f.src='avatar.html?p=1';f.setAttribute('aria-hidden','true');f.tabIndex=-1;
+f.style.cssText='position:fixed;left:-4000px;top:0;width:420px;height:420px;border:0;opacity:0;pointer-events:none';
+document.body.appendChild(f);
+setTimeout(function(){try{f.remove()}catch(e){}try{portraitInto($('#myAv'),id,(window.my&&my.type)||'doer')}catch(e){}},9000)}catch(e){}}
+function portraitInto(el,id,type){try{if(!id||!el||picPref()==='mark')return;var c=window.sb;if(!c)return;
+c.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){
+var mine=!!(window.SESSION&&window.SESSION.user&&window.SESSION.user.id===id);
+if(r.error||!r.data){if(mine)makePortrait(id);return}
+var fresh=false;try{if(mine&&!localStorage.getItem('deeds_av_reshot')){localStorage.setItem('deeds_av_reshot','1');fresh=true}}catch(e){}
+if(fresh)makePortrait(id);
 var base=(typeof SB_URL==='string')?SB_URL:'https://helqqdygwaihrliglbvw.supabase.co';
 var img=document.createElement('img');img.className='pav';img.alt='';
-img.onload=function(){try{var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});el.innerHTML='';el.appendChild(img);el.appendChild(mk)}catch(e){}};
+img.onload=function(){try{if(picPref()==='mark')return;var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});el.innerHTML='';el.appendChild(img);el.appendChild(mk)}catch(e){}};
 img.src=base+'/storage/v1/object/public/avatars/'+id+'.png?v='+encodeURIComponent(r.data.updated_at)}).catch(function(){})}catch(e){}}
-function renderProfile(){$('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:false});
-try{portraitInto($('#myAv'),(window.SESSION&&window.SESSION.user)?window.SESSION.user.id:null,my.type)}catch(e){}
+function myPicId(){try{return(window.SESSION&&window.SESSION.user)?window.SESSION.user.id:null}catch(e){return null}}
+function paintMyPic(){try{var el=$('#myAv');if(!el)return;
+var ver=false;try{ver=!!(window.PROFILE&&PROFILE.member_type_verified_at)}catch(e){}
+el.innerHTML=DeedsTypes.svg((window.my&&my.type)||'doer',88,{verified:ver});
+portraitInto(el,myPicId(),(window.my&&my.type)||'doer')}catch(e){}}
+function hookAvSwap(){try{var b=$('#avSwap');if(!b||b._w)return;b._w=1;
+b.textContent=picPref()==='mark'?'Use your avatar.':'Use the type mark.';
+b.onclick=function(){setPicPref(picPref()==='mark'?'avatar':'mark');
+b.textContent=picPref()==='mark'?'Use your avatar.':'Use the type mark.';paintMyPic()}}catch(e){}}
+function renderProfile(){paintMyPic();hookAvSwap();
 var n=deedCount(),m=monthCount(),ci=coinIdx(n);
 $('#myCoin').innerHTML=ci<0?'':coinSvg(ci,36);
 $('#rMonth').textContent=m>=4?'RHYTHM BUILT. KEEP GOING.':'JULY · '+m+(m===1?' DEED':' DEEDS')+'. KEEP BUILDING.';
@@ -3696,7 +3720,7 @@ baseRenderProfile();
 var so=$('#pSignout');
 if(PROFILE){$('#myHandle').textContent=PROFILE.handle;
 $('#mySince').textContent='Member Since '+sinceStr(PROFILE.created_at);
-$('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:!!PROFILE.member_type_verified_at});
+paintMyPic();hookAvSwap();
 var rm=$('#rMonth');if(rm&&rm.textContent.indexOf('JULY')>=0)rm.textContent=rm.textContent.replace('JULY',MONTHS[new Date().getMonth()]);
 if(so){so.style.display='inline-block';so.onclick=doSignOut}
 hookPicks();renderOrgs();renderCxMine();renderNotes();renderAdmin()}
