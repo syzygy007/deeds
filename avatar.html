@@ -538,12 +538,15 @@
       return opaque > 900 && diff > 60;
     } catch (e) { return true; }
   }
+  // the shot is always the same pose whatever you left the figure turned to: face square to the camera, head centred, a touch from above
+  var SHOT_TURN = 0;
+  function shotCam(){ var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, 0.55, 8.0); cam.lookAt(0, 0.1, 0); return cam; }
   function shootPortrait(){
     if (!LIVE || !sb || !ME) return;
     var S = 320, rot = root.rotation.y, url = null;
     try {
-      var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.15, 8.3); cam.lookAt(0, -0.7, 0);
-      root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); url = looksLikeAFace(canvas) ? canvas.toDataURL('image/png') : null;
+      var cam = shotCam();
+      root.rotation.y = SHOT_TURN; renderer.setSize(S, S, false); renderer.render(scene, cam); url = looksLikeAFace(canvas) ? canvas.toDataURL('image/png') : null;
     } catch (e) { url = null; }
     root.rotation.y = rot; size(); dirty = true;
     if (!url) return;
@@ -563,7 +566,7 @@
     turn: function(r){ root.rotation.y = r; dirty = true; },
     look: function(y, dist, up){ camera.position.set(0, y + (up || 0), dist); camera.lookAt(0, y, 0); camera.updateProjectionMatrix(); dirty = true; },
     face: function(o){ FACE = o || {}; build(); },
-    portrait: function(){ var S = 320, rot = root.rotation.y, cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.15, 8.3); cam.lookAt(0, -0.7, 0); root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); var ok = looksLikeAFace(canvas), u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return ok ? u : 'BLANK'; },
+    portrait: function(){ var S = 320, rot = root.rotation.y, cam = shotCam(); root.rotation.y = SHOT_TURN; renderer.setSize(S, S, false); renderer.render(scene, cam); var ok = looksLikeAFace(canvas), u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return ok ? u : 'BLANK'; },
     tab: function(s){ ACTIVE = s; paint(); },
     state: function(){ return {EQ:EQ, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
     ready: true
