@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.21">
+<meta name="world-build" content="4.22">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -2953,7 +2953,7 @@ function actWords(fn,args,d){args=args||{};let w=OWNERW[fn]||fn;if(fn==='garden_
 function announce(fn,args,d){if(!PRES||!PRESOK||fn==='garden_things')return;try{PRES.send({type:'broadcast',event:'act',payload:{id:ME,h:MYHANDLE,fn,args:args||{},fell:!!(d&&d.fell)}})}catch(e){}}
 /* ---------- presence: one channel per garden ---------- */
 let PRESOK=false,REFT=0;
-function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();
+function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();pingStart(owner);
   const go=()=>{const ch=sb.channel('garden:'+owner,{config:{presence:{key:ME},broadcast:{self:false,ack:false}}});
     ch.on('presence',{event:'sync'},()=>{onPresence(ch.presenceState())})
       .on('broadcast',{event:'pos'},m=>onPos(m&&m.payload))
@@ -2962,6 +2962,13 @@ function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();
     PRES=ch};
   if(MYHANDLE)go();else sb.from('profiles').select('handle').eq('id',ME).limit(1).then(r=>{const p=r.data&&r.data[0];if(p&&p.handle)MYHANDLE=p.handle;go()}).catch(go)}
 function leaveGarden(){if(PRES){try{sb.removeChannel(PRES)}catch(e){}PRES=null;PRESOK=false}Object.keys(FR).forEach(dropFriend);PRESENCE={}}
+/* 4.22: who is online, and in which game (patch 61). The root app pings 'app'; here we ping 'garden' with the room = the garden you stand in */
+let PINGROOM=null,PINGT=0;
+function pingNow(){if(!sb||!ME||!PINGROOM)return;try{Promise.resolve(sb.rpc('presence_ping',{p_game:'garden',p_room:PINGROOM})).then(()=>{},()=>{})}catch(e){}}
+function pingStart(owner){PINGROOM=owner;pingNow();if(!PINGT)PINGT=setInterval(()=>{if(!document.hidden)pingNow()},45000)}
+function pingLeave(){if(!sb||!ME)return;try{Promise.resolve(sb.rpc('presence_leave',{})).then(()=>{},()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pingLeave();else pingNow()});
+window.addEventListener('pagehide',pingLeave);
 let FULLT=0;
 function onPresence(state){state=state||{};const seen={};Object.keys(state).forEach(k=>{if(k===ME)return;const p=(state[k]||[])[0];if(!p||!p.id)return;seen[k]=Object.assign(PRESENCE[k]||{},p)});
   PRESENCE=seen;const n=Object.keys(PRESENCE).length;
