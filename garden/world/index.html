@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.14">
+<meta name="world-build" content="4.15">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -200,6 +200,276 @@ canvas{display:block;touch-action:none;cursor:default}
 <script src="../../wardrobe.js?v=3"></script>
 <script src="../../figure.js?v=1"></script>
 <script>
+/* THE ROOMS: the inside of the mansion, its own small scene in the house's local frame (x east, z toward the front door, y up).
+   Five rooms down (great room, library, hall, music room, dining room) and three up (bedroom, gallery, study). Each floor stands at a
+   level 0 (the bare shell) to 3 (elegant). Everything is built once and shown by level; the collision grids are painted per level. */
+const INTERIOR=(()=>{
+const INT=new THREE.Scene();INT.background=new THREE.Color(0xEDE8D6);
+const GF=0,UF=4.8,GH=4.4,UH=8.2,WT=0.28,PR=0.30;
+const R={
+ great:{fl:0,x0:-10.8,x1:-6,z0:-2.3,z1:3.3,name:'The great room'},
+ library:{fl:0,x0:-6,x1:-2,z0:-3.4,z1:4,name:'The library'},
+ hall:{fl:0,x0:-2,x1:2,z0:-3.4,z1:4,name:'The hall'},
+ music:{fl:0,x0:2,x1:6,z0:-3.4,z1:4,name:'The music room'},
+ dining:{fl:0,x0:6,x1:10.8,z0:-2.3,z1:3.3,name:'The dining room'},
+ bedroom:{fl:1,x0:-6,x1:-2,z0:-3.4,z1:4,name:'The bedroom'},
+ gallery:{fl:1,x0:-2,x1:2,z0:-3.4,z1:4,name:'The gallery'},
+ study:{fl:1,x0:2,x1:6,z0:-3.4,z1:4,name:'The study'}};
+function roomAt(x,z,feet){const up=feet>4.3;for(const k in R){const r=R[k];if((r.fl===1)===up&&x>=r.x0&&x<=r.x1&&z>=r.z0&&z<=r.z1)return k}return up?'gallery':'hall'}
+/* ---------- textures drawn in code ---------- */
+function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
+let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+function plankTex(dark){const c=canvas(512,512),g=c.getContext('2d');
+ for(let j=0;j<8;j++){const y=j*64,off=(j%2)*200;for(let i=-1;i<3;i++){const x=i*256+off,v=0.85+rnd()*0.3;
+  g.fillStyle=`rgb(${Math.round((dark?96:128)*v)},${Math.round((dark?66:88)*v)},${Math.round((dark?40:52)*v)})`;g.fillRect(x+1,y+1,254,62);
+  g.strokeStyle='rgba(40,25,10,.28)';g.lineWidth=1;for(let k=0;k<4;k++){g.beginPath();const yy=y+8+k*14;g.moveTo(x,yy+rnd()*6);g.bezierCurveTo(x+80,yy+rnd()*8,x+170,yy-rnd()*8,x+256,yy+rnd()*6);g.stroke()}
+  g.fillStyle='rgba(20,10,0,.35)';g.fillRect(x-1,y,2,64)}}
+ g.fillStyle='rgba(20,10,0,.4)';for(let j=0;j<=8;j++)g.fillRect(0,j*64-1,512,2);
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return t}
+function marbleTex(){const c=canvas(512,512),g=c.getContext('2d');
+ for(let j=0;j<4;j++)for(let i=0;i<4;i++){const d=(i+j)%2;g.fillStyle=d?'#2E4A36':'#EDE4CF';g.fillRect(i*128,j*128,128,128);
+  g.strokeStyle=d?'rgba(200,220,200,.16)':'rgba(120,110,90,.22)';g.lineWidth=1.5;for(let k=0;k<4;k++){g.beginPath();g.moveTo(i*128+rnd()*128,j*128);g.bezierCurveTo(i*128+rnd()*128,j*128+40,i*128+rnd()*128,j*128+90,i*128+rnd()*128,j*128+128);g.stroke()}}
+ g.strokeStyle='rgba(60,50,40,.35)';g.lineWidth=2;for(let k=0;k<=4;k++){g.beginPath();g.moveTo(k*128,0);g.lineTo(k*128,512);g.moveTo(0,k*128);g.lineTo(512,k*128);g.stroke()}
+ const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return t}
+function rugTex(field,border,motif){const c=canvas(512,512),g=c.getContext('2d');g.fillStyle=border;g.fillRect(0,0,512,512);g.fillStyle=field;g.fillRect(36,36,440,440);
+ g.strokeStyle=motif;g.lineWidth=6;g.strokeRect(56,56,400,400);g.lineWidth=3;g.strokeRect(18,18,476,476);
+ g.save();g.translate(256,256);g.rotate(Math.PI/4);g.fillStyle=motif;g.fillRect(-90,-90,180,180);g.fillStyle=field;g.fillRect(-64,-64,128,128);g.fillStyle=motif;g.fillRect(-26,-26,52,52);g.restore();
+ for(let k=0;k<4;k++){g.save();g.translate(256,256);g.rotate(k*Math.PI/2);g.fillStyle=motif;for(let i=0;i<7;i++)g.fillRect(-180+i*60,-232,20,20);g.restore()}
+ const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t}
+function paintTex(i){const c=canvas(256,320),g=c.getContext('2d');
+ const pal=[['#C9B79C','#6F8B6A','#3F5A46','#8A6A52'],['#D9C6A5','#7F8DAA','#4A5878','#7A5C48'],['#E2CFA8','#A57C5A','#5D4630','#3D5A4B'],['#CFD6C3','#7E9C8B','#40604E','#6B5A4A'],['#E8D3B0','#B98A5E','#6E4A34','#2F4A3C']][i%5];
+ g.fillStyle=pal[0];g.fillRect(0,0,256,320);
+ g.fillStyle=pal[1];g.beginPath();g.moveTo(0,190);for(let x=0;x<=256;x+=32)g.lineTo(x,175+Math.sin(x*0.05+i)*18);g.lineTo(256,320);g.lineTo(0,320);g.fill();
+ g.fillStyle=pal[2];g.beginPath();g.moveTo(0,240);for(let x=0;x<=256;x+=32)g.lineTo(x,232+Math.cos(x*0.07+i)*12);g.lineTo(256,320);g.lineTo(0,320);g.fill();
+ const tx=70+((i*53)%120);g.fillStyle=pal[3];g.beginPath();g.arc(tx,215,26,0,6.3);g.fill();g.fillRect(tx-6,215,12,60);
+ g.fillStyle='rgba(255,240,200,.4)';g.beginPath();g.arc(190,70,22,0,6.3);g.fill();
+ g.fillStyle='rgba(60,40,20,.12)';for(let k=0;k<400;k++)g.fillRect(rnd()*256,rnd()*320,3,1);
+ return new THREE.CanvasTexture(c)}
+const PAINT=[];function paintingTex(i){return PAINT[i]=PAINT[i]||paintTex(i)}
+/* ---------- materials and the kit ---------- */
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:0.9},o||{}));
+const plankT=plankTex(false),plankD=plankTex(true),marbleT=marbleTex();
+const MT={plaster:M(0xF3ECDC,{roughness:.96}),paint:M(0xE4D3AE,{roughness:.9}),paintG:M(0xC9D3C0,{roughness:.9}),paintM:M(0xD9B7B2,{roughness:.9}),
+ wood:M(0x6B4423,{roughness:.7}),walnut:M(0x4A2C17,{roughness:.5}),trim:M(0xEEE6D2,{roughness:.8}),stone:M(0xD9CDB2),
+ brass:M(0xC69C3E,{roughness:.3,metalness:.8}),gilt:M(0xD4B04A,{roughness:.35,metalness:.7}),glass:M(0xBFDCF0,{transparent:true,opacity:.32,roughness:.1,metalness:.2,depthWrite:false}),
+ forest:M(0x2E4A36),mulberry:M(0x6B2D3E),cream:M(0xE9DFC8),navy:M(0x2B3A5C),ochre:M(0xB8862B),black:M(0x1E1A16,{roughness:.3}),ivory:M(0xF6F1E4),
+ lamp:M(0xFFE9B0,{emissive:0xFFB347,emissiveIntensity:.8}),candle:M(0xFFF4D6,{emissive:0xFFD27A,emissiveIntensity:.6}),fire:M(0xFF7A1A,{emissive:0xFF6A00,emissiveIntensity:1.5}),
+ dark:M(0x241A12,{roughness:1}),leather:M(0x5A2A2C,{roughness:.5}),green:M(0x3A6B3F),copper:M(0x8E6A45,{metalness:.4,roughness:.5}),globe:M(0x6E8FBF,{roughness:.6}),
+ ash:M(0x3A3230,{roughness:1}),quilt:M(0x7B3A4E),linen:M(0xF1EADA)};
+const UB=new THREE.BoxGeometry(1,1,1),UC=new THREE.CylinderGeometry(0.5,0.5,1,12),US=new THREE.SphereGeometry(0.5,12,10),UT=new THREE.TorusGeometry(0.5,0.06,8,24),UCONE=new THREE.ConeGeometry(0.5,1,10);
+const GEO={box:UB,cyl:UC,sph:US,tor:UT,cone:UCONE};
+const INST={};const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler(),P=new THREE.Vector3(),SC=new THREE.Vector3();
+let TAG={fl:0,lv:0,until:3};const at=(fl,lv,until)=>{TAG={fl,lv,until:until==null?3:until}};
+function inst(part,x,y,z,sx,sy,sz,ry,rx,rz,shape){E.set(rx||0,ry||0,rz||0,'YXZ');Q.setFromEuler(E);P.set(x,y,z);SC.set(sx,sy,sz);M4.compose(P,Q,SC);
+ const k=TAG.fl+':'+TAG.lv+':'+TAG.until+':'+part+':'+(shape||'box');(INST[k]=INST[k]||[]).push(M4.clone())}
+const box=(part,x,y,z,sx,sy,sz,ry,rx,rz)=>inst(part,x,y,z,sx,sy,sz,ry,rx,rz,'box');
+const cyl=(part,x,y,z,r,h,ry,rx,rz,r2)=>inst(part,x,y,z,r*2,h,(r2||r)*2,ry,rx,rz,'cyl');
+const sph=(part,x,y,z,r)=>inst(part,x,y,z,r*2,r*2,r*2,0,0,0,'sph');
+const tor=(part,x,y,z,r,rx)=>inst(part,x,y,z,r*2,r*2,r*2,0,rx==null?Math.PI/2:rx,0,'tor');
+const cone=(part,x,y,z,r,h)=>inst(part,x,y,z,r*2,h,r*2,0,0,0,'cone');
+const SHOW=[],LIGHTS=[],SPOTS=[];   /* meshes and lights carrying a level tag, and the lamp spots the follow light visits */
+function mesh(geo,mat,x,y,z,ry,rx){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);if(ry)m.rotation.y=ry;if(rx)m.rotation.x=rx;m.castShadow=true;m.receiveShadow=true;m.userData.tag=Object.assign({},TAG);INT.add(m);SHOW.push(m);return m}
+/* ---------- the collision grids: one for each floor ---------- */
+const CELL=0.25,IEXT=12,IGN=Math.round(IEXT*2/CELL);const IG=[new Float32Array(IGN*IGN),new Float32Array(IGN*IGN)];const MARKS=[];
+function mark(x0,z0,x1,z1,h,both){MARKS.push({fl:TAG.fl,lv:TAG.lv,until:TAG.until,x0,z0,x1,z1,h,both:!!both})}
+function paintGrid(down,up){IG[0].fill(0);IG[1].fill(0);
+ MARKS.forEach(m=>{const L=m.fl?up:down;if(L<m.lv||L>m.until)return;(m.both?[0,1]:[m.fl]).forEach(g=>{
+  for(let z=m.z0;z<=m.z1+1e-6;z+=CELL)for(let x=m.x0;x<=m.x1+1e-6;x+=CELL){const ix=Math.floor((x+IEXT)/CELL),iz=Math.floor((z+IEXT)/CELL);if(ix<0||iz<0||ix>=IGN||iz>=IGN)continue;const i=iz*IGN+ix;if(IG[g][i]<m.h)IG[g][i]=m.h}})})}
+function floorAt(x,z,feet){const G=IG[feet>4.3?1:0];let h=0;const ix=Math.floor((x+IEXT)/CELL),iz=Math.floor((z+IEXT)/CELL);
+ for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){const jx=ix+dx,jz=iz+dz;if(jx<0||jz<0||jx>=IGN||jz>=IGN)continue;
+  const cx=jx*CELL-IEXT+CELL/2,cz=jz*CELL-IEXT+CELL/2;const nx=Math.max(cx-CELL/2,Math.min(x,cx+CELL/2)),nz=Math.max(cz-CELL/2,Math.min(z,cz+CELL/2));
+  if(Math.hypot(nx-x,nz-z)<PR){const v=G[jz*IGN+jx];if(v>h)h=v}}
+ return h}
+/* ---------- walls with doors and windows cut out ---------- */
+const WINS=[],DOORS=[];
+/* a wall running along x at z=c (axis 'x') or along z at x=c (axis 'z'), from a0 to a1, y0 to y1. holes: {a, w, y0, y1, kind:'door'|'win'|'fixed'} */
+function wall(axis,c,a0,a1,y0,y1,holes,opt){opt=opt||{};const part=opt.part||'plaster',t=opt.t||WT,side=opt.side||1;
+ const put=(a,b,py0,py1)=>{if(b-a<0.02||py1-py0<0.02)return;const mid=(a+b)/2,L=b-a;if(axis==='x')box(part,mid,(py0+py1)/2,c+(opt.inset||0),L,py1-py0,t);else box(part,c+(opt.inset||0),(py0+py1)/2,mid,t,py1-py0,L)};
+ const mk=(a,b)=>{if(opt.nomark)return;if(axis==='x')mark(a,c-t/2,b,c+t/2,opt.h);else mark(c-t/2,a,c+t/2,b,opt.h)};
+ const H=(holes||[]).slice().sort((p,q)=>p.a-q.a);let cur=a0;
+ H.forEach(h=>{const l=h.a-h.w/2,r=h.a+h.w/2;put(cur,l,y0,y1);mk(cur,l);
+  if(h.kind==='door'){put(l,r,h.y1,y1);if(!opt.nodress)DOORS.push({axis,c,a:h.a,w:h.w,h:h.y1-y0,y:y0,fl:TAG.fl,front:h.front,locked:h.locked,side})}
+  else{put(l,r,y0,h.y0);put(l,r,h.y1,y1);mk(l,r);if(!opt.nodress)WINS.push({axis,c,a:h.a,w:h.w,y0:h.y0,y1:h.y1,fl:TAG.fl,dressed:h.kind==='win',side})}
+  cur=r});
+ put(cur,a1,y0,y1);mk(cur,a1)}
+function local(axis,c,a){const ry=axis==='x'?0:Math.PI/2,cx=axis==='x'?a:c,cz=axis==='x'?c:a,co=Math.cos(ry),si=Math.sin(ry);return (lx,ly,lz,sx,sy,sz,part,lry)=>box(part,cx+lx*co+lz*si,ly,cz-lx*si+lz*co,sx,sy,sz,ry+(lry||0))}
+function dressWindows(){WINS.forEach(w=>{const F=local(w.axis,w.c,w.a),h=w.y1-w.y0,cy=(w.y0+w.y1)/2,sd=w.side;
+ at(w.fl,0,3);
+ F(0,cy,0,w.w,h,0.03,'glass');F(-(w.w/2+0.04),cy,0,0.09,h+0.16,0.34,'trim');F(w.w/2+0.04,cy,0,0.09,h+0.16,0.34,'trim');F(0,w.y1+0.04,0,w.w+0.26,0.09,0.34,'trim');F(0,w.y0-0.06,sd*0.1,w.w+0.4,0.11,0.5,'trim');
+ F(0,cy,sd*0.02,0.035,h,0.03,'trim');F(0,cy,sd*0.02,w.w,0.035,0.03,'trim');
+ if(w.dressed){at(w.fl,2,3);const ch=h+0.55,cyy=w.y0-0.2+ch/2;[-1,1].forEach(q=>F(q*(w.w/2+0.2),cyy,sd*0.24,0.36,ch,0.16,'mulberry'));F(0,w.y1+0.2,sd*0.22,w.w+0.9,0.14,0.28,'walnut')}})}
+function dressDoors(){DOORS.forEach(d=>{const F=local(d.axis,d.c,d.a),sd=d.side;
+ at(d.fl,1,3);
+ [-1,1].forEach(q=>F(q*(d.w/2+0.05),d.y+d.h/2,0,0.11,d.h+0.1,0.36,'trim'));F(0,d.y+d.h+0.05,0,d.w+0.32,0.11,0.36,'trim');
+ if(d.front){F(0,d.y+d.h/2,sd*0.17,d.w-0.04,d.h-0.04,0.06,'green');[[-0.38,0.5],[0.38,0.5],[-0.38,1.15],[0.38,1.15],[-0.38,1.8],[0.38,1.8]].forEach(([px,py])=>F(px,d.y+py,sd*0.21,0.5,0.5,0.02,'green'));F(0.12,d.y+1.05,sd*0.24,0.06,0.06,0.06,'brass');F(0,d.y+d.h/2,sd*0.2,0.04,d.h,0.05,'trim')}
+ else if(d.locked){F(0,d.y+d.h/2,sd*0.17,d.w-0.04,d.h-0.04,0.06,'walnut');F(0.12,d.y+1.05,sd*0.24,0.06,0.06,0.06,'brass')}
+ else{const hx=-(d.w/2-0.03),open=1.35;const lx=hx+Math.cos(open)*(d.w/2)*0.98,lz=sd*Math.sin(open)*(d.w/2)*0.98;F(lx,d.y+d.h/2,lz,d.w-0.06,d.h-0.04,0.05,'walnut',-sd*open);[0.5,1.55].forEach(py=>F(lx+Math.sin(open)*0.03*sd*0,d.y+py,lz,d.w-0.3,0.72,0.07,'wood',-sd*open));F(lx+Math.cos(open)*0.36,d.y+1.05,lz+sd*Math.sin(open)*0.36,0.05,0.05,0.1,'brass',-sd*open)}})}
+/* ---------- furniture. Every piece stands on the floor of the current tag (Y) ---------- */
+const Y=()=>TAG.fl?UF:GF;
+function table(x,z,w,d,h,part,ry){part=part||'wood';const y=Y();box(part,x,y+h-0.03,z,w,0.06,d,ry);const dx=w/2-0.1,dz=d/2-0.1;const c=Math.cos(ry||0),s=Math.sin(ry||0);[[-dx,-dz],[dx,-dz],[-dx,dz],[dx,dz]].forEach(([lx,lz])=>box(part,x+lx*c+lz*s,y+(h-0.06)/2,z-lx*s+lz*c,0.08,h-0.06,0.08,ry));mark(x-w/2,z-d/2,x+w/2,z+d/2,y+h)}
+function chair(x,z,ry,seat,frame){frame=frame||'wood';seat=seat||frame;const y=Y(),c=Math.cos(ry),s=Math.sin(ry);const L=(lx,ly,lz,sx,sy,sz,part)=>box(part,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ L(0,0.45,0,0.46,0.06,0.46,seat);L(0,0.75,-0.21,0.46,0.54,0.05,seat);[[-0.19,-0.19],[0.19,-0.19],[-0.19,0.19],[0.19,0.19]].forEach(([a,b])=>L(a,0.22,b,0.05,0.44,0.05,frame));mark(x-0.25,z-0.25,x+0.25,z+0.25,y+0.95)}
+function armchair(x,z,ry,part,w){w=w||0.9;const y=Y(),c=Math.cos(ry),s=Math.sin(ry);const L=(lx,ly,lz,sx,sy,sz,p)=>box(p||part,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ L(0,0.24,0.05,w,0.48,0.8);L(0,0.62,-0.3,w,0.7,0.22);[-1,1].forEach(q=>L(q*(w/2-0.08),0.44,0.05,0.16,0.4,0.8));mark(x-w/2,z-0.45,x+w/2,z+0.45,y+0.9)}
+function sofa(x,z,ry,part){armchair(x,z,ry,part,2.0)}
+function bed(x,z,ry){const c=Math.cos(ry),s=Math.sin(ry);const L=(lx,ly,lz,sx,sy,sz,p)=>box(p,x+lx*c+lz*s,UF+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ at(1,1,3);L(0,0.22,0,1.7,0.2,2.2,'walnut');[[-0.78,-1.02],[0.78,-1.02],[-0.78,1.02],[0.78,1.02]].forEach(([a,b])=>L(a,0.15,b,0.1,0.3,0.1,'walnut'));L(0,0.42,0,1.6,0.22,2.1,'linen');mark(x-0.85,z-1.1,x+0.85,z+1.1,UF+0.7);
+ at(1,2,3);L(0,0.58,0.15,1.6,0.1,1.5,'quilt');[-0.38,0.38].forEach(px=>L(px,0.6,-0.8,0.6,0.14,0.36,'ivory'));L(0,0.85,-1.1,1.7,0.9,0.1,'walnut');
+ at(1,3,3);[[-0.82,-1.08],[0.82,-1.08],[-0.82,1.08],[0.82,1.08]].forEach(([a,b])=>L(a,1.2,b,0.09,2.4,0.09,'walnut'));L(0,2.42,0,1.86,0.08,2.36,'walnut');L(0,2.15,0,1.8,0.5,2.3,'mulberry');[-1,1].forEach(q=>L(q*0.86,1.4,1.05,0.06,2.0,0.24,'mulberry'))}
+function shelves(x,z,ry,w,h,fl,lv,books){const c=Math.cos(ry),s=Math.sin(ry),y=fl?UF:GF;const L=(lx,ly,lz,sx,sy,sz,p)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ at(fl,lv,3);L(0,h/2,0,w,h,0.04,'walnut');[-1,1].forEach(q=>L(q*(w/2-0.03),h/2,0.16,0.06,h,0.34,'walnut'));L(0,h+0.03,0.16,w+0.06,0.06,0.36,'walnut');
+ const rows=Math.round(h/0.42);for(let k=0;k<=rows;k++)L(0,0.06+k*(h-0.1)/rows,0.16,w-0.1,0.04,0.32,'walnut');
+ const ax=Math.abs(c),az=Math.abs(s);mark(x-w/2*ax-0.36*az,z-w/2*az-0.36*ax,x+w/2*ax+0.36*az,z+w/2*az+0.36*ax,y+2.1);
+ if(books){at(fl,books,3);const parts=['forest','mulberry','navy','ochre','leather','cream'];for(let k=0;k<rows;k++){let bx=-(w/2-0.12);const y0=0.08+k*(h-0.1)/rows;const fill=0.55+rnd()*0.35;
+  while(bx<(w/2-0.12)*fill){const bw=0.04+rnd()*0.05,bh=0.2+rnd()*0.13;L(bx+bw/2,y0+bh/2,0.16,bw,bh,0.2+rnd()*0.06,parts[Math.floor(rnd()*parts.length)]);bx+=bw+0.006}}}}
+function fireplace(x,z,ry,fl,lv){const c=Math.cos(ry),s=Math.sin(ry),y=fl?UF:GF;const L=(lx,ly,lz,sx,sy,sz,p)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ at(fl,lv,3);L(0,0.75,-0.2,1.5,1.5,0.5,'ash');[-1,1].forEach(q=>L(q*0.85,0.7,0.1,0.34,1.4,0.36,'stone'));L(0,1.5,0.1,2.04,0.24,0.38,'stone');L(0,1.68,0.12,2.3,0.12,0.44,'trim');L(0,0.03,0.45,2.3,0.06,0.9,'stone');L(0,2.9,-0.1,2.0,2.2,0.3,'plaster');
+ [-0.25,0,0.25].forEach(px=>cyl('wood',x+px*c+0.15*s,y+0.14,z-px*s+0.15*c,0.08,0.7,ry,0,Math.PI/2));
+ const ax=Math.abs(c),az=Math.abs(s);mark(x-1.1*ax-0.5*az,z-1.1*az-0.5*ax,x+1.1*ax+0.5*az,z+1.1*az+0.5*ax,y+1.7);
+ at(fl,3,3);[[-0.15,0.42,0.2],[0.12,0.5,0.24],[0,0.6,0.16]].forEach(([px,h,r])=>cone('fire',x+px*c+0.18*s,y+0.12+h/2,z-px*s+0.18*c,r,h));SPOTS.push({fl,lv:3,x:x+0.7*s,y:y+0.9,z:z+0.7*c,fire:true})}
+function chandelier(x,y,z,fl,lv){at(fl,lv,3);cyl('brass',x,y+0.5,z,0.015,1.0);tor('brass',x,y,z,0.42);sph('brass',x,y-0.2,z,0.12);for(let k=0;k<8;k++){const a=k/8*6.283,px=x+Math.cos(a)*0.42,pz=z+Math.sin(a)*0.42;cyl('candle',px,y+0.12,pz,0.02,0.22);sph('lamp',px,y+0.28,pz,0.04)}
+ SPOTS.push({fl,lv,x,y:y-0.3,z})}
+function lamp(x,z,h,fl,lv,part){at(fl,lv,3);const y=(fl?UF:GF)+h;cyl('brass',x,y+0.03,z,0.11,0.06);cyl('brass',x,y+0.28,z,0.02,0.5);cyl(part||'cream',x,y+0.68,z,0.18,0.3);SPOTS.push({fl,lv,x,y:y+0.7,z,small:true})}
+function sconce(x,y,z,ry,fl,lv){at(fl,lv,3);const c=Math.cos(ry),s=Math.sin(ry);box('brass',x+0.06*s,y,z+0.06*c,0.08,0.26,0.06,ry);sph('lamp',x+0.16*s,y+0.14,z+0.16*c,0.07)}
+function rug(x,z,w,d,tex,fl,lv,ry){at(fl,lv,3);const m=new THREE.MeshStandardMaterial({map:tex,roughness:1});const g=new THREE.PlaneGeometry(w,d);const r=mesh(g,m,x,(fl?UF:GF)+0.012,z,0,-Math.PI/2);if(ry)r.rotation.z=ry;r.castShadow=false}
+function painting(x,y,z,ry,w,h,i,fl,lv,gilt){at(fl,lv,3);const c=Math.cos(ry),s=Math.sin(ry);const fw=gilt?0.09:0.05;const F=(lx,ly,sx,sy)=>box(gilt?'gilt':'walnut',x+lx*c+0.03*s,y+ly,z-lx*s+0.03*c,sx,sy,0.06,ry);
+ F(-(w/2+fw/2),0,fw,h+fw*2);F(w/2+fw/2,0,fw,h+fw*2);F(0,h/2+fw/2,w,fw);F(0,-(h/2+fw/2),w,fw);
+ const m=new THREE.MeshStandardMaterial({map:paintingTex(i),roughness:.85});const g=new THREE.PlaneGeometry(w,h);const p=mesh(g,m,x+0.005*s,y,z+0.005*c,ry);p.castShadow=false;p.userData.painting=i}
+function piano(x,z,ry,fl,grand){const c=Math.cos(ry),s=Math.sin(ry),y=fl?UF:GF;const L=(lx,ly,lz,sx,sy,sz,p,lry)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry+(lry||0));
+ if(!grand){at(fl,2,2);L(0,0.62,0,1.5,1.24,0.6,'black');L(0,0.78,0.36,1.4,0.04,0.28,'ivory');for(let k=0;k<20;k++)if(k%7!==2&&k%7!==6)L(-0.66+k*0.07,0.81,0.32,0.03,0.03,0.16,'black');L(0,1.26,-0.02,1.52,0.05,0.62,'black');chair(x+0.85*s,z+0.85*c,ry+Math.PI,'black','black');mark(x-0.8,z-0.35,x+0.8,z+0.35,y+1.3)}
+ else{at(fl,3,3);L(0,0.86,0,1.5,0.24,2.0,'black');L(0.55,0.86,-0.9,0.5,0.24,0.7,'black');L(0,0.72,0.9,1.46,0.05,0.28,'ivory');for(let k=0;k<20;k++)if(k%7!==2&&k%7!==6)L(-0.64+k*0.07,0.75,0.86,0.03,0.03,0.16,'black');
+  [[-0.65,0.85],[0.65,0.85],[0,-0.85]].forEach(([a,b])=>L(a,0.38,b,0.09,0.76,0.09,'black'));box('black',x+(-0.28)*s,y+1.0+0.7*Math.sin(0.55),z-(-0.28)*c-0.0,1.45,0.03,1.5,ry,-0.55);L(0.6,1.25,-0.5,0.03,0.55,0.03,'brass');L(0,0.98,0.02,1.42,0.02,1.9,'gilt');chair(x+1.35*s,z+1.35*c,ry+Math.PI,'black','black');mark(x-0.8,z-1.05,x+0.8,z+1.05,y+1.1)}}
+function harp(x,z,ry,fl){at(fl,3,3);const c=Math.cos(ry),s=Math.sin(ry),y=fl?UF:GF;const L=(lx,ly,lz,sx,sy,sz,p,rz)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry,0,rz);
+ L(0,0.05,0,0.5,0.1,0.3,'gilt');L(0.3,0.85,0,0.12,1.7,0.12,'gilt',-0.1);L(-0.1,1.65,0,0.85,0.1,0.1,'gilt',0.35);L(-0.35,0.8,0,0.1,1.5,0.1,'gilt',0.15);for(let k=0;k<10;k++)L(-0.32+k*0.06,0.9+k*0.02,0,0.006,1.2-k*0.06,0.006,'ivory');mark(x-0.3,z-0.2,x+0.3,z+0.2,y+1.7)}
+function globe(x,z,fl,lv){at(fl,lv,3);const y=fl?UF:GF;cyl('walnut',x,y+0.05,z,0.22,0.1);cyl('walnut',x,y+0.5,z,0.03,0.9);sph('globe',x,y+1.02,z,0.28);tor('brass',x,y+1.02,z,0.3,0);mark(x-0.25,z-0.25,x+0.25,z+0.25,y+1.2)}
+function sidetable(x,z,fl,lv){at(fl,lv,3);const y=fl?UF:GF;cyl('walnut',x,y+0.6,z,0.24,0.04);cyl('walnut',x,y+0.3,z,0.03,0.6);cyl('walnut',x,y+0.03,z,0.16,0.06);mark(x-0.25,z-0.25,x+0.25,z+0.25,y+0.6)}
+/* a desk: the chair sits on the local +z side and faces local -z */
+function desk(x,z,ry,fine){const c=Math.cos(ry),s=Math.sin(ry),y=Y();const L=(lx,ly,lz,sx,sy,sz,p)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry);
+ L(0,0.74,0,1.6,0.06,0.8,fine?'walnut':'wood');[-1,1].forEach(q=>L(q*0.62,0.36,0,0.34,0.72,0.7,fine?'walnut':'wood'));if(fine){L(0,0.79,0,1.4,0.02,0.6,'leather');[-1,1].forEach(q=>[0.2,0.4,0.6].forEach(py=>L(q*0.62,py,0.36,0.26,0.14,0.02,'brass')))}
+ chair(x+0.75*s,z+0.75*c,ry+Math.PI,fine?'leather':'wood',fine?'walnut':'wood');mark(x-0.85*Math.abs(c)-0.45*Math.abs(s),z-0.85*Math.abs(s)-0.45*Math.abs(c),x+0.85*Math.abs(c)+0.45*Math.abs(s),z+0.85*Math.abs(s)+0.45*Math.abs(c),y+0.8)}
+function wainscot(room){const r=R[room];at(r.fl,3,3);const y=r.fl?UF:GF;const H=1.0,t=0.05;
+ const doorsOn=(axis,c)=>DOORS.filter(d=>d.axis===axis&&Math.abs(d.c-c)<0.01&&d.fl===r.fl).map(d=>({a:d.a,w:d.w+0.2,y0:y,y1:y+H,kind:'door'}));
+ wall('x',r.z0+WT/2+t/2+0.01,r.x0+WT/2,r.x1-WT/2,y,y+H,doorsOn('x',r.z0),{part:'walnut',t,nomark:true,nodress:true});
+ wall('x',r.z1-WT/2-t/2-0.01,r.x0+WT/2,r.x1-WT/2,y,y+H,doorsOn('x',r.z1),{part:'walnut',t,nomark:true,nodress:true});
+ wall('z',r.x0+WT/2+t/2+0.01,r.z0+WT/2,r.z1-WT/2,y,y+H,doorsOn('z',r.x0),{part:'walnut',t,nomark:true,nodress:true});
+ wall('z',r.x1-WT/2-t/2-0.01,r.z0+WT/2,r.z1-WT/2,y,y+H,doorsOn('z',r.x1),{part:'walnut',t,nomark:true,nodress:true});
+ [r.z0+WT/2+0.08,r.z1-WT/2-0.08].forEach(z=>box('trim',(r.x0+r.x1)/2,y+H+0.03,z,r.x1-r.x0-WT,0.06,0.09));[r.x0+WT/2+0.08,r.x1-WT/2-0.08].forEach(x=>box('trim',x,y+H+0.03,(r.z0+r.z1)/2,0.09,0.06,r.z1-r.z0-WT))}
+function floorSlab(room,tex,lv0,lv1,y){const r=R[room];at(r.fl,lv0,lv1);const w=r.x1-r.x0,d=r.z1-r.z0;const t=tex.clone();t.needsUpdate=true;t.repeat.set(w/2.2,d/1.3);
+ const m=new THREE.MeshStandardMaterial({map:t,roughness:.75});const f=mesh(new THREE.PlaneGeometry(w,d),m,(r.x0+r.x1)/2,y+0.001,(r.z0+r.z1)/2,0,-Math.PI/2);f.castShadow=false;return f}
+function ceiling(room,y,thick){const r=R[room];at(r.fl,0,3);thick=thick||0.32;box('plaster',(r.x0+r.x1)/2,y+thick/2,(r.z0+r.z1)/2,r.x1-r.x0+0.3,thick,r.z1-r.z0+0.3);
+ [r.z0+0.05,r.z1-0.05].forEach(z=>box('trim',(r.x0+r.x1)/2,y-0.08,z,r.x1-r.x0,0.16,0.14));[r.x0+0.05,r.x1-0.05].forEach(x=>box('trim',x,y-0.08,(r.z0+r.z1)/2,0.14,0.16,r.z1-r.z0))}
+/* ---------- the shell: floors, walls, windows, doors, the stairs ---------- */
+function shell(){
+ ['great','library','music','dining'].forEach(k=>{floorSlab(k,plankT,0,3,GF);ceiling(k,GH,0.4)});
+ floorSlab('hall',plankT,0,2,GF);
+ at(0,3,3);{const r=R.hall;const t=marbleT.clone();t.needsUpdate=true;t.repeat.set(2,3.7);const m=new THREE.MeshStandardMaterial({map:t,roughness:.35,metalness:.05});const f=mesh(new THREE.PlaneGeometry(r.x1-r.x0,r.z1-r.z0),m,0,GF+0.001,(r.z0+r.z1)/2,0,-Math.PI/2);f.castShadow=false}
+ /* the hall ceiling is the slab under the gallery, with the stair void cut out */
+ at(0,0,3);[[-2,-3.4,0.9,4],[0.9,-3.4,2,-2.4],[0.9,2.6,2,4]].forEach(([x0,z0,x1,z1])=>box('plaster',(x0+x1)/2,GH+0.2,(z0+z1)/2,x1-x0,0.4,z1-z0));
+ [R.hall.z0+0.05,R.hall.z1-0.05].forEach(z=>box('trim',-0.55,GH-0.08,z,2.9,0.16,0.14));box('trim',-1.95,GH-0.08,0.3,0.14,0.16,7.4);
+ ['bedroom','study'].forEach(k=>{floorSlab(k,plankD,0,3,UF);const r=R[k];at(1,0,3);mark(r.x0,r.z0,r.x1,r.z1,UF)});
+ ['bedroom','gallery','study'].forEach(k=>ceiling(k,UH));
+ /* the gallery floor is the landing round the stair void */
+ at(1,0,3);[[-2,-3.4,0.9,4],[0.9,-3.4,2,-2.4],[0.9,2.6,2,4]].forEach(([x0,z0,x1,z1])=>{const t=plankD.clone();t.needsUpdate=true;t.repeat.set((x1-x0)/2.2,(z1-z0)/1.3);const m=new THREE.MeshStandardMaterial({map:t,roughness:.75});const f=mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),m,(x0+x1)/2,UF+0.001,(z0+z1)/2,0,-Math.PI/2);f.castShadow=false;mark(x0,z0,x1,z1,UF)});
+ /* walls. side = which way the room lies from the wall, in the wall's local z (world +z for a wall along x, world +x for a wall along z) */
+ const win=(a,w,y0,y1)=>({a,w,y0,y1,kind:'win'}),door=(a,w,y1,o)=>Object.assign({a,w,y1,kind:'door'},o||{});
+ at(0,0,3);
+ wall('x',4.0,-6,6,GF,GH,[door(0,1.6,GF+2.4,{front:true}),{a:0,w:1.5,y0:GF+2.5,y1:GF+3.2,kind:'fixed'},win(-2.8,0.9,1.25,3.45),win(-4.6,0.9,1.25,3.45),win(2.8,0.9,1.65,3.05),win(4.6,0.9,1.65,3.05)],{h:8.2,side:-1});
+ wall('x',-3.4,-6,6,GF,GH,[win(-3.0,0.9,1.65,3.05),win(3.0,0.9,1.65,3.05)],{h:8.2,side:1});
+ wall('z',-6,-3.4,4,GF,GH,[door(0.5,1.2,GF+2.3)],{h:8.2,side:1});
+ wall('z',6,-3.4,4,GF,GH,[door(0.5,1.2,GF+2.3)],{h:8.2,side:-1});
+ wall('z',-2,-3.4,4,GF,GH,[door(0.6,1.2,GF+2.3)],{h:8.2,side:1});
+ wall('z',2,-3.4,4,GF,GH,[door(3.2,1.1,GF+2.3)],{h:8.2,side:-1});
+ wall('x',3.3,-10.8,-6,GF,GH,[win(-9.1,0.9,1.65,3.05),win(-7.0,0.9,1.65,3.05)],{h:8.2,side:-1});wall('x',-2.3,-10.8,-6,GF,GH,[win(-8.4,0.9,1.65,3.05)],{h:8.2,side:1});wall('z',-10.8,-2.3,3.3,GF,GH,[],{h:8.2,side:1});
+ wall('x',3.3,6,10.8,GF,GH,[win(9.75,0.9,1.65,3.05),door(7.6,1.4,GF+2.2,{locked:true})],{h:8.2,side:-1});wall('x',-2.3,6,10.8,GF,GH,[win(8.4,0.9,1.65,3.05)],{h:8.2,side:1});wall('z',10.8,-2.3,3.3,GF,GH,[],{h:8.2,side:-1});
+ at(1,0,3);
+ wall('x',4.0,-6,6,UF,UH,[{a:0,w:1.2,y0:UF+0.7,y1:UF+2.9,kind:'fixed'},win(-2.8,0.9,UF+1.35,UF+2.75),win(-4.6,0.9,UF+1.35,UF+2.75),win(2.8,0.9,UF+1.35,UF+2.75),win(4.6,0.9,UF+1.35,UF+2.75)],{h:8.2,side:-1});
+ wall('x',-3.4,-6,6,UF,UH,[win(-3.0,0.9,UF+1.35,UF+2.75),win(3.0,0.9,UF+1.35,UF+2.75)],{h:8.2,side:1});
+ wall('z',-6,-3.4,4,UF,UH,[win(-2.4,0.9,UF+1.35,UF+2.75),win(0,0.9,UF+1.35,UF+2.75),win(2.4,0.9,UF+1.35,UF+2.75)],{h:8.2,side:1});
+ wall('z',6,-3.4,4,UF,UH,[win(-2.4,0.9,UF+1.35,UF+2.75),win(0,0.9,UF+1.35,UF+2.75),win(2.4,0.9,UF+1.35,UF+2.75)],{h:8.2,side:-1});
+ wall('z',-2,-3.4,4,UF,UH,[door(0.6,1.2,UF+2.3)],{h:8.2,side:1});
+ wall('z',2,-3.4,4,UF,UH,[door(3.2,1.1,UF+2.3)],{h:8.2,side:-1});
+ /* outside the windows: a lawn and a hedge line, so the glass looks onto green */
+ at(0,0,3);{const lawn=mesh(new THREE.CircleGeometry(60,32),M(0x6F8F4A,{roughness:1}),0,-0.03,0,0,-Math.PI/2);lawn.castShadow=false;lawn.receiveShadow=false;
+  [[0,-9,30,2.4],[0,10,30,2.4],[-16,0,2.4,20],[16,0,2.4,20]].forEach(([x,z,w,d])=>box('green',x,1.0,z,w,2.0,d))}
+ /* the stairs: twenty treads up the east side of the hall, from downstairs basic. A rail on the open side, a railing round the void upstairs */
+ at(0,1,3);for(let k=0;k<20;k++){const h=(k+1)*0.24,zc=2.6-0.125-k*0.25;box('plaster',1.45,(h-0.05)/2,zc,1.1,h-0.05,0.25);box('walnut',1.45,h-0.025,zc-0.015,1.1,0.05,0.29);box('walnut',1.45,h-0.145,zc-0.125,1.1,0.19,0.03);mark(0.9,zc-0.125,2.0,zc+0.125,h,true)}
+ for(let k=0;k<10;k++){const zc=2.475-k*0.5,h=(2*k+1)*0.24;cyl('trim',0.9,h+0.45,zc,0.02,0.9)}box('walnut',0.9,2.4+0.95,0.1,0.07,0.07,6.93,0,Math.atan2(4.8,5.0));cyl('walnut',0.9,0.6,2.7,0.06,1.2);sph('brass',0.9,1.25,2.7,0.09);
+ mark(0.75,-2.4,0.95,2.6,5.8,true);
+ at(1,0,3);for(let k=0;k<10;k++)cyl('trim',0.9,UF+0.45,-2.3+k*0.5,0.02,0.9);box('walnut',0.9,UF+0.95,0.1,0.07,0.07,5.0);for(let k=0;k<3;k++)cyl('trim',1.0+k*0.4,UF+0.45,2.6,0.02,0.9);box('walnut',1.45,UF+0.95,2.6,1.1,0.07,0.07);mark(0.9,2.55,2.0,2.75,5.8);
+ /* level 0: the builder's leavings */
+ at(0,0,0);box('wood',-0.6,0.42,1.2,1.2,0.05,0.4,0.3);[[-1.1,1.0],[-0.1,1.4]].forEach(([x,z])=>[[-0.15,0],[0.15,0]].forEach(([dx,dz])=>box('wood',x+dx,0.2,z+dz,0.04,0.4,0.04,0.3,0,dx*1.2)));for(let k=0;k<4;k++)box('wood',0.4,0.06+k*0.12,-2.2,0.2,0.12,2.0,0.1);
+ at(1,0,0);for(let k=0;k<3;k++)box('wood',-4,UF+0.06+k*0.12,-2.2,0.2,0.12,2.0,0.1);
+ dressWindows();dressDoors()}
+/* ---------- the rooms by level ---------- */
+function furnish(){const RUG=rugTex('#8E4A5C','#2E4A36','#E9DFC8'),RUG2=rugTex('#2E4A36','#6B2D3E','#D4B04A'),RUG3=rugTex('#D9C6A5','#6B2D3E','#2E4A36');
+ /* THE GREAT ROOM: the hearth on the west wall, seats round it */
+ fireplace(-10.5,0.5,Math.PI/2,0,1);
+ at(0,1,3);box('wood',-8.4,0.22,1.9,1.4,0.44,0.5);mark(-9.1,1.65,-7.7,2.15,0.44);cyl('wood',-9.6,0.2,-1.6,0.3,0.4);
+ at(0,2,3);rug(-8.6,0.5,2.6,2.2,RUG,0,2);sofa(-7.6,0.5,-Math.PI/2,'cream');armchair(-8.7,-1.2,0.5,'forest');armchair(-8.7,2.2,2.6,'forest');sidetable(-7.4,2.3,0,2);lamp(-7.4,2.3,0.62,0,2);
+ painting(-10.41,2.7,0.5,Math.PI/2,1.1,0.9,0,0,2,false);
+ at(0,3,3);chandelier(-8.4,3.95,0.5,0,3);wainscot('great');painting(-8.4,2.6,-2.16,0,1.4,1.1,1,0,3,true);painting(-8.0,2.45,3.16,Math.PI,0.9,0.7,2,0,3,true);
+ /* THE LIBRARY: shelves on the back wall and the east wall, the reading desk facing the front windows */
+ shelves(-4,-3.22,0,3.6,3.2,0,1,2);shelves(-2.16,-1.7,-Math.PI/2,2.8,3.2,0,1,2);shelves(-2.16,2.7,-Math.PI/2,2.2,3.2,0,1,2);
+ at(0,1,1);table(-4.2,1.2,1.2,0.7,0.75,'wood');chair(-4.2,0.5,0,'wood');
+ at(0,2,3);rug(-4,0.8,3.0,3.6,RUG3,0,2);desk(-4.2,1.2,Math.PI,false);lamp(-3.7,1.4,0.77,0,2,'forest');
+ at(0,3,3);chandelier(-4,3.95,0.6,0,3);wainscot('library');armchair(-5.1,-1.4,1.0,'leather');globe(-3.1,3.3,0,3);
+ /* THE HALL: the stairs stand already; a console, sconces, the marble at elegant */
+ at(0,1,3);table(-1.5,-1.4,0.4,1.2,0.85,'wood');cyl('brass',-0.4,GH-0.3,2.6,0.012,0.6);box('brass',-0.4,GH-0.75,2.6,0.3,0.42,0.3);box('lamp',-0.4,GH-0.75,2.6,0.2,0.3,0.2);SPOTS.push({fl:0,lv:1,x:-0.4,y:GH-0.8,z:2.6});
+ at(0,2,3);rug(-0.4,2.8,1.8,1.4,RUG2,0,2);sconce(-1.0,2.2,3.85,Math.PI,0,2);sconce(1.0,2.2,3.85,Math.PI,0,2);painting(-1.85,2.3,-2.4,Math.PI/2,0.9,1.2,3,0,2,false);
+ at(0,3,3);chandelier(-0.4,3.95,1.4,0,3);wainscot('hall');[-0.1,1.3].forEach(z=>cyl('trim',-1.88,2.2,z,0.1,4.4));painting(-1.85,2.4,2.5,Math.PI/2,1.0,1.3,4,0,3,true);
+ /* THE MUSIC ROOM: a bench, then the upright, then the grand and the harp */
+ at(0,1,1);box('wood',4,0.45,0.5,1.4,0.08,0.4);[3.4,4.6].forEach(x=>box('wood',x,0.2,0.5,0.08,0.4,0.36));mark(3.3,0.3,4.7,0.7,0.5);
+ at(0,1,2);cyl('brass',5.2,0.6,-1.0,0.02,1.2);box('brass',5.2,1.25,-1.0,0.34,0.4,0.02,0,-0.4);
+ piano(4,-2.95,0,0,false);
+ at(0,2,3);rug(4,0.8,3.2,3.4,RUG,0,2);armchair(5.3,2.6,-2.4,'mulberry');
+ at(0,3,3);chandelier(4,3.95,0.3,0,3);wainscot('music');piano(4.3,-0.3,0.6,0,true);harp(2.7,-2.2,0.4,0);painting(5.86,2.5,-2.2,-Math.PI/2,1.2,0.9,5,0,3,true);
+ /* THE DINING ROOM: a plain table, then chairs and the sideboard, then the long cloth and the chandelier */
+ at(0,1,1);table(8.4,0.5,2.6,1.0,0.76,'wood');
+ at(0,2,3);table(8.4,0.5,3.0,1.1,0.76,'walnut');[-1.0,0,1.0].forEach(dx=>{chair(8.4+dx,-0.3,0,'forest','walnut');chair(8.4+dx,1.3,Math.PI,'forest','walnut')});
+ box('walnut',10.4,0.5,-1.5,0.5,1.0,1.6);mark(10.1,-2.3,10.65,-0.7,1.0);[-0.4,0.4].forEach(dz=>box('brass',10.4,0.5,-1.5+dz,0.52,0.04,0.4));rug(8.4,0.5,4.2,3.2,RUG2,0,2);
+ [7.6,9.2].forEach(x=>{cyl('brass',x,0.86,0.5,0.05,0.2);cyl('candle',x,1.06,0.5,0.015,0.2);sph('lamp',x,1.18,0.5,0.03)});
+ fireplace(10.55,1.6,-Math.PI/2,0,2);
+ at(0,3,3);chandelier(8.4,3.9,0.5,0,3);wainscot('dining');box('cream',8.4,0.78,0.5,2.6,0.02,0.8);sph('green',8.4,0.95,0.5,0.22);[[-0.1,1.05,0.08],[0.1,1.0,0.1],[0,1.12,0.08]].forEach(([dx,y,dz])=>sph('mulberry',8.4+dx,y,0.5+dz,0.08));
+ painting(8.4,2.5,-2.16,0,1.6,1.1,6,0,3,true);painting(7.0,2.4,3.16,Math.PI,0.9,0.7,7,0,3,true);
+ /* UPSTAIRS. THE BEDROOM: the bed against the back wall */
+ bed(-4.3,-2.1,0);
+ at(1,1,3);box('walnut',-5.4,UF+0.35,2.8,0.9,0.7,0.5);mark(-5.85,2.55,-4.95,3.05,UF+0.7);
+ at(1,2,3);rug(-4,0.8,2.8,2.6,RUG3,1,2);[-5.4,-3.2].forEach(x=>{sidetable(x,-2.6,1,2);lamp(x,-2.6,0.62,1,2)});at(1,2,3);box('walnut',-2.48,UF+1.0,2.8,0.6,2.0,1.4);mark(-2.8,2.1,-2.16,3.5,UF+2.0);[-1,1].forEach(q=>box('brass',-2.8,UF+1.0,2.8+q*0.35,0.02,0.16,0.04));
+ painting(-5.86,UF+2.2,0.6,Math.PI/2,1.0,0.8,8,1,2,false);
+ at(1,3,3);chandelier(-4,UF+3.0,0.6,1,3);wainscot('bedroom');armchair(-3.1,1.4,-2.2,'forest',1.6);painting(-3.8,UF+2.3,-3.16,0,1.2,0.9,9,1,3,true);
+ /* THE GALLERY: the paintings along the west wall and the front, the void railed already */
+ at(1,2,3);rug(-0.55,0.3,1.2,6.0,RUG,1,2);box('walnut',-0.4,UF+0.24,3.2,1.2,0.48,0.5);mark(-1.0,2.95,0.2,3.45,UF+0.48);
+ [[-1.86,-2.2],[-1.86,-0.4],[-1.86,1.4]].forEach(([x,z],i)=>painting(x,UF+2.1,z,Math.PI/2,1.1,0.9,10+i,1,2,false));painting(-0.4,UF+2.1,-3.16,0,1.2,0.9,13,1,2,false);
+ at(1,3,3);chandelier(1.45,UF+3.0,0.1,1,3);wainscot('gallery');[[-1.86,-3.0],[-1.86,3.2],[1.4,3.86]].forEach(([x,z],i)=>painting(x,UF+2.1,z,z>3.5?Math.PI:Math.PI/2,0.8,1.0,14+i,1,3,true));
+ [[-1.4,-3.0],[-1.4,3.4]].forEach(([x,z])=>{box('stone',x,UF+0.5,z,0.36,1.0,0.36);sph('trim',x,UF+1.22,z,0.18);box('trim',x,UF+1.05,z,0.26,0.1,0.14);mark(x-0.2,z-0.2,x+0.2,z+0.2,UF+1.3)});
+ /* THE STUDY: the desk under the east windows, facing them */
+ at(1,1,1);desk(4.7,0.4,-Math.PI/2,false);
+ at(1,2,3);rug(4,0.4,2.8,3.0,RUG2,1,2);desk(4.7,0.4,-Math.PI/2,true);lamp(4.9,-0.3,0.77,1,2,'forest');shelves(2.16,-1.5,Math.PI/2,2.6,2.6,1,2,2);globe(2.7,3.2,1,2);
+ at(1,3,3);chandelier(4,UF+3.0,0.4,1,3);wainscot('study');fireplace(4.6,-3.15,0,1,3);armchair(3.2,1.8,2.4,'leather');painting(5.86,UF+2.2,2.4,-Math.PI/2,0.9,1.1,17,1,3,true);
+ cyl('brass',5.3,UF+0.85,3.3,0.03,1.4,0,0.9,0);cyl('brass',5.3,UF+0.45,3.3,0.02,0.9,0,0,0.5);cyl('brass',5.5,UF+0.45,3.5,0.02,0.9,0,0,-0.5);cyl('brass',5.1,UF+0.45,3.5,0.02,0.9,0,0.5,0)}
+/* ---------- build, bake, show ---------- */
+shell();furnish();
+const INSTS=[];
+Object.entries(INST).forEach(([k,ms])=>{const [fl,lv,until,part,shape]=k.split(':');const im=new THREE.InstancedMesh(GEO[shape],MT[part],ms.length);ms.forEach((mm,i)=>im.setMatrixAt(i,mm));im.instanceMatrix.needsUpdate=true;im.castShadow=part!=='glass';im.receiveShadow=true;im.userData.tag={fl:+fl,lv:+lv,until:+until};INT.add(im);INSTS.push(im)});
+/* light: a warm hemisphere, sun through the windows by phase, and one warm point light that visits the lamp nearest you */
+const hemi=new THREE.HemisphereLight(0xfff3e0,0x8a7a5a,0.75);INT.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff1dc,1.0);sun.position.set(-8,14,16);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);const sc=sun.shadow.camera;sc.left=-14;sc.right=14;sc.top=12;sc.bottom=-12;sc.near=1;sc.far=60;sun.shadow.bias=-0.0012;INT.add(sun);INT.add(sun.target);
+const warm=new THREE.PointLight(0xffd9a0,0.9,11,1.6);INT.add(warm);
+const PHASE={dawn:{bg:0xF7DCC4,sun:0.55,sunC:0xffc9a0,hemi:0.6,lamps:0.7},day:{bg:0xEDE8D6,sun:1.05,sunC:0xfff1dc,hemi:0.8,lamps:0.5},golden:{bg:0xF6D6A6,sun:0.9,sunC:0xffc070,hemi:0.6,lamps:0.7},dusk:{bg:0xD9A98E,sun:0.35,sunC:0xff9e7a,hemi:0.45,lamps:1.0},night:{bg:0x26325A,sun:0.08,sunC:0xa9bfff,hemi:0.22,lamps:1.4}};
+let PHN='day';
+function setPhase(name){const p=PHASE[name]||PHASE.day;PHN=name;INT.background.set(p.bg);sun.intensity=p.sun;sun.color.set(p.sunC);hemi.intensity=p.hemi;MT.lamp.emissiveIntensity=0.8*p.lamps;MT.candle.emissiveIntensity=0.6*p.lamps;warm.intensity=0.6+0.5*p.lamps}
+let LV=[0,0];
+function setLevels(down,up){LV=[Math.max(0,Math.min(3,down|0)),Math.max(0,Math.min(3,up|0))];const on=t=>{const L=LV[t.fl];return L>=t.lv&&L<=t.until};INSTS.forEach(im=>im.visible=on(im.userData.tag));SHOW.forEach(m=>m.visible=on(m.userData.tag));paintGrid(LV[0],LV[1])}
+setLevels(0,0);
+/* the follow light: the nearest lit spot in your room, else a soft glow over your head */
+let FT=0;function tick(t,you){const room=roomAt(you.x,you.z,you.feet);let best=null,bd=1e9;SPOTS.forEach(s=>{if(LV[s.fl]<s.lv)return;const up=s.fl===1;if(up!==(you.feet>4.3))return;const d=Math.hypot(s.x-you.x,s.z-you.z);if(d<bd){bd=d;best=s}});
+ if(best&&bd<7){warm.position.set(best.x,best.y,best.z);if(best.fire){FT+=0.1;warm.intensity=(PHASE[PHN].lamps*0.5+0.5)+Math.sin(t*23)*0.12+Math.sin(t*7.3)*0.08}}else{warm.position.set(you.x,you.feet+2.6,you.z)}
+ return room}
+return {scene:INT,setLevels,levels:()=>LV.slice(),floorAt,roomAt,tick,setPhase,R,DOOR:{x:0,z:3.35},DESK:{x:-4.2,z:1.2},PAINT,paintingTex,MT,sun,warm,hemi,SPOTS}
+})();
+
+</script>
+<script>
 /* ======================================================================
    THE GARDEN · world 3.1 · gardencoin (patch 45): Flora pays coin on one press, the seed store in gardencoin with Deedcoins filling in,
    the fish market, the fountain's spring at 40 beds with fish to catch, the plinth waves
@@ -333,7 +603,8 @@ function markBand(P,closed,hw,h){const n=P.length,segs=closed?n:n-1;
       if(!closed&&(((X-e0[0])*e0[2]+(Z-e0[1])*e0[3])<0||((X-e1[0])*e1[2]+(Z-e1[1])*e1[3])>0))continue;
       if(segDist(X,Z,a,b)<=hw)markCell(X,Z,h)}}}
 const PR=0.30;                       /* your radius */
-function floorAt(x,z){let h=0;const ix=Math.floor((x+EXT)/CELL),iz=Math.floor((z+EXT)/CELL);
+function floorAt(x,z){return INSIDE?INTERIOR.floorAt(x,z,you.feet):floorAtW(x,z)}
+function floorAtW(x,z){let h=0;const ix=Math.floor((x+EXT)/CELL),iz=Math.floor((z+EXT)/CELL);
   for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){const jx=ix+dx,jz=iz+dz;if(jx<0||jz<0||jx>=GN||jz>=GN)continue;
     const cx=jx*CELL-EXT+CELL/2,cz=jz*CELL-EXT+CELL/2;
     /* the cell counts if the circle overlaps it: nearest point of the cell to you */
@@ -886,6 +1157,15 @@ const MONGER={};
 const SPOTS=[[-6,30.2],[6,30.2],[-6,-30.2],[6,-30.2],[34,34],[-34,34],[34,-34],[-34,-34],[33.5,8],[33.5,-8],[-33.5,8],[-33.5,-8]];
 /* 3.3: the house site at the top of the north avenue, the twelve oaks in two groves beside it, the ten hiding places of the chest deep in the wood */
 const HOUSE={x:0,z:-61,front:{x:5.6,z:-53.4}};
+/* 4.15 THE ROOMS: the front door on the steps, and the ladder of bundles past the mansion, mirrored from gc_house_rooms() so the demo and the toasts agree with the server */
+const DOORW={x:0,z:-56.5};const ROOMS_PREVIEW=Math.max(0,Math.min(3,+QS.get('rooms')||0));const ROOM_LVN=['bare','basic','nice','elegant'];let ROOM_TIERS=[20,40,50,60,70,80];
+function roomsOf(wood,stage){const rw=(stage|0)<3?0:Math.max(0,(wood|0)-HOUSE_TIERS[2]);let down=0,up=0,prev=0,next=null;
+  for(let k=0;k<ROOM_TIERS.length;k++){if(rw>=ROOM_TIERS[k]){if(k%2===0)down++;else up++;prev=ROOM_TIERS[k]}else{next={floor:k%2===0?'down':'up',level:(k>>1)+1,need:ROOM_TIERS[k]-prev,have:rw-prev};break}}
+  return {down,up,next,done:!next,rwood:rw}}
+const stepName=n=>n?((n.floor==='down'?'downstairs':'upstairs')+(n.level===1?'':n.level===2?' nice':' elegant')):'';
+function roomsWord(){const r=S.rooms||roomsOf(0,0);return 'downstairs '+ROOM_LVN[r.down]+' \u00B7 upstairs '+ROOM_LVN[r.up]}
+function roomLevels(){const r=S.rooms||roomsOf(0,0);return [Math.max(r.down,ROOMS_PREVIEW),Math.max(r.up,ROOMS_PREVIEW)]}
+let INSIDE=false,OUTPOS=null,ROOM='hall';
 const OAKS=[[-9,-42],[-14,-45.5],[-20,-43],[-11,-49],[-17,-52],[-23,-49.5],[9,-42],[14,-45.5],[20,-43],[11,-49],[17,-52],[23,-49.5]];
 const RINGS=[[-9.5,-33.0],[-15.0,-32.0],[-21.0,-33.5],[-12.0,-38.0],[-18.0,-37.5],[-24.0,-39.0],[9.5,-33.0],[15.0,-32.0],[21.0,-33.5],[12.0,-38.0],[18.0,-37.5],[24.0,-39.0],[-27.0,-42.0],[-32.5,-44.5],[-38.0,-42.5],[-29.0,-48.0],[-34.5,-50.5],[-40.0,-47.5],[27.0,-42.0],[32.5,-44.5],[38.0,-42.5],[29.0,-48.0],[34.5,-50.5],[40.0,-47.5],[-27.0,-32.0],[-33.0,-30.0],[-39.0,-31.5],[-27.5,-37.0],[-32.5,-39.5],[-39.5,-37.0],[27.0,-32.0],[33.0,-30.0],[39.0,-31.5],[27.5,-37.0],[32.5,-39.5],[39.5,-37.0],[-27.0,-55.0],[-33.5,-54.5],[-39.0,-55.5],[-29.5,-59.5],[-35.5,-58.5],[-41.0,-60.0],[27.0,-55.0],[33.5,-54.5],[39.0,-55.5],[29.5,-59.5],[35.5,-58.5],[41.0,-60.0]];   /* 3.4: the preset tree rings, four groves of twelve (six west, six east) that fill in with saplings from the Keeper, one grove at a time */
 const TREEPOS=OAKS.concat(RINGS),RING_BLOCK=12,RING_NAMES=['the front grove','the outer grove','the south corner','the north corner'];
@@ -1155,7 +1435,7 @@ const freeWater=()=>LIVE?ADMIN:TESTING;
 const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
 let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
-const FIRST_GC=1000,SECOND_GC=1000,REARM_S=3600,CHEST_TOYS=['chainsaw','bubbles','kite'],CHEST_GC=1000,AXE_DC=30,CHOPS=5,HOUSE_TIERS=[5,10,50],STATUES_TO_WAKE=12;let REGROW_S=600,GROW_S=600,SAPLING_GC=300,PATCH47=false,PATCH50=false,PATCH51=false,PATCH52=false,PATCH53=false,PATCH55=false,RINGS_OPEN=null,WOOD_CAPS=null,PACK_GC=1000,PACKL=null,PACKG=null;   /* the chest 1000 gardencoin every plain open (patch 54), the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
+const FIRST_GC=1000,SECOND_GC=1000,REARM_S=3600,CHEST_TOYS=['chainsaw','bubbles','kite'],CHEST_GC=1000,AXE_DC=30,CHOPS=5,HOUSE_TIERS=[5,10,50],STATUES_TO_WAKE=12;let REGROW_S=600,GROW_S=600,SAPLING_GC=300,PATCH47=false,PATCH50=false,PATCH51=false,PATCH52=false,PATCH53=false,PATCH55=false,PATCH60=false,RINGS_OPEN=null,WOOD_CAPS=null,PACK_GC=1000,PACKL=null,PACKG=null;   /* the chest 1000 gardencoin every plain open (patch 54), the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
 const TOOLS={rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'}};
 const PACKS={pack_basic:{n:'The Gardener'},pack_ivory:{n:'The Ivory'},pack_sun:{n:'The Golden Sun'},pack_cyber:{n:'The Cyber Sprout'},pack_starlight:{n:'The Starlight'},pack_neon:{n:'The Neon Tulip'}};
 const packImg=k=>BASE+'garden-pack-'+k.slice(5)+'.webp';
@@ -1177,7 +1457,7 @@ if(S.coins===undefined){S.coins=(S.bank||0)*50;S.sack={}}
 if(!S.sack)S.sack={};if(!S.plants)S.plants={};if(!S.flags)S.flags={};if(!S.pads)S.pads={};if(!S.ledger)S.ledger=[];
 if(S.earned===undefined)S.earned=S.deeds*DEED_PAY;if(S.sent===undefined)S.sent=0;if(!S.gifts)S.gifts=[];
 if(!S.basket)S.basket={};if(!S.stats)S.stats={};if(!(S.gc>=0))S.gc=0;if(S.fountain===undefined)S.fountain=null;
-if(!S.tools)S.tools={};if(sawFound())S.tools.chainsaw=1;if(!S.trees)S.trees={};Object.values(S.trees).forEach(tr=>{if(tr&&tr.cut&&!tr.ready)tr.ready=tr.cut+REGROW_S*1000});if(!(S.wood>=0))S.wood=0;if(!S.house)S.house={stage:0,wood:0};if(!S.chest)S.chest={};if(!S.packs)S.packs={};if(S.worn===undefined)S.worn=null;
+if(!S.tools)S.tools={};if(sawFound())S.tools.chainsaw=1;if(!S.trees)S.trees={};Object.values(S.trees).forEach(tr=>{if(tr&&tr.cut&&!tr.ready)tr.ready=tr.cut+REGROW_S*1000});if(!(S.wood>=0))S.wood=0;if(!S.house)S.house={stage:0,wood:0};if(!S.rooms||typeof S.rooms.down!=='number')S.rooms=roomsOf(S.house.wood,S.house.stage);if(!S.chest)S.chest={};if(!S.packs)S.packs={};if(S.worn===undefined)S.worn=null;
 /* ---------- the clock: the server's ripening rule, mirrored here for drawing and for the signed out demo ---------- */
 let NOW_OFF=0;const snow=()=>Date.now()+NOW_OFF;
 function ripe(p,at){const c=CAT[p.t];if(!c)return {n:0,frac:0,next:0,stopped:false,value:0,flowers:0};const now=at||snow();
@@ -1234,7 +1514,8 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
     S.trees={};(d.trees||[]).forEach(t=>{const cut=t.cut_at?new Date(t.cut_at).getTime()-NOW_OFF:0;const ready=t.next_s!=null?(+t.next_s>0?Date.now()+(+t.next_s)*1000:0):(cut?cut+REGROW_S*1000:0);
       S.trees[+t.i]={st:+t.stage||0,cut,ready,pl:(+t.i<RING_BLOCK||t.planted)?1:0,wt:!!t.watered}});
     S.wood=+(d.house&&d.house.carrying)||0;S.house={stage:+(d.house&&d.house.stage)||0,wood:+(d.house&&d.house.wood)||0};if(d.house&&+d.house.axe_dc>0)AXE_DCS=+d.house.axe_dc;if(d.chest&&+d.chest.coins>0)CHEST_GCS=+d.chest.coins;
-    PATCH55=+d.patch>=55;if(PATCH55){S.packs={};(d.packs||[]).forEach(k=>{if(PACKS[k])S.packs[k]=1});S.worn=PACKS[d.worn]?d.worn:null;if(+d.wood_cap>0)WOOD_CAPS=+d.wood_cap;if(+d.pack_gc>0)PACK_GC=+d.pack_gc;setPack(S.worn);paintHotbar()}}
+    PATCH55=+d.patch>=55;if(PATCH55){S.packs={};(d.packs||[]).forEach(k=>{if(PACKS[k])S.packs[k]=1});S.worn=PACKS[d.worn]?d.worn:null;if(+d.wood_cap>0)WOOD_CAPS=+d.wood_cap;if(+d.pack_gc>0)PACK_GC=+d.pack_gc;setPack(S.worn);paintHotbar()}
+    PATCH60=+d.patch>=60;if(PATCH60&&Array.isArray(d.room_tiers)&&d.room_tiers.length===6)ROOM_TIERS=d.room_tiers.map(Number);S.rooms=(PATCH60&&d.rooms&&typeof d.rooms.down==='number')?d.rooms:roomsOf(S.house.wood,S.house.stage);if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
   S.coins=+d.balance||0;S.earned=+d.earned||0;S.sent=+d.sent||0;S.deeds=+d.deeds||0;S.sack={};Object.entries(d.sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q});if(VISIT){S.sack={};Object.entries(d.visit.visitor_sack||{}).forEach(([t,q])=>{if(q>0)S.sack[t]=+q})}
@@ -1247,7 +1528,7 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
   S.ledger=(d.ledger||[]).map(l=>({t:l.at?new Date(l.at).getTime():Date.now(),l:l.note||l.kind,a:+l.amount||0,w:KINDW[l.kind]||l.kind||''}));
   save();plantBeds();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));renderHud();paintBar();renderTrees();renderHouse();placeChest();if(STORE_ON)renderStore();loadThings()}
 /* a quiet refresh after a sale or a buy, so the sack, the basket and the fish are exactly the server's */
-function refresh(){if(!sb||!LIVE||!PATCH44)return;Promise.resolve(VISIT?sb.rpc('garden_visit_state',{p_owner:VISIT.owner}):sb.rpc(PATCH55?'garden_state7':PATCH50?'garden_state6':PATCH47?'garden_state5':PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2')).then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
+function refresh(){if(!sb||!LIVE||!PATCH44)return;Promise.resolve(VISIT?sb.rpc('garden_visit_state',{p_owner:VISIT.owner}):sb.rpc(PATCH60?'garden_state8':PATCH55?'garden_state7':PATCH50?'garden_state6':PATCH47?'garden_state5':PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2')).then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;loadLook();
     return loadState().then(r2=>{
@@ -1274,7 +1555,7 @@ function renderSack(){const bq=basketQty(),fn=fountainNow();const row=(a,b,m)=>'
   $('#sackRows').innerHTML=row('Gardencoin',(S.gc|0).toLocaleString(),'what the garden pays')+row('Deedcoins',(S.coins|0).toLocaleString(),'a deed pays '+DEED_PAY)+row('Seeds',sackTotal(),seeds||'')+
     row('Flowers',bq,bq?'worth '+gcWorth().toLocaleString()+' gardencoin at Flora':'')+row('Fish',fn.held,fn.held?'the market pays '+FISH_WORTH+' each':'')+
     row('Tools',tools||'none',tools?'in your hotbar':'the Keeper sells them')+row('Wood',S.wood?plural(S.wood,'bundle'):'none',S.wood?'for the builder'+(hasPack()?' \u00B7 the pack holds '+woodCap():''):'')+
-    (S.house.stage?row('The house',['','Fireplace wing','Main house','The mansion'][S.house.stage],S.house.stage<3?S.house.wood+' of '+HOUSE_TIERS[S.house.stage]+' bundles':'finished'):row('The house',S.house.wood+' of '+HOUSE_TIERS[0],'bundles at the builder'))+
+    (S.house.stage?row('The house',['','Fireplace wing','Main house','The mansion'][S.house.stage],S.house.stage<3?S.house.wood+' of '+HOUSE_TIERS[S.house.stage]+' bundles':(S.rooms&&S.rooms.done?'finished \u00B7 '+roomsWord():roomsWord()+(S.rooms&&S.rooms.next?' \u00B7 '+stepName(S.rooms.next)+' next, '+S.rooms.next.have+' of '+S.rooms.next.need+' bundles':''))):row('The house',S.house.wood+' of '+HOUSE_TIERS[0],'bundles at the builder'))+
     (anyPack()?'<div class="micro" style="margin-top:12px;opacity:.75">YOUR PACKS \u00B7 '+(hasPack()?'TAP ONE TO WEAR IT':'BUY THE BACKPACK AT THE SHOP TO WEAR ONE')+'</div><div id="wardrobe">'+Object.keys(PACKS).filter(k=>S.packs[k]).map(k=>'<div class="wpk'+(S.worn===k?' worn':'')+(hasPack()?'':' locked')+'" data-pk="'+k+'"><img src="'+packImg(k)+'" alt=""><div class="nm">'+PACKS[k].n+'</div></div>').join('')+'</div>':'')+
     (LIVE?'':'<div class="micro" style="opacity:.6;margin-top:10px">Local until you sign in on DEEDS.</div>');
   $$('#sackRows .wpk').forEach(el=>el.onclick=()=>wearPack(el.dataset.pk))}
@@ -1587,7 +1868,7 @@ function setCan(on){CAN=!!on;TOOL=CAN?'can':(TOOL==='can'?'hand':TOOL);CANG.visi
   if(CAN){SND.rustle();const n=thirsty().length;toast(n?'The can is out. Walk past the beds; '+plural(n,'bed')+(n===1?' is':' are')+' thirsty.':'Nothing is thirsty right now.')}else toast('The can is away.');updateAct()}
 $$('#bar .slot').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const t=b.dataset.tool;if(!t)return;setTool(TOOL===t&&t!=='hand'?'hand':t)}));
 $('#packSlot').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const f=$('#packFan');if(f.classList.contains('on'))f.classList.remove('on');else{renderFan();f.classList.add('on');SND.open()}});
-function canTick(){if(!CAN||BLOOM||STORE_ON)return;
+function canTick(){if(!CAN||BLOOM||STORE_ON||INSIDE)return;
   const th=thirsty();if(!th.length){setCan(false);setTimeout(()=>SND.allWatered(),150);toast('Everything is watered. The can goes away.');return}
   for(const plot of th){const b=BED[plot];const d=inPoly(b.P,you.x,you.z)?0:polyDist(b.P,true,you.x,you.z);if(d<1.7){waterAt(plot,true);POUR=performance.now()+900;return}}}
 /* dig up: the seed goes back to the sack */
@@ -1793,11 +2074,17 @@ function tickRockets(dt){for(let i=ROCKETS.length-1;i>=0;i--){const R=ROCKETS[i]
       if(R.answer){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);rocketBurst(R)}}}}
 /* THE WATER LAUNCHER: an arc of water over one half of the garden, then rain on every thirsty bed in it */
 const LAUNCH={t:-1};
-function fireLauncher(h){const beds=thirstyHalf(h);if(!beds.length){SND.knock();toast('The '+HALFN[h]+' half is watered.');return}
-  const done=(rows)=>{rows.forEach(r=>{const p=S.plants[r.plot];if(!p)return;p.boost=(p.boost||0)+(+r.boost||0);p.watered=true;p.wd=today()});save();plantBeds();renderHud();SND.allWatered();toast('The '+HALFN[h]+' half is watered \u00B7 '+plural(rows.length,'bed')+'.');updateAct()};
-  beds.forEach((pl,i)=>setTimeout(()=>{const b=BED[pl];rain(b.cx,b.cz,b.rmax)},220+i*70));LAUNCH.t=0;LAUNCH.h=h;SND.splash();
-  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('garden_water_half',{p_half:h,p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}done(d.beds||[])}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
-  setTimeout(()=>done(beds.map(pl=>({plot:pl,boost:Math.ceil(ripe(S.plants[pl]).next/2)}))),700)}
+/* 4.15: one shot waters the beds on that half and every growing sapling and regrowing stump on it (trees 0-5 west, 6-11 east, and so on by sixes) */
+const treeHalf=i=>((i/6)|0)%2;
+const thirstyTrees=h=>TREEPOS.map((p,i)=>i).filter(i=>treeHalf(i)===h&&planted(i)&&growLeft(S.trees[i])>0&&(freeWater()||!S.trees[i].wt));
+function fireLauncher(h){const beds=thirstyHalf(h),trs=thirstyTrees(h);if(!beds.length&&!trs.length){SND.knock();toast('The '+HALFN[h]+' half is watered.');return}
+  const done=(rows,trows)=>{rows.forEach(r=>{const p=S.plants[r.plot];if(!p)return;p.boost=(p.boost||0)+(+r.boost||0);p.watered=true;p.wd=today()});
+    (trows||[]).forEach(r=>{const tr=S.trees[+r.tree];if(!tr)return;tr.wt=true;if(+r.next_s>0)tr.ready=Date.now()+(+r.next_s)*1000});
+    save();plantBeds();if(trows&&trows.length)renderTrees();renderHud();SND.allWatered();
+    const parts=[];if(rows.length)parts.push(plural(rows.length,'bed'));if(trows&&trows.length)parts.push(plural(trows.length,'tree'));toast('The '+HALFN[h]+' half is watered'+(parts.length?' \u00B7 '+parts.join(', '):'')+'.');updateAct()};
+  beds.forEach((pl,i)=>setTimeout(()=>{const b=BED[pl];rain(b.cx,b.cz,b.rmax)},220+i*70));trs.forEach((i,k)=>setTimeout(()=>{const [tx,tz]=TREEPOS[i];rain(tx,tz,2.4)},500+k*90));LAUNCH.t=0;LAUNCH.h=h;SND.splash();
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC(PATCH60?'garden_water_half2':'garden_water_half',{p_half:h,p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}done(d.beds||[],d.trees||[])}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
+  setTimeout(()=>done(beds.map(pl=>({plot:pl,boost:Math.ceil(ripe(S.plants[pl]).next/2)})),trs.map(i=>({tree:i,next_s:Math.ceil(growLeft(S.trees[i])/2)}))),700)}
 const STREAM=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(90*3),3)),new THREE.PointsMaterial({map:chipMat.map,color:0xCFE9FF,size:0.22,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2}));STREAM.visible=false;scene.add(STREAM);
 function tickLauncher(dt){if(LAUNCH.t<0)return;LAUNCH.t+=dt;if(LAUNCH.t>1.6){LAUNCH.t=-1;STREAM.visible=false;return}STREAM.visible=true;const a=STREAM.geometry.attributes.position;const tx=(LAUNCH.h?1:-1)*17,tz=0;
   for(let j=0;j<a.count;j++){const u=((LAUNCH.t*0.9)+j/a.count)%1;const x=you.x+(tx-you.x)*u,z=you.z+(tz-you.z)*u,y=you.feet+1.2+Math.sin(u*Math.PI)*7;a.setXYZ(j,x+Math.sin(j*7.1)*0.3,y,z+Math.cos(j*5.3)*0.3)}a.needsUpdate=true}
@@ -2073,11 +2360,26 @@ const BUILDER={swing:-1};
  markRect(HOUSE.front.x+1.6,HOUSE.front.z-3.2,HOUSE.front.x+3.2,HOUSE.front.z-1.2,0.9)}
 function renderPile(){const n=Math.min(12,S.house.stage>=3?12:S.house.wood);BUILDER.pile.forEach((l,k)=>l.visible=k<n)}
 function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood from the oaks.');return}
-  const done=(wood,stage,dl)=>{const was=S.house.stage;S.wood=0;S.house.wood=wood;S.house.stage=stage;save();renderHud();paintBundle();renderHouse();
+  const done=(wood,stage,dl)=>{const was=S.house.stage,rb=S.rooms||roomsOf(0,0);S.wood=0;S.house.wood=wood;S.house.stage=stage;S.rooms=roomsOf(wood,stage);save();renderHud();paintBundle();renderHouse();
     if(stage>was){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast(['','The builder raises the fireplace wing.','The main house goes up, with the library.','The mansion. Portico, columns, the upper floor and your bedroom.'][stage])}
-    else{SND.clink();toast((dl>1?dl+' bundles delivered':'Delivered')+' \u00B7 '+wood+' of '+HOUSE_TIERS[stage]+' bundles.')}updateAct()};
+    else if(S.rooms.down>rb.down||S.rooms.up>rb.up){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));const r=S.rooms;
+      toast(r.down>rb.down?['','Downstairs is built. The stairs, the hall, the rooms. Go inside.','Downstairs is nice now \u00B7 rugs, curtains, books, the piano.','Downstairs is elegant \u00B7 chandeliers, marble, the grand piano, the fires lit.'][r.down]:['','Upstairs is built \u00B7 the bedroom, the gallery, the study.','Upstairs is nice now \u00B7 rugs, curtains, lamps, paintings.','Upstairs is elegant \u00B7 the four poster, the chandeliers, the gallery hung.'][r.up]);
+      if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
+    else{SND.clink();const n=S.rooms.next;toast((dl>1?dl+' bundles delivered':'Delivered')+' \u00B7 '+(stage<3?wood+' of '+HOUSE_TIERS[stage]+' bundles.':n?n.have+' of '+n.need+' bundles \u00B7 '+stepName(n)+'.':'the house is finished.'))}updateAct()};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();toast('Bring a bundle of wood from the oaks.');return}done(+d.wood||0,+d.stage||0,+d.delivered||1)}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
   const dl=S.wood;const wood=S.house.wood+dl;let stage=S.house.stage;while(stage<3&&wood>=HOUSE_TIERS[stage])stage++;done(wood,stage,dl)}
+/* 4.15 in through the front door: the gardener steps into the interior scene, the rooms at their levels, and the world waits outside where you left it */
+function enterHouse(){if(INSIDE)return;OUTPOS={x:you.x,z:you.z};INSIDE=true;hideAct();LOCK.kind=null;LOCK.id=-1;if(CAN)setCan(false);
+  scene.remove(AV.g);INTERIOR.scene.add(AV.g);const L=roomLevels();INTERIOR.setLevels(L[0],L[1]);INTERIOR.setPhase(ph);
+  you.x=0;you.z=2.3;you.feet=0;you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=0;you.face=0;you.pitch=-0.34;camDist=2.2;ROOM='hall';areaNow='';camera.fov=78;camera.updateProjectionMatrix();camera.position.set(0,2.5,3.7);camera.rotation.set(-0.34,0,0);SND.knock();
+  toast(L[0]?'Your house \u00B7 '+roomsWord()+'.':'The bare shell \u00B7 bring the builder 20 bundles for downstairs.')}
+function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g);scene.add(AV.g);hideAct();LOCK.kind=null;LOCK.id=-1;
+  you.x=OUTPOS?OUTPOS.x:DOORW.x;you.z=OUTPOS?OUTPOS.z:DOORW.z+0.8;you.feet=floorAtW(you.x,you.z);you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
+function insideAct(){const L=roomLevels();
+  if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<1.6){showAct('Go outside.','leave',null,null,'the front door',null,[0,2.4,3.6]);return}
+    if(L[0]>=2){const dk=Math.hypot(you.x-INTERIOR.DESK.x,you.z-INTERIOR.DESK.z);if(dk<1.7){showAct('Read.','read',null,null,'the Library on DEEDS',null,[INTERIOR.DESK.x,1.7,INTERIOR.DESK.z]);return}}}
+  hideAct()}
+function openLibrary(){window.open('../../','_blank')}
 function tickBuilder(t,dt){const B=BUILDER;const dx=you.x-B.g.position.x,dz=you.z-B.g.position.z,near=Math.hypot(dx,dz);
   const look=near<9?localLook(dx,dz,Math.PI):0;B.head.rotation.y+=(Math.max(-1.1,Math.min(1.1,look))-B.head.rotation.y)*Math.min(1,4*dt);
   if(B.swing>=0){B.swing+=dt;B.armR.rotation.x=-0.2-Math.abs(Math.sin(B.swing*9))*1.4;if(B.swing>2.4){B.swing=-1;B.armR.rotation.x=-0.2}}
@@ -2090,7 +2392,7 @@ let ACT=null,ATSTAND=false,ATFLORIST=false,ATFISH=false;             /* {mode,pl
 const actEl=$('#act'),actMain=$('#actMain'),actChips=$('#actChips'),actKey=$('#actKey');
 let ANCHOR=null,CHIPSIG='',EXTRA=[],DIGSHOW=0;          /* the point the prompt floats over; the chips only rebuild when their words change */
 const LOCK={kind:null,id:-1};                             /* what the prompt is on. It lets go only past the exit range, so it never flickers at the edge */
-const ENTER={compass:2.3,wild:2.9,gate:1.6,stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,chest:2.6,tree:2.7,house:3.4,bed:1.3},EXIT={compass:3.1,wild:3.7,gate:2.3,stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,chest:3.4,tree:3.5,house:4.4,bed:2.1};
+const ENTER={compass:2.3,wild:2.9,gate:1.6,stand:2.8,florist:2.8,fish:2.8,fountain:4.4,plinth:2.3,chest:2.6,tree:2.7,house:3.4,door:2.4,bed:1.3},EXIT={compass:3.1,wild:3.7,gate:2.3,stand:3.7,florist:3.7,fish:3.7,fountain:5.3,plinth:3.1,chest:3.4,tree:3.5,house:4.4,door:3.2,bed:2.1};
 function bedDist(b){return inPoly(b.P,you.x,you.z)?-1:polyDist(b.P,true,you.x,you.z)}
 function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax>3.4)continue;const d=bedDist(b);if(d<bd){bd=d;best=b}}return {b:best,d:bd}}
 function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
@@ -2098,12 +2400,12 @@ function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypo
 function distTo(kind,id){if(kind==='compass')return Math.hypot(you.x-COMPASS.x,you.z-COMPASS.z);if(kind==='wild'){const it=WILD[id];return it?Math.hypot(you.x-it.x,you.z-it.z):1e9}if(kind==='gate')return Math.hypot(you.x-GATE.x,you.z-GATE.z);if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
   if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
-  if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);return bedDist(BED[id])}
+  if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);if(kind==='door')return Math.hypot(DOORW.x-you.x,DOORW.z-you.z);return bedDist(BED[id])}
 function oakNear(){let best=-1,bd=1e9;const awake=treesAwake();TREEPOS.forEach(([ox,oz],i)=>{if(isRing(i)&&(!awake||(!planted(i)&&!ringOpen(i))))return;const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
 function nearest(){const dg=distTo('gate',0);if(dg<ENTER.gate)return {kind:'gate',id:0,d:dg};const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
   const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
   const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};const dcm=distTo('compass',0);if(dcm<ENTER.compass)return {kind:'compass',id:0,d:dcm};
-  const ok=oakNear();if(ok.i>=0&&ok.d<ENTER.tree)return {kind:'tree',id:ok.i,d:ok.d};const dh2=distTo('house',0);if(dh2<ENTER.house)return {kind:'house',id:0,d:dh2};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};if(TOOL==='chainsaw'&&owns('chainsaw')){const wn=wildNear();if(wn.i>=0&&wn.d<ENTER.wild)return {kind:'wild',id:wn.i,d:wn.d}}return null}
+  const ok=oakNear();if(ok.i>=0&&ok.d<ENTER.tree)return {kind:'tree',id:ok.i,d:ok.d};if(houseLvl()>=3||ROOMS_PREVIEW){const dd=distTo('door',0);if(dd<ENTER.door)return {kind:'door',id:0,d:dd}}const dh2=distTo('house',0);if(dh2<ENTER.house)return {kind:'house',id:0,d:dh2};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};if(TOOL==='chainsaw'&&owns('chainsaw')){const wn=wildNear();if(wn.i>=0&&wn.d<ENTER.wild)return {kind:'wild',id:wn.i,d:wn.d}}return null}
 function pickTarget(){const c=nearest();
   if(LOCK.kind){const dl=distTo(LOCK.kind,LOCK.id);
     /* hold on to it inside its exit range, unless you are standing in another bed or something is clearly nearer */
@@ -2125,7 +2427,9 @@ function showAct(label,mode,plot,chips,say,extra,at){ACT=mode?{mode,plot}:null;i
 function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
 const stallAt=s=>[s.x+1.72,2.7,s.z];
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
+  if(INSIDE){insideAct();return}
   const T=pickTarget();
+  if(T.kind==='door'){showAct('Go inside.','enter',null,null,roomsWord(),null,[DOORW.x,2.6,DOORW.z]);return}
   if(T.kind==='gate'){const at=[GATE.x,2.4,GATE.z];if(!LIVE)showAct('Friends can walk into your garden. Sign in on DEEDS.',null,null,null,'the gate',null,at);else if(VISIT)showAct('Go home to your garden.','home',null,null,'you are in '+VISIT.handle+'\u2019s garden',null,at);else showAct('Visit a friend\u2019s garden.','friends',null,null,'friends who follow you back',null,at);return}
   if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('The Shop.','stand',null,null,'\u201CSeeds are '+gcv(Math.min(...FLOWERS.map(id=>CAT[id].price)))+' to '+gcv(Math.max(...FLOWERS.map(id=>CAT[id].price)))+'. Gardencoin first, Deedcoins fill in.\u201D',null,stallAt(STAND));return}
   ATSTAND=false;
@@ -2165,8 +2469,10 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
     if(TOOL==='chainsaw'){showAct(CUT.on&&CUT.mode==='saw'&&CUT.plot===i?'Sawing.':tr.st?'Hold to saw.':'Hold to saw \u00B7 '+gcv(AXE_DCS)+' gardencoin.','saw',i,null,'hold it down and the oak comes down',null,at);return}
     if(!tr.st)showAct('Take an axe to this oak \u00B7 '+gcv(AXE_DCS)+' gardencoin.','chop',i,null,CHOPS+' chops fell it',null,at);else showAct('Chop \u00B7 '+tr.st+' of '+CHOPS+'.','chop',i,null,null,null,at);return}
   if(T.kind==='house'){const at=[HOUSE.front.x,2.3,HOUSE.front.z],st=S.house.stage;
-    if(S.wood)showAct('Give the wood to the builder.','wood',null,null,st<3?S.house.wood+' of '+HOUSE_TIERS[st]+' bundles':'',null,at);
-    else if(st>=3)showAct('Your house. Built by you.',null,null,null,null,null,at);else showAct('Bring wood \u00B7 '+S.house.wood+' of '+HOUSE_TIERS[st]+' bundles.',null,null,null,['the fireplace wing','the main house','the mansion'][st]+' comes next \u00B7 the oaks stand beside the avenue',null,at);return}
+    const rn=st>=3&&S.rooms?S.rooms.next:null;
+    if(S.wood)showAct('Give the wood to the builder.','wood',null,null,st<3?S.house.wood+' of '+HOUSE_TIERS[st]+' bundles':rn?rn.have+' of '+rn.need+' bundles \u00B7 '+stepName(rn):'the house is finished',null,at);
+    else if(st>=3&&rn)showAct('Bring wood \u00B7 '+rn.have+' of '+rn.need+' bundles.',null,null,null,stepName(rn)+' comes next \u00B7 '+roomsWord(),null,at);
+    else if(st>=3)showAct('Your house. Built by you.',null,null,null,'downstairs elegant, upstairs elegant \u00B7 the front door is on the steps',null,at);else showAct('Bring wood \u00B7 '+S.house.wood+' of '+HOUSE_TIERS[st]+' bundles.',null,null,null,['the fireplace wing','the main house','the mansion'][st]+' comes next \u00B7 the oaks stand beside the avenue',null,at);return}
   if(CAN){const n=thirsty().length;showAct('Put the can away.','can',null,null,n?plural(n,'bed')+' still thirsty':'',null,[you.x,you.feet+2.15,you.z]);return}
   if(T.kind!=='bed'){hideAct();return}
   const b=BED[T.id],at=[b.cx,1.55,b.cz];
@@ -2183,7 +2489,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();updateAct()}
+function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -2242,7 +2548,7 @@ function rayHit(cx,cy){_ray.set((cx/innerWidth)*2-1,-(cy/innerHeight)*2+1,0.5).u
   if(_ray.y>-0.02)return null;const t=(0.6-camera.position.y)/_ray.y;if(t>18)return null;return [camera.position.x+_ray.x*t,camera.position.z+_ray.z*t]}
 function bedAt(hx,hz){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-hx,b.cz-hz)-b.rmax>1.4)continue;const d=inPoly(b.P,hx,hz)?-1:polyDist(b.P,true,hx,hz);if(d<bd){bd=d;best=b}}return best&&bd<0.8?best:null}
 /* tap the flowers: a tap on a bed picks it, or sows it when it is empty; a tap on a stall opens it; on a plinth it chisels */
-function tapAt(cx,cy){if(STORE_ON||BLOOM||$('#forms').classList.contains('on'))return false;
+function tapAt(cx,cy){if(STORE_ON||BLOOM||INSIDE||$('#forms').classList.contains('on'))return false;
   const h=rayHit(cx,cy);if(!h)return false;const [hx,hz]=h;
   const best=bedAt(hx,hz);
   if(best){const reach=bedDist(best);
@@ -2297,6 +2603,7 @@ function applyPhase(){const p=PH[ph];
   CLOUDS.forEach(c=>{c.s.material.color.set(p.cloud);c.s.material.opacity=ph==='night'?0.5:0.9});
   MAT.water.color.set(ph==='night'?0x16324a:ph==='dusk'?0x35507c:0x2c7e98);springLight.intensity=SPRUNG?0.3+p.lamp*0.9:0;
   $('#phase').textContent=ph.charAt(0).toUpperCase()+ph.slice(1);
+  INTERIOR.setPhase(ph);
 }
 $('#phase').onclick=()=>{ph=ORDER[(ORDER.indexOf(ph)+1)%ORDER.length];applyPhase()};
 $('#back').onclick=()=>location.href=ON_SITE?'/':'https://deeds.fun/';
@@ -2316,6 +2623,7 @@ function nextTrack(){track=track%6+1;audio.src=BASE+'garden-music-'+track+'.mp3'
 const areaEl=$('#area'),nearEl=$('#near'),walkEl=$('#walkin');
 let areaNow='';
 function labels(){
+  if(INSIDE){const nm=(INTERIOR.R[ROOM]||{}).name||'Your house';if(nm!==areaNow){areaNow=nm;areaEl.innerHTML=nm+'<span>.</span>'}nearEl.textContent='';return}
   let name='The Parterre';const d0=Math.hypot(you.x,you.z);
   if(d0<6.2)name='The Fountain';
   else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(you.x<-2.2&&you.x>-9.5&&you.z>31&&you.z<46)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
@@ -2346,21 +2654,21 @@ function loop(now){
     const nx=you.x+you.vx*dt,nz=you.z+you.vz*dt;
     if(!blocked(nx,you.z))you.x=nx;else you.vx*=0.2;
     if(!blocked(you.x,nz))you.z=nz;else you.vz*=0.2;
-    const rr=Math.hypot(you.x,you.z);if(rr>61){you.x*=61/rr;you.z*=61/rr}
+    const rr=Math.hypot(you.x,you.z);if(!INSIDE&&rr>61){you.x*=61/rr;you.z*=61/rr}
   }
   /* up and down: stand on whatever is under you, never inside it */
   const fl=floorAt(you.x,you.z);
   if(jumpQ){jumpQ=false;if(you.grounded){you.vy=JUMPV;you.grounded=false}}
   if(you.grounded){if(fl>you.feet+1e-3){you.stepOff-=(fl-you.feet);you.feet=fl}else if(fl<you.feet-1e-3)you.grounded=false}
-  if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);if(you.vy<-1.5&&fl>0.8&&Math.hypot(you.x,you.z)<3.4)fountainDive();you.feet=fl;you.vy=0;you.grounded=true}}
+  if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);if(!INSIDE&&you.vy<-1.5&&fl>0.8&&Math.hypot(you.x,you.z)<3.4)fountainDive();you.feet=fl;you.vy=0;you.grounded=true}}
   you.stepOff+=(0-you.stepOff)*Math.min(1,12*dt);
   /* the body, then the camera: behind and above, pulled in when a hedge or a tree would come between */
   AV.g.position.set(you.x,you.feet+you.stepOff,you.z);AV.g.rotation.y=you.face;avatarTick(t,dt,sp,mag);friendsTick(dt);pulsePos(now,sp);
-  const ty=you.feet+you.stepOff+1.45;
+  const ty=you.feet+you.stepOff+(INSIDE?1.85:1.45);
   lookV.set(-Math.sin(you.yaw)*Math.cos(you.pitch),Math.sin(you.pitch),-Math.cos(you.yaw)*Math.cos(you.pitch));
-  let want=you.dist;for(let s=0.7;s<you.dist;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||floorAt(px,pz)>py-0.22){want=Math.max(1.3,s-0.3);break}}
-  camDist+=(want-camDist)*Math.min(1,(want<camDist?20:4)*dt);
-  camera.position.set(you.x-lookV.x*camDist,Math.max(0.32,ty-lookV.y*camDist),you.z-lookV.z*camDist);
+  let want=INSIDE?Math.min(you.dist,2.8):you.dist;for(let s=INSIDE?0.3:0.7;s<want;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||floorAt(px,pz)>py-0.22){want=Math.max(INSIDE?0.5:1.3,s-0.3);break}}
+  camDist+=(want-camDist)*Math.min(1,(want<camDist?20:4)*dt);AV.g.visible=!INSIDE||camDist>1.0;
+  camera.position.set(you.x-lookV.x*camDist,Math.max(0.32,ty-lookV.y*camDist),you.z-lookV.z*camDist);if(INSIDE)camera.position.y=Math.min(camera.position.y,(you.feet>4.3?8.2:4.4)-0.2);
   camera.rotation.y=you.yaw;camera.rotation.x=you.pitch;
   camera.updateMatrixWorld(true);camera.matrixWorldInverse.copy(camera.matrixWorld).invert();   /* so the prompt is placed from this frame's camera, not the last one's */
   placeAct();
@@ -2400,7 +2708,8 @@ function loop(now){
   if(CAN)CANG.rotation.x+=((POUR>performance.now()?-0.95:0)-CANG.rotation.x)*Math.min(1,6*dt);
   if(frame%6===0){labels();updateAct();canTick()}
   if(!BLOOM&&frame%240===0)plantBeds();
-  if(!SIM){renderer.render(scene,camera);requestAnimationFrame(loop)}
+  if(INSIDE)ROOM=INTERIOR.tick(t,you);
+  if(!SIM){renderer.render(INSIDE?INTERIOR.scene:scene,camera);requestAnimationFrame(loop)}
 }
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
@@ -2485,7 +2794,7 @@ function friendsTick(dt){const k=Math.min(1,dt*9);Object.values(FR).forEach(f=>{
     f.av.g.position.set(f.x,floorAt(f.x,f.z)+Math.abs(Math.sin(f.av.ph))*0.045*walk,f.z);f.av.g.rotation.y=f.yaw;
     if(f.moving&&performance.now()-f.last>1500)f.moving=false})}
 /* your own position, a few times a second while it changes */
-function pulsePos(now,sp){if(!PRES||!PRESOK)return;const moving=sp>0.05;const cur={x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),m:moving,tool:TOOL,k:S.worn||''};
+function pulsePos(now,sp){if(!PRES||!PRESOK||INSIDE)return;const moving=sp>0.05;const cur={x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),m:moving,tool:TOOL,k:S.worn||''};
   if(POSLAST&&now-POSAT<250)return;
   if(POSLAST&&Math.abs(POSLAST.x-cur.x)<0.03&&Math.abs(POSLAST.z-cur.z)<0.03&&Math.abs(POSLAST.yaw-cur.yaw)<0.05&&POSLAST.m===cur.m&&POSLAST.tool===cur.tool&&POSLAST.k===cur.k)return;
   POSAT=now;POSLAST=cur;try{PRES.send({type:'broadcast',event:'pos',payload:Object.assign({id:ME,h:MYHANDLE},cur)})}catch(e){}}
@@ -2495,7 +2804,7 @@ function visitState(handle){return Promise.resolve(sb.from('profiles').select('i
     return Promise.resolve(sb.rpc('garden_visit_state',{p_owner:p.id})).then(v=>{if(v.error){const m=String(v.error.message||'');
         toast(/not_friends/.test(m)?'You can visit the gardens of friends who follow you back. Follow each other on DEEDS.':/not find|function|schema cache/i.test(m)?'Run patch 48 on DEEDS first.':'That garden did not open.');return sb.rpc('garden_state5')}
       return v})})}
-function loadState(){return GHANDLE?visitState(GHANDLE):Promise.resolve(sb.rpc('garden_state7')).then(r7=>(!r7.error&&r7.data)?r7:sb.rpc('garden_state6')).then(r6=>(!r6.error&&r6.data)?r6:sb.rpc('garden_state5')).then(r5=>(!r5.error&&r5.data)?r5:sb.rpc('garden_state4')).then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3'))}
+function loadState(){return GHANDLE?visitState(GHANDLE):Promise.resolve(sb.rpc('garden_state8')).then(r8=>(!r8.error&&r8.data)?r8:sb.rpc('garden_state7')).then(r7=>(!r7.error&&r7.data)?r7:sb.rpc('garden_state6')).then(r6=>(!r6.error&&r6.data)?r6:sb.rpc('garden_state5')).then(r5=>(!r5.error&&r5.data)?r5:sb.rpc('garden_state4')).then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3'))}
 function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function visitGuard(what){if(!VISIT)return false;SND.knock();toast('Only '+VISIT.handle+' can '+what+' here. Pick, water, sell and chop all you like.');return true}
 /* the friends sheet: who follows you back, and their gardens */
