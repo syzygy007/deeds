@@ -2712,7 +2712,7 @@ document.body.appendChild(f);
 setTimeout(function(){try{f.remove()}catch(e){}try{portraitInto($('#myAv'),id,(window.my&&my.type)||'doer')}catch(e){}},9000)}catch(e){}}
 function portraitInto(el,id,type){try{if(!id||!el||picPref()==='mark')return;var c=window.sb;if(!c)return;
 c.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){
-var mine=!!(window.SESSION&&window.SESSION.user&&window.SESSION.user.id===id);
+var mine=(myPicId()===id);
 if(r.error||!r.data){if(mine)makePortrait(id);return}
 var fresh=false;try{if(mine&&!localStorage.getItem('deeds_av_reshot')){localStorage.setItem('deeds_av_reshot','1');fresh=true}}catch(e){}
 if(fresh)makePortrait(id);
@@ -2720,7 +2720,7 @@ var base=(typeof SB_URL==='string')?SB_URL:'https://helqqdygwaihrliglbvw.supabas
 var img=document.createElement('img');img.className='pav';img.alt='';
 img.onload=function(){try{if(picPref()==='mark')return;var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});el.innerHTML='';el.appendChild(img);el.appendChild(mk)}catch(e){}};
 img.src=base+'/storage/v1/object/public/avatars/'+id+'.png?v='+encodeURIComponent(r.data.updated_at)}).catch(function(){})}catch(e){}}
-function myPicId(){try{return(window.SESSION&&window.SESSION.user)?window.SESSION.user.id:null}catch(e){return null}}
+function myPicId(){try{var p=window.PROFILE;if(p&&p.id)return p.id;var s=window.SESSION;return(s&&s.user)?s.user.id:null}catch(e){return null}}
 function paintMyPic(){try{var el=$('#myAv');if(!el)return;
 var ver=false;try{ver=!!(window.PROFILE&&PROFILE.member_type_verified_at)}catch(e){}
 el.innerHTML=DeedsTypes.svg((window.my&&my.type)||'doer',88,{verified:ver});
