@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.19">
+<meta name="world-build" content="4.20">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1005,7 +1005,7 @@ const lawn=mesh(new THREE.PlaneGeometry(360,360),MAT.lawn);lawn.rotation.x=-Math
 const gravelG=[];
 {const g=new THREE.PlaneGeometry(HALF*2,HALF*2);g.rotateX(-Math.PI/2);g.translate(0,0.012,0);gravelG.push(g);
  [[0,-(HALF+9)],[0,HALF+9]].forEach(([x,z])=>{const p=new THREE.PlaneGeometry(4.2,18);p.rotateX(-Math.PI/2);p.translate(x,0.012,z);gravelG.push(p)});
- {const p=new THREE.PlaneGeometry(3.0,13.4);p.rotateX(-Math.PI/2);p.translate(-3.55,0.012,38.6);gravelG.push(p)}}   /* the market apron, west of the south avenue */
+ {const p=new THREE.PlaneGeometry(16,6.4);p.rotateX(-Math.PI/2);p.translate(0,0.012,45.2);gravelG.push(p)}}   /* the market apron across the end of the south avenue */
 const gravelMesh=mesh(mergeGeos(gravelG),MAT.gravel);
 /* ShapeGeometry and PlaneGeometry carry uv 0..1 or metre uv; make gravel and lawn repeat in metres */
 {const fix=(m,per)=>{const a=m.geometry.attributes.position,uv=m.geometry.attributes.uv;for(let i=0;i<a.count;i++){uv.setXY(i,a.getX(i)/per*1,a.getZ(i)/per*1)}uv.needsUpdate=true};
@@ -1110,7 +1110,8 @@ function tickFish(t,n){FISHES.forEach((f,i)=>{const on=i<n;f.g.visible=on;f.ring
    THE MARKET ROW, on the lawn west of the south avenue, just outside the gate: the seed stand first, the florist beside it, a third place kept for the fish market.
    Each stall is built in a local frame (front = local -x, width along local z) and turned by its rot to face the avenue; the seller stands behind the counter.
    ====================================================================== */
-const STAND={x:-6.0,z:34.6,rot:Math.PI,front:{x:-3.5,z:34.6}};
+const MKZ=45.2,MKF=42.7;   /* 4.20: the market row stands across the end of the south avenue, facing the gate, so you see it from the garden */
+const STAND={x:0,z:MKZ,rot:-Math.PI/2,front:{x:0,z:MKF}};
 /* where someone stands, seen from a stall's own frame: the angle a seller turns the head by (the face is on local -x) */
 const localLook=(dx,dz,th)=>Math.atan2(Math.sin(th)*dx+Math.cos(th)*dz,-(Math.cos(th)*dx-Math.sin(th)*dz));
 const KEEPER={};
@@ -1149,15 +1150,15 @@ const KEEPER={};
  KEEPER.armL=arm(-1);KEEPER.armR=arm(1);KEEPER.armL.rotation.x=0.12;KEEPER.armL.fore.rotation.x=-0.6;KEEPER.armR.rotation.x=-0.1;KEEPER.armR.fore.rotation.x=-0.5;
  KEEPER.torsoY=1.18;
  /* the stall footprint in world space: turned by pi, local x runs back along world x, local z back along world z */
- markRect(STAND.x-1.7,STAND.z-1.95,STAND.x+1.7,STAND.z+1.95,1.0)}
+ markRect(STAND.x-1.95,STAND.z-1.7,STAND.x+1.95,STAND.z+1.7,1.0)}
 /* the same points in world space for the billboard wares */
-const SL=(lx,lz)=>[STAND.x-lx,STAND.z-lz];
+const SL=(lx,lz)=>[STAND.x+lx*Math.cos(STAND.rot)+lz*Math.sin(STAND.rot),STAND.z-lx*Math.sin(STAND.rot)+lz*Math.cos(STAND.rot)];
 
 /* ======================================================================
    THE FLORIST, beside the seed stand in the market row, her counter facing the avenue. She takes what you grew and pays in seeds.
    Same stall, same turn; buckets of cut flowers on the counter.
    ====================================================================== */
-const FLORIST={x:-6.0,z:38.9,rot:Math.PI,front:{x:-3.5,z:38.9}};
+const FLORIST={x:-4.4,z:MKZ,rot:-Math.PI/2,front:{x:-4.4,z:MKF}};
 const FLORA={};
 {const G=new THREE.Group();G.position.set(FLORIST.x,0,FLORIST.z);G.rotation.y=FLORIST.rot;scene.add(G);
  const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
@@ -1202,13 +1203,13 @@ const FLORA={};
  FLORA.armL=arm(-1);FLORA.armR=arm(1);FLORA.armL.rotation.x=0.4;FLORA.armL.fore.rotation.x=-1.2;FLORA.armR.rotation.x=-0.3;FLORA.armR.fore.rotation.x=-0.9;
  /* the shears in her right hand */
  const sh=new THREE.Group();sh.position.set(0,-0.32,0);FLORA.armR.fore.add(sh);km(new THREE.BoxGeometry(0.16,0.012,0.02),steel,-0.07,0,0,sh);km(new THREE.BoxGeometry(0.16,0.012,0.02),steel,-0.07,0,0.02,sh).rotation.y=0.35;
- markRect(FLORIST.x-1.7,FLORIST.z-1.95,FLORIST.x+1.7,FLORIST.z+1.95,1.0)}
-const FL=(lx,lz)=>[FLORIST.x-lx,FLORIST.z-lz];
+ markRect(FLORIST.x-1.95,FLORIST.z-1.7,FLORIST.x+1.95,FLORIST.z+1.7,1.0)}
+const FL=(lx,lz)=>[FLORIST.x+lx*Math.cos(FLORIST.rot)+lz*Math.sin(FLORIST.rot),FLORIST.z-lx*Math.sin(FLORIST.rot)+lz*Math.cos(FLORIST.rot)];
 
 /* ======================================================================
    THE FISH MARKET, third in the row. The fish you catch at the fountain sell here for gardencoin, a hundred a fish.
    ====================================================================== */
-const MARKET3={x:-6.0,z:43.2,rot:Math.PI,front:{x:-3.5,z:43.2}};
+const MARKET3={x:4.4,z:MKZ,rot:-Math.PI/2,front:{x:4.4,z:MKF}};
 const MONGER={};
 {const G=new THREE.Group();G.position.set(MARKET3.x,0,MARKET3.z);G.rotation.y=MARKET3.rot;scene.add(G);
  const gm=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);G.add(o);return o};
@@ -1246,7 +1247,7 @@ const MONGER={};
    km(new THREE.SphereGeometry(0.078,10,8),shirt,0,0,0,A);km(new THREE.CylinderGeometry(0.062,0.056,0.3,10),shirt,0,-0.17,0,A);
    const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.052,0.046,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.058,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
  MONGER.armL=arm(-1);MONGER.armR=arm(1);MONGER.armL.rotation.x=0.15;MONGER.armL.fore.rotation.x=-0.7;MONGER.armR.rotation.x=-0.1;MONGER.armR.fore.rotation.x=-0.5;
- markRect(MARKET3.x-1.7,MARKET3.z-1.95,MARKET3.x+1.7,MARKET3.z+1.95,1.0)}
+ markRect(MARKET3.x-1.95,MARKET3.z-1.7,MARKET3.x+1.95,MARKET3.z+1.7,1.0)}
 
 /* ======================================================================
    TWELVE PLINTHS for marble: by the gates, in the wood's corner clearings, and outside the east and west hedges
@@ -1370,7 +1371,7 @@ const WILD=[];   /* every wild tree in the wood and down the avenue: {x,z,h,h0,k
 {const r=rng(1234);const put={};const all=[];
  const add=(kind,x,z,h)=>{const it={x,z,y:0,h,h0:h,flip:r()>.5,kind};(put[kind]=put[kind]||[]).push(it);all.push(it);markDisk(x,z,kind==='cypress'?0.42:0.55,3)};
  /* the avenue: cypress pairs down both openings */
- [-1,1].forEach(side=>{for(let k=0;k<6;k++){if(side<0&&k>=4)continue;const z=side*(HALF+3.4+k*4.1);const hs=side<0?(1-k*0.13):1;if(!(side>0&&k<3))add('cypress',-3.1,z,(7.6+r()*1.2)*hs);add('cypress',3.1,z,(7.6+r()*1.2)*hs)}});   /* north side steps down 13% a pair, the last pair about two thirds */   /* no cypress in front of the market */
+ [-1,1].forEach(side=>{for(let k=0;k<6;k++){if(side<0&&k>=4)continue;if(side>0&&k>=3)continue;const z=side*(HALF+3.4+k*4.1);const hs=side<0?(1-k*0.13):1;add('cypress',-3.1,z,(7.6+r()*1.2)*hs);add('cypress',3.1,z,(7.6+r()*1.2)*hs)}});   /* north side steps down 13% a pair, the last pair about two thirds */   /* no cypress in front of the market */
  /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
@@ -1379,7 +1380,7 @@ const WILD=[];   /* every wild tree in the wood and down the avenue: {x,z,h,h0,k
    if(Math.max(Math.abs(x),Math.abs(z))<HALF+2.6)continue;          /* inside the hedge */
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
-   if(Math.hypot(x+6.0,z-43.2)<5.2)continue;                        /* the third stall, kept for the fish market */
+   if(Math.hypot(x-MARKET3.x,z-MARKET3.z)<5.2)continue;             /* the fish market */
    if(Math.hypot(x-HOUSE.x,z-HOUSE.z)<17)continue;                   /* the house and its lawn */
    if(TREEPOS.some(([ox,oz])=>Math.hypot(x-ox,z-oz)<3.6))continue;    /* the oak groves and the tree rings */
    if(CHEST_SPOTS.some(([cx,cz])=>Math.hypot(x-cx,z-cz)<2.6))continue;/* room to stand at the chest */
@@ -1866,7 +1867,7 @@ function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knoc
   const left=S.sack[id]||0;if(!left)setTimeout(()=>SND.lastSeed(),140);toast('Sown. '+c.n+' in bed '+(plot+1)+'. '+(left?plural(left,'seed')+' left.':'That was the last '+c.n.toLowerCase()+' seed.')+' Water it and it grows twice as fast.');
   if(!left)SOWT=null}
 /* pick: tap, take it at whatever it is worth, the bed starts again. too soon = nothing happens */
-function nudgeFlorist(){if(S.flags.florist)return;if(basketQty()<1)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. Flora pays gardencoin, at the market by the south gate.'),1500)}
+function nudgeFlorist(){if(S.flags.florist)return;if(basketQty()<1)return;S.flags.florist=1;save();setTimeout(()=>toast('You have flowers. Flora pays gardencoin, at the market at the end of the south avenue.'),1500)}
 const PICKING=new Set();   /* beds the server is still answering for */
 const held=p=>p.hold>snow()?Math.ceil((p.hold-snow())/1000):0;   /* seconds a refused bed waits before it is offered again */
 /* the server's countdown wins: shift a plot's clock so the mirror agrees with next_s (and with a full bed) */
@@ -2166,7 +2167,7 @@ function tickKite(t,dt){const on=KITE.up||KITE.ease>0.01;if(!on){KITEG.visible=f
 /* THE COMPASS (4.7): a brass compass on a stone pedestal behind the seed stand. Its needle always points at today's chest;
    read it and a golden arrow floats above you, pointing the way with the distance, until the chest is opened. Near the chest,
    a golden glimmer rises over the lid so the trees cannot hide it */
-const COMPASS={x:STAND.x-2.6,z:STAND.z,on:false};
+const COMPASS={x:STAND.x,z:STAND.z+2.8,on:false};
 const COMPG=new THREE.Group();COMPG.position.set(COMPASS.x,0,COMPASS.z);scene.add(COMPG);
 {const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.44,1.06,12),MAT.stone);ped.position.y=0.53;ped.castShadow=true;ped.receiveShadow=true;COMPG.add(ped);
  const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.36,0.1,12),MAT.stone);cap.position.y=1.1;COMPG.add(cap);
@@ -2426,7 +2427,7 @@ const BALLOON=new THREE.Group();scene.add(BALLOON);
  const light=new THREE.PointLight(0xFFB070,0,30,2);light.position.y=1.15;BALLOON.add(light);BALLOON.light=light;
  const tether=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,1,4),rope);scene.add(tether);BALLOON.tether=tether;BALLOON.up=UP}
 const BALLOON_Y=24;   /* the basket floats 24 m up; the envelope tops out near 37 m, well over the mansion and the oaks */
-function balloonTick(t){const s=t*0.001;const sx=Math.sin(s*0.31)*1.4,sz=Math.cos(s*0.23)*1.1,y=BALLOON_Y+Math.sin(s*0.45)*0.8;
+function balloonTick(t){const on=houseLvl()<3;BALLOON.visible=on;BALLOON.tether.visible=on;if(!on){BALLOON.light.intensity=0;return}const s=t*0.001;const sx=Math.sin(s*0.31)*1.4,sz=Math.cos(s*0.23)*1.1,y=BALLOON_Y+Math.sin(s*0.45)*0.8;
   BALLOON.position.set(HOUSE.x+sx,y,HOUSE.z+sz);BALLOON.rotation.y=s*0.08;BALLOON.rotation.z=Math.sin(s*0.31)*0.03;
   const dark=ph==='night'||ph==='dusk';const puff=dark?1.0+Math.sin(s*9)*0.25:0.35;BALLOON.flame.scale.set(1.6*puff,1.6*puff,1);BALLOON.light.intensity=dark?1.3+Math.sin(s*9)*0.3:0;
   const T=BALLOON.tether,by=0.6,dy=y-by;const L=Math.hypot(sx,dy,sz);T.scale.y=L;T.position.set(HOUSE.x+sx/2,(y+by)/2,HOUSE.z+sz/2);T.quaternion.setFromUnitVectors(BALLOON.up,new THREE.Vector3(sx,dy,sz).normalize())}
@@ -2810,7 +2811,7 @@ function labels(){
   if(INSIDE){const nm=(INTERIOR.R[ROOM]||{}).name||'Your house';if(nm!==areaNow){areaNow=nm;areaEl.innerHTML=nm+'<span>.</span>'}nearEl.textContent='';return}
   let name='The Parterre';const d0=Math.hypot(you.x,you.z);
   if(d0<6.2)name='The Fountain';
-  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(you.x<-2.2&&you.x>-9.5&&you.z>31&&you.z<46)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
+  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(Math.abs(you.x)<8&&you.z>40.5&&you.z<49)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
   if(name!==areaNow){areaNow=name;areaEl.innerHTML=name+'<span>.</span>'}
   let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const d=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(d<bd){bd=d;best=b}}
   if(best&&bd<1.3){const inside=inPoly(best.P,you.x,you.z);nearEl.textContent='Bed '+(best.plot+1)+' · '+(bedLabel[best.plot]||'empty, waiting for a seed')+(inside?' · you are standing in it':'')}
