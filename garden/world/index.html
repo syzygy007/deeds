@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.13">
+<meta name="world-build" content="4.14">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -197,6 +197,8 @@ canvas{display:block;touch-action:none;cursor:default}
 </div></div>
 <div id="short" class="sheet"><div class="panel small"><h2>Not enough<span>.</span></h2><p id="shBody"></p><div class="sfoot"><button class="btn" id="shKeep">Keep shopping.</button><button class="btn on" id="shDeed">Log a deed.</button></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../../wardrobe.js?v=3"></script>
+<script src="../../figure.js?v=1"></script>
 <script>
 /* ======================================================================
    THE GARDEN · world 3.1 · gardencoin (patch 45): Flora pays coin on one press, the seed store in gardencoin with Deedcoins filling in,
@@ -1247,7 +1249,7 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
 /* a quiet refresh after a sale or a buy, so the sack, the basket and the fish are exactly the server's */
 function refresh(){if(!sb||!LIVE||!PATCH44)return;Promise.resolve(VISIT?sb.rpc('garden_visit_state',{p_owner:VISIT.owner}):sb.rpc(PATCH55?'garden_state7':PATCH50?'garden_state6':PATCH47?'garden_state5':PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2')).then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
-  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
+  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;loadLook();
     return loadState().then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
         if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
@@ -1527,6 +1529,37 @@ function waterAt(plot,fromCan){const p=S.plants[plot];if(!p||p.pending)return;co
    THE GARDENER · you. A plain figure in the same cloth as the Keeper, seen from behind most of the day, so the walk is the whole character.
    Built facing local -z, the way the camera looks, so rotation.y is the way you face.
    ====================================================================== */
+/* ======================================================================
+   4.14 THE AVATAR · the toy figure from the wardrobe (figure.js + wardrobe.js at the repo root) walks the garden dressed the way
+   avatar_equipped says: body, skin, hair, hat, top, legs, feet, neck, ears, topper. The world keeps its own hands and back: the hotbar
+   decides what is in the right hand, the sack decides the pack. Friends carry their look in presence (av) or it is read by id.
+   If the two files did not load, the old gardener still walks.
+   ====================================================================== */
+const TOY=!!(window.Figure&&window.Wardrobe&&window.Wardrobe.util);
+const AVH=1.75;                                                   /* metres, the ground to the top of the head */
+const TOY_SLOTS=['torso','legs','feet','neck','ears','head','topper'];
+const LOOK0={eq:{body:'body.a',skin:'skin.s3',hair:'hair.crop',head:'head.gardenhat',torso:'torso.tee',legs:'legs.trousers',feet:'feet.boots'},cw:{}};
+let LOOK=null;                                                    /* your own look {eq:{slot:item_id}, cw:{item_id:colour id}} once avatar_equipped answers */
+function lookFromRows(rows){const eq={},cw={};(rows||[]).forEach(r=>{if(r.slot&&r.item_id)eq[r.slot]=r.item_id;if(r.item_id&&r.colorway)cw[r.item_id]=r.colorway});return Object.keys(eq).length?{eq,cw}:null}
+function lookOut(){return LOOK||null}
+function lookKey(l){try{return JSON.stringify(l)}catch(e){return ''}}
+function makeGardener(pal,look){if(!TOY)return makeGardener0(pal);const AVx={ph:0,toy:true,fig:null,s:1,d:null,lookKey:''};const G=new THREE.Group();scene.add(G);AVx.g=G;
+  AVx.torso=new THREE.Group();AVx.fore=new THREE.Group();AVx.armR={fore:AVx.fore};AVx.armL={};AVx.legL={};AVx.legR={};AVx.head={};   /* filled by dressToy; torso and fore persist across a change of clothes */
+  dressToy(AVx,look||LOOK0);return AVx}
+/* (re)build the figure inside its group; the tool frame (fore) and the back frame (torso) are metre scaled and face forward, so the world's tools and packs sit as before */
+function dressToy(AVx,look){if(!AVx||!AVx.toy)return;look=look||LOOK0;let built;
+  try{built=Figure.build({eq:Object.assign({},LOOK0.eq,look.eq||{}),colorway:look.cw||{},slots:TOY_SLOTS})}catch(e){console.error('dressToy',e);return}
+  const d=built.dims,s=AVH/(d.headRy-d.ground),fig=built.fig;fig.scale.setScalar(s);fig.position.y=-d.ground*s;fig.rotation.y=Math.PI;
+  AVx.legR=built.legs[0];AVx.legL=built.legs[1];AVx.armR=built.arms[0];AVx.armL=built.arms[1];AVx.head=built.head;AVx.hat=built.hat;
+  const F=AVx.fore;AVx.armR.add(F);AVx.armR.fore=F;F.scale.setScalar(1/s);F.rotation.set(0,Math.PI,0);F.position.set(0,-(d.upper+d.fore+d.hand*0.5)+0.3/s,0);   /* (0,-0.3,0) in F is the hand */
+  const T=AVx.torso;fig.add(T);T.scale.setScalar(1/s);T.rotation.set(0,Math.PI,0);T.position.set(0,d.ground+0.82/s,0);
+  const old=AVx.fig;AVx.fig=fig;AVx.s=s;AVx.d=d;AVx.lookKey=lookKey(look);AVx.g.add(fig);if(old){AVx.g.remove(old);Figure.dispose(old)}}
+function toyBreath(AVx,t){const b=1+Math.sin(t*1.5)*0.006;AVx.fig.scale.y=AVx.s*b;AVx.fig.position.y=-AVx.d.ground*AVx.s*b}
+function loadLook(){if(!sb||!ME)return;Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',ME)).then(r=>{if(r.error)return;const lk=lookFromRows(r.data);if(!lk)return;LOOK=lk;dressToy(AV,LOOK);trackMe()}).catch(()=>{})}
+function trackMe(){if(!PRES||!PRESOK)return;try{PRES.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',av:lookOut(),t:Date.now()})}catch(e){}}
+/* a friend's look: from their presence when they sent it, else read by id (avatar_equipped is readable by every member) */
+function lookOfPresence(p,id){if(p&&p.av&&p.av.eq)return p.av;
+  if(sb&&id)Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',id)).then(r=>{const lk=!r.error&&lookFromRows(r.data);const f=FR[id];if(lk&&f&&f.av&&f.av.toy&&f.av.lookKey!==lookKey(lk))dressToy(f.av,lk)}).catch(()=>{});return null}
 const OUTFITS=[{},{shirt:0xE8DCC8,vest:0x6B4A2B,trouser:0x2F4A34,straw:0xC9A86A,band:0x8E3B2F},{shirt:0xF1EAD6,vest:0x2F4A34,trouser:0x3E4A57,straw:0xD2B15E,band:0x1F1711,hair:0x2A1C12},{shirt:0xEFE4D2,vest:0x8E3B2F,trouser:0x2A2E38,straw:0xD8C27A,band:0x2F4A34,hair:0x6B4A2B}];
 const AV=makeGardener(OUTFITS[0]);   /* 4.0: the same figure the friends wear, in the first outfit */
 setTimeout(()=>{setPack(S.worn);paintHotbar()},0);   /* 4.12: the pack the save says, once the bundle block below exists */
@@ -1536,7 +1569,7 @@ function avatarTick(t,dt,sp,mag){const walk=Math.min(1,sp/2.4);AV.ph+=dt*(1.4+sp
   if(you.grounded){AV.legL.rotation.x=sw;AV.legR.rotation.x=-sw;AV.g.position.y+=Math.abs(Math.sin(AV.ph))*0.045*walk}
   else{AV.legL.rotation.x=-0.55;AV.legR.rotation.x=0.45}
   AV.armL.rotation.x=-sw*0.75;AV.armR.rotation.x+=((CAN?-0.75:sw*0.75)-AV.armR.rotation.x)*Math.min(1,10*dt);
-  AV.torso.scale.y=1+Math.sin(t*1.5)*0.006;
+  if(AV.toy)toyBreath(AV,t);else AV.torso.scale.y=1+Math.sin(t*1.5)*0.006;
   AV.head.rotation.x=walk>0.05?0:Math.sin(t*0.7)*0.03}
 
 let CAN=false,POUR=0;
@@ -1884,7 +1917,7 @@ function tickTrees(dt){let any=false;Object.keys(TREE.fall).forEach(k=>{const i=
     if(f.t>1.5){delete TREE.fall[k];renderTrees()}});
   GROWT+=dt;if(GROWT>1){GROWT=0;renderTrees()}else if(any)treeDirty()}
 /* the bundle on your shoulder */
-const BUNDLE=new THREE.Group();AV.torso.add(BUNDLE);BUNDLE.position.set(0,0.66,-0.2);BUNDLE.rotation.z=Math.PI/2;BUNDLE.rotation.y=0.35;BUNDLE.visible=false;
+const BUNDLE=new THREE.Group();AV.torso.add(BUNDLE);BUNDLE.position.set(0,AV.toy?0.47:0.66,-0.2);BUNDLE.rotation.z=Math.PI/2;BUNDLE.rotation.y=0.35;BUNDLE.visible=false;
 {const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});[[0,0.09],[0.08,-0.06],[-0.08,-0.06]].forEach(([y,z])=>{const l=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.95,10),bark);l.position.set(0,y,z);BUNDLE.add(l)});
  const tie=new THREE.Mesh(new THREE.TorusGeometry(0.16,0.015,6,16),new THREE.MeshStandardMaterial({color:0xB9A26B}));tie.rotation.x=Math.PI/2;BUNDLE.add(tie)}
 /* the backpack, drawn in the right physics (his rule): six designs, the glow ones carry a small light so the
@@ -2380,7 +2413,7 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
    the door AS the owner on the server. Presence and positions ride a realtime channel per garden, no game server.
    ====================================================================== */
 /* the gardener, built to order: the same figure in a few outfits, so friends can be told apart */
-function makeGardener(pal){pal=pal||{};const AVx={ph:0};const G=new THREE.Group();scene.add(G);AVx.g=G;
+function makeGardener0(pal){pal=pal||{};const AVx={ph:0};const G=new THREE.Group();scene.add(G);AVx.g=G;
  const skin=new THREE.MeshStandardMaterial({color:pal.skin||0xD8B08C,roughness:0.85}),shirt=new THREE.MeshStandardMaterial({color:pal.shirt||0xF1EAD6,roughness:0.9}),vest=new THREE.MeshStandardMaterial({color:pal.vest||0x8A6A3F,roughness:0.9}),
    trouser=new THREE.MeshStandardMaterial({color:pal.trouser||0x3E4A57,roughness:0.95}),boot=new THREE.MeshStandardMaterial({color:0x3A2A1E,roughness:0.8}),hair=new THREE.MeshStandardMaterial({color:pal.hair||0x4A3222,roughness:0.9}),
    straw=new THREE.MeshStandardMaterial({color:pal.straw||0xD2B15E,roughness:0.95}),band=new THREE.MeshStandardMaterial({color:pal.band||0x2F4A34,roughness:0.8}),dark=new THREE.MeshStandardMaterial({color:0x1F1711,roughness:0.6});
@@ -2426,7 +2459,7 @@ function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();
     ch.on('presence',{event:'sync'},()=>{onPresence(ch.presenceState())})
       .on('broadcast',{event:'pos'},m=>onPos(m&&m.payload))
       .on('broadcast',{event:'act'},m=>onAct(m&&m.payload))
-      .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;try{ch.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',t:Date.now()})}catch(e){}}});
+      .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;try{ch.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',av:lookOut(),t:Date.now()})}catch(e){}}});
     PRES=ch};
   if(MYHANDLE)go();else sb.from('profiles').select('handle').eq('id',ME).limit(1).then(r=>{const p=r.data&&r.data[0];if(p&&p.handle)MYHANDLE=p.handle;go()}).catch(go)}
 function leaveGarden(){if(PRES){try{sb.removeChannel(PRES)}catch(e){}PRES=null;PRESOK=false}Object.keys(FR).forEach(dropFriend);PRESENCE={}}
@@ -2440,12 +2473,12 @@ function onPos(p){if(!p||!p.id||p.id===ME)return;const f=FR[p.id];if(!f){if(!PRE
 function onAct(p){if(!p||!p.id||p.id===ME)return;const who=(p.h||PRESENCE[p.id]&&PRESENCE[p.id].h||'A friend');toast(who+' '+actWords(p.fn,p.args,{fell:p.fell})+'.');
   clearTimeout(REFT);REFT=setTimeout(refresh,900)}
 /* the friends you can see: one gardener each, a name over the head, sliding between the positions they send */
-function syncFriends(){Object.keys(PRESENCE).forEach(id=>{if(FR[id]){const p=PRESENCE[id];if(FR[id].pk!==(p.k||'')){FR[id].pk=p.k||'';attachPack(FR[id].av,FR[id].pk)}return}const p=PRESENCE[id];const av=makeGardener(OUTFITS[1+hashId(id)%3]);if(p.k&&PACKS[p.k])attachPack(av,p.k);const x=+p.x||0,z=+p.z||0;
+function syncFriends(){Object.keys(PRESENCE).forEach(id=>{if(FR[id]){const p=PRESENCE[id];if(FR[id].pk!==(p.k||'')){FR[id].pk=p.k||'';attachPack(FR[id].av,FR[id].pk)}if(p.av&&p.av.eq&&FR[id].av.toy&&FR[id].av.lookKey!==lookKey(p.av))dressToy(FR[id].av,p.av);return}const p=PRESENCE[id];const av=makeGardener(OUTFITS[1+hashId(id)%3],lookOfPresence(p,id));if(p.k&&PACKS[p.k])attachPack(av,p.k);const x=+p.x||0,z=+p.z||0;
     const f={id,h:p.h||'',av,x,z,yaw:+p.yaw||0,tx:x,tz:z,tyaw:+p.yaw||0,moving:false,last:performance.now(),label:nameSprite(p.h||'friend')};
-    f.label.position.set(0,2.25,0);av.g.add(f.label);av.g.position.set(x,floorAt(x,z),z);FR[id]=f;
+    f.label.position.set(0,av.toy?2.08:2.25,0);av.g.add(f.label);av.g.position.set(x,floorAt(x,z),z);FR[id]=f;
     if(!f.h)return;toast(f.h+' is here.')});
   Object.keys(FR).forEach(id=>{if(!PRESENCE[id])dropFriend(id)})}
-function dropFriend(id){const f=FR[id];if(!f)return;scene.remove(f.av.g);f.av.g.traverse(o=>{if(o.material&&o.material.map)o.material.map.dispose()});delete FR[id]}
+function dropFriend(id){const f=FR[id];if(!f)return;scene.remove(f.av.g);f.av.g.traverse(o=>{if(o.material&&o.material.map)o.material.map.dispose()});if(f.av.toy&&f.av.fig){try{Figure.dispose(f.av.fig)}catch(e){}}delete FR[id]}
 function friendsTick(dt){const k=Math.min(1,dt*9);Object.values(FR).forEach(f=>{f.x+=(f.tx-f.x)*k;f.z+=(f.tz-f.z)*k;f.yaw+=wrapA(f.tyaw-f.yaw)*k;
     const sp=f.moving?3.2:0;f.av.ph+=dt*(1.4+sp*1.9);const walk=f.moving?1:0;const sw=Math.sin(f.av.ph)*0.66*walk;
     f.av.legL.rotation.x=sw;f.av.legR.rotation.x=-sw;f.av.armL.rotation.x=-sw*0.75;f.av.armR.rotation.x=sw*0.75;
@@ -2487,7 +2520,7 @@ function showAway(rows){if(!rows||!rows.length||VISIT)return;let since=0;try{sin
   const lines=Object.entries(by).map(([h,fns])=>h+' '+Object.entries(fns).map(([fn,n])=>{const w=NAME[fn]||[fn,fn+' N times'];return n===1?w[0]:w[1].replace('N',String(n))}).join(', '));
   setTimeout(()=>toast('While you were away: '+lines.join('. ')+'.'),2600)}
 
-window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow};
+window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;applyPhase()},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
