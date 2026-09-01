@@ -2698,14 +2698,14 @@ wireFeed()}
 
 /* ============ PROFILE + STATUS ============ */
 /* the avatar portrait: the wardrobe saves a head shot, the profile shows it next to the handle (type mark becomes the badge) */
-function portraitInto(el,id,type){if(!sb||!id||!el)return;
-sb.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){if(r.error||!r.data)return;
-var img=document.createElement('img');img.className='pav';img.alt='';img.src=SB_URL+'/storage/v1/object/public/avatars/'+id+'.png?v='+encodeURIComponent(r.data.updated_at);
-img.onerror=function(){el.innerHTML=DeedsTypes.svg(type||'doer',88,{verified:false})};
-var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});
-el.innerHTML='';el.appendChild(img);el.appendChild(mk)}).catch(function(){})}
+function portraitInto(el,id,type){try{var c=window.sb;if(!c||!id||!el)return;
+c.from('avatar_portraits').select('updated_at').eq('profile_id',id).maybeSingle().then(function(r){if(r.error||!r.data)return;
+var base=(typeof SB_URL==='string')?SB_URL:'https://helqqdygwaihrliglbvw.supabase.co';
+var img=document.createElement('img');img.className='pav';img.alt='';
+img.onload=function(){try{var mk=document.createElement('span');mk.className='pmark';mk.innerHTML=DeedsTypes.svg(type||'doer',34,{verified:false});el.innerHTML='';el.appendChild(img);el.appendChild(mk)}catch(e){}};
+img.src=base+'/storage/v1/object/public/avatars/'+id+'.png?v='+encodeURIComponent(r.data.updated_at)}).catch(function(){})}catch(e){}}
 function renderProfile(){$('#myAv').innerHTML=DeedsTypes.svg(my.type||'doer',88,{verified:false});
-portraitInto($('#myAv'),(typeof SESSION!=='undefined'&&SESSION&&SESSION.user)?SESSION.user.id:null,my.type);
+try{portraitInto($('#myAv'),(window.SESSION&&window.SESSION.user)?window.SESSION.user.id:null,my.type)}catch(e){}
 var n=deedCount(),m=monthCount(),ci=coinIdx(n);
 $('#myCoin').innerHTML=ci<0?'':coinSvg(ci,36);
 $('#rMonth').textContent=m>=4?'RHYTHM BUILT. KEEP GOING.':'JULY · '+m+(m===1?' DEED':' DEEDS')+'. KEEP BUILDING.';

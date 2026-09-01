@@ -137,7 +137,7 @@
 
   // ---------- colour, scene, light ----------
   var canvas = document.getElementById('c');
-  var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
+  var renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, preserveDrawingBuffer:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -529,12 +529,21 @@
   var undoBtn = document.getElementById('undo'); if (undoBtn) undoBtn.addEventListener('click', undoAll);
   // ---------- the portrait: a head shot saved to your profile after every change ----------
   function portrait(){ undoState(); if (!LIVE || !sb || !ME) return; clearTimeout(PT); PT = setTimeout(shootPortrait, 1200); }
+  // a blank capture (some browsers hand back an empty canvas) must never overwrite a good portrait
+  function looksLikeAFace(src){
+    try {
+      var cv = document.createElement('canvas'); cv.width = 32; cv.height = 32; var g = cv.getContext('2d'); g.drawImage(src, 0, 0, 32, 32);
+      var px = g.getImageData(0, 0, 32, 32).data, r0 = px[0], g0 = px[1], b0 = px[2], diff = 0, opaque = 0;
+      for (var i = 0; i < px.length; i += 4){ if (px[i + 3] > 10) opaque++; if (Math.abs(px[i] - r0) + Math.abs(px[i + 1] - g0) + Math.abs(px[i + 2] - b0) > 40) diff++; }
+      return opaque > 900 && diff > 60;
+    } catch (e) { return true; }
+  }
   function shootPortrait(){
     if (!LIVE || !sb || !ME) return;
     var S = 320, rot = root.rotation.y, url = null;
     try {
       var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.15, 8.3); cam.lookAt(0, -0.7, 0);
-      root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); url = canvas.toDataURL('image/png');
+      root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); url = looksLikeAFace(canvas) ? canvas.toDataURL('image/png') : null;
     } catch (e) { url = null; }
     root.rotation.y = rot; size(); dirty = true;
     if (!url) return;
@@ -554,7 +563,7 @@
     turn: function(r){ root.rotation.y = r; dirty = true; },
     look: function(y, dist, up){ camera.position.set(0, y + (up || 0), dist); camera.lookAt(0, y, 0); camera.updateProjectionMatrix(); dirty = true; },
     face: function(o){ FACE = o || {}; build(); },
-    portrait: function(){ var S = 320, rot = root.rotation.y, cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.1, 7.6); cam.lookAt(0, -0.6, 0); root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); var u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return u; },
+    portrait: function(){ var S = 320, rot = root.rotation.y, cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, -0.15, 8.3); cam.lookAt(0, -0.7, 0); root.rotation.y = 0.35; renderer.setSize(S, S, false); renderer.render(scene, cam); var ok = looksLikeAFace(canvas), u = canvas.toDataURL('image/png'); root.rotation.y = rot; size(); dirty = true; return ok ? u : 'BLANK'; },
     tab: function(s){ ACTIVE = s; paint(); },
     state: function(){ return {EQ:EQ, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
     ready: true
