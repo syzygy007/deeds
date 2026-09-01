@@ -131,66 +131,147 @@
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setClearColor(U.col('#EFEAE0'));
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-  scene.add(new THREE.HemisphereLight(U.col('#fbf6ea'), U.col('#8a7358'), 0.72));
-  var key = new THREE.DirectionalLight(U.col('#fff0d8'), 1.15);
-  key.position.set(6, 10, 9); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
-  key.shadow.camera.left = -6; key.shadow.camera.right = 6; key.shadow.camera.top = 5; key.shadow.camera.bottom = -10;
-  key.shadow.camera.near = 1; key.shadow.camera.far = 40; key.shadow.bias = -0.0006; key.shadow.normalBias = 0.03;
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
+  scene.add(new THREE.HemisphereLight(U.col('#fff5e8'), U.col('#a08a6a'), 0.9));
+  var key = new THREE.DirectionalLight(U.col('#ffe9cf'), 1.0);
+  key.position.set(8, 15, 14); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.left = -9; key.shadow.camera.right = 9; key.shadow.camera.top = 6; key.shadow.camera.bottom = -18;
+  key.shadow.camera.near = 1; key.shadow.camera.far = 70; key.shadow.bias = -0.0006; key.shadow.normalBias = 0.04; key.shadow.radius = 3;
   scene.add(key);
-  var fill = new THREE.DirectionalLight(U.col('#dde6f5'), 0.38); fill.position.set(-8, 3, 6); scene.add(fill);
-  var rim = new THREE.DirectionalLight(U.col('#ffffff'), 0.28); rim.position.set(1, 6, -10); scene.add(rim);
+  var fill = new THREE.DirectionalLight(U.col('#e4ebf7'), 0.5); fill.position.set(-12, 5, 9); scene.add(fill);
+  var rim = new THREE.DirectionalLight(U.col('#ffffff'), 0.22); rim.position.set(2, 9, -15); scene.add(rim);
   var root = new THREE.Group(); scene.add(root);
-  var ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({opacity:0.16}));
-  ground.rotation.x = -Math.PI / 2; ground.position.y = -7.78; ground.receiveShadow = true; scene.add(ground);
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({opacity:0.12}));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -9.5; ground.receiveShadow = true; scene.add(ground);
 
-  // ---------- the figure ----------
+  // ---------- the figure: a soft toy, 5 heads tall, one joined body; 1 unit = half the head width = 0.09 H; the head is a rounded cylinder ----------
+  var K = 1 / 0.09;
+  var SPEC = {
+    'body.a': {headZ:0.90, headH:0.20, headD:0.185, chinZ:0.80, neckZ:0.78, neckW:0.095, collarZ:0.78, hemZ:0.465, sleeveZ:0.64,
+      shoulder:[0.145, 0.735], elbowZ:0.585, wristZ:0.45, handL:0.095, upperR:[0.078, 0.07], foreR:[0.07, 0.06], handW:0.075, handT:0.058, abduct:6,
+      hip:[0.075, 0.42], kneeZ:0.24, ankleZ:0.08, footAnkle:0.06, thighR:[0.12, 0.105], shinR:[0.105, 0.09], foot:[0.098, 0.165, 0.06, 0.11, 0.055], stance:0.30,
+      body:[[0.39, 0.05, 0.03], [0.40, 0.10, 0.06], [0.42, 0.113, 0.07], [0.48, 0.112, 0.07], [0.55, 0.108, 0.069], [0.62, 0.118, 0.073], [0.68, 0.132, 0.077], [0.72, 0.14, 0.078], [0.74, 0.145, 0.076], [0.752, 0.13, 0.07], [0.762, 0.105, 0.062], [0.77, 0.075, 0.052], [0.776, 0.055, 0.046], [0.778, 0.045, 0.045]],
+      shell:[[0.465, 0.115, 0.07], [0.466, 0.14, 0.08], [0.55, 0.145, 0.084], [0.66, 0.155, 0.088], [0.72, 0.162, 0.088], [0.74, 0.165, 0.085], [0.755, 0.155, 0.082], [0.765, 0.135, 0.074], [0.772, 0.11, 0.066], [0.778, 0.08, 0.058], [0.782, 0.055, 0.052], [0.784, 0.045, 0.045]],
+      pants:{waistZ:0.465, waistR:0.132, hipR:0.136, crotchZ:0.39, crotchR:0.136, r:[0.062, 0.058, 0.058], hemZ:0.075},
+      eyeX:0.034, eyeZ:0.888, eyeR:0.19, noseZ:0.87, mouthZ:0.85, mouthR:0.25, blush:0, hair:'crop', ears:true, hatY:-0.1, hatScale:1.15, n:2.3, sleeveDome:0.25},
+    'body.b': {headZ:0.90, headH:0.20, headD:0.185, chinZ:0.80, neckZ:0.78, neckW:0.088, collarZ:0.78, hemZ:0.51, sleeveZ:0.70,
+      shoulder:[0.135, 0.735], elbowZ:0.585, wristZ:0.455, handL:0.09, upperR:[0.07, 0.062], foreR:[0.062, 0.054], handW:0.068, handT:0.052, abduct:6,
+      hip:[0.08, 0.43], kneeZ:0.24, ankleZ:0.08, footAnkle:0.06, thighR:[0.125, 0.10], shinR:[0.10, 0.085], foot:[0.093, 0.165, 0.06, 0.11, 0.055], stance:0.27,
+      body:[[0.40, 0.05, 0.03], [0.41, 0.103, 0.062], [0.43, 0.118, 0.07], [0.48, 0.124, 0.072], [0.54, 0.118, 0.068], [0.60, 0.104, 0.064], [0.64, 0.115, 0.07, 0.004], [0.68, 0.125, 0.074, 0.006], [0.72, 0.128, 0.072, 0.002], [0.74, 0.135, 0.07], [0.752, 0.12, 0.066], [0.762, 0.095, 0.058], [0.77, 0.068, 0.05], [0.776, 0.05, 0.044], [0.778, 0.04, 0.04]],
+      shell:[[0.51, 0.10, 0.06], [0.512, 0.13, 0.076], [0.55, 0.128, 0.075], [0.60, 0.115, 0.07], [0.64, 0.126, 0.078, 0.004], [0.68, 0.136, 0.084, 0.005], [0.72, 0.14, 0.082, 0.002], [0.74, 0.145, 0.078], [0.753, 0.135, 0.074], [0.763, 0.115, 0.066], [0.771, 0.09, 0.058], [0.778, 0.065, 0.052], [0.782, 0.05, 0.05], [0.784, 0.04, 0.04]],
+      pants:{waistZ:0.49, waistR:0.132, hipR:0.134, crotchZ:0.39, crotchR:0.134, r:[0.06, 0.056, 0.056], hemZ:0.075},
+      eyeX:0.034, eyeZ:0.888, eyeR:0.19, noseZ:0.87, mouthZ:0.85, mouthR:0.25, blush:0, hair:'bob', ears:false, hatY:-0.1, hatScale:1.15, n:2.3, sleeveDome:0.1, sleevePad:0.13, collarLift:0.06}
+  };
+  var FACE = {};
   function dimsFor(body){
-    if (body === 'body.b') return {top:-1.45, bottom:-4.35, shoulder:1.35, chest:1.1, waist:0.82, hips:1.3, depth:0.6, upper:1.4, fore:1.2, handR:0.34, upperR:0.31, foreR:0.27, hipX:0.6, thigh:1.55, shin:1.45, thighR:0.5, shinR:0.38};
-    return {top:-1.45, bottom:-4.35, shoulder:1.5, chest:1.2, waist:1.0, hips:1.15, depth:0.62, upper:1.45, fore:1.25, handR:0.38, upperR:0.36, foreR:0.31, hipX:0.6, thigh:1.6, shin:1.5, thighR:0.5, shinR:0.4};
+    var s = Object.assign({}, SPEC[body] || SPEC['body.a'], FACE); function Y(z){ return (z - s.headZ) * K; }
+    var rows = function(list){ return list.map(function(r){ return {y:Y(r[0]), rx:r[1] * K, rz:r[2] * K, cy:(r[3] || 0) * K}; }); };
+    var d = {K:K, spec:s, Y:Y, ground:Y(s.ankleZ - (s.footAnkle || s.ankleZ)), headRy:s.headH / 2 * K, headRz:s.headD / 2 * K, chinY:Y(s.chinZ), hatY:s.hatY,
+      top:Y(s.shoulder[1]), bottom:Y(s.hemZ), collarY:Y(s.collarZ) + (s.collarLift == null ? 0.12 : s.collarLift), neckR:s.neckW / 2 * K, neckY:Y(s.neckZ), chestY:Y(0.68),
+      body:rows(s.body), shell:rows(s.shell), n:s.n || 2.4,
+      shoulderX:s.shoulder[0] * K, abduct:s.abduct * Math.PI / 180,
+      upper:(s.shoulder[1] - s.elbowZ) * K, fore:(s.elbowZ - s.wristZ) * K, hand:s.handL * K, handW:s.handW * K, handT:s.handT * K,
+      upperR:s.upperR[0] / 2 * K, upperR2:s.upperR[1] / 2 * K, foreR:s.foreR[0] / 2 * K, foreR2:s.foreR[1] / 2 * K, handR:s.handW / 2 * K,
+      hipX:s.hip[0] * K, hipY:Y(s.hip[1]), thigh:(s.hip[1] - s.kneeZ) * K, shin:(s.kneeZ - s.ankleZ) * K,
+      splay:Math.min(0.06, Math.atan2(s.stance / 2 - s.foot[0] / 2 - s.hip[0], s.hip[1] - s.ankleZ)), toeYaw:2 * Math.PI / 180,
+      thighR:s.thighR[0] / 2 * K, thighR2:s.thighR[1] / 2 * K, shinR:s.shinR[0] / 2 * K, shinR2:s.shinR[1] / 2 * K,
+      foot:{w:s.foot[0] * K, l:s.foot[1] * K, h:s.foot[2] * K, fwd:s.foot[3] * K, back:s.foot[4] * K, ankleUp:(s.footAnkle || s.ankleZ) * K},
+      sleeve:(s.shoulder[1] - s.sleeveZ) * K, sleeveDome:s.sleeveDome, sleevePad:s.sleevePad,
+      pants:{waistY:Y(s.pants.waistZ), waistR:s.pants.waistR * K, hipR:s.pants.hipR * K, crotchY:Y(s.pants.crotchZ), crotchR:s.pants.crotchR * K, r:s.pants.r.map(function(r){ return r * K; }), hemY:-(s.hip[1] - s.pants.hemZ) * K, pad:s.pants.pad}};
+    d.chestRz = U.rowAt(d.body, d.chestY).rz; d.chestCy = U.rowAt(d.body, d.chestY).cy || 0;
+    d.S = d.shoulderX / 1.5;
+    // legacy keys for builders written against the old figure
+    d.shoulder = d.shoulderX; d.chest = U.rowAt(d.body, d.chestY).rx; d.waist = U.rowAt(d.body, Y(0.55)).rx; d.hips = U.rowAt(d.body, Y(0.48)).rx; d.depth = d.chestRz / d.chest;
+    return d;
   }
   var fig = null;
   function disposeTree(o){ o.traverse(function(n){ if (n.geometry) n.geometry.dispose(); if (n.material){ [].concat(n.material).forEach(function(m){ if (m.map) m.map.dispose(); m.dispose(); }); } }); }
-  function onHead(fig, geo, m, x, y, z, push){
-    var d = new THREE.Vector3(x, y, z).normalize(), o = new THREE.Mesh(geo, m);
-    o.position.copy(d).multiplyScalar(1 + (push || 0)); o.lookAt(d.clone().multiplyScalar(3)); o.receiveShadow = true; fig.add(o); return o;
+  // the head surface: a rounded cylinder, radius 1 down the straight sides, a soft dome on top and a rounded chin; phi 0 = forward, theta 0 = top
+  function headProfile(d, y){
+    var ry = d.headRy, ct = 0.6, cb = 0.55, pt = 2.8, pb = 2.4;
+    if (y > ry - ct){ var t = Math.min(1, (y - (ry - ct)) / ct); return Math.pow(Math.max(0, 1 - Math.pow(t, pt)), 1 / pt); }
+    if (y < -ry + cb){ var b = Math.min(1, ((-ry + cb) - y) / cb); return Math.pow(Math.max(0, 1 - Math.pow(b, pb)), 1 / pb); }
+    return 1;
+  }
+  function headPoint(d, phi, theta, k){
+    var y = Math.cos(theta) * d.headRy, r = headProfile(d, y);
+    return new THREE.Vector3(r * Math.sin(phi) * k, y * k, r * Math.cos(phi) * d.headRz * k);
+  }
+  // put a feature on the face at lateral x and height y (head space), facing outward
+  function onFace(fig, d, geo, m, x, y, push){
+    var r = headProfile(d, y), z = d.headRz * Math.sqrt(Math.max(0, r * r - x * x));
+    var p = new THREE.Vector3(x, y, z), nrm = new THREE.Vector3(x, 0, z / (d.headRz * d.headRz)).normalize();
+    var o = new THREE.Mesh(geo, m); o.position.copy(p).addScaledVector(nrm, push || 0); o.lookAt(p.clone().addScaledVector(nrm, 3)); o.receiveShadow = true; fig.add(o); return o;
+  }
+  function hairCrop(d, hairM, hatted){
+    // a soft cap of hair: a rounded hairline at the forehead, over the ears, down to the nape
+    function edge(phi){ var a = Math.abs(phi); if (a < 0.7) return 0.44 + 0.04 * Math.cos(a / 0.7 * Math.PI); if (a < 1.4) return 0.40 - Math.pow((a - 0.7) / 0.7, 1.3) * 0.42; if (a < 2.1) return -0.02 - (a - 1.4) / 0.7 * 0.36; return -0.38 - (a - 2.1) / 1.04 * 0.3; }
+    var top = hatted ? 0.62 : d.headRy;
+    return U.mesh(U.grid(function(u, v){
+      var phi = u * Math.PI * 2 - Math.PI, y0 = edge(phi), ys = top + (y0 - top) * v, k = v > 0.94 ? 0.985 : 1.11 - 0.05 * v;
+      var th = Math.acos(Math.max(-1, Math.min(1, ys / d.headRy))), p = headPoint(d, phi, th, k); if (v < 0.001) p.set(0, d.headRy * k, 0);
+      if (hatted && v < 0.1) p.multiplyScalar(0.92);
+      return p;
+    }, 72, 24), hairM);
+  }
+  function hairBob(d, hairM, hatted){
+    // a chin length bob: the face open at the front, hair hanging to the jaw round the sides and back, fullest mid way and tucked at the ends
+    var chin = d.chinY - 0.12;
+    function edge(phi){ var a = Math.abs(phi); if (a < 0.6) return 0.46 - 0.04 * Math.cos(a / 0.6 * Math.PI); if (a < 1.2){ var t = (a - 0.6) / 0.6; return 0.46 - Math.pow(t, 1.5) * (0.46 - chin); } return chin - 0.05 * Math.min(1, (a - 1.2) / 1.5); }
+    var top = hatted ? 0.62 : d.headRy, m = hairM.clone(); m.side = THREE.DoubleSide;
+    return U.mesh(U.grid(function(u, v){
+      var phi = u * Math.PI * 2 - Math.PI, a = Math.abs(phi), y0 = edge(phi), ys = top + (y0 - top) * v;
+      var yc = Math.max(-d.headRy * 0.999, Math.min(d.headRy * 0.999, ys)), th = Math.acos(yc / d.headRy), p = headPoint(d, phi, th, 1), r = Math.hypot(p.x, p.z);
+      var f = Math.max(0, Math.min(1, (0.3 - ys) / 1.4)), hang = 1.08 + 0.14 * Math.sin(Math.PI * Math.min(1, f * 1.15)) - 0.02 * f;
+      var tuck = v > 0.84 ? 1 - (0.1 + 0.16 * Math.max(0, 1 - a / 1.6)) * ((v - 0.84) / 0.16) : 1, wgt = Math.max(0, Math.min(1, (0.5 - ys) / 0.7)), hr = Math.max(r * (1.08 + 0.05 * (1 - v)), hang * wgt) * tuck;
+      var sc = hr / Math.max(1e-6, r), q = new THREE.Vector3(p.x * sc, ys, p.z * sc * 1.03 - 0.03);
+      if (v < 0.001) q.set(0, top * 1.1, 0);
+      if (hatted && v < 0.1) q.multiplyScalar(0.92);
+      return q;
+    }, 80, 30), m);
   }
   function build(){
     if (fig){ root.remove(fig); disposeTree(fig); fig = null; }
     fig = new THREE.Group(); root.add(fig);
-    var d = dimsFor(EQ.body), skinHex = W.skins[EQ.skin] || W.skins['skin.s4'], hairHex = W.hairs[EQ.hair] || W.hairs['hair.h1'];
-    var skin = U.mat(skinHex, 0.85), hairM = U.mat(hairHex, 0.9), ink = U.mat('#1f1b18', 0.6);
-    fig.add(U.mesh(new THREE.SphereGeometry(1, 64, 40), skin));
-    fig.add(U.mesh(new THREE.SphereGeometry(0.17, 24, 16), skin, -0.98, -0.03, 0.02)).scale.set(0.55, 1, 0.85);
-    fig.add(U.mesh(new THREE.SphereGeometry(0.17, 24, 16), skin, 0.98, -0.03, 0.02)).scale.set(0.55, 1, 0.85);
-    onHead(fig, new THREE.SphereGeometry(0.1, 20, 14), skin, 0, -0.16, 0.99, -0.02).scale.set(0.9, 0.8, 0.7);
-    onHead(fig, new THREE.SphereGeometry(0.085, 20, 14), ink, -0.34, 0.06, 0.94, -0.01).scale.set(1, 1.15, 0.35);
-    onHead(fig, new THREE.SphereGeometry(0.085, 20, 14), ink, 0.34, 0.06, 0.94, -0.01).scale.set(1, 1.15, 0.35);
-    onHead(fig, new THREE.TorusGeometry(0.17, 0.02, 8, 24, Math.PI), ink, 0, -0.42, 0.92, 0.004).rotateZ(Math.PI);
-    var hairTop = U.mesh(new THREE.SphereGeometry(1.045, 64, 32, 0, Math.PI * 2, 0, 1.08), hairM); hairTop.castShadow = false; fig.add(hairTop);
-    var hairBack = U.mesh(new THREE.SphereGeometry(1.045, 64, 32, Math.PI * 1.5 - 1.55, 3.1, 0.9, 0.55), hairM); hairBack.castShadow = false; fig.add(hairBack);
-    fig.add(U.mesh(new THREE.CylinderGeometry(0.34, 0.4, 1.1, 40), skin, 0, -1.25, 0));
-    var torso = U.lathe([[0.92, d.top], [d.shoulder, d.top - 0.42], [d.chest, d.top - 0.98], [d.waist, d.top - 1.95], [d.hips, d.top - 2.55], [d.hips * 0.9, d.bottom]], skin, 48); torso.scale.z = d.depth; fig.add(torso);
+    var d = dimsFor(EQ.body), s = d.spec, skinHex = W.skins[EQ.skin] || W.skins['skin.s3'], hairHex = W.hairs[EQ.hair] || W.hairs['hair.h1'];
+    var skin = U.mat(skinHex, 0.88), hairM = U.mat(hairHex, 0.92), ink = U.mat('#2b2320', 0.55), white = U.mat('#ffffff', 0.5), mouthM = U.mat('#8a5443', 0.85);
+    var blushM = U.mat('#' + U.col(skinHex).lerp(U.col('#e8786e'), s.blush || 0).getHexString(), 0.9), eyeR = s.eyeR || 0.16, mouthR = s.mouthR || 0.3;
+    ground.position.y = d.ground;
+    // head
+    fig.add(U.mesh(U.grid(function(u, v){ return headPoint(d, u * Math.PI * 2, v * Math.PI, 1); }, 72, 48), skin));
+    if (s.ears){ [-1, 1].forEach(function(side){ var e = U.mesh(new THREE.SphereGeometry(0.25, 20, 14), skin, side * 0.97, -0.05, -0.04); e.scale.set(0.32, 1, 0.72); fig.add(e); }); }
+    var eyeY = d.Y(s.eyeZ), eyeX = s.eyeX * K;
+    [-1, 1].forEach(function(side){
+      // solid dark eyes with one catchlight: the toy look
+      onFace(fig, d, new THREE.SphereGeometry(eyeR, 24, 16), ink, side * eyeX, eyeY, 0.02).scale.set(1, 1.3, 0.35);
+      if (s.blush){ var bl = onFace(fig, d, new THREE.SphereGeometry(0.19, 20, 12), blushM, side * (eyeX + 0.22), eyeY - 0.44, 0.003); bl.scale.set(1.5, 0.8, 0.2); bl.castShadow = false; }
+      var hl = onFace(fig, d, new THREE.SphereGeometry(0.055 * eyeR / 0.16, 10, 8), white, side * eyeX - 0.34 * eyeR, eyeY + 0.47 * eyeR, 0.09); hl.castShadow = false; hl.receiveShadow = false;
+    });
+    onFace(fig, d, new THREE.SphereGeometry(0.085, 18, 12), skin, 0, d.Y(s.noseZ), 0.02).scale.set(0.85, 0.9, 0.6);
+    var mouth = onFace(fig, d, new THREE.TorusGeometry(mouthR, 0.032, 8, 22, 1.5), mouthM, 0, d.Y(s.mouthZ) + 0.4 * mouthR, 0.02); mouth.rotateZ(Math.PI / 2 - 0.75 + Math.PI);
+    var hatted = EQ.head && EQ.head !== 'head.bare' && !!W.parts[EQ.head];
+    var hair = s.hair === 'bob' ? hairBob(d, hairM, hatted) : hairCrop(d, hairM, hatted); hair.castShadow = false; fig.add(hair);
+    // neck and torso, one soft body
+    fig.add(U.mesh(new THREE.CylinderGeometry(d.neckR, d.neckR + 0.08, (d.chinY - d.neckY) + 0.9, 40), skin, 0, (d.chinY + d.neckY) / 2 - 0.15, -0.02));
+    fig.add(U.mesh(U.tube(d.body, {n:d.n}), skin));
+    // arms and legs: one smooth piece each, mitten hands
     var arms = [], legs = [];
     [-1, 1].forEach(function(side){
-      var a = new THREE.Group(); a.position.set(side * (d.shoulder - 0.12), d.top - 0.4, 0); a.rotation.z = side * 0.1; fig.add(a); arms.push(a);
-      a.add(U.mesh(new THREE.SphereGeometry(d.upperR + 0.02, 20, 14), skin, 0, 0, 0));
-      a.add(U.mesh(new THREE.CylinderGeometry(d.upperR, d.upperR - 0.02, d.upper, 20), skin, 0, -d.upper / 2, 0));
-      a.add(U.mesh(new THREE.SphereGeometry(d.foreR + 0.02, 16, 12), skin, 0, -d.upper, 0));
-      a.add(U.mesh(new THREE.CylinderGeometry(d.foreR, d.foreR - 0.03, d.fore, 20), skin, 0, -d.upper - d.fore / 2, 0));
-      a.add(U.mesh(new THREE.SphereGeometry(d.handR, 20, 14), skin, 0, -d.upper - d.fore - 0.05, 0.05)).scale.set(0.9, 1.1, 0.75);
-      var l = new THREE.Group(); l.position.set(side * d.hipX, d.bottom + 0.2, 0); fig.add(l); legs.push(l);
-      l.add(U.mesh(new THREE.SphereGeometry(d.thighR + 0.02, 20, 14), skin, 0, 0, 0));
-      l.add(U.mesh(new THREE.CylinderGeometry(d.thighR, d.thighR - 0.04, d.thigh, 20), skin, 0, -d.thigh / 2, 0));
-      l.add(U.mesh(new THREE.SphereGeometry(d.shinR + 0.03, 16, 12), skin, 0, -d.thigh, 0));
-      l.add(U.mesh(new THREE.CylinderGeometry(d.shinR, d.shinR - 0.04, d.shin, 20), skin, 0, -d.thigh - d.shin / 2, 0));
+      var i = side < 0 ? 0 : 1;
+      var a = new THREE.Group(); a.position.set(side * d.shoulderX, d.top, 0); a.rotation.z = side * d.abduct; fig.add(a); arms[i] = a;
+      a.add(U.mesh(U.capsule(d.upperR, d.foreR2, d.upper + d.fore - 0.12, 36), skin, 0, -0.12, 0));
+      var hand = U.mesh(U.capsule(d.handR, d.handR * 0.9, d.hand - d.handR, 24), skin, 0, -d.upper - d.fore + 0.08, 0.02); hand.scale.set(1, 1, Math.max(0.7, d.handT / (d.handR * 2))); a.add(hand);
+      var thumb = U.mesh(U.capsule(d.handR * 0.36, d.handR * 0.3, d.hand * 0.36, 12), skin, -side * (d.handR * 0.6), -d.upper - d.fore - 0.05, 0.16); thumb.rotation.z = side * 0.35; thumb.rotation.x = -0.25; a.add(thumb);
+      var l = new THREE.Group(); l.position.set(side * d.hipX, d.hipY, 0); l.rotation.z = side * d.splay; fig.add(l); legs[i] = l;
+      l.add(U.mesh(U.capsule(d.thighR, d.shinR2, d.thigh + d.shin, 36), skin));
     });
     var ctx = {dims:d, arms:arms, legs:legs, skin:skinHex, hair:hairHex, colorway:null};
+    var hatG = new THREE.Group(); hatG.position.y = d.hatY; var hs = s.hatScale || 1; hatG.scale.set(hs, hs, hs); fig.add(hatG);
     ['torso', 'legs', 'feet', 'hands', 'back', 'attach', 'head', 'topper'].forEach(function(slot){
       var id = EQ[slot], part = id && W.parts[id]; if (!part) return;
       var cw = W.colorways[id], pick = cw && (cw.filter(function(c){ return c.id === COLORWAY[id]; })[0] || cw.filter(function(c){ return c.id === W.defaultColorway[id]; })[0] || cw[0]);
       ctx.colorway = pick ? pick.hex : null;
-      var g = part(ctx); if (g) fig.add(g);
+      var g = part(ctx); if (g){ if (slot === 'head') hatG.add(g); else fig.add(g); }
     });
     fig.traverse(function(n){ if (n.isMesh && n.castShadow !== false){ n.castShadow = true; n.receiveShadow = true; } });
     dirty = true;
@@ -212,11 +293,12 @@
     renderer.setSize(w, h, false); camera.aspect = w / h;
     var tan = Math.tan(camera.fov * Math.PI / 360);
     if (ZOOM === 'head'){
-      var dist = Math.max(7.6, 4.8 / (2 * tan * camera.aspect));
-      camera.position.set(0, -0.15 + 0.7 * (dist / 7.6), dist); camera.lookAt(0, -0.15, 0);
+      var dist = Math.max(8.4, 5.2 / (2 * tan * camera.aspect));
+      camera.position.set(0, -0.3 + 0.8 * (dist / 8.4), dist); camera.lookAt(0, -0.3, 0);
     } else {
-      var dist2 = Math.max(20.5, 5.8 / (2 * tan * camera.aspect));
-      camera.position.set(0, -2.7 + 2.4, dist2); camera.lookAt(0, -2.7, 0);
+      var top = 1.6, bot = ground.position.y - 0.3, cy = (top + bot) / 2, span = top - bot;
+      var dist2 = Math.max(span / (2 * tan) * 1.04, (span * 0.42) / (2 * tan * camera.aspect));
+      camera.position.set(0, cy + 3.4, dist2); camera.lookAt(0, cy, 0);
     }
     camera.updateProjectionMatrix(); dirty = true;
   }
@@ -361,6 +443,8 @@
     color: function(id, c){ COLORWAY[id] = c; build(); paint(); },
     zoom: function(z){ ZOOM = z; zoomBtn.textContent = ZOOM === 'full' ? 'Head.' : 'Everything.'; size(); },
     turn: function(r){ root.rotation.y = r; dirty = true; },
+    look: function(y, dist, up){ camera.position.set(0, y + (up || 0), dist); camera.lookAt(0, y, 0); camera.updateProjectionMatrix(); dirty = true; },
+    face: function(o){ FACE = o || {}; build(); },
     tab: function(s){ ACTIVE = s; paint(); },
     state: function(){ return {EQ:EQ, OWNED:OWNED, GC:GC, LIVE:LIVE, ME:ME}; },
     ready: true
