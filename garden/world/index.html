@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.16">
+<meta name="world-build" content="4.17">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -275,6 +275,7 @@ function mark(x0,z0,x1,z1,h,both){MARKS.push({fl:TAG.fl,lv:TAG.lv,until:TAG.unti
 function paintGrid(down,up){IG[0].fill(0);IG[1].fill(0);
  MARKS.forEach(m=>{const L=m.fl?up:down;if(L<m.lv||L>m.until)return;(m.both?[0,1]:[m.fl]).forEach(g=>{
   for(let z=m.z0;z<=m.z1+1e-6;z+=CELL)for(let x=m.x0;x<=m.x1+1e-6;x+=CELL){const ix=Math.floor((x+IEXT)/CELL),iz=Math.floor((z+IEXT)/CELL);if(ix<0||iz<0||ix>=IGN||iz>=IGN)continue;const i=iz*IGN+ix;if(IG[g][i]<m.h)IG[g][i]=m.h}})})}
+function floorPt(x,z,feet){const G=IG[feet>SWITCH?1:0];const ix=Math.floor((x+IEXT)/CELL),iz=Math.floor((z+IEXT)/CELL);if(ix<0||iz<0||ix>=IGN||iz>=IGN)return 0;return G[iz*IGN+ix]}
 function floorAt(x,z,feet){const G=IG[feet>SWITCH?1:0];let h=0;const ix=Math.floor((x+IEXT)/CELL),iz=Math.floor((z+IEXT)/CELL);
  for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){const jx=ix+dx,jz=iz+dz;if(jx<0||jz<0||jx>=IGN||jz>=IGN)continue;
   const cx=jx*CELL-IEXT+CELL/2,cz=jz*CELL-IEXT+CELL/2;const nx=Math.max(cx-CELL/2,Math.min(x,cx+CELL/2)),nz=Math.max(cz-CELL/2,Math.min(z,cz+CELL/2));
@@ -286,14 +287,15 @@ const WINS=[],DOORS=[];
 function wall(axis,c,a0,a1,y0,y1,holes,opt){opt=opt||{};const part=opt.part||'plaster',t=opt.t||WT,side=opt.side||1;
  const put=(a,b,py0,py1)=>{if(b-a<0.02||py1-py0<0.02)return;const mid=(a+b)/2,L=b-a;if(axis==='x')box(part,mid,(py0+py1)/2,c+(opt.inset||0),L,py1-py0,t);else box(part,c+(opt.inset||0),(py0+py1)/2,mid,t,py1-py0,L)};
  const mk=(a,b)=>{if(opt.nomark)return;if(axis==='x')mark(a,c-t/2,b,c+t/2,opt.h);else mark(c-t/2,a,c+t/2,b,opt.h)};
- const H=(holes||[]).slice().sort((p,q)=>p.a-q.a);let cur=a0;
- H.forEach(h=>{const l=h.a-h.w/2,r=h.a+h.w/2;put(cur,l,y0,y1);mk(cur,l);
+ const H=(holes||[]).slice().sort((p,q)=>p.a-q.a);let cur=a0,curDoor=false;
+ const open=h=>h.kind==='door'&&!h.front&&!h.locked;   /* a doorway you walk through: the grid keeps a clear cell either side of it */
+ H.forEach(h=>{const l=h.a-h.w/2,r=h.a+h.w/2;put(cur,l,y0,y1);mk(cur+(curDoor?CELL:0),l-(open(h)?CELL:0));curDoor=open(h);
   if(h.kind==='door'){if(h.fan){const fl=h.a-h.fan.w/2,fr=h.a+h.fan.w/2;put(l,r,h.fan.y1,y1);put(l,fl,h.y1,h.fan.y1);put(fr,r,h.y1,h.fan.y1);if(!opt.nodress)WINS.push({axis,c,a:h.a,w:h.fan.w,y0:h.y1,y1:h.fan.y1,fl:TAG.fl,dressed:false,side})}else put(l,r,h.y1,y1);
    if(h.front||h.locked)mk(l,r);   /* a closed door: nobody walks through it, and the camera stays inside */
    if(!opt.nodress)DOORS.push({axis,c,a:h.a,w:h.w,h:h.y1-y0,y:y0,fl:TAG.fl,front:h.front,locked:h.locked,side})}
   else{put(l,r,y0,h.y0);put(l,r,h.y1,y1);mk(l,r);if(!opt.nodress)WINS.push({axis,c,a:h.a,w:h.w,y0:h.y0,y1:h.y1,fl:TAG.fl,dressed:h.kind==='win',side})}
   cur=r});
- put(cur,a1,y0,y1);mk(cur,a1)}
+ put(cur,a1,y0,y1);mk(cur+(curDoor?CELL:0),a1)}
 function local(axis,c,a){const ry=axis==='x'?0:Math.PI/2,cx=axis==='x'?a:c,cz=axis==='x'?c:a,co=Math.cos(ry),si=Math.sin(ry);return (lx,ly,lz,sx,sy,sz,part,lry)=>box(part,cx+lx*co+lz*si,ly,cz-lx*si+lz*co,sx,sy,sz,ry+(lry||0))}
 function dressWindows(){WINS.forEach(w=>{const F=local(w.axis,w.c,w.a),h=w.y1-w.y0,cy=(w.y0+w.y1)/2,sd=w.side;
  at(w.fl,0,3);
@@ -376,9 +378,9 @@ function shell(){
  at(1,0,3);VOID.forEach(([x0,z0,x1,z1])=>{const t=plankD.clone();t.needsUpdate=true;t.repeat.set((x1-x0)/2.2,(z1-z0)/1.3);const m=new THREE.MeshStandardMaterial({map:t,roughness:.75});const f=mesh(new THREE.PlaneGeometry(x1-x0,z1-z0),m,(x0+x1)/2,UF+0.001,(z0+z1)/2,0,-Math.PI/2);f.castShadow=false;mark(x0,z0,x1,z1,UF)});
  /* walls. side = which way the room lies from the wall, in the wall's local z (world +z for a wall along x, world +x for a wall along z). Every wall is 8.2 tall in the grid and up to the roof for the upper floor */
  const win=(a,w,y0,y1)=>({a,w,y0,y1,kind:'win'}),door=(a,w,y1,o)=>Object.assign({a,w,y1,kind:'door'},o||{});
- const GW=(a)=>win(a,1.2,1.1,4.4),UW=(a)=>win(a,1.2,UF+1.0,UF+3.6),ID=(a)=>door(a,1.5,GF+3.4),UD=(a)=>door(a,1.5,UF+3.4);
+ const GW=(a)=>win(a,1.2,1.1,4.4),UW=(a)=>win(a,1.2,UF+1.0,UF+3.6),ID=(a)=>door(a,1.8,GF+3.4),UD=(a)=>door(a,1.8,UF+3.4);
  at(0,0,3);
- wall('x',6,-9,9,GF,GH,[door(0,2.0,GF+3.6,{front:true,fan:{w:1.9,y1:GF+4.6}}),GW(-4.2),GW(-6.9),GW(4.2),GW(6.9)],{h:9,side:-1});
+ wall('x',6,-9,9,GF,GH,[door(0,2.2,GF+3.6,{front:true,fan:{w:2.0,y1:GF+4.6}}),GW(-4.2),GW(-6.9),GW(4.2),GW(6.9)],{h:9,side:-1});
  wall('x',-5.1,-9,9,GF,GH,[GW(-4.5),GW(4.5)],{h:9,side:1});
  wall('z',-9,-5.1,6,GF,GH,[ID(0.75)],{h:9,side:1});
  wall('z',9,-5.1,6,GF,GH,[ID(0.75)],{h:9,side:-1});
@@ -484,7 +486,7 @@ function tick(t,you){const room=roomAt(you.x,you.z,you.feet);const up=you.feet>S
  near.sort((a,b)=>a[0]-b[0]);
  POOL.forEach((L,k)=>{const e=near[k];if(!e||e[0]>16){L.intensity=0;return}const s=e[1];L.position.set(s.x,s.y,s.z);let i=(KIND_I[s.kind]||1)*p.lamps;if(s.kind==='fire')i*=0.85+Math.sin(t*23+k)*0.1+Math.sin(t*7.3+k*2)*0.07;L.intensity=i;L.distance=s.kind==='candle'?5:s.kind==='chandelier'?11:9});
  return room}
-return {scene:INT,setLevels,levels:()=>LV.slice(),floorAt,roomAt,tick,setPhase,R,DOOR:{x:0,z:5.3},ENTER_AT:{x:0,z:4.3},DESK:{x:-6.3,z:1.8},H:{GF,GH,UF,UH,SWITCH},PAINT,paintingTex,MT,sun,hemi,POOL,SPOTS}
+return {scene:INT,setLevels,levels:()=>LV.slice(),floorAt,floorPt,roomAt,tick,setPhase,R,DOOR:{x:0,z:5.3},ENTER_AT:{x:0,z:4.3},DESK:{x:-6.3,z:1.8},H:{GF,GH,UF,UH,SWITCH},PAINT,paintingTex,MT,sun,hemi,POOL,SPOTS}
 })();
 
 </script>
@@ -2685,7 +2687,7 @@ function loop(now){
   AV.g.position.set(you.x,you.feet+you.stepOff,you.z);AV.g.rotation.y=you.face;avatarTick(t,dt,sp,mag);friendsTick(dt);pulsePos(now,sp);
   const ty=you.feet+you.stepOff+(INSIDE?1.85:1.45);
   lookV.set(-Math.sin(you.yaw)*Math.cos(you.pitch),Math.sin(you.pitch),-Math.cos(you.yaw)*Math.cos(you.pitch));
-  let want=INSIDE?Math.min(you.dist,3.4):you.dist;for(let s=INSIDE?0.3:0.7;s<want;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||floorAt(px,pz)>py-0.22){want=Math.max(INSIDE?0.5:1.3,s-0.3);break}}
+  let want=INSIDE?Math.min(you.dist,3.4):you.dist;for(let s=INSIDE?0.3:0.7;s<want;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||(INSIDE?INTERIOR.floorPt(px,pz,you.feet):floorAt(px,pz))>py-0.22){want=Math.max(INSIDE?0.5:1.3,s-0.3);break}}
   camDist+=(want-camDist)*Math.min(1,(want<camDist?20:4)*dt);AV.g.visible=!INSIDE||camDist>1.0;
   camera.position.set(you.x-lookV.x*camDist,Math.max(0.32,ty-lookV.y*camDist),you.z-lookV.z*camDist);if(INSIDE)camera.position.y=Math.min(camera.position.y,(you.feet>INTERIOR.H.SWITCH?INTERIOR.H.UH:INTERIOR.H.GH)-0.2);
   camera.rotation.y=you.yaw;camera.rotation.x=you.pitch;
