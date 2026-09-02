@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.25">
+<meta name="world-build" content="4.26">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -497,7 +497,7 @@ function furnish(){const RUG=rugTex('#8E4A5C','#2E4A36','#E9DFC8'),RUG2=rugTex('
  fireplace(-15.85,0.75,Math.PI/2,0,1);
  at(0,1,3);box('wood',-12.6,0.22,3.1,1.4,0.44,0.5);mark(-13.3,2.85,-11.9,3.35,0.44);cyl('wood',-14.6,0.2,-2.5,0.3,0.4);lantern(-12.6,GH-0.6,0.75,0,1,2);
  at(0,2,3);rug(-13.2,0.75,4.0,3.2,RUG,0,2);sofa(-11.4,0.75,-Math.PI/2,'cream');armchair(-13.4,-1.3,0.5,'forest');armchair(-13.4,2.8,2.6,'forest');sidetable(-10.9,3.0,0,2);lamp(-10.9,3.0,0.62,0,2);sidetable(-10.9,-1.5,0,2);lamp(-10.9,-1.5,0.62,0,2);
- painting(-15.56,2.95,0.75,Math.PI/2,1.3,1.0,0,0,2,false);
+ painting(-16.03,2.95,0.75,Math.PI/2,1.3,1.0,0,0,2,false);
  at(0,3,3);chandelier(-12.6,5.0,0.75,0,3);wainscot('great');painting(-12.2,3.0,-3.29,0,1.7,1.3,1,0,3,true);painting(-11.0,2.9,4.79,Math.PI,1.1,0.9,2,0,3,true);
  /* THE LIBRARY (x -9..-3): shelves to the ceiling on the back and east walls, the reading desk facing the front windows */
  shelves(-6,-4.92,0,5.5,4.2,0,1,2);shelves(-3.18,-2.7,-Math.PI/2,4.1,4.2,0,1,2);shelves(-3.18,4.0,-Math.PI/2,3.3,4.2,0,1,2);
@@ -529,19 +529,19 @@ function furnish(){const RUG=rugTex('#8E4A5C','#2E4A36','#E9DFC8'),RUG2=rugTex('
  bed(-6.4,-3.6,0);
  at(1,1,3);box('walnut',-8.3,UF+0.35,4.2,0.9,0.7,0.5);mark(-8.75,3.95,-7.85,4.45,UF+0.7);lantern(-6,UH-0.6,0.9,1,1,2);
  at(1,2,3);rug(-6,0.9,4.0,3.8,RUG3,1,2);[-7.6,-5.2].forEach(x=>{sidetable(x,-4.2,1,2);lamp(x,-4.2,0.62,1,2)});at(1,2,3);box('walnut',-3.5,UF+1.0,4.2,0.6,2.0,1.4);mark(-3.8,3.5,-3.16,4.9,UF+2.0);[-1,1].forEach(q=>box('brass',-3.82,UF+1.0,4.2+q*0.35,0.02,0.16,0.04));
- painting(-8.83,UF+2.5,0.9,Math.PI/2,1.2,1.0,8,1,2,false);
- at(1,3,3);chandelier(-6,UF+4.0,0.9,1,3);wainscot('bedroom');armchair(-4.6,2.0,-2.2,'forest',1.6);painting(-5.7,UF+2.9,-4.93,0,1.4,1.0,9,1,3,true);
+ painting(-8.83,UF+2.5,1.8,Math.PI/2,1.2,1.0,8,1,2,false);
+ at(1,3,3);chandelier(-6,UF+4.0,0.9,1,3);wainscot('bedroom');armchair(-4.6,2.0,-2.2,'forest',1.6);painting(-6.5,UF+2.9,-4.93,0,1.4,1.0,9,1,3,true);
  /* THE GALLERY (x -3..1.35): the paintings along the west wall and the front, the void railed already */
  at(1,1,3);lantern(-0.8,UH-0.7,4.6,1,1);
  at(1,2,3);rug(-0.85,0.45,1.6,9.0,RUG,1,2);box('walnut',-0.6,UF+0.24,4.8,1.2,0.48,0.5);mark(-1.2,4.55,0,5.05,UF+0.48);
- [[-2.84,-3.5],[-2.84,-1.0],[-2.84,1.5]].forEach(([x,z],i)=>painting(x,UF+2.5,z,Math.PI/2,1.2,1.0,10+i,1,2,false));painting(-0.6,UF+2.5,-4.93,0,1.4,1.0,13,1,2,false);
+ [[-2.84,-3.5],[-2.84,-1.0],[-2.84,5.2]].forEach(([x,z],i)=>painting(x,UF+2.5,z,Math.PI/2,1.2,1.0,10+i,1,2,false));painting(-0.6,UF+2.5,-4.93,0,1.4,1.0,13,1,2,false);
  at(1,3,3);chandelier((SX0+SX1)/2,UF+3.8,0.5,1,3);wainscot('gallery');[[-2.84,3.9],[2.1,5.84],[-2.84,-4.7]].forEach(([x,z],i)=>painting(x,UF+2.5,z,z>5?Math.PI:Math.PI/2,0.9,1.2,14+i,1,3,true));
  [[-2.2,-4.4],[-2.2,5.3]].forEach(([x,z])=>{box('stone',x,UF+0.5,z,0.36,1.0,0.36);sph('trim',x,UF+1.22,z,0.18);box('trim',x,UF+1.05,z,0.26,0.1,0.14);mark(x-0.2,z-0.2,x+0.2,z+0.2,UF+1.3)});
  /* THE STUDY (x 3..9): the desk under the east windows, facing them */
  at(1,1,1);desk(7.0,0.6,-Math.PI/2,false);
  at(1,1,3);lantern(6,UH-0.6,0.6,1,1,2);
  at(1,2,3);rug(6,0.6,4.0,4.4,RUG2,1,2);desk(7.0,0.6,-Math.PI/2,true);lamp(7.2,-0.1,0.77,1,2,'forest');shelves(3.18,-2.4,Math.PI/2,3.6,3.6,1,2,2);globe(4.0,4.6,1,2);
- at(1,3,3);chandelier(6,UF+4.0,0.6,1,3);wainscot('study');fireplace(7.0,-4.75,0,1,3);armchair(4.8,2.6,2.4,'leather');painting(8.83,UF+2.6,3.6,-Math.PI/2,1.1,1.4,17,1,3,true);
+ at(1,3,3);chandelier(6,UF+4.0,0.6,1,3);wainscot('study');fireplace(7.0,-4.75,0,1,3);armchair(4.8,2.6,2.4,'leather');painting(8.83,UF+2.6,1.8,-Math.PI/2,1.1,1.4,17,1,3,true);
  cyl('brass',8.0,UF+0.85,4.8,0.03,1.4,0,0.9,0);cyl('brass',8.0,UF+0.45,4.8,0.02,0.9,0,0,0.5);cyl('brass',8.2,UF+0.45,5.0,0.02,0.9,0,0,-0.5);cyl('brass',7.8,UF+0.45,5.0,0.02,0.9,0,0.5,0)}
 /* ---------- build, bake, show ---------- */
 shell();furnish();
@@ -568,7 +568,7 @@ function tick(t,you){const room=roomAt(you.x,you.z,you.feet);const up=you.feet>S
  near.sort((a,b)=>a[0]-b[0]);
  POOL.forEach((L,k)=>{const e=near[k];if(!e||e[0]>16){L.intensity=0;return}const s=e[1];L.position.set(s.x,s.y,s.z);let i=(KIND_I[s.kind]||1)*p.lamps;if(s.kind==='fire')i*=0.85+Math.sin(t*23+k)*0.1+Math.sin(t*7.3+k*2)*0.07;L.intensity=i;L.distance=s.kind==='candle'?5:s.kind==='chandelier'?11:9});
  return room}
-return {scene:INT,setLevels,levels:()=>LV.slice(),floorAt,floorPt,roomAt,tick,setPhase,R,DOOR:{x:0,z:5.3},ENTER_AT:{x:0,z:4.3},DESK:{x:-6.3,z:1.8},H:{GF,GH,UF,UH,SWITCH},PAINT,paintingTex,MT,sun,hemi,POOL,SPOTS}
+return {scene:INT,setLevels,levels:()=>LV.slice(),floorAt,floorPt,roomAt,tick,setPhase,R,DOOR:{x:0,z:5.3},ENTER_AT:{x:0,z:2.4},DESK:{x:-6.3,z:1.8},H:{GF,GH,UF,UH,SWITCH},PAINT,paintingTex,MT,sun,hemi,POOL,SPOTS}
 })();
 
 </script>
@@ -2603,7 +2603,7 @@ function enterHouse(){if(INSIDE)return;OUTPOS={x:you.x,z:you.z};INSIDE=true;hide
   you.x=INTERIOR.ENTER_AT.x;you.z=INTERIOR.ENTER_AT.z;you.feet=0;you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=0;you.face=0;you.pitch=-0.34;camDist=2.2;ROOM='hall';areaNow='';camera.fov=78;camera.updateProjectionMatrix();camera.position.set(0,2.8,INTERIOR.ENTER_AT.z+1.6);camera.rotation.set(-0.34,0,0);SND.knock();
   toast(L[0]?'Your house \u00B7 '+roomsWord()+'.':'The bare shell \u00B7 bring the builder 20 bundles for downstairs.')}
 function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g);scene.add(AV.g);hideAct();LOCK.kind=null;LOCK.id=-1;
-  you.x=OUTPOS?OUTPOS.x:DOORW.x;you.z=OUTPOS?OUTPOS.z:DOORW.z+0.8;you.feet=floorAtW(you.x,you.z);you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
+  you.x=DOORW.x;you.z=DOORW.z+2.9;you.feet=floorAtW(you.x,you.z);   /* 4.26: always out on the path, clear of the steps and the door prompt */you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
 function insideAct(){const L=roomLevels();
   if(you.feet<1&&!owns('sword')&&Math.hypot(you.x-SWORD_AT.x,you.z-SWORD_AT.z)<2.8){showAct('Take the sword.','takesword',null,null,'it hangs over the hearth',null,[SWORD_AT.x+0.4,2.6,SWORD_AT.z]);return}
   if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<2.0){showAct('Go outside.','leave',null,null,'the front door',null,[0,3.0,INTERIOR.DOOR.z+0.3]);return}
