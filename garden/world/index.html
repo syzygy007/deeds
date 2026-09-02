@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.27">
+<meta name="world-build" content="4.28">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -96,7 +96,7 @@ canvas{display:block;touch-action:none;cursor:default}
 #menu{position:fixed;right:18px;top:max(64px,calc(env(safe-area-inset-top) + 52px));z-index:26;display:none;flex-direction:column;gap:6px;background:rgba(21,19,14,.9);border:1px solid rgba(246,243,235,.3);border-radius:18px;padding:12px;min-width:210px;pointer-events:auto}
 #menu.on{display:flex}#menu .btn{width:100%;text-align:left;background:rgba(246,243,235,.06)}#menu .btn.on{background:var(--ivory);color:var(--ink)}#menu .mlabel{opacity:.55;margin:4px 0 2px;font-size:.56rem;letter-spacing:.2em}
 #lockchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:23;display:none;align-items:center;gap:7px;pointer-events:none;background:rgba(20,18,16,.72);color:#F6F3EB;border-radius:999px;padding:6px 12px;font:600 12px/1 ui-monospace,monospace;letter-spacing:.06em}#lockchip.on{display:flex}#lockchip.amber{color:#F3C64F}#lockchip svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.qbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}.qbtns .btn{padding:6px 10px;font-size:12px}
-#nightchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:24;display:none;pointer-events:none;background:rgba(20,18,16,.78);color:#F3C64F;border:1px solid rgba(243,198,79,.45);border-radius:999px;padding:8px 14px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap}#nightchip.on{display:block;animation:nightpulse .9s ease-in-out 3}#nightleft{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:22;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.9}#nightleft.on{display:block}@keyframes nightpulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+#nightchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:24;display:none;pointer-events:none;background:rgba(20,18,16,.78);color:#F3C64F;border:1px solid rgba(243,198,79,.45);border-radius:999px;padding:8px 14px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap}#nightchip.on{display:block;animation:nightpulse .9s ease-in-out 3}#nightleft{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:22;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.9}#nightleft.on{display:block}#floats{position:fixed;inset:0;pointer-events:none;z-index:38}#floats .fl{position:absolute;transform:translate(-50%,-50%);font:700 15px/1 ui-monospace,monospace;letter-spacing:.04em;color:#2ECB7A;text-shadow:0 1px 2px rgba(0,0,0,.55);white-space:nowrap;display:flex;align-items:center;gap:5px;animation:flrise 1.6s ease-out forwards}#floats .fl i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#2ECB7A;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}@keyframes flrise{0%{opacity:0;margin-top:6px}12%{opacity:1;margin-top:0}70%{opacity:1}100%{opacity:0;margin-top:-46px}}@keyframes nightpulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 #hearts{position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:23;display:none;gap:6px;pointer-events:none}#hearts.on{display:flex}#hearts i{width:24px;height:24px;display:block}#hearts i svg{width:24px;height:24px;fill:#C8322B;stroke:#3a0d0b;stroke-width:1.2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}#hearts i.off svg{fill:rgba(0,0,0,.35);stroke:#C8322B}
 #hurt{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(200,50,43,0) 42%,rgba(200,50,43,.62) 100%);opacity:0;transition:opacity .5s;z-index:30}#hurt.on{opacity:1;transition:opacity .06s}
 #dead{position:fixed;inset:0;background:#0b0a0d;color:#F4F1E8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;opacity:0;pointer-events:none;transition:opacity 1s;font-size:34px;letter-spacing:.01em;text-align:center;padding:0 24px}#dead.on{opacity:1;pointer-events:auto}#dead small{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.7;line-height:1.6}
@@ -188,7 +188,7 @@ canvas{display:block;touch-action:none;cursor:default}
 
 <div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
 <div id="status" class="micro"></div>
-<div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
+<div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="floats"></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SHOP</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
   <div class="tabs" id="stTabs"></div>
@@ -246,10 +246,11 @@ function wrap(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;retu
 let GRACE=0,BITES=0,PACKCOOL=0;   /* one bite at a time: the pack shares a two second cooldown; timers count down by dt, never by the clock */
 function tick(t,dt,ctx){ /* ctx: {x,z,night,stage,visit,inside,door:{x,z},onBite,onGrowl} */
   if(GRACE>0)GRACE-=dt;if(PACKCOOL>0)PACKCOOL-=dt;
-  const active=ctx.night&&ctx.stage>=3&&GRACE<=0;   /* 4.25: the stage is the garden's, so guests meet the owner's wolves too */
+  const active=ctx.night&&ctx.stage>=3&&GRACE<=0&&!ctx.done&&ctx.beast!=='skeleton';   /* 4.25 guests meet the owner's wolves; 4.28 five kills end the night, skeleton nights are theirs */
   if(active&&!list.length){spawn(3,ctx.x,ctx.z);if(ctx.onGrowl)ctx.onGrowl()}
   for(let i=list.length-1;i>=0;i--){const w=list[i];if(!w)continue;   /* a bite can clear the pack mid loop */
     if(w.dead){w.dead+=dt;w.g.rotation.z=Math.min(1.45,w.dead*4);w.g.position.y=floorAt(w.x,w.z)+0.1;if(w.dead>2.2){G.remove(w.g);list.splice(i,1)}continue}
+    if(w.burn>0){w.burn-=dt;w.g.rotation.z=Math.sin(t*40)*0.12;if(w.burn<=0){w.dead=0.001;w.st='dead';if(ctx.onBurnt)ctx.onBurnt(w);continue}}   /* 4.28: on fire, still coming, then down */
     if(!active){if(w.st!=='flee'){w.st='flee';w.fleeT=0}}
     const dx=ctx.x-w.x,dz=ctx.z-w.z,d=Math.hypot(dx,dz);
     let speed=0,want=w.face;
@@ -270,9 +271,10 @@ function tick(t,dt,ctx){ /* ctx: {x,z,night,stage,visit,inside,door:{x,z},onBite
     g.body.position.y=0.72+Math.abs(Math.sin(w.ph*2.2))*0.05*trot;g.head.rotation.x=w.st==='chase'?0.18:-0.05+Math.sin(w.ph*0.7)*0.06;g.tail.rotation.x=w.st==='chase'?0.15:0.5+Math.sin(w.ph)*0.15;
     g.head.children.forEach(c=>{if(c.material===M.eye)c.material.emissiveIntensity=ctx.night?1.6:0.2})}
 }
-function swing(x,z,face){let hit=null;list.forEach(w=>{if(w.dead)return;const dx=w.x-x,dz=w.z-z,d=Math.hypot(dx,dz);if(d>2.1)return;const a=Math.abs(wrap(Math.atan2(-dx,-dz)-face));if(a>1.45)return;if(!hit||d<hit.d)hit={w,d}});   /* 4.24: the front is -z of the figure; the old cone only caught wolves behind you */
-  if(!hit)return null;const w=hit.w;w.hp--;w.face=Math.atan2(x-w.x,z-w.z);w.hurt=0.55;w.cool=Math.max(w.cool,0.9);
-  if(w.hp<=0){w.dead=0.001;w.st='dead'}return {hp:w.hp,dead:w.hp<=0,left:list.filter(v=>!v.dead).length}}
+function swing(x,z,face,dmg,reach,arc){dmg=dmg||1;reach=reach||2.1;arc=arc||1.45;let hit=null;list.forEach(w=>{if(w.dead||w.burn>0)return;const dx=w.x-x,dz=w.z-z,d=Math.hypot(dx,dz);if(d>reach)return;const a=Math.abs(wrap(Math.atan2(-dx,-dz)-face));if(a>arc)return;if(!hit||d<hit.d)hit={w,d}});   /* 4.24: the front is -z of the figure; the old cone only caught wolves behind you */
+  if(!hit)return null;const w=hit.w;if(dmg==='burn'){w.hp=0;w.burn=2.0;w.face=Math.atan2(x-w.x,z-w.z);return {hp:0,dead:false,burning:true,w,left:list.filter(v=>!v.dead).length}}
+  w.hp-=dmg;w.face=Math.atan2(x-w.x,z-w.z);w.hurt=0.55;w.cool=Math.max(w.cool,0.9);
+  if(w.hp<=0){w.dead=0.001;w.st='dead'}return {hp:w.hp,dead:w.hp<=0,w,left:list.filter(v=>!v.dead).length}}
 function near(x,z,r){let best=null,bd=1e9;list.forEach(w=>{if(w.dead)return;const d=Math.hypot(w.x-x,w.z-z);if(d<bd){bd=d;best=w}});return best&&bd<=(r||2.6)?{w:best,d:bd}:null}
 function clear(){list.forEach(w=>G.remove(w.g));list.length=0}
 function init(scene,fa,ext){SC=scene;seed=(Date.now()%233280)||7;floorAt=fa||floorAt;if(ext)EXT=ext;scene.add(G)}
@@ -1455,6 +1457,7 @@ function toNight(){let s=dayT(),acc=0;for(const [nm,l] of DAYPH){if(nm==='night'
 const NIGHT_WARN=[[120,'growl'],[60,'alert'],[45,'howl'],[10,'howl']];let WARNED={},WARN_DAY=-1,nightT;
 function nightChip(m){const c=$('#nightchip');c.textContent=m;c.classList.add('on');clearTimeout(nightT);nightT=setTimeout(()=>c.classList.remove('on'),6000)}
 function nightWarn(){if(Date.now()<=PHPIN)return;const day=Math.floor(Date.now()/1000/DAY_S);if(day!==WARN_DAY){WARN_DAY=day;WARNED={}}
+  if(tonightBeast()==='skeleton'){if(!(houseLvl()>=3)||INSIDE)return;const l2=toNight();if(l2>0&&l2<=60&&!WARNED.still){WARNED.still=1;nightChip('A still night. The wolves come tomorrow.')}return}   /* 4.28: skeleton nights are quiet until the skeletons arrive */
   if(!(houseLvl()>=3)||INSIDE)return;const left=toNight();if(left<=0)return;
   for(const [at,kind] of NIGHT_WARN){if(WARNED[at]||left>at||left<at-14)continue;WARNED[at]=1;
     if(kind==='growl'){SND.growl();nightChip('The wolves are stirring. Two minutes.')}
@@ -2111,11 +2114,28 @@ const FIRE=new THREE.Group();FLAMEG.add(FIRE);const FIRE_P=[];
 function flameParticles(t,dt,on){FIRE_P.forEach(p=>{p.a+=dt*2.4;if(p.a>1)p.a-=1;const k=p.a;p.s.position.set(0.02+Math.sin(t*41+k*9)*0.1*k,-0.3+Math.sin(t*33+k*7)*0.08*k+k*0.4,0.8+k*2.8);const sc=0.16+k*0.85;p.s.scale.set(sc,sc,1);p.s.material.opacity=on?(1-k)*0.95:Math.max(0,p.s.material.opacity-dt*5)})}
 /* THE HEARTS, THE BITE, THE FALL */
 let HEARTS=3,DYING=false,SWING={t:0},FLAME={t:0},REGEN=0,WOLF_INIT=false,HEARTS_KEY='';
+/* 4.28: the night's beast comes from the day number (even nights wolves, odd nights skeletons, the server counts the same way); kills pay on the server, five a night */
+let BEAST_SRV=null,KILLS=0,KILLS_NIGHT=-1,KILL_CAP=5,WOLF_GC=50,SKEL_GC=40,SAW_T=0;
+function nightN(){return Math.floor(Date.now()/1000/DAY_S)}
+function tonightBeast(){return BEAST_SRV||(nightN()%2===0?'wolf':'skeleton')}
+function killsTonight(){if(KILLS_NIGHT!==nightN()){KILLS_NIGHT=nightN();KILLS=0}return KILLS}
+function nightDone(){return killsTonight()>=KILL_CAP}
+function floatGc(amount,wx,wy,wz){const host=$('#floats');if(!host)return;let x=innerWidth/2,y=innerHeight*0.3;
+  if(wx!=null){try{const v=new THREE.Vector3(wx,wy,wz).project(camera);if(v.z<1){x=(v.x+1)/2*innerWidth;y=(1-v.y)/2*innerHeight}}catch(e){}}
+  else{const c=$('#purse .gc');if(c){const r=c.getBoundingClientRect();x=r.left+r.width/2+28;y=r.bottom+14}}
+  const el=document.createElement('div');el.className='fl';el.innerHTML='<i></i>+'+(+amount).toLocaleString();el.style.left=x+'px';el.style.top=y+'px';host.appendChild(el);setTimeout(()=>el.remove(),1700)}
+function killBeast(kind,w){const wx=w?w.x:you.x,wz=w?w.z:you.z,wy=(w?floorAtW(w.x,w.z):you.feet)+1.4;const pay=kind==='wolf'?WOLF_GC:SKEL_GC;
+  const local=()=>{killsTonight();if(KILLS>=KILL_CAP)return;KILLS++;S.gc=(S.gc|0)+pay;save();renderHud();floatGc(pay,wx,wy,wz);ledger(kind==='wolf'?'A wolf':'A skeleton',pay,'the night');if(KILLS>=KILL_CAP)nightOver()};
+  if(!LIVE){local();return}if(!PATCH64){return}
+  RPC('beast_kill',{p_kind:kind,p_owner:VISIT?VISIT.owner:null}).then(r=>{const d=r.data||{};if(r.error||!d.ok){if(d.reason==='done'){KILLS=KILL_CAP;nightOver()}return}
+    if(d.balance!=null)S.gc=+d.balance;KILLS_NIGHT=nightN();KILLS=+d.kills||KILLS+1;renderHud();floatGc(+d.pay||pay,wx,wy,wz);ledger(kind==='wolf'?'A wolf':'A skeleton',+d.pay||pay,'the night');if(d.done)nightOver()}).catch(()=>{})}
+function nightOver(){WOLVES.clear();SND.howlAway&&SND.howlAway();toast('Five tonight. The pack gives up on you. The night is yours.')}
 function paintHearts(){const on=WOLVES.count()>0||HEARTS<3||DYING;const key=(on?1:0)+':'+HEARTS;if(key===HEARTS_KEY)return;HEARTS_KEY=key;$('#hearts').classList.toggle('on',on);
   $('#hearts').innerHTML=[0,1,2].map(i=>'<i'+(i<HEARTS?'':' class="off"')+'><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg></i>').join('')}
 const wolvesWord=n=>n===1?'one wolf':n+' wolves';
 function wolvesTick(t,dt){if(!WOLF_INIT){WOLVES.init(scene,floorAtW,EXT-4);WOLF_INIT=true}
-  if(!DYING)WOLVES.tick(t,dt,{x:you.x,z:you.z,night:ph==='night',stage:houseLvl(),visit:!!VISIT,inside:INSIDE,door:{x:DOORW.x,z:DOORW.z},onBite:wolfBite,prey:gardPrey(),onPrey:gardenerDeath,
+  if(SAW_T>0)SAW_T-=dt;
+  if(!DYING)WOLVES.tick(t,dt,{x:you.x,z:you.z,night:ph==='night',stage:houseLvl(),visit:!!VISIT,inside:INSIDE,door:{x:DOORW.x,z:DOORW.z},onBite:wolfBite,prey:gardPrey(),onPrey:gardenerDeath,done:nightDone(),beast:tonightBeast(),onBurnt:w=>{SND.bloom();killBeast('wolf',w)},
     onGrowl:()=>{SND.howl();toast(owns('sword')?'Wolves. They are out tonight.':VISIT?'Wolves. They are out tonight. Get inside.':'Wolves. They are out tonight. The sword hangs over the hearth.')},onNear:()=>SND.growlNear()});
   REGEN+=dt;if(HEARTS<3&&!DYING&&REGEN>(WOLVES.count()?30:12)){HEARTS++;REGEN=0}
   paintHearts();
@@ -2135,7 +2155,11 @@ function wolfDeath(){if(DYING)return;DYING=true;WOLVES.clear();WOLVES.grace(20);
     HEARTS=3;DYING=false;paintHearts();refresh();toast('You wake at your own front door. It is still night. Get inside.'+(fl||fish?' The wolves took what you carried.':''))},2800)}
 let SWORD_TIP=false;try{SWORD_TIP=localStorage.getItem('deeds_sword_tip')==='1'}catch(e){}
 function swingSword(){if(SWING.t>0||!owns('sword'))return;SWING.t=0.32;SND.rustle();if(!SWORD_TIP){SWORD_TIP=true;try{localStorage.setItem('deeds_sword_tip','1')}catch(e){}updateAct()}const r=WOLVES.swing(you.x,you.z,you.face);
-  if(!r){SND.knock();return}if(r.dead){SND.bloom();toast(r.left?'The wolf goes down.':'The last wolf goes down. The night is yours.')}else{SND.knock()}}
+  if(!r){SND.knock();return}if(r.dead){SND.bloom();killBeast('wolf',r.w);if(!r.left&&!nightDone())toast('The pack is down. More will come.')}else{SND.knock()}}
+/* 4.28: the chainsaw and the flamethrower fight too. Two strokes of the saw; the flame takes one, up close, and the wolf keeps coming while it burns */
+function sawStrike(){if(SAW_T>0||!owns('chainsaw'))return;SAW_T=0.5;SND.saw();const r=WOLVES.swing(you.x,you.z,you.face,2,2.1,1.45);if(!r){SND.knock();return}if(r.dead){SND.bloom();killBeast('wolf',r.w)}}
+function flameStrike(){if(FLAME.t>0||!owns('flamethrower'))return;FLAME.t=1.4;SND.saw();const r=WOLVES.swing(you.x,you.z,you.face,'burn',2.6,1.7);if(!r){SND.knock();return}SND.growlNear()}
+function beastNear(){return !!WOLVES.near(you.x,you.z,3.2)}
 function takeSword(){if(owns('sword'))return;S.tools=S.tools||{};S.tools.sword=1;save();SWORDWALL.visible=false;paintHotbar();renderHud();SND.buy(6);hideAct();
   toast('The sword is yours. Slot 8 in your hotbar. The wolves come at night.');if(LIVE)RPC('sword_take').catch(()=>{});setTool('sword')}
 function burnAt(plot){const p=S.plants[plot];if(!p||p.pending)return;if(LIVE&&!VISIT&&!PATCH64){SND.knock();toast('Run patch 64 on DEEDS first.');return}
@@ -2633,11 +2657,12 @@ const SPR_ICON='<svg viewBox="0 0 24 24" style="width:34px;height:34px;flex:none
 const GARD_ICON='<svg viewBox="0 0 24 24" style="width:34px;height:34px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><circle cx="9" cy="6" r="2.4"/><path d="M6 21v-6l3-3 3 3v6M4 8h10M15 4l5 5M20 9l-2 2M12 20h9"/></svg>';
 function estateHydrate(e){const E=EST(),was={coins:E.coins,sown:E.sown,dead:E.dead,gard:E.gard,flowers:E.flowers};
   E.spr=(e.sprinklers||[]).map(Number);E.gard=!!e.gardener;E.dead=!!e.gardener_dead;
-  if(e.gardeners!=null){E.n=+e.gardeners||0;E.nd=+e.gardeners_dead||0}else{E.n=E.gard?1:0;E.nd=E.dead?1:0}E.fence=!!e.fence;if(+e.fence_gc>0)FENCE_GC=+e.fence_gc;if(+e.gardeners_max>0)GARD_MAX=+e.gardeners_max;E.flowers=+e.gardener_flowers||0;E.coins=+e.gardener_coins||0;E.sown=+e.gardener_sown||0;E.deaths=+e.deaths||0;E.locks=+e.locks||0;
+  if(e.gardeners!=null){E.n=+e.gardeners||0;E.nd=+e.gardeners_dead||0}else{E.n=E.gard?1:0;E.nd=E.dead?1:0}E.fence=!!e.fence;
+  if(e.beast){BEAST_SRV=e.beast;KILLS_NIGHT=nightN();KILLS=+e.kills_tonight||0;if(+e.kill_cap>0)KILL_CAP=+e.kill_cap;if(+e.wolf_gc>0)WOLF_GC=+e.wolf_gc;if(+e.skeleton_gc>0)SKEL_GC=+e.skeleton_gc}if(+e.fence_gc>0)FENCE_GC=+e.fence_gc;if(+e.gardeners_max>0)GARD_MAX=+e.gardeners_max;E.flowers=+e.gardener_flowers||0;E.coins=+e.gardener_coins||0;E.sown=+e.gardener_sown||0;E.deaths=+e.deaths||0;E.locks=+e.locks||0;
   E.lock=e.locked&&+e.lock_s>0?Date.now()+(+e.lock_s)*1000:0;
   if(+e.sprinkler_gc>0)SPRINKLER_GC=+e.sprinkler_gc;if(+e.gardener_gc>0)GARDENER_GC=+e.gardener_gc;if(+e.cut>0)GARD_CUT=+e.cut;if(+e.lock_len>0)LOCK_S=+e.lock_len;
   const tk=e.tick||{};if(+tk.watered>0)sprinklerRain(E.spr);
-  if(was.gard&&E.coins>was.coins){SND.bloom();ledger('The gardener',E.coins-was.coins,'sold to Flora');toast('The gardener sold '+plural(E.flowers-was.flowers,'flower')+' \u00B7 +'+(E.coins-was.coins).toLocaleString()+' gardencoin.')}
+  if(was.gard&&E.coins>was.coins){SND.bloom();ledger('The gardener',E.coins-was.coins,'sold to Flora');const g0=GARDS.find(g=>g.on);floatGc(E.coins-was.coins,g0?g0.x:null,g0?floorAtW(g0.x,g0.z)+2.1:0,g0?g0.z:0)}   /* 4.28: green float, no box */
   else if(was.gard&&E.sown>was.sown)toast('The gardener planted '+plural(E.sown-was.sown,'bed')+'.');
   placeSprinklers();showGardeners();placeFence();paintLock();if(STORE_ON)renderTabs()}
 /* the lock */
@@ -2750,7 +2775,7 @@ function estateTickLocal(){const E=EST(),alive=gardAlive();if(!E.spr.length&&!al
     if(alive>b.q&&rp.stopped&&rp.flowers>=1){const c=Math.round(rp.value*RATE*GARD_CUT);p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.g=1;p.picks=(p.picks||0)+1;S.gc+=c;E.coins+=c;E.flowers+=rp.flowers;gc+=c;fl+=rp.flowers;pk++}});
   if(alive)BED.forEach(b=>{if(S.plants[b.plot]||b.q>=alive)return;const types=FLOWERS.filter(t=>S.sack[t]>0).sort((a,c)=>CAT[c].price-CAT[a].price);if(!types.length)return;const t=types[0];S.sack[t]--;S.plants[b.plot]={t,g:0,cy:snow(),est:false,boost:0,watered:false};E.sown++;sn++});
   if(w)sprinklerRain(E.spr);
-  if(pk){SND.bloom();ledger('The gardener',gc,'sold to Flora');toast('The gardener sold '+plural(fl,'flower')+' \u00B7 +'+gc.toLocaleString()+' gardencoin.')}else if(sn)toast('The gardener planted '+plural(sn,'bed')+'.');
+  if(pk){SND.bloom();ledger('The gardener',gc,'sold to Flora');const g0=GARDS.find(g=>g.on);floatGc(gc,g0?g0.x:null,g0?floorAtW(g0.x,g0.z)+2.1:0,g0?g0.z:0)}else if(sn)toast('The gardener planted '+plural(sn,'bed')+'.');
   if(w||pk||sn){save();plantBeds();renderHud();if(STORE_ON)renderTabs()}}
 function tickEstate(t,dt){lockTick(dt);tickGardener(t,dt);SPRG.forEach(g=>{if(g.visible)g.head.rotation.y+=dt*2.6});
   EST_T+=dt;if(EST_T>(LIVE?45:6)){EST_T=0;if(!VISIT){if(LIVE){if(PATCH62&&(EST().spr.length||gardAlive())&&!document.hidden)refresh()}else estateTickLocal()}}}
@@ -2826,6 +2851,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(TOOL==='rocket'){const q=quadHere();if(q==null){showAct('Walk into a quadrant to fire the rocket.',null,null,null,null,null,[you.x,you.feet+2.15,you.z]);return}
     const n=ripeIn(q).length;if(n)showAct('Fire at quadrant '+(q+1)+' \u00B7 '+plural(n,'ripe bed')+'.','rocket',q,null,'every ripe bed in it, picked at once',null,[QC[q].x,2.2,QC[q].z]);else showAct('Nothing ripe in quadrant '+(q+1)+'.',null,null,null,null,null,[QC[q].x,2.2,QC[q].z]);return}
   if(TOOL==='sword'){if(!SWORD_TIP)showAct('Tap to swing.',null,null,null,'',null,[you.x,you.feet+2.15,you.z]);else hideAct();return}   /* 4.24: the tip shows until the first swing, then the sword speaks for itself */
+  if((TOOL==='flamethrower'||TOOL==='chainsaw')&&beastNear()){showAct('Tap to strike.',null,null,null,TOOL==='chainsaw'?'two strokes':'one burst, it keeps coming while it burns',null,[you.x,you.feet+2.15,you.z]);return}
   if(TOOL==='flamethrower'){const at=[you.x,you.feet+2.15,you.z];if(T.kind!=='bed'){showAct('Walk up to a bed to burn it.',null,null,null,VISIT?'':'yours or a friend\u2019s',null,at);return}const b=BED[T.id],p=S.plants[b.plot],bat=[b.cx,1.55,b.cz];
     if(!p||p.pending){showAct('Nothing planted in bed '+(b.plot+1)+'.',null,null,null,null,null,bat);return}const rp=ripe(p);
     if(rp.flowers<1){showAct('Nothing ripe to burn in bed '+(b.plot+1)+'.',null,null,null,CAT[p.t].n+' blooms in '+mmss(rp.next),null,bat);return}showAct('Burn bed '+(b.plot+1)+' \u00B7 '+plural(rp.flowers,'bloom')+'.','burn',b.plot,null,'the harvest, never the plant',null,bat);return}
@@ -2924,6 +2950,7 @@ function bedAt(hx,hz){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];
 /* tap the flowers: a tap on a bed picks it, or sows it when it is empty; a tap on a stall opens it; on a plinth it chisels */
 function tapAt(cx,cy){if(STORE_ON||BLOOM||INSIDE||$('#forms').classList.contains('on'))return false;
   if(TOOL==='sword'&&owns('sword')){swingSword();return true}   /* 4.24: sword out = every tap on the world is a swing */
+  if(TOOL==='chainsaw'&&owns('chainsaw')&&beastNear()){sawStrike();return true}if(TOOL==='flamethrower'&&owns('flamethrower')&&beastNear()){flameStrike();return true}   /* 4.28: a wolf in reach takes the tap */
   const h=rayHit(cx,cy);if(!h)return false;const [hx,hz]=h;
   const best=bedAt(hx,hz);
   if(best){const reach=bedDist(best);
@@ -3128,7 +3155,7 @@ function nameSprite(text){const c=cv(320,80),g=c.getContext('2d');const t=String
 const hashId=s=>{let h=7;for(let i=0;i<(s||'').length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h};
 /* ---------- the door router: at home the door itself, in a friend's garden the same door run as the owner ---------- */
 const SPEND=['sprinkler_buy','gardener_hire','house_lock','gardener_kill','seed_buy2','tool_buy','thing_buy2','tree_plant','gc_buy','chest_open','garden_dig','garden_clear','seed_buy','thing_buy','seed_sell'];
-const DIRECT=['garden_burn','garden_burn2','garden_burn3','sword_take','wolf_kill','wolf_kill2','tree_gift','thing_gift'];   /* 4.25: gifts and guest deaths too */   /* 4.18: these doors already know whose garden they act on */
+const DIRECT=['garden_burn','garden_burn2','garden_burn3','sword_take','wolf_kill','wolf_kill2','tree_gift','thing_gift','beast_kill'];   /* 4.25: gifts and guest deaths too */   /* 4.18: these doors already know whose garden they act on */
 function RPC(fn,args){args=args||{};
   if(DIRECT.indexOf(fn)>=0)return Promise.resolve(sb.rpc(fn,args)).then(r=>{if(/^garden_burn|_gift$/.test(fn)&&!r.error&&r.data&&r.data.ok!==false)announce(fn,args,r.data);return r});
   if(VISIT&&PATCH64&&fn==='seed_buy2')return Promise.resolve(sb.rpc(fn,args)).then(r=>{if(!r.error&&r.data&&r.data.ok!==false)announce(fn,args,r.data);return r});   /* 4.25: your own sack, your own purse */
@@ -3225,7 +3252,7 @@ function showAway(rows){if(!rows||!rows.length||VISIT)return;let since=0;try{sin
   const lines=Object.entries(by).map(([h,fns])=>h+' '+Object.entries(fns).map(([fn,n])=>{const w=NAME[fn]||[fn,fn+' N times'];return n===1?w[0]:w[1].replace('N',String(n))}).join(', '));
   setTimeout(()=>toast('While you were away: '+lines.join('. ')+'.'),2600)}
 
-window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,friendTool,friendKite,SPRG,estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS};
+window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
