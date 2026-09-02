@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.26">
+<meta name="world-build" content="4.27">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1463,7 +1463,7 @@ function nightWarn(){if(Date.now()<=PHPIN)return;const day=Math.floor(Date.now()
 let PHPIN=QS.get('phase')&&PH[QS.get('phase')]?Infinity:0;
 function clockTick(){if(Date.now()>PHPIN){const nm=livePhase();if(nm!==ph){ph=nm;applyPhase();updateAct()}}nightWarn();nightClock()}
 /* 4.25: while it is night a small clock counts down to dawn */
-let NIGHTLEFT_T='';function nightClock(){const el=$('#nightleft');if(!el)return;if(ph!=='night'){el.classList.remove('on');return}const pinned=Date.now()<=PHPIN&&PHPIN!==Infinity;
+let NIGHTLEFT_T='';function nightClock(){const el=$('#nightleft');if(!el)return;if(ph!=='night'||houseLvl()<3){el.classList.remove('on');return}   /* 4.27: no clock until the threat is there */const pinned=Date.now()<=PHPIN&&PHPIN!==Infinity;
   const sLeft=pinned?Math.ceil((PHPIN-Date.now())/1000):Math.ceil(phaseLeft());const txt='NIGHT \u00B7 '+mmss(Math.max(0,sLeft));if(txt!==NIGHTLEFT_T){NIGHTLEFT_T=txt;el.textContent=txt}el.classList.add('on')}
 let ph=QS.get('phase')&&PH[QS.get('phase')]?QS.get('phase'):livePhase();
 const skyMat=new THREE.MeshBasicMaterial({side:THREE.BackSide,fog:false,depthWrite:false});
@@ -3147,7 +3147,7 @@ function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();pingStart(ow
     ch.on('presence',{event:'sync'},()=>{onPresence(ch.presenceState())})
       .on('broadcast',{event:'pos'},m=>onPos(m&&m.payload))
       .on('broadcast',{event:'act'},m=>onAct(m&&m.payload))
-      .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;try{ch.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',tool:TOOL,kite:KITE.up,av:lookOut(),t:Date.now()})}catch(e){}}});
+      .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;try{ch.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',tool:TOOL,kite:KITE.up,in:INSIDE?1:0,feet:INSIDE?+you.feet.toFixed(2):0,av:lookOut(),t:Date.now()})}catch(e){}}});
     PRES=ch};
   if(MYHANDLE)go();else sb.from('profiles').select('handle').eq('id',ME).limit(1).then(r=>{const p=r.data&&r.data[0];if(p&&p.handle)MYHANDLE=p.handle;go()}).catch(go)}
 function leaveGarden(){if(PRES){try{sb.removeChannel(PRES)}catch(e){}PRES=null;PRESOK=false}Object.keys(FR).forEach(dropFriend);PRESENCE={}}
@@ -3164,7 +3164,9 @@ function onPresence(state){state=state||{};const seen={};Object.keys(state).forE
   if(VISIT&&n>=4&&!FULLT){FULLT=1;SND.knock();toast('The garden is full. Four at a time.');setTimeout(()=>{location.href=location.pathname},1800);return}
   syncFriends()}
 function onPos(p){if(!p||!p.id||p.id===ME)return;const f=FR[p.id];if(!f){if(!PRESENCE[p.id])PRESENCE[p.id]={id:p.id,h:p.h||''};syncFriends()}const g=FR[p.id];if(!g)return;
-  g.tx=+p.x||0;g.tz=+p.z||0;g.tyaw=+p.yaw||0;g.moving=!!p.m;g.last=performance.now();if(p.h)g.h=p.h;if(p.k!==undefined&&g.pk!==(p.k||'')){g.pk=p.k||'';attachPack(g.av,g.pk)}if(p.tool!==undefined&&g.tool!==(p.tool||'hand')){g.tool=p.tool||'hand';friendTool(g)}if(p.kite!==undefined)g.kite=!!p.kite}
+  g.tx=+p.x||0;g.tz=+p.z||0;g.tyaw=+p.yaw||0;g.moving=!!p.m;g.last=performance.now();if(p.h)g.h=p.h;if(p.k!==undefined&&g.pk!==(p.k||'')){g.pk=p.k||'';attachPack(g.av,g.pk)}if(p.tool!==undefined&&g.tool!==(p.tool||'hand')){g.tool=p.tool||'hand';friendTool(g)}if(p.kite!==undefined)g.kite=!!p.kite;if(p.in!==undefined){const was=!!g.tin;g.tin=!!p.in;g.tfeet=+p.feet||0;if(g.tin!==was){g.x=g.tx;g.z=g.tz;g.feet=g.tfeet}}}
+/* 4.27: a friend who walks into the house leaves the garden scene and appears in the rooms (you see them when you are inside too); out again the same way */
+function friendScene(f){const want=f.tin?INTERIOR.scene:scene;if(f.sceneIn===want)return;try{if(f.av.g.parent)f.av.g.parent.remove(f.av.g);want.add(f.av.g)}catch(e){}f.sceneIn=want;if(f.kiteG)f.kiteG.visible=false}
 /* 4.25: what a friend holds. A clone of the same tool group hangs off their right forearm; a kite flies over them */
 const TOOLSRC={sword:()=>SWORDG,flamethrower:()=>FLAMEG,rocket:()=>ROCKETG,launcher:()=>LAUNCHG,chainsaw:()=>SAWG,bubbles:()=>BUBBLEG,can:()=>CANG};
 function friendTool(f){if(f.toolG){try{f.toolG.parent&&f.toolG.parent.remove(f.toolG)}catch(e){}f.toolG=null}const mk=TOOLSRC[f.tool];const fore=f.av&&f.av.armR&&f.av.armR.fore;if(!mk||!fore)return;
@@ -3177,19 +3179,20 @@ function onAct(p){if(!p||!p.id||p.id===ME)return;const who=(p.h||PRESENCE[p.id]&
 function syncFriends(){Object.keys(PRESENCE).forEach(id=>{if(FR[id]){const p=PRESENCE[id];if(FR[id].pk!==(p.k||'')){FR[id].pk=p.k||'';attachPack(FR[id].av,FR[id].pk)}if(p.av&&p.av.eq&&FR[id].av.toy&&FR[id].av.lookKey!==lookKey(p.av))dressToy(FR[id].av,p.av);return}const p=PRESENCE[id];const av=makeGardener(OUTFITS[1+hashId(id)%3],lookOfPresence(p,id));if(p.k&&PACKS[p.k])attachPack(av,p.k);const x=+p.x||0,z=+p.z||0;
     const f={id,h:p.h||'',av,x,z,yaw:+p.yaw||0,tx:x,tz:z,tyaw:+p.yaw||0,moving:false,last:performance.now(),label:nameSprite(p.h||'friend')};
     f.label.position.set(0,av.toy?2.08:2.25,0);av.g.add(f.label);av.g.position.set(x,floorAt(x,z),z);FR[id]=f;
-    if(p.tool&&p.tool!=='hand'){f.tool=p.tool;friendTool(f)}f.kite=!!p.kite;
+    if(p.tool&&p.tool!=='hand'){f.tool=p.tool;friendTool(f)}f.kite=!!p.kite;f.tin=!!p.in;f.tfeet=+p.feet||0;f.feet=f.tfeet;f.sceneIn=scene;
     if(!f.h)return;toast(f.h+' is here.')});
   Object.keys(FR).forEach(id=>{if(!PRESENCE[id])dropFriend(id)})}
 function dropFriend(id){const f=FR[id];if(!f)return;scene.remove(f.av.g);if(f.kiteG)scene.remove(f.kiteG);f.av.g.traverse(o=>{if(o.material&&o.material.map)o.material.map.dispose()});if(f.av.toy&&f.av.fig){try{Figure.dispose(f.av.fig)}catch(e){}}delete FR[id]}
 function friendsTick(dt){const k=Math.min(1,dt*9);Object.values(FR).forEach(f=>{f.x+=(f.tx-f.x)*k;f.z+=(f.tz-f.z)*k;f.yaw+=wrapA(f.tyaw-f.yaw)*k;
     const sp=f.moving?3.2:0;f.av.ph+=dt*(1.4+sp*1.9);const walk=f.moving?1:0;const sw=Math.sin(f.av.ph)*0.66*walk;
     f.av.legL.rotation.x=sw;f.av.legR.rotation.x=-sw;f.av.armL.rotation.x=-sw*0.75;f.av.armR.rotation.x=sw*0.75;
-    f.av.g.position.set(f.x,floorAt(f.x,f.z)+Math.abs(Math.sin(f.av.ph))*0.045*walk,f.z);f.av.g.rotation.y=f.yaw;
-    friendKite(f,dt);if(f.moving&&performance.now()-f.last>1500)f.moving=false})}
+    friendScene(f);if(f.tin){f.feet=(f.feet==null?f.tfeet:f.feet)+((f.tfeet||0)-(f.feet||0))*k}
+    f.av.g.position.set(f.x,(f.tin?(f.feet||0):floorAt(f.x,f.z))+Math.abs(Math.sin(f.av.ph))*0.045*walk,f.z);f.av.g.rotation.y=f.yaw;
+    if(!f.tin)friendKite(f,dt);if(f.moving&&performance.now()-f.last>1500)f.moving=false})}
 /* your own position, a few times a second while it changes */
-function pulsePos(now,sp){if(!PRES||!PRESOK||INSIDE)return;const moving=sp>0.05;const cur={x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),m:moving,tool:TOOL,kite:KITE.up,k:S.worn||''};
+function pulsePos(now,sp){if(!PRES||!PRESOK)return;const moving=sp>0.05;const cur={x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),m:moving,tool:TOOL,kite:KITE.up,k:S.worn||'',in:INSIDE?1:0,feet:INSIDE?+you.feet.toFixed(2):0};   /* 4.27: inside the house the coordinates are the house's own */
   if(POSLAST&&now-POSAT<250)return;
-  if(POSLAST&&Math.abs(POSLAST.x-cur.x)<0.03&&Math.abs(POSLAST.z-cur.z)<0.03&&Math.abs(POSLAST.yaw-cur.yaw)<0.05&&POSLAST.m===cur.m&&POSLAST.tool===cur.tool&&POSLAST.kite===cur.kite&&POSLAST.k===cur.k)return;
+  if(POSLAST&&Math.abs(POSLAST.x-cur.x)<0.03&&Math.abs(POSLAST.z-cur.z)<0.03&&Math.abs(POSLAST.yaw-cur.yaw)<0.05&&POSLAST.m===cur.m&&POSLAST.tool===cur.tool&&POSLAST.kite===cur.kite&&POSLAST.k===cur.k&&POSLAST.in===cur.in&&Math.abs((POSLAST.feet||0)-(cur.feet||0))<0.05)return;
   POSAT=now;POSLAST=cur;try{PRES.send({type:'broadcast',event:'pos',payload:Object.assign({id:ME,h:MYHANDLE},cur)})}catch(e){}}
 /* ---------- the visit itself ---------- */
 function visitState(handle){return Promise.resolve(sb.from('profiles').select('id,handle').ilike('handle',handle).limit(1)).then(r=>{const p=r.data&&r.data[0];
