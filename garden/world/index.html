@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="4.23">
+<meta name="world-build" content="4.24">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -96,6 +96,7 @@ canvas{display:block;touch-action:none;cursor:default}
 #menu{position:fixed;right:18px;top:max(64px,calc(env(safe-area-inset-top) + 52px));z-index:26;display:none;flex-direction:column;gap:6px;background:rgba(21,19,14,.9);border:1px solid rgba(246,243,235,.3);border-radius:18px;padding:12px;min-width:210px;pointer-events:auto}
 #menu.on{display:flex}#menu .btn{width:100%;text-align:left;background:rgba(246,243,235,.06)}#menu .btn.on{background:var(--ivory);color:var(--ink)}#menu .mlabel{opacity:.55;margin:4px 0 2px;font-size:.56rem;letter-spacing:.2em}
 #lockchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:23;display:none;align-items:center;gap:7px;pointer-events:none;background:rgba(20,18,16,.72);color:#F6F3EB;border-radius:999px;padding:6px 12px;font:600 12px/1 ui-monospace,monospace;letter-spacing:.06em}#lockchip.on{display:flex}#lockchip.amber{color:#F3C64F}#lockchip svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.qbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}.qbtns .btn{padding:6px 10px;font-size:12px}
+#nightchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:24;display:none;pointer-events:none;background:rgba(20,18,16,.78);color:#F3C64F;border:1px solid rgba(243,198,79,.45);border-radius:999px;padding:8px 14px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap}#nightchip.on{display:block;animation:nightpulse .9s ease-in-out 3}@keyframes nightpulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 #hearts{position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:23;display:none;gap:6px;pointer-events:none}#hearts.on{display:flex}#hearts i{width:24px;height:24px;display:block}#hearts i svg{width:24px;height:24px;fill:#C8322B;stroke:#3a0d0b;stroke-width:1.2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}#hearts i.off svg{fill:rgba(0,0,0,.35);stroke:#C8322B}
 #hurt{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(200,50,43,0) 42%,rgba(200,50,43,.62) 100%);opacity:0;transition:opacity .5s;z-index:30}#hurt.on{opacity:1;transition:opacity .06s}
 #dead{position:fixed;inset:0;background:#0b0a0d;color:#F4F1E8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;opacity:0;pointer-events:none;transition:opacity 1s;font-size:34px;letter-spacing:.01em;text-align:center;padding:0 24px}#dead.on{opacity:1;pointer-events:auto}#dead small{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.7;line-height:1.6}
@@ -187,7 +188,7 @@ canvas{display:block;touch-action:none;cursor:default}
 
 <div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
 <div id="status" class="micro"></div>
-<div id="hearts"></div><div id="lockchip"></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
+<div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SHOP</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
   <div class="tabs" id="stTabs"></div>
@@ -269,7 +270,7 @@ function tick(t,dt,ctx){ /* ctx: {x,z,night,stage,visit,inside,door:{x,z},onBite
     g.body.position.y=0.72+Math.abs(Math.sin(w.ph*2.2))*0.05*trot;g.head.rotation.x=w.st==='chase'?0.18:-0.05+Math.sin(w.ph*0.7)*0.06;g.tail.rotation.x=w.st==='chase'?0.15:0.5+Math.sin(w.ph)*0.15;
     g.head.children.forEach(c=>{if(c.material===M.eye)c.material.emissiveIntensity=ctx.night?1.6:0.2})}
 }
-function swing(x,z,face){let hit=null;list.forEach(w=>{if(w.dead)return;const dx=w.x-x,dz=w.z-z,d=Math.hypot(dx,dz);if(d>2.1)return;const a=Math.abs(wrap(Math.atan2(dx,dz)-face));if(a>1.25)return;if(!hit||d<hit.d)hit={w,d}});
+function swing(x,z,face){let hit=null;list.forEach(w=>{if(w.dead)return;const dx=w.x-x,dz=w.z-z,d=Math.hypot(dx,dz);if(d>2.1)return;const a=Math.abs(wrap(Math.atan2(-dx,-dz)-face));if(a>1.45)return;if(!hit||d<hit.d)hit={w,d}});   /* 4.24: the front is -z of the figure; the old cone only caught wolves behind you */
   if(!hit)return null;const w=hit.w;w.hp--;w.face=Math.atan2(x-w.x,z-w.z);w.hurt=0.55;w.cool=Math.max(w.cool,0.9);
   if(w.hp<=0){w.dead=0.001;w.st='dead'}return {hp:w.hp,dead:w.hp<=0,left:list.filter(v=>!v.dead).length}}
 function near(x,z,r){let best=null,bd=1e9;list.forEach(w=>{if(w.dead)return;const d=Math.hypot(w.x-x,w.z-z);if(d<bd){bd=d;best=w}});return best&&bd<=(r||2.6)?{w:best,d:bd}:null}
@@ -1443,13 +1444,24 @@ const PH={
   night :{cloud:0x3e4b70,sky:null,grad:['#02050F','#050A20','#0B1430','#141F44','#1E2C55','#2C3A66'],hz:'#26325A',tint:0x8494c4,skyTint:0xffffff,fog:'#1e2a4a',fogN:22,fogF:120,sun:[0.5,0.7,-0.5],sunI:0.28,sunC:0xa9bfff,hemiI:0.35,hemiS:0x3a4e88,hemiG:0x101a12,orb:'moon',stars:1,lamp:1.6}
 };
 const ORDER=['dawn','day','golden','dusk','night'];
-/* 4.23: the day is twelve minutes for everyone, the same minute everywhere: 45 s of dawn, 5.5 min of day, a minute of golden, 45 s of dusk, 4 min of night */
-const DAY_S=720,DAYPH=[['dawn',45],['day',330],['golden',60],['dusk',45],['night',240]];
+/* 4.24: the day is eight minutes for everyone, the same minute everywhere: 45 s of dawn, 3 min of day, 30 s of golden, 45 s of dusk, 3 min of night */
+const DAY_S=480,DAYPH=[['dawn',45],['day',180],['golden',30],['dusk',45],['night',180]];
 function dayT(){return ((Date.now()/1000)%DAY_S+DAY_S)%DAY_S}
 function livePhase(){let s=dayT();for(const [nm,l] of DAYPH){if(s<l)return nm;s-=l}return 'night'}
 function phaseLeft(){let s=dayT();for(const [nm,l] of DAYPH){if(s<l)return l-s;s-=l}return 0}
+/* 4.24: seconds until night falls on the shared clock (0 during night) */
+function toNight(){let s=dayT(),acc=0;for(const [nm,l] of DAYPH){if(nm==='night')return Math.max(0,acc-s);acc+=l}return 0}
+/* the wolves announce themselves: a growl two minutes out, the words at one, a howl at 45 s and again at 10 s; only when a pack will come (mansion stands, your own garden) */
+const NIGHT_WARN=[[120,'growl'],[60,'alert'],[45,'howl'],[10,'howl']];let WARNED={},WARN_DAY=-1,nightT;
+function nightChip(m){const c=$('#nightchip');c.textContent=m;c.classList.add('on');clearTimeout(nightT);nightT=setTimeout(()=>c.classList.remove('on'),6000)}
+function nightWarn(){if(Date.now()<=PHPIN)return;const day=Math.floor(Date.now()/1000/DAY_S);if(day!==WARN_DAY){WARN_DAY=day;WARNED={}}
+  if(!(houseLvl()>=3)||VISIT||INSIDE)return;const left=toNight();if(left<=0)return;
+  for(const [at,kind] of NIGHT_WARN){if(WARNED[at]||left>at||left<at-14)continue;WARNED[at]=1;
+    if(kind==='growl'){SND.growl();nightChip('The wolves are stirring. Two minutes.')}
+    else if(kind==='alert'){SND.growl();nightChip('One minute until night.')}
+    else{SND.howl();nightChip(at>20?'The wolves are howling. 45 seconds.':'Ten seconds. Get inside or draw the sword.')}}}
 let PHPIN=QS.get('phase')&&PH[QS.get('phase')]?Infinity:0;
-function clockTick(){if(Date.now()>PHPIN){const nm=livePhase();if(nm!==ph){ph=nm;applyPhase();updateAct()}}}
+function clockTick(){if(Date.now()>PHPIN){const nm=livePhase();if(nm!==ph){ph=nm;applyPhase();updateAct()}}nightWarn()}
 let ph=QS.get('phase')&&PH[QS.get('phase')]?QS.get('phase'):livePhase();
 const skyMat=new THREE.MeshBasicMaterial({side:THREE.BackSide,fog:false,depthWrite:false});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(330,48,20,0,Math.PI*2,0,Math.PI*0.5),skyMat);sky.renderOrder=-2;scene.add(sky);
@@ -1751,7 +1763,16 @@ const SND=(()=>{
       SAWN.g.gain.setTargetAtTime(0.045+u*0.14,T,0.07);SAWN.ng.gain.setTargetAtTime(0.018+u*0.1,T,0.07);SAWN.f.frequency.setTargetAtTime(700+u*1800,T,0.09)},
     sawOff(){if(!SAWN)return;const S2=SAWN;SAWN=null;if(!AC)return;const T=AC.currentTime;try{S2.g.gain.setTargetAtTime(0.0001,T,0.09);S2.ng.gain.setTargetAtTime(0.0001,T,0.09);setTimeout(()=>{try{S2.o.stop();S2.o2.stop()}catch(e){}},420)}catch(e){}},
     bubbles(){puff(0,0.35,0.07,true,1400,0.5);[0,0.08,0.17,0.27].forEach((t0,i)=>tone(1200+i*180,t0,0.12,0.035,'sine',1500+i*200))},
-    pop(){if(!gate('pop',70))return;tone(1800+Math.random()*900,0,0.05,0.04,'sine',600);puff(0,0.03,0.05,true,3200,1.2)}
+    pop(){if(!gate('pop',70))return;tone(1800+Math.random()*900,0,0.05,0.04,'sine',600);puff(0,0.03,0.05,true,3200,1.2)},
+    /* the wolves: a growl is a low tremolo drone under a throat of noise; a howl is one wolf sliding up and falling, a second answering lower */
+    growl(){const a=ctx();if(!a)return;const T=a.currentTime,o=a.createOscillator(),g=a.createGain(),f=a.createBiquadFilter(),l=a.createOscillator(),lg=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(58,T);o.frequency.linearRampToValueAtTime(48,T+0.9);
+      f.type='lowpass';f.frequency.value=420;l.type='sine';l.frequency.value=19;lg.gain.value=0.05;l.connect(lg);lg.connect(g.gain);
+      g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(0.11,T+0.12);g.gain.setValueAtTime(0.11,T+0.7);g.gain.exponentialRampToValueAtTime(0.0001,T+1.05);o.connect(f);f.connect(g);g.connect(BUS);o.start(T);l.start(T);o.stop(T+1.1);l.stop(T+1.1);
+      puff(0.05,0.95,0.06,true,300,1.2);vibe([40,60,40])},
+    howl(){const a=ctx();if(!a)return;const one=(t0,base,gain)=>{const T=a.currentTime+t0,o=a.createOscillator(),g=a.createGain(),v=a.createOscillator(),vg=a.createGain();o.type='sine';o.frequency.setValueAtTime(base,T);o.frequency.exponentialRampToValueAtTime(base*2.3,T+0.55);o.frequency.setValueAtTime(base*2.3,T+1.1);o.frequency.exponentialRampToValueAtTime(base*1.5,T+2.2);
+        v.type='sine';v.frequency.value=5.5;vg.gain.value=base*0.06;v.connect(vg);vg.connect(o.frequency);
+        g.gain.setValueAtTime(0.0001,T);g.gain.exponentialRampToValueAtTime(gain,T+0.3);g.gain.setValueAtTime(gain,T+1.3);g.gain.exponentialRampToValueAtTime(0.0001,T+2.3);o.connect(g);g.connect(BUS);o.start(T);v.start(T);o.stop(T+2.4);v.stop(T+2.4)};
+      one(0,220,0.07);one(0.7,165,0.05);vibe([60,80,60])}
   }})();
 addEventListener('pointerdown',()=>SND.unlock(),{once:true});
 addEventListener('keydown',()=>SND.unlock(),{once:true});
@@ -1796,8 +1817,8 @@ const SAP_IMG='data:image/webp;base64,UklGRgZMAABXRUJQVlA4WAoAAAAQAAAAmwAAZwEAQU
 function buyTool(k){const t=TOOLS[k];if(!t||S.tools[k])return;const cost=gcv(t.dc);
   const done=()=>{S.tools[k]=1;save();paintBar();renderHud();SND.buy(8);closeStore();setTool(k);toast('The '+t.n.toLowerCase()+' is yours. Slot '+t.slot+' in your hotbar.')};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC(k==='flamethrower'?'flame_buy':'tool_buy',k==='flamethrower'?{}:{p_kind:k}).then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger(t.n,-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+      if(r.error){renderTabs();const m=String(r.error.message||r.error.hint||r.error.code||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper said: '+(m||'nothing')));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger(t.n,-cost,'the Keeper');done()}).catch(e=>{BUSY=false;renderTabs();toast('The Keeper did not answer: '+String(e&&e.message||e))});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger(t.n,-cost,'the Keeper');done()}
 function buyPack(){if(S.packs.pack_basic)return;const cost=PACK_GC;
   const done=()=>{S.packs.pack_basic=1;WOOD_CAPS=null;if(!S.worn){S.worn='pack_basic';setPack('pack_basic')}save();paintHotbar();renderHud();SND.buy(10);closeStore();toast('The backpack is on your back. Your tools ride in it now, and it carries five bundles of wood.')};
@@ -2056,7 +2077,7 @@ function renderFan(){const ks=['can','rocket','launcher','chainsaw','bubbles','k
 function paintBar(){$$('#bar .slot').forEach(b=>{const t=b.dataset.tool;if(!t){b.classList.toggle('on',TOOL!=='hand'&&anyPack());return}b.classList.toggle('off',!!TOOLS[t]&&!owns(t));b.classList.toggle('on',TOOL===t)});ROCKETG.visible=TOOL==='rocket';LAUNCHG.visible=TOOL==='launcher';SAWG.visible=TOOL==='chainsaw';BUBBLEG.visible=TOOL==='bubbles';SWORDG.visible=TOOL==='sword';FLAMEG.visible=TOOL==='flamethrower';SWORDWALL.visible=!owns('sword')}
 function setTool(t){if(!t||(TOOLS[t]&&!owns(t)))t='hand';if(t==='can'){if(!CAN)setCan(true);return}if(CAN){setCan(false)}const was=TOOL;TOOL=t;if(t!=='kite'&&KITE.up)flyKite();if(t==='chainsaw'&&was!=='chainsaw')SND.sawOn();if(t!=='chainsaw'&&was==='chainsaw'){SND.sawOff();cutEnd()}paintBar();updateAct()}
 /* the guns in hand, on the right forearm like the can */
-const SWORDG=new THREE.Group();AV.armR.fore.add(SWORDG);SWORDG.visible=false;SWORDG.position.set(0.02,-0.3,0.1);SWORDG.rotation.x=-0.2;
+const SWORDG=new THREE.Group();AV.armR.fore.add(SWORDG);SWORDG.visible=false;SWORDG.position.set(0.02,-0.3,0.1);SWORDG.rotation.set(0.2,Math.PI,0);   /* 4.24: every tool turned to face the front (-z of the hand frame, where the can's spout points) */
 {const steel=new THREE.MeshStandardMaterial({color:0xd9dde3,roughness:0.25,metalness:0.85}),brass=new THREE.MeshStandardMaterial({color:0xb08d3c,roughness:0.4,metalness:0.7}),grip=new THREE.MeshStandardMaterial({color:0x3b2a1e,roughness:0.9});
  const blade=new THREE.Mesh(new THREE.BoxGeometry(0.055,0.012,0.95),steel);blade.position.set(0,0,0.62);SWORDG.add(blade);
  const tip=new THREE.Mesh(new THREE.ConeGeometry(0.03,0.12,4),steel);tip.rotation.x=Math.PI/2;tip.scale.set(1.8,1,0.4);tip.position.set(0,0,1.15);SWORDG.add(tip);
@@ -2065,7 +2086,7 @@ const SWORDG=new THREE.Group();AV.armR.fore.add(SWORDG);SWORDG.visible=false;SWO
  const pommel=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),brass);pommel.position.set(0,0,-0.14);SWORDG.add(pommel)}
 const SWORD_AT={x:-15.5,z:0.75};   /* over the hearth in the great room, in the house's own frame */
 const SWORDWALL=SWORDG.clone();SWORDWALL.position.set(-15.62,2.55,SWORD_AT.z);SWORDWALL.rotation.set(0,Math.PI/2,-Math.PI/2);SWORDWALL.scale.set(1.15,1.15,1.15);INTERIOR.scene.add(SWORDWALL);
-const FLAMEG=new THREE.Group();AV.armR.fore.add(FLAMEG);FLAMEG.visible=false;
+const FLAMEG=new THREE.Group();AV.armR.fore.add(FLAMEG);FLAMEG.visible=false;FLAMEG.rotation.y=Math.PI;
 {const dk=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.6,metalness:0.4}),tank=new THREE.MeshStandardMaterial({color:0x8a2f22,roughness:0.5,metalness:0.3}),brass=new THREE.MeshStandardMaterial({color:0xb08d3c,roughness:0.4,metalness:0.7});
  const tube=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.04,0.9,10),dk);tube.rotation.x=-Math.PI/2;tube.position.set(0.02,-0.3,0.2);FLAMEG.add(tube);
  const noz=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.035,0.16,10),brass);noz.rotation.x=-Math.PI/2;noz.position.set(0.02,-0.3,0.7);FLAMEG.add(noz);
@@ -2085,21 +2106,22 @@ function wolvesTick(t,dt){if(!WOLF_INIT){WOLVES.init(scene,floorAtW,EXT-4);WOLF_
     onGrowl:()=>{SND.knock();toast(owns('sword')?'Wolves. They are out tonight.':'Wolves. They are out tonight. The sword hangs over the hearth.')}});
   REGEN+=dt;if(HEARTS<3&&!DYING&&REGEN>(WOLVES.count()?30:12)){HEARTS++;REGEN=0}
   paintHearts();
-  if(SWING.t>0){SWING.t-=dt;const k=1-Math.max(0,SWING.t)/0.32;SWORDG.rotation.x=-1.3+Math.sin(k*Math.PI)*1.9;SWORDG.rotation.y=Math.sin(k*Math.PI)*0.5}else{SWORDG.rotation.x=-0.2;SWORDG.rotation.y=0}
+  if(SWING.t>0){SWING.t-=dt;const k=1-Math.max(0,SWING.t)/0.32;SWORDG.rotation.x=1.3-Math.sin(k*Math.PI)*1.9;SWORDG.rotation.y=Math.PI+Math.sin(k*Math.PI)*0.5}else{SWORDG.rotation.x=0.2;SWORDG.rotation.y=Math.PI}
   if(FLAMEG.visible){if(FLAME.t>0)FLAME.t-=dt;flameParticles(t,dt,FLAME.t>0)}}
 function wolfBite(w){if(DYING||INSIDE)return;HEARTS=Math.max(0,HEARTS-1);REGEN=0;SND.knock();
   const h=$('#hurt');h.classList.add('on');setTimeout(()=>h.classList.remove('on'),260);
   if(HEARTS<=0){wolfDeath();return}toast(HEARTS===2?'A wolf bit you. Two hearts left.':'A wolf bit you. One heart left. Run for the door.')}
-function wolfDeath(){if(DYING)return;DYING=true;WOLVES.clear();WOLVES.grace(150);paintHearts();hideAct();
+function wolfDeath(){if(DYING)return;DYING=true;WOLVES.clear();WOLVES.grace(20);   /* 4.24: twenty seconds of grace, then the pack is back; the night keeps going */paintHearts();hideAct();
   const fl=Object.values(S.basket||{}).reduce((a,b)=>a+(+b.q||0),0),fish=(S.fountain&&+S.fountain.held)||0;
   $('#deadLine').textContent=(fl||fish)?[fl?plural(fl,'unsold flower'):'',fish?plural(fish,'fish'):''].filter(Boolean).join(' and ')+' lost to the night':'you carried nothing they could take';
   $('#dead').classList.add('on');
   S.basket={};if(S.fountain)S.fountain.held=0;save();renderHud();
   if(LIVE)RPC('wolf_kill').then(r=>{const d=r.data||{};if(!r.error&&d.ok)ledger('The wolves',0,'the night','')}).catch(()=>{});
   setTimeout(()=>{$('#dead').classList.remove('on');if(INSIDE)leaveHouse();you.x=DOORW.x;you.z=DOORW.z+1.2;you.feet=floorAtW(you.x,you.z);you.vx=you.vz=you.vy=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;
-    ph='dawn';PHPIN=Date.now()+90000;applyPhase();HEARTS=3;DYING=false;paintHearts();refresh();toast('You wake at your own front door at dawn.'+(fl||fish?' The wolves took what you carried.':''))},2800)}
-function swingSword(){if(SWING.t>0||!owns('sword'))return;SWING.t=0.32;SND.rustle();const r=WOLVES.swing(you.x,you.z,you.face);
-  if(!r)return;if(r.dead){SND.bloom();toast(r.left?'The wolf goes down. '+wolvesWord(r.left)+' left.':'The last wolf goes down. The night is yours.')}else{SND.knock();toast('A hit. '+r.hp+' more and it goes down.')}}
+    HEARTS=3;DYING=false;paintHearts();refresh();toast('You wake at your own front door. It is still night. Get inside.'+(fl||fish?' The wolves took what you carried.':''))},2800)}
+let SWORD_TIP=false;try{SWORD_TIP=localStorage.getItem('deeds_sword_tip')==='1'}catch(e){}
+function swingSword(){if(SWING.t>0||!owns('sword'))return;SWING.t=0.32;SND.rustle();if(!SWORD_TIP){SWORD_TIP=true;try{localStorage.setItem('deeds_sword_tip','1')}catch(e){}updateAct()}const r=WOLVES.swing(you.x,you.z,you.face);
+  if(!r){SND.knock();return}if(r.dead){SND.bloom();toast(r.left?'The wolf goes down.':'The last wolf goes down. The night is yours.')}else{SND.knock()}}
 function takeSword(){if(owns('sword'))return;S.tools=S.tools||{};S.tools.sword=1;save();SWORDWALL.visible=false;paintHotbar();renderHud();SND.buy(6);hideAct();
   toast('The sword is yours. Slot 8 in your hotbar. The wolves come at night.');if(LIVE)RPC('sword_take').catch(()=>{});setTool('sword')}
 function burnAt(plot){const p=S.plants[plot];if(!p||p.pending)return;if(LIVE&&!VISIT){SND.knock();toast('Only in a friend\u2019s garden.');return}
@@ -2114,13 +2136,13 @@ function burnAt(plot){const p=S.plants[plot];if(!p||p.pending)return;if(LIVE&&!V
     refresh()}).catch(()=>{BUSY=false;toast('The flame went out.')})}
 function raidNews(){if(!RAIDS.length||VISIT)return;const r=RAIDS[0];let seen='';try{seen=localStorage.getItem('deeds_raid_seen')||''}catch(e){}if(!r.at||r.at===seen)return;try{localStorage.setItem('deeds_raid_seen',r.at)}catch(e){}
   const c=CAT[r.t];setTimeout(()=>toast('A friend burnt bed '+((+r.plot||0)+1)+(c?' \u00B7 '+(+r.flowers>1?r.flowers+' '+c.p.toLowerCase():c.n)+' gone':'')+'. The plant is growing again.'),1800)}
-const ROCKETG=new THREE.Group();AV.armR.fore.add(ROCKETG);ROCKETG.visible=false;
+const ROCKETG=new THREE.Group();AV.armR.fore.add(ROCKETG);ROCKETG.visible=false;ROCKETG.rotation.y=Math.PI;
 {const red=new THREE.MeshStandardMaterial({color:0xB8332B,roughness:0.5,metalness:0.2}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6}),dk=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.6,metalness:0.4});
  const tube=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.075,0.92,14),dk);tube.rotation.x=-Math.PI/2;tube.position.set(0.02,-0.3,0.18);ROCKETG.add(tube);
  const nose=new THREE.Mesh(new THREE.ConeGeometry(0.075,0.22,14),red);nose.rotation.x=-Math.PI/2;nose.position.set(0.02,-0.3,0.75);ROCKETG.add(nose);
  const band=new THREE.Mesh(new THREE.CylinderGeometry(0.082,0.082,0.1,14),iv);band.rotation.x=-Math.PI/2;band.position.set(0.02,-0.3,0.5);ROCKETG.add(band);
  const grip=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.16,0.06),dk);grip.position.set(0.02,-0.4,0.02);ROCKETG.add(grip)}
-const LAUNCHG=new THREE.Group();AV.armR.fore.add(LAUNCHG);LAUNCHG.visible=false;
+const LAUNCHG=new THREE.Group();AV.armR.fore.add(LAUNCHG);LAUNCHG.visible=false;LAUNCHG.rotation.y=Math.PI;
 {const blue=new THREE.MeshStandardMaterial({color:0x2E7FB8,roughness:0.45,metalness:0.25}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6}),dk=new THREE.MeshStandardMaterial({color:0x2a2622,roughness:0.6,metalness:0.4});
  const tank=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.42,16),blue);tank.rotation.x=-Math.PI/2;tank.position.set(0.02,-0.3,0.16);LAUNCHG.add(tank);
  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.6,12),dk);barrel.rotation.x=-Math.PI/2;barrel.position.set(0.02,-0.3,0.62);LAUNCHG.add(barrel);
@@ -2132,10 +2154,10 @@ function sawModel(){const G=new THREE.Group();const org=new THREE.MeshStandardMa
   const handle=new THREE.Mesh(new THREE.TorusGeometry(0.09,0.018,6,14),dk);handle.position.set(0,0.03,-0.02);handle.rotation.y=Math.PI/2;G.add(handle);const rear=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.06,0.16),dk);rear.position.set(0,-0.02,-0.18);G.add(rear);
   const bar=new THREE.Mesh(new THREE.BoxGeometry(0.025,0.07,0.62),st);bar.position.set(0,-0.01,0.41);bar.castShadow=true;G.add(bar);G.bar=bar;
   for(let k=0;k<7;k++){[1,-1].forEach(sg=>{const t=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.02,0.04),dk);t.position.set(0,sg*0.045,0.16+k*0.08);G.add(t)})}return G}
-const SAWG=sawModel();SAWG.position.set(0.02,-0.34,0.06);AV.armR.fore.add(SAWG);SAWG.visible=false;
-function tickSaw(dt){if(SAW.rev>0){SAW.rev-=dt;SAWG.position.x=0.02+(Math.random()-0.5)*0.03;SAWG.rotation.z=(Math.random()-0.5)*0.12;SAWG.rotation.x=-0.25;if(SAW.rev<=0){SAWG.position.x=0.02;SAWG.rotation.z=0;SAWG.rotation.x=0}}}
+const SAWG=sawModel();SAWG.position.set(0.02,-0.34,0.06);SAWG.rotation.y=Math.PI;AV.armR.fore.add(SAWG);SAWG.visible=false;
+function tickSaw(dt){if(SAW.rev>0){SAW.rev-=dt;SAWG.position.x=0.02+(Math.random()-0.5)*0.03;SAWG.rotation.z=(Math.random()-0.5)*0.12;SAWG.rotation.x=0.25;if(SAW.rev<=0){SAWG.position.x=0.02;SAWG.rotation.z=0;SAWG.rotation.x=0}}}
 /* THE TOYS (4.5): the bubble gun and the kite, both found in the chest. Pure fun: no coins, no server beyond owning them */
-const BUBBLEG=new THREE.Group();AV.armR.fore.add(BUBBLEG);BUBBLEG.visible=false;
+const BUBBLEG=new THREE.Group();AV.armR.fore.add(BUBBLEG);BUBBLEG.visible=false;BUBBLEG.rotation.y=Math.PI;
 {const pink=new THREE.MeshStandardMaterial({color:0xE87FA8,roughness:0.45,metalness:0.1}),iv=new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.6}),ring=new THREE.MeshStandardMaterial({color:0xF7D46A,roughness:0.35,metalness:0.6});
  const body=new THREE.Mesh(new THREE.BoxGeometry(0.11,0.13,0.2),pink);body.position.set(0.02,-0.3,0.12);BUBBLEG.add(body);
  const bottle=new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.05,0.14,12),iv);bottle.position.set(0.02,-0.42,0.14);BUBBLEG.add(bottle);
@@ -2756,7 +2778,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(TOOL==='kite'&&owns('kite')){showAct(KITE.up?'Reel the kite in.':'Fly the kite.','kite',null,null,KITE.up?'walk, it follows you':'look up',null,[you.x,you.feet+2.15,you.z]);return}
   if(TOOL==='rocket'){const q=quadHere();if(q==null){showAct('Walk into a quadrant to fire the rocket.',null,null,null,null,null,[you.x,you.feet+2.15,you.z]);return}
     const n=ripeIn(q).length;if(n)showAct('Fire at quadrant '+(q+1)+' \u00B7 '+plural(n,'ripe bed')+'.','rocket',q,null,'every ripe bed in it, picked at once',null,[QC[q].x,2.2,QC[q].z]);else showAct('Nothing ripe in quadrant '+(q+1)+'.',null,null,null,null,null,[QC[q].x,2.2,QC[q].z]);return}
-  if(TOOL==='sword'){const nw=WOLVES.near(you.x,you.z,2.6),at=[you.x,you.feet+2.15,you.z];if(nw)showAct('Swing.','sword',null,null,'the wolf takes '+nw.w.hp+' more',null,[nw.w.x,1.7,nw.w.z]);else if(WOLVES.count())showAct('Sword out.',null,null,null,wolvesWord(WOLVES.count())+' in the dark',null,at);else showAct('Sword out.',null,null,null,houseLvl()>=3?'the wolves come at night':'',null,at);return}
+  if(TOOL==='sword'){if(!SWORD_TIP)showAct('Tap to swing.',null,null,null,'',null,[you.x,you.feet+2.15,you.z]);else hideAct();return}   /* 4.24: the tip shows until the first swing, then the sword speaks for itself */
   if(TOOL==='flamethrower'){const at=[you.x,you.feet+2.15,you.z];if(T.kind!=='bed'){showAct('Walk up to a bed to burn it.',null,null,null,VISIT?'':'only in a friend\u2019s garden',null,at);return}const b=BED[T.id],p=S.plants[b.plot],bat=[b.cx,1.55,b.cz];
     if(LIVE&&!VISIT){showAct('Only in a friend\u2019s garden.',null,null,null,'your own flowers are safe from you',null,bat);return}if(!p||p.pending){showAct('Nothing planted in bed '+(b.plot+1)+'.',null,null,null,null,null,bat);return}const rp=ripe(p);
     if(rp.flowers<1){showAct('Nothing ripe to burn in bed '+(b.plot+1)+'.',null,null,null,CAT[p.t].n+' blooms in '+mmss(rp.next),null,bat);return}showAct('Burn bed '+(b.plot+1)+' \u00B7 '+plural(rp.flowers,'bloom')+'.','burn',b.plot,null,'the harvest, never the plant',null,bat);return}
@@ -2854,6 +2876,7 @@ function rayHit(cx,cy){_ray.set((cx/innerWidth)*2-1,-(cy/innerHeight)*2+1,0.5).u
 function bedAt(hx,hz){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(Math.hypot(b.cx-hx,b.cz-hz)-b.rmax>1.4)continue;const d=inPoly(b.P,hx,hz)?-1:polyDist(b.P,true,hx,hz);if(d<bd){bd=d;best=b}}return best&&bd<0.8?best:null}
 /* tap the flowers: a tap on a bed picks it, or sows it when it is empty; a tap on a stall opens it; on a plinth it chisels */
 function tapAt(cx,cy){if(STORE_ON||BLOOM||INSIDE||$('#forms').classList.contains('on'))return false;
+  if(TOOL==='sword'&&owns('sword')){swingSword();return true}   /* 4.24: sword out = every tap on the world is a swing */
   const h=rayHit(cx,cy);if(!h)return false;const [hx,hz]=h;
   const best=bedAt(hx,hz);
   if(best){const reach=bedDist(best);
@@ -3144,7 +3167,7 @@ function showAway(rows){if(!rows||!rows.length||VISIT)return;let since=0;try{sin
   const lines=Object.entries(by).map(([h,fns])=>h+' '+Object.entries(fns).map(([fn,n])=>{const w=NAME[fn]||[fn,fn+' N times'];return n===1?w[0]:w[1].replace('N',String(n))}).join(', '));
   setTimeout(()=>toast('While you were away: '+lines.join('. ')+'.'),2600)}
 
-window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,SPRG,estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS};
+window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,SPRG,estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
