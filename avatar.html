@@ -73,7 +73,7 @@
   </div>
   <aside class="rail">
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <a class="back" href="/#profile">&larr; Back to your profile</a>
+    <a class="back" id="backLink" href="/#profile">&larr; Back to your profile</a>
     <p class="eyebrow">The wardrobe</p>
     <h1>Dress your avatar.</h1>
     <p class="coin" id="coin"></p>
@@ -300,7 +300,9 @@
   // what the figure shows = what you own and wear, with anything you are trying on laid over it; TRY never touches a door
   function shown(){ var o = {}; Object.keys(EQ).forEach(function(k){ o[k] = EQ[k]; }); Object.keys(TRY).forEach(function(k){ o[k] = TRY[k]; }); return o; }
   function tryChip(){ var el = document.getElementById('tryon'); if (el) el.hidden = !Object.keys(TRY).length; undoState(); }
-  function build(){ var real = EQ; EQ = shown(); try { buildReal(); } finally { EQ = real; } tryChip(); }
+  function build(){ var real = EQ; EQ = shown(); try { buildReal(); } finally { EQ = real; } tryChip(); cacheLook(); }
+  /* the garden and the club read this, so you arrive in what you wear here */
+  function cacheLook(){ try { if (EQ && EQ.body) localStorage.setItem('deeds_look', JSON.stringify({eq: EQ, cw: COLORWAY || {}})); } catch (e) {} }
   function buildReal(){
     if (fig){ root.remove(fig); disposeTree(fig); fig = null; }
     fig = new THREE.Group(); root.add(fig);
@@ -590,6 +592,11 @@
     ready: true
   };
 })();
+</script>
+<script>
+(function(){var q=new URLSearchParams(location.search).get('back');var a=document.getElementById('backLink');if(!a||!q)return;
+  if(q==='club'){a.textContent='\u2190 Back to the club';a.href='/garden/club/';}else if(q==='world'){a.textContent='\u2190 Back to the garden';a.href='/garden/world/';}
+  a.addEventListener('click',function(e){if(window.parent&&window.parent!==window){e.preventDefault();try{window.parent.postMessage({deeds:'wardrobe_done'},'*');}catch(x){}}});})();
 </script>
 </body>
 </html>
