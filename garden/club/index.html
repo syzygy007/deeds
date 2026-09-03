@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="club-build" content="1.1">
+<meta name="club-build" content="1.2">
 <title>The Club · DEEDS</title>
 <style>
 :root{--ink:#0b0910;--ivory:#F6F3EB;--pink:#ff2fa8;--cyan:#28e0ff;--violet:#8a5cff;--lime:#b8ff3a;--amber:#ffb02f}
@@ -691,11 +691,14 @@ function loop(now){const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now;
   if(!SIM){updateAct();placeAct();renderer.render(scene,camera);requestAnimationFrame(loop)}}
 /* 0.9 the sound gate. On a phone the ringer switch silences Web Audio unless a real media element has played, so a silent clip plays on the same tap; every later touch resumes the context; the chip shows the state */
 let SILENT=null;
-function unlockAudio(){try{if(!SILENT){SILENT=document.createElement('audio');SILENT.setAttribute('playsinline','');SILENT.loop=true;SILENT.volume=0.01;SILENT.src='data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQQAAAAAAAA=';document.body.appendChild(SILENT)}const p=SILENT.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}MUSIC.resume()}
-function paintSnd(){const el=$('#snd');const st=MUSIC.state();if(!MUSIC.on()){el.classList.remove('on');return}el.classList.add('on');const ok=st==='running';el.textContent=ok?'Sound on':'Tap for sound';el.classList.toggle('warn',!ok)}
+function silentWav(){const sr=8000,n=sr,b=new ArrayBuffer(44+n*2),v=new DataView(b);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);return URL.createObjectURL(new Blob([b],{type:'audio/wav'}))}
+function unlockAudio(){try{if(!SILENT){SILENT=document.createElement('audio');SILENT.setAttribute('playsinline','');SILENT.loop=true;SILENT.volume=0.01;SILENT.src=silentWav();document.body.appendChild(SILENT)}const p=SILENT.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}MUSIC.resume()}
+/* the test tone: a plain beep straight to the speaker, outside the music engine, so a silent phone tells us which half is broken */
+function testTone(){try{const a=MUSIC.ctx();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.setValueAtTime(0.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(0.4,a.currentTime+0.01);g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.35);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+0.4)}catch(e){shout('tone: '+e.message)}}
+function paintSnd(){const el=$('#snd');const st=MUSIC.state();if(!MUSIC.on()){el.classList.remove('on');return}el.classList.add('on');const ok=st==='running';const a=MUSIC.ctx();el.textContent=ok?'Sound on \u00B7 '+Math.round(a.currentTime)+'s \u00B7 beat '+(MUSIC.stepAt()>>2):'Tap for sound \u00B7 '+st;el.classList.toggle('warn',!ok)}
 setInterval(paintSnd,800);
 function paintPurse(){const el=$('#purse');let gc=null;try{gc=localStorage.getItem('deeds_gc')}catch(e){}if(gc==null||isNaN(+gc)){el.classList.remove('on');return}el.textContent=(+gc).toLocaleString()+' gc';el.classList.add('on')}paintPurse();setInterval(paintPurse,3000);
-$('#snd').addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();MUSIC.start();setTimeout(paintSnd,300)});
+$('#snd').addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();MUSIC.start();testTone();setTimeout(paintSnd,300)});
 document.addEventListener('pointerdown',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});document.addEventListener('touchend',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});
 $('#enter').addEventListener('click',()=>{unlockAudio();MUSIC.start();$('#load').style.opacity='0';setTimeout(()=>{$('#load').style.display='none'},600);toast('Welcome in. Walk up to the decks.');requestAnimationFrame(loop)});
 $('#enter').addEventListener('touchend',()=>{unlockAudio()},{passive:true});
