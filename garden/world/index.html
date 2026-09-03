@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="5.2">
+<meta name="world-build" content="5.4">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1744,7 +1744,7 @@ if(!BLOOM){const c=document.createElement('script');c.src='https://cdn.jsdelivr.
 const COINIMG='<img class="dc" src="'+BASE+'garden-coin.webp" alt="">';
 function renderHud(){const el=$('#purse');
   if(BLOOM){el.textContent='The parterre in bloom';$('#deed').style.display='none';$('#bar').style.display='none';return}
-  const bq=basketQty(),fn=fountainNow();const fh=P69()?fishItems().length:fn.held;
+  const bq=basketQty(),fn=fountainNow();const fh=P69()?fishItems().length:fn.held;try{localStorage.setItem('deeds_gc',String(Math.round(S.gc||0)))}catch(e){}   /* 5.4: the club reads the purse */
   el.innerHTML=(VISIT?'<span class="vis">'+esc(VISIT.handle)+'\u2019s garden</span>':'')+'<span><span class="gc"></span><b>'+(S.gc|0).toLocaleString()+'</b></span>'+(VISIT?'':'<span>'+COINIMG+'<b>'+(S.coins|0).toLocaleString()+'</b></span>')+
     '<span>'+sackTotal()+' seeds</span>'+(bq?'<span>'+bq+' flowers</span>':'')+(fh?'<span>'+fh+' fish</span>':'')+(S.wood?'<span>wood \u00D7 '+S.wood+'</span>':'');
   if($('#sack').classList.contains('on'))renderSack()}
@@ -2072,7 +2072,8 @@ function dressToy(AVx,look){if(!AVx||!AVx.toy)return;look=look||LOOK0;let built;
   const T=AVx.torso;fig.add(T);T.scale.setScalar(1/s);T.rotation.set(0,Math.PI,0);T.position.set(0,d.ground+0.82/s,0);
   const old=AVx.fig;AVx.fig=fig;AVx.s=s;AVx.d=d;AVx.lookKey=lookKey(look);AVx.g.add(fig);if(old){AVx.g.remove(old);Figure.dispose(old)}}
 function toyBreath(AVx,t){const b=1+Math.sin(t*1.5)*0.006;AVx.fig.scale.y=AVx.s*b;AVx.fig.position.y=-AVx.d.ground*AVx.s*b}
-function loadLook(){if(!sb||!ME)return;Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',ME)).then(r=>{if(r.error)return;const lk=lookFromRows(r.data);if(!lk)return;LOOK=lk;dressToy(AV,LOOK);trackMe()}).catch(()=>{})}
+function loadLook(){if(!sb||!ME)return;Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',ME)).then(r=>{if(r.error)return;const lk=lookFromRows(r.data);if(!lk)return;LOOK=lk;try{localStorage.setItem('deeds_look',JSON.stringify(lk))}catch(e){}   /* 5.3: the club reads this so you arrive in your own clothes */
+  dressToy(AV,LOOK);trackMe()}).catch(()=>{})}
 function trackMe(){if(!PRES||!PRESOK)return;try{PRES.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',av:lookOut(),t:Date.now()})}catch(e){}}
 /* a friend's look: from their presence when they sent it, else read by id (avatar_equipped is readable by every member) */
 function lookOfPresence(p,id){if(p&&p.av&&p.av.eq)return p.av;
