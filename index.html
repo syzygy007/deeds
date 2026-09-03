@@ -78,6 +78,15 @@ input,textarea{font:inherit;color:var(--ink)}
 .pa:hover{color:var(--forest)}
 .pa.more{margin-left:auto}
 .endnote{text-align:center;color:var(--muted);font-size:13px;padding:38px 20px}
+.dcount{padding:22px 18px 18px;border-bottom:1px solid var(--line)}
+.dcount .dn{font-family:Georgia,'Times New Roman',serif;font-size:60px;line-height:1;letter-spacing:-.02em;margin:8px 0 14px;font-variant-numeric:tabular-nums}.dcount .dn b{color:var(--forest)}
+.dbar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}.dbar i{display:block;height:100%;background:var(--forest);transition:width .9s ease}
+.dsub{font-size:13px;color:var(--muted);margin-top:9px}
+.markcard{background:var(--forest);color:var(--ivory);padding:26px 18px 22px}.markcard .micro{color:var(--sage)}
+.markcard .mn{font-family:Georgia,'Times New Roman',serif;font-size:46px;line-height:1.05;margin:8px 0 12px}.markcard .mn b{color:var(--sage)}
+.markcard p{font-size:15px;line-height:1.55;margin:0 0 10px;opacity:.94}.markcard .wbtn{background:var(--ivory);color:var(--forest);margin-top:6px}
+.adstat{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;margin-top:14px}.adstat .n{font-size:23px;font-weight:800;letter-spacing:-.01em}.adstat .l{font-size:8.5px;letter-spacing:.14em;color:var(--muted);font-weight:800;margin-top:3px;text-transform:uppercase}
+.admarks{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.7}
 /* meet rail (in feed, mobile) */
 .meetrail{padding:20px 0 22px;border-bottom:1px solid var(--line)}
 .meetrail .micro{color:var(--muted);padding:0 18px}
@@ -1526,6 +1535,8 @@ body.gsky-on .tab.on{color:var(--ivory)}
     <div class="page on" id="pg-feed">
       <div class="searchwrap" id="searchwrap"><input id="searchin" type="search" placeholder="Search deeds, people, organizations." autocomplete="off"></div>
       <div id="pplres" style="display:none"></div>
+      <div class="markcard" id="markcard" style="display:none"></div>
+      <div class="dcount" id="dcount" style="display:none"><div class="micro" style="color:var(--forest)">Deeds Done On DEEDS.</div><div class="dn"><span id="dcn">0</span><b>.</b></div><div class="dbar"><i id="dcbar" style="width:0"></i></div><div class="dsub" id="dcsub"></div></div>
       <div class="post" id="pwacard"><div class="micro" style="color:var(--forest)" id="pwamicro">The App</div>
         <p class="pwline" id="pwline">Put DEEDS. on your Home Screen.</p>
         <div style="display:flex;gap:12px;align-items:center;margin-top:9px">
@@ -1723,6 +1734,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
         </div>
       </div>
       <div class="sect" id="deskrow" style="display:none"><button class="wbtn" id="deskgo" style="width:100%">The Desk. &#183; Admin</button></div>
+      <div class="sect" id="admstat" style="display:none"><div class="micro" style="color:var(--forest)">The Count &#183; Admin</div><div class="adstat" id="adgrid"></div><div class="admarks" id="admarks"></div></div>
       <div class="sect" id="advsect" style="display:none">
         <div class="micro">Organizations To Review</div>
         <div id="advlist"></div>
@@ -3696,7 +3708,10 @@ function prependLive(row){if(!row||row.is_private)return;
 if(LIVEPOSTS.some(function(x){return x.id===row.id}))return;
 LIVEPOSTS.unshift(row);pageFrom++;fetchNames([row]).then(renderFeed)}
 function subRealtime(){try{
-sb.channel('deeds-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'deeds'},function(pl){prependLive(markKind(pl.new,'deed'))}).subscribe()
+sb.channel('deeds-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'deeds'},function(pl){prependLive(markKind(pl.new,'deed'));countLater()}).subscribe()
+}catch(e){}
+try{
+sb.channel('count-live').on('postgres_changes',{event:'UPDATE',schema:'public',table:'deed_counter'},function(pl){var w=pl&&pl.new;if(w&&DSTAT&&+w.total!==DSTAT.total){DSTAT.to_go=DSTAT.next?DSTAT.next-(+w.total):null;DSTAT.total=+w.total;paintCount()}countLater()}).subscribe()
 }catch(e){}
 try{
 sb.channel('posts-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},function(pl){prependLive(markKind(pl.new,'post'))}).subscribe()
@@ -3710,6 +3725,34 @@ srvTimer=setTimeout(function(){serverSearch(q);searchPeople(q)},350)});
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)loadMore()})});
 io.observe($('#endnote'));
 
+/* ---- the counter and the marks: every deed ever, and the parties along the way ---- */
+var DSTAT=null,DCTIMER=null,DCSHOWN=0;
+function fmtN(n){n=+n;return isNaN(n)?'0':n.toLocaleString('en-US')}
+function prevMark(next){if(!next||next<=100)return 0;var s=String(next);return s.charAt(0)==='5'?next*2/5:next/2}
+function markWords(n){var w={100:'One hundred',200:'Two hundred',500:'Five hundred',1000:'One thousand',2000:'Two thousand',5000:'Five thousand',10000:'Ten thousand'};return w[n]||fmtN(n)}
+function rollNumber(el,to){if(!el)return;to=+to||0;var from=DCSHOWN,t0=null;if(from===to){el.textContent=fmtN(to);return}
+function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/700);p=1-Math.pow(1-p,3);el.textContent=fmtN(Math.round(from+(to-from)*p));if(p<1)requestAnimationFrame(step);else DCSHOWN=to}
+requestAnimationFrame(step)}
+function paintCount(){var s=DSTAT,el=$('#dcount');if(!s||!el)return;el.style.display='';
+rollNumber($('#dcn'),s.total);
+var nx=s.next,pv=prevMark(nx),bar=$('#dcbar');if(bar)bar.style.width=nx?Math.max(2,Math.min(100,Math.round((s.total-pv)/(nx-pv)*100)))+'%':'100%';
+var sub=nx?fmtN(s.to_go)+' to '+fmtN(nx):'Past every mark';if(s.today)sub+=' \u00B7 '+s.today+' today';
+var ds=$('#dcsub');if(ds)ds.textContent=sub;
+var mc=$('#markcard');if(mc){var L=s.last,fresh=L&&L.hit_at&&(Date.now()-new Date(L.hit_at).getTime()<48*3600e3);
+if(fresh){var when=new Date(L.hit_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+mc.innerHTML='<div class="micro">A Mark \u00B7 '+esc(when)+'</div><div class="mn">'+esc(markWords(L.n))+'<b>.</b></div>'+
+'<p>DEEDS. just crossed '+fmtN(L.n)+' deeds done.'+(L.handle?' Number '+fmtN(L.n)+' was '+esc(L.handle)+'\u2019s'+(L.title?': \u201C'+esc(String(L.title).replace(/\.+$/,''))+'.\u201D':'.'):'')+(nx?' The next mark is '+fmtN(nx)+'.':'')+'</p>'+
+'<p>Yours could be '+fmtN(L.n+1)+'.</p><button class="wbtn" id="markgo">Log It.</button>';
+mc.style.display='';var g=$('#markgo');if(g)g.onclick=function(){if(!PROFILE){openJoin();return}openCompose('deed')}}else mc.style.display='none'}
+paintAdminCount()}
+function paintAdminCount(){var s=DSTAT,sec=$('#admstat');if(!sec)return;if(!s||!PROFILE||!PROFILE.is_admin){sec.style.display='none';return}
+sec.style.display='';
+$('#adgrid').innerHTML='<div><div class="n">'+fmtN(s.today)+'</div><div class="l">Today</div></div><div><div class="n">'+fmtN(s.week)+'</div><div class="l">This Week</div></div>'+
+'<div><div class="n">'+fmtN(s.month)+'</div><div class="l">This Month</div></div><div><div class="n">'+fmtN(s.total)+'</div><div class="l">All Time</div></div>';
+var m=$('#admarks'),marks=s.marks||[];
+m.innerHTML=(s.next?'Next mark '+fmtN(s.next)+' \u00B7 '+fmtN(s.to_go)+' to go':'Past every mark')+(marks.length?'<br>'+marks.map(function(k){return fmtN(k.n)+' \u00B7 '+new Date(k.hit_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})+(k.handle?' \u00B7 '+esc(k.handle):'')+' \u00B7 mailed to '+fmtN(k.mailed)}).join('<br>'):'<br>No mark hit yet.')}
+function loadCount(){if(!sb)return;sb.rpc('deed_stats').then(function(r){if(r.error||!r.data)return;DSTAT=r.data;paintCount()}).catch(function(){})}
+function countLater(){clearTimeout(DCTIMER);DCTIMER=setTimeout(loadCount,1200)}
 /* ---- live impact: real numbers or nothing ---- */
 function loadStats(){var blk=$('#impblock');if(!blk)return;
 sb.from('live_stats').select('*').then(function(r){
@@ -4860,7 +4903,7 @@ if(l){setTimeout(wantLog,300);return}setTimeout(function(){COINCTX='new';openCoi
 
 /* ================= ADMIN: organization review ================= */
 function renderAdmin(){var s=$('#advsect'),ms=$('#modsect');if(!s)return;
-var dk=$('#deskrow');if(dk)dk.style.display=(window.PROFILE&&PROFILE.is_admin)?'':'none';
+var dk=$('#deskrow');if(dk)dk.style.display=(window.PROFILE&&PROFILE.is_admin)?'':'none';paintAdminCount();
 if(!liveOn||!PROFILE||!PROFILE.is_admin){s.style.display='none';if(ms)ms.style.display='none';return}
 s.style.display='block';if(ms)ms.style.display='block';loadPending();loadModQueue()}
 
@@ -6133,7 +6176,7 @@ renderFeed();
 function init(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
 liveOn=true;
 var blk=$('#impblock');if(blk)blk.style.display='none';
-guestUI();loadStats();loadFeed();loadDaily();subRealtime();unsubArrival();coArrival();artArrival();
+guestUI();loadStats();loadFeed();loadDaily();loadCount();subRealtime();unsubArrival();coArrival();artArrival();
 sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;
 if(s){SESSION=s;loadProfile(0)}}).catch(function(){});
 sb.auth.onAuthStateChange(function(ev,s){
