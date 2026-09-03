@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="club-build" content="0.8">
+<meta name="club-build" content="1.0">
 <title>The Club · DEEDS</title>
 <style>
 :root{--ink:#0b0910;--ivory:#F6F3EB;--pink:#ff2fa8;--cyan:#28e0ff;--violet:#8a5cff;--lime:#b8ff3a;--amber:#ffb02f}
@@ -54,6 +54,7 @@ canvas{display:block;touch-action:none}
 #beat{display:flex;gap:5px;justify-content:center;margin-bottom:6px}
 #beat i{width:26px;height:5px;border-radius:999px;background:rgba(246,243,235,.14)}
 #beat i.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+#snd{position:fixed;left:18px;top:max(14px,env(safe-area-inset-top));z-index:22;pointer-events:auto;background:rgba(11,9,16,.5);border:1px solid rgba(246,243,235,.5);color:var(--ivory);padding:8px 12px;border-radius:999px;font:800 10px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;display:none}#snd.on{display:block}#snd.warn{border-color:var(--amber);color:var(--amber);animation:nightpulse .9s ease-in-out infinite}
 #leave{position:fixed;right:18px;top:max(14px,env(safe-area-inset-top));z-index:22;pointer-events:auto;background:rgba(11,9,16,.5);border:1px solid rgba(246,243,235,.5);color:var(--ivory);padding:8px 12px;border-radius:999px;font:800 10px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;cursor:pointer}
 #load{position:fixed;inset:0;z-index:50;background:#07060a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .6s}
 #load h2{margin:0;font-size:clamp(1.6rem,6vw,2.6rem);letter-spacing:-.04em;font-weight:800;text-shadow:0 0 30px var(--pink)}
@@ -68,6 +69,7 @@ canvas{display:block;touch-action:none}
 #menu .it button{border:1px solid rgba(246,243,235,.35);background:transparent;color:var(--ivory);border-radius:999px;padding:8px 12px;font:800 10px/1 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
 #menu .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}#menu .foot .n{font:800 9px/1 ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;opacity:.55}
 #menu .close{border:1px solid rgba(246,243,235,.4);background:transparent;color:var(--ivory);border-radius:999px;padding:9px 14px;font:800 10px/1 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+#dressing{position:fixed;inset:0;z-index:45;display:none;background:#07060a}#dressing.on{display:block}#dressing iframe{position:absolute;inset:0;width:100%;height:100%;border:0}#dressing .x{position:absolute;right:14px;top:max(12px,env(safe-area-inset-top));z-index:2;background:var(--ivory);color:var(--ink);border:0;border-radius:999px;padding:10px 16px;font:800 11px/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 20px rgba(255,47,168,.45)}
 #err{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;background:#7A1F1F;color:#fff;font:600 11px/1.5 ui-monospace,monospace;padding:10px 14px;white-space:pre-wrap}
 @keyframes strobe{0%,100%{opacity:0}50%{opacity:.85}}
 #strobe{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:28}
@@ -75,12 +77,12 @@ canvas{display:block;touch-action:none}
 </style>
 </head>
 <body>
-<div id="load"><h2>The Club<span>.</span></h2><div class="micro" style="opacity:.7">Every night, when the wolves come out</div><button class="btn" id="enter">Walk in</button></div>
+<div id="load"><h2>The Club<span>.</span></h2><div class="micro" style="opacity:.7">Every night, when the wolves come out</div><button class="btn" id="enter">Walk in · sound on</button></div>
 <div id="hud">
   <div id="place"><div class="micro" id="walkin">You are in</div><h1 id="area">The Club<span>.</span></h1><div class="micro" id="near"></div></div>
 </div>
 <div id="hype"><div class="lab"><span>Hype</span><span id="hypeN">0</span></div><div class="bar"><i id="hypeBar"></i></div></div>
-<button id="leave">&larr; The garden</button>
+<button id="leave">&larr; The garden</button><button id="snd">Sound</button>
 <div id="hint" class="micro">Drag left to walk · drag right to look · walk up to the decks</div>
 <div id="act"><button class="abtn" id="actMain">Take the decks.</button></div>
 <div id="status" class="micro"></div>
@@ -111,6 +113,7 @@ canvas{display:block;touch-action:none}
   </div>
 </div>
 <div id="menu"><div class="card"><h3 id="mTitle">The bar<span style="color:var(--amber)">.</span></h3><div class="sub" id="mSub">NOTHING HERE IS ALCOHOL. EVERYTHING HERE IS COLD.</div><div id="mRows"></div><div class="foot"><div class="n" id="mNote">THE TILL OPENS WITH PATCH 70</div><button class="close" id="mClose">Close</button></div></div></div>
+<div id="dressing"><button class="x" id="dressX">Back to the club</button></div>
 <div id="err"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -433,7 +436,8 @@ function hypeCrowd(kind){const near=CROWD.filter(c=>Math.hypot(c.x-YOU.x,c.z-YOU
    YOU. The same third person walk as the garden: drag left to walk, drag right to look, WASD on a keyboard.
    ====================================================================== */
 const YOU={x:0,z:9,y:0,yaw:0,pitch:-0.3,face:0,feet:0,vy:0,grounded:true};
-let AV=null;{const r=rng(7);const look=CLUB_EQ(r);AV=TOY?makeToy(look):null;if(!AV)AV=makeDrawn(r);AV.look=look;scene.add(AV.g)}
+let AV=null;{const r=rng(7);let look=null;try{const j=JSON.parse(localStorage.getItem('deeds_look')||'null');if(j&&j.eq&&j.eq.body)look={eq:j.eq,cw:j.cw||{}}}catch(e){}if(!look)look=CLUB_EQ(r);   /* 0.9: your own look, cached by the garden (world 5.3), hat and all */
+  AV=TOY?makeToy(look):null;if(!AV)AV=makeDrawn(r);AV.look=look;scene.add(AV.g)}
 const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if(e.key===' ')jump()});addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=0});
 let lookDX=0,lookDY=0,mvX=0,mvZ=0,stickId=null,stick0=null,lookId=null,lookLast=null;
 const stickEl=$('#stick'),knob=$('#knob');
@@ -494,7 +498,7 @@ const MUSIC=(()=>{let AC=null,BUS=null,COMP=null,NOISE=null,STYLE='deep',on=fals
   /* 0.3 the house layer: an offbeat piano stab (the classic, on the and of every beat every other bar), a shaker on the sixteenths, a pad underneath */
   function stab(T,notes,g){notes.forEach(m=>{const o=AC.createOscillator(),v=AC.createGain(),f=AC.createBiquadFilter();o.type='square';o.frequency.value=mtof(m+12);f.type='lowpass';f.frequency.setValueAtTime(2600,T);f.frequency.exponentialRampToValueAtTime(700,T+0.12);v.gain.setValueAtTime(0.0001,T);v.gain.exponentialRampToValueAtTime(g/notes.length,T+0.004);v.gain.exponentialRampToValueAtTime(0.0001,T+0.16);o.connect(f);f.connect(v);v.connect(sc);v.connect(REVSEND);o.start(T);o.stop(T+0.2)})}
   function shaker(T,g){noise(T,0.035,g,'highpass',9500,0.5)}
-  function pad(T,notes,dur,g){notes.forEach(m=>{const o=AC.createOscillator(),v=AC.createGain();o.type='triangle';o.frequency.value=mtof(m-12);v.gain.setValueAtTime(0.0001,T);v.gain.linearRampToValueAtTime(g/notes.length,T+dur*0.4);v.gain.linearRampToValueAtTime(0.0001,T+dur);o.connect(v);v.connect(chordLP);o.start(T);o.stop(T+dur+0.05)})}
+  function padLayer(T,notes,dur,g){notes.forEach(m=>{const o=AC.createOscillator(),v=AC.createGain();o.type='triangle';o.frequency.value=mtof(m-12);v.gain.setValueAtTime(0.0001,T);v.gain.linearRampToValueAtTime(g/notes.length,T+dur*0.4);v.gain.linearRampToValueAtTime(0.0001,T+dur);o.connect(v);v.connect(chordLP);o.start(T);o.stop(T+dur+0.05)})}
   /* 0.5 THE LAYERS, so it is never one synth: a supersaw pad under the chords, an organ bass doubling the sub on the ands, a counter melody pluck on the last two bars of each four,
      congas and a rim on the sixteenths, a crash on every drop, the choir vowel under the second half of a section */
   function supersaw(T,notes,dur,g){notes.forEach(m=>{[-12,-4,4,12].forEach(det=>{const o=AC.createOscillator(),v=AC.createGain();o.type='sawtooth';o.frequency.value=mtof(m+12);o.detune.value=det;v.gain.setValueAtTime(0.0001,T);v.gain.linearRampToValueAtTime(g/notes.length/4,T+dur*0.3);v.gain.linearRampToValueAtTime(0.0001,T+dur);o.connect(v);v.connect(chordLP);v.connect(REVSEND);o.start(T);o.stop(T+dur+0.05)})})}
@@ -559,7 +563,7 @@ const MUSIC=(()=>{let AC=null,BUS=null,COMP=null,NOISE=null,STYLE='deep',on=fals
     if(sec===28){riserStart(T,4);if(big)breakUntil=bar+4;EV.push({at:T,kind:'riser',len:beat*16})}
     if(sec===0&&bar>0){impact(T);cheer(T+0.05,big);breakUntil=-1;filt.frequency.cancelScheduledValues(T);filt.frequency.setValueAtTime(18000,T);chordLP.frequency.setTargetAtTime(STYLES[STYLE].cut*1.7,T,0.05);EV.push({at:T,kind:'drop',auto:true,big})}
     if(bar%4===0&&sec<24){const S=STYLES[STYLE];ARR.cutK=0.7+Math.random()*0.9;chordLP.frequency.setTargetAtTime(S.cut*ARR.cutK,T,beat*2);chordLP.Q.setTargetAtTime(0.9+Math.random()*3,T,beat)}
-    if(sec===8||sec===16){pad(T,STYLES[STYLE].chords[Math.floor(bar/2)%4],beat*16,0.22)}}
+    if(sec===8||sec===16){padLayer(T,STYLES[STYLE].chords[Math.floor(bar/2)%4],beat*16,0.22)}}
   function schedule(T,s){const S=STYLES[STYLE],beat=60/S.bpm,bar=Math.floor(s/16),b16=s%16,phrase=bar%8,inBreak=bar<breakUntil;arrange(T,bar,b16);
     const sec=bar%32;const energy=inBreak?0.35:(sec>=24?0.6:(bar%64>=32?1:0.85));const chordN=S.chords[Math.floor(bar/2)%4];
     if(S.house){if(b16%2===1)shaker(T,0.035+(b16%4===3?0.02:0));if(bar%2===1&&(b16===2||b16===6||b16===10||b16===14)&&!inBreak)stab(T,chordN,0.32);if(b16===7&&!inBreak)hat(T,true,0.09)}
@@ -582,7 +586,9 @@ const MUSIC=(()=>{let AC=null,BUS=null,COMP=null,NOISE=null,STYLE='deep',on=fals
     if(bar%4!==0||b16>0){const cutBase=S.cut*(ARR.cutK||1)*(inBreak?0.45:1)*(0.8+0.2*Math.sin(bar*S.lfo*6.28+b16*0.4));chordLP.frequency.setTargetAtTime(cutBase*(energy>0.9?1.5:1),T,0.08)}
     EV.push({at:T,kind:'step',b16,bar,energy})}
   function loop(){const a=AC;while(next<a.currentTime+LOOK){const st=60/STYLES[STYLE].bpm/4;schedule(next+(step%2?st*SWING:0),step);step++;next+=st}}   /* 0.4 the off sixteenths swing */
-  function start(){ctx();if(AC.state==='suspended')AC.resume().catch(()=>{});try{renderSamples()}catch(e){}if(on)return;on=true;step=0;next=AC.currentTime+0.06;timer=setInterval(loop,TICK)}
+  function resume(){if(!AC)return;if(AC.state!=='running')AC.resume().catch(()=>{})}
+  function state(){return AC?AC.state:'none'}
+  function start(){ctx();if(AC.state==='suspended')AC.resume().catch(()=>{});if(AC.state!=='closed'){try{const b=AC.createBuffer(1,1,AC.sampleRate),src=AC.createBufferSource();src.buffer=b;src.connect(AC.destination);src.start(0)}catch(e){}}try{renderSamples()}catch(e){}if(on)return;on=true;step=0;next=AC.currentTime+0.06;timer=setInterval(loop,TICK)}
   function stop(){on=false;clearInterval(timer)}
   function setStyle(k){if(!STYLES[k])return;STYLE=k;if(!AC)return;chordLP.frequency.setTargetAtTime(STYLES[k].cut,AC.currentTime,0.2);EV.push({at:AC.currentTime,kind:'style'})}
   /* the pads: everything lands on the next beat so it always sounds on purpose */
@@ -599,7 +605,7 @@ const MUSIC=(()=>{let AC=null,BUS=null,COMP=null,NOISE=null,STYLE='deep',on=fals
   function filterHold(down){if(!AC)return;const T=AC.currentTime;filtHold=down;filt.frequency.cancelScheduledValues(T);if(down){filt.frequency.setValueAtTime(filt.frequency.value,T);filt.frequency.exponentialRampToValueAtTime(420,T+0.9)}else{filt.frequency.setValueAtTime(filt.frequency.value,T);filt.frequency.exponentialRampToValueAtTime(18000,T+0.35);cheer(T+0.1,false);EV.push({at:T,kind:'release'})}}
   /* the lights read what has already sounded */
   function drain(){if(!AC)return [];const now=AC.currentTime+0.02;const out=[];for(let i=EV.length-1;i>=0;i--)if(EV[i].at<=now){out.push(EV[i]);EV.splice(i,1)}return out.reverse()}
-  return {start,stop,pad,setStyle,filterHold,drain,bottleSting,crackle,duck,hit,scratch,scratchStop,samples:()=>SAMPLES,style:()=>STYLE,bpm:()=>STYLES[STYLE].bpm,on:()=>on,time:()=>AC?AC.currentTime:0,ctx:()=>AC,stepAt:()=>step}})();
+  return {start,stop,resume,state,pad,setStyle,filterHold,drain,bottleSting,crackle,duck,hit,scratch,scratchStop,samples:()=>SAMPLES,style:()=>STYLE,bpm:()=>STYLES[STYLE].bpm,on:()=>on,time:()=>AC?AC.currentTime:0,ctx:()=>AC,stepAt:()=>step}})();
 
 /* ======================================================================
    THE DECKS, THE PADS, THE HYPE
@@ -626,11 +632,16 @@ addEventListener('keydown',e=>{if(!ATDECK||e.repeat)return;const map={q:'hey',w:
  const idle=()=>{if(id!=null){if(performance.now()-lastT>70){vel*=0.6;MUSIC.scratch(vel)}}else if(ATDECK){ang+=0.6;disc.style.transform='rotate('+ang+'deg)'}requestAnimationFrame(idle)};idle()}
 $$('.sty').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();$$('.sty').forEach(x=>x.classList.remove('on'));b.classList.add('on');MUSIC.setStyle(b.dataset.sty);toast({deep:'Deep. Warm chords, a rolling bass.',tech:'Tech. Stripped, driving, stabs on the offbeat.',disco:'Disco. Bright chords, the octave bass, open hats.',melodic:'Melodic. The arp on top, the chords underneath.'}[b.dataset.sty]);if(ATDECK)hypeCrowd('style')}));
 addEventListener('keydown',e=>{if(!ATDECK)return;const map={'1':'drop','2':'riser','3':'strobe','4':'lasers','5':'horn','7':'flames','8':'confetti'};if(map[e.key])padHit(map[e.key]);if(e.key==='6'){MUSIC.filterHold(true)}});addEventListener('keyup',e=>{if(ATDECK&&e.key==='6')MUSIC.filterHold(false)});
+/* 1.0 THE DRESSING ROOM opens over the club in a frame (avatar.html at the root). Close it, or tap its back link, and you come out wearing what you picked. */
+function openDressing(){const d=$('#dressing');let f=d.querySelector('iframe');if(!f){f=document.createElement('iframe');f.setAttribute('allow','autoplay');d.appendChild(f)}f.src=(ON_SITE?'/':'../../')+'avatar.html?back=club&t='+Date.now();d.classList.add('on');mvX=mvZ=0;lookDX=lookDY=0;hideAct();toast('Through the curtain.')}
+function closeDressing(){const d=$('#dressing');d.classList.remove('on');const f=d.querySelector('iframe');if(f)f.src='about:blank';
+  try{const j=JSON.parse(localStorage.getItem('deeds_look')||'null');if(j&&j.eq&&j.eq.body&&TOY){const nd=makeToy({eq:j.eq,cw:j.cw||{}});if(nd){scene.remove(AV.g);nd.g.position.copy(AV.g.position);nd.g.rotation.copy(AV.g.rotation);AV=Object.assign(nd,{look:{eq:j.eq,cw:j.cw||{}}});scene.add(AV.g);toast('Looking good.');sparks(YOU.x,1.8,YOU.z,8,NEON.pink)}}}catch(e){}updateAct()}
+$('#dressX').addEventListener('click',closeDressing);addEventListener('message',e=>{if(e.data&&e.data.deeds==='wardrobe_done')closeDressing()});
 /* the prompt over what you are near */
 const actEl=$('#act'),actMain=$('#actMain');let ACT=null,ANCHOR=null,TALK=null;
 function showAct(label,mode,at){ACT=mode?{mode}:null;ANCHOR=at;actMain.textContent=label;actMain.classList.toggle('quiet',!mode);actEl.classList.add('on')}
 function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
-actMain.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!ACT)return;if(ACT.mode==='deck')setDeck(true);else if(ACT.mode==='leave')setDeck(false);else if(ACT.mode==='booth')openMenu('bottle');else if(ACT.mode==='vip')toast('The terraces sell by the night, first come first serve. Next patch.');else if(ACT.mode==='bar')openMenu('bar');else if(ACT.mode==='door')toast('Outside it is night. The wolves are out. Stay a while.');else if(ACT.mode==='pool')toast('The water is warm. Swimming comes with the next patch.');else if(ACT.mode==='dress'){toast('Through the curtain.');setTimeout(()=>{location.href=(ON_SITE?'/':'../../')+'avatar.html?back=club'},500)}else if(ACT.mode==='talk'&&TALK){TALK.said++;toast('\u201C'+TALK.line+'\u201D');sparks(TALK.x,2.0,TALK.z,3,NEON.pink);TALK.hands=1.2;addHype(2)}});
+actMain.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!ACT)return;if(ACT.mode==='deck')setDeck(true);else if(ACT.mode==='leave')setDeck(false);else if(ACT.mode==='booth')openMenu('bottle');else if(ACT.mode==='vip')toast('The terraces sell by the night, first come first serve. Next patch.');else if(ACT.mode==='bar')openMenu('bar');else if(ACT.mode==='door')toast('Outside it is night. The wolves are out. Stay a while.');else if(ACT.mode==='pool')toast('The water is warm. Swimming comes with the next patch.');else if(ACT.mode==='dress')openDressing();else if(ACT.mode==='talk'&&TALK){TALK.said++;toast('\u201C'+TALK.line+'\u201D');sparks(TALK.x,2.0,TALK.z,3,NEON.pink);TALK.hands=1.2;addHype(2)}});
 function updateAct(){if(ATDECK){showAct('Step off the decks.','leave',[DECK.x,3.0,DECK.z-0.6]);return}
   const d=(x,z)=>Math.hypot(YOU.x-x,YOU.z-z);
   $('#area').innerHTML=(YOU.z>POOL.z0+0.5?'The Pool':YOU.z<-9?'The Decks':Math.abs(YOU.x)>13?'The Booths':'The Floor')+'<span>.</span>';
@@ -673,13 +684,21 @@ function lightsTick(t,dt){const evs=MUSIC.drain();for(const e of evs){
    ====================================================================== */
 let last=performance.now(),SIM=false;
 function loop(now){const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now;const t=now/1000;
-  if($('#menu').classList.contains('on')){mvX=mvZ=0;lookDX=lookDY=0}if(!ATDECK)walkTick(dt);else{AV.g.position.set(YOU.x,YOU.y,YOU.z);AV.g.rotation.y=Math.PI;const cd=5.5;camera.position.set(DECK.x+Math.sin(t*0.15)*2.2,3.4,DECK.z-3.2);camera.lookAt(YOU.x,YOU.y+1.2,YOU.z+6);
+  if($('#menu').classList.contains('on')||$('#dressing').classList.contains('on')){mvX=mvZ=0;lookDX=lookDY=0}if(!ATDECK)walkTick(dt);else{AV.g.position.set(YOU.x,YOU.y,YOU.z);AV.g.rotation.y=Math.PI;const cd=5.5;camera.position.set(DECK.x+Math.sin(t*0.15)*2.2,3.4,DECK.z-3.2);camera.lookAt(YOU.x,YOU.y+1.2,YOU.z+6);
     const p=BEATPH*6.28;AV.legL.rotation.x=Math.sin(p)*0.12;AV.legR.rotation.x=-Math.sin(p)*0.12;AV.g.position.y=YOU.y+Math.abs(Math.sin(p))*0.04}
   danceTick(t,dt,BEATPH+BEATN,ENERGY*(MUSIC.on()?1:0.35));talkTick(t,dt);runnerTick(t,dt);lightsTick(t,dt);sparkTick(dt);hypeTick(dt);flamesTick(dt);confettiTick(dt);poolTick(t,dt);
   if(!SIM){updateAct();placeAct();renderer.render(scene,camera);requestAnimationFrame(loop)}}
-$('#enter').addEventListener('click',()=>{$('#load').style.opacity='0';setTimeout(()=>{$('#load').style.display='none'},600);MUSIC.start();toast('Welcome in. Walk up to the decks.');requestAnimationFrame(loop)});
+/* 0.9 the sound gate. On a phone the ringer switch silences Web Audio unless a real media element has played, so a silent clip plays on the same tap; every later touch resumes the context; the chip shows the state */
+let SILENT=null;
+function unlockAudio(){try{if(!SILENT){SILENT=document.createElement('audio');SILENT.setAttribute('playsinline','');SILENT.loop=true;SILENT.volume=0.01;SILENT.src='data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQQAAAAAAAA=';document.body.appendChild(SILENT)}const p=SILENT.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}MUSIC.resume()}
+function paintSnd(){const el=$('#snd');const st=MUSIC.state();if(!MUSIC.on()){el.classList.remove('on');return}el.classList.add('on');const ok=st==='running';el.textContent=ok?'Sound on':'Tap for sound';el.classList.toggle('warn',!ok)}
+setInterval(paintSnd,800);
+$('#snd').addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();MUSIC.start();setTimeout(paintSnd,300)});
+document.addEventListener('pointerdown',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});document.addEventListener('touchend',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});
+$('#enter').addEventListener('click',()=>{unlockAudio();MUSIC.start();$('#load').style.opacity='0';setTimeout(()=>{$('#load').style.display='none'},600);toast('Welcome in. Walk up to the decks.');requestAnimationFrame(loop)});
+$('#enter').addEventListener('touchend',()=>{unlockAudio()},{passive:true});
 $('#leave').addEventListener('click',()=>{location.href=ON_SITE?'/garden/world/':'../world/'});
-window.__club={YOU,CROWD,MUSIC,DECK,BOOTHS,VIP,POOL,BAR,DRESS,FLAMES,CONFETTI,RIG,rigShow,BLACK,blackout,TALKERS,talk:()=>TALK,confettiFire,DRINKS,PIZZA,BOTTLES,openMenu,closeMenu,runBottle,RUNNER,bottleShow,setDeck,padHit,hypeCrowd,hype:()=>HYPE,floorAt,updateAct,act:()=>ACT,go:(x,z)=>{YOU.x=x;YOU.z=z;YOU.y=YOU.feet=floorAt(x,z)},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},STYLES,TILES,HEADS,toy:TOY};
+window.__club={YOU,CROWD,MUSIC,DECK,BOOTHS,VIP,POOL,BAR,DRESS,openDressing,closeDressing,FLAMES,CONFETTI,RIG,rigShow,BLACK,blackout,TALKERS,talk:()=>TALK,confettiFire,DRINKS,PIZZA,BOTTLES,openMenu,closeMenu,runBottle,RUNNER,bottleShow,setDeck,padHit,hypeCrowd,hype:()=>HYPE,floorAt,updateAct,act:()=>ACT,go:(x,z)=>{YOU.x=x;YOU.z=z;YOU.y=YOU.feet=floorAt(x,z)},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},STYLES,TILES,HEADS,toy:TOY};
 </script>
 </body>
 </html>
