@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.4">
+<meta name="world-build" content="6.5">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -3064,7 +3064,7 @@ addEventListener('pointerup',()=>{cutEnd();setTimeout(()=>{PRESSED=false},0)});a
    YOU · third person. The stick or the keys move you across what the camera sees, you turn yourself toward where you are going,
    and the camera hangs behind and above you and eases round behind you as you walk on. Nothing locks the mouse.
    ====================================================================== */
-const SPEED=9.0,RUN=14.0,ACC=44,DRAG=14,STEP=0.28,GRAV=20,JUMPV=6.1,DRIVEV=24;   /* 6.4: doubled for the shared garden; DRIVEV is the mower */   /* 16 studs a second; a hop of 0.93 m clears a quadrant hedge, never the outer one */
+const SPEED=9.0,RUN=14.0,ACC=44,DRAG=14,STEP=0.28,GRAV=20,JUMPV=6.1,DRIVEV=13,KACC=9,KBRAKE=16,KDRAG=2.15,KTURN=2.4;let KS=0;   /* 6.5: the mower is a kart: throttle, brake, steer, a little slide */   /* 16 studs a second; a hop of 0.93 m clears a quadrant hedge, never the outer one */
 /* 6.0 bindSeat: your estate is the plan placed at your seat. Everything that reads the plan (beds, house, oaks, plinths, the pen,
    the fountain, the gate, the lantern lights) is moved once, before the game binds to your state */
 let BOUND=-1,SEATBASE=null,DRIVE=false;
@@ -3079,7 +3079,7 @@ const MOWER=new THREE.Group();MOWER.visible=false;scene.add(MOWER);MOWER.wheels=
  km(new THREE.CylinderGeometry(0.06,0.06,0.5,10),chrome,0.36,1.05,-0.7).rotation.z=Math.PI/2;
  [[-0.56,0.66,0.30],[0.56,0.66,0.30],[-0.5,-0.7,0.22],[0.5,-0.7,0.22]].forEach(([x,z,r])=>{const w=km(new THREE.CylinderGeometry(r,r,0.22,16),tyre,x,r,z);w.rotation.z=Math.PI/2;MOWER.wheels.push(w);const hub=km(new THREE.CylinderGeometry(r*0.5,r*0.5,0.24,12),gold,x,r,z);hub.rotation.z=Math.PI/2;MOWER.wheels.push(hub)})}
 function showMower(){const on=!VISIT&&!!(S.tools&&S.tools.mower);MOWER.visible=on;if(!on){if(DRIVE)DRIVE=false;return}if(!DRIVE){const [x,z]=seatW(-8.6,-51.8);MOWER.position.set(x,floorAtW(x,z),z);MOWER.rotation.y=-SEATROT[BOUND<0?0:BOUND]+Math.PI/2}}
-function mowerToggle(){if(!MOWER.visible)return;DRIVE=!DRIVE;SND.buy(DRIVE?4:2);if(DRIVE){you.stepOff=0;toast('On the mower. Press E to get off.')}else{MOWER.position.set(you.x,you.feet,you.z);MOWER.rotation.y=you.face;you.x+=Math.sin(you.face+Math.PI/2)*1.1;you.z+=Math.cos(you.face+Math.PI/2)*1.1}hideAct()}
+function mowerToggle(){if(!MOWER.visible)return;DRIVE=!DRIVE;KS=0;SND.buy(DRIVE?4:2);if(DRIVE){you.stepOff=0;you.face=MOWER.rotation.y;toast(COARSE?'On the mower. Push forward for gas, sideways to steer.':'On the mower. W is gas, S brakes, A and D steer. E to get off.')}else{MOWER.position.set(you.x,you.feet,you.z);MOWER.rotation.y=you.face;you.x+=Math.sin(you.face+Math.PI/2)*1.1;you.z+=Math.cos(you.face+Math.PI/2)*1.1}hideAct()}
 function mowerBuy(){if(visitGuard('buy the mower'))return;if(S.tools.mower){toast('It is parked by the house.');return}const cost=gcv(TOOLS.mower.dc);
   const done=()=>{S.tools.mower=1;save();renderHud();SND.buy(8);closeStore();showMower();toast('The gold mower is yours. It is parked by the house.')};
   if(LIVE){if(BUSY)return;BUSY=true;renderTabs();RPC('mower_buy').then(r=>{BUSY=false;
@@ -3236,15 +3236,29 @@ function loop(now){
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
   if(keys['a']||keys['arrowleft'])ix-=1;if(keys['d']||keys['arrowright'])ix+=1;
-  const run=DRIVE?DRIVEV:(keys['shift']||RUNNING)?RUN:SPEED;let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
-  const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
-  const wantX=(iz*fx+ix*fz)*run,wantZ=(iz*fz-ix*fx)*run;
-  const k=mag>0.02?ACC:DRAG;
-  you.vx+=(wantX-you.vx)*Math.min(1,k*dt);you.vz+=(wantZ-you.vz)*Math.min(1,k*dt);
-  const sp=Math.hypot(you.vx,you.vz);
-  /* you face where you are going. The camera eases round behind you while you walk on ahead, never while you side step or come back toward it */
-  if(mag>0.02){you.face+=wrapA(Math.atan2(-wantX,-wantZ)-you.face)*Math.min(1,14*dt);you.moving+=dt}else you.moving=0;
-  if(you.moving>0.5&&now-lookAt>1400){const dA=wrapA(you.face-you.yaw);if(Math.abs(dA)<0.95)you.yaw+=dA*Math.min(1,1.8*dt)}
+  let mag,sp;
+  if(DRIVE){
+    /* THE KART: W is the throttle, S the brake (then reverse), A and D steer, and the steering bites with speed. Momentum carries you,
+       the drag is low, and the wheels only mostly follow the nose so a hard turn at speed slides a little. The camera swings in behind */
+    const th=Math.max(-1,Math.min(1,-iz)),st=Math.max(-1,Math.min(1,ix));
+    if(th>0)KS+=th*KACC*dt;else if(th<0){if(KS>0.3)KS+=th*KBRAKE*dt;else KS+=th*KACC*0.5*dt}
+    KS-=KS*KDRAG*dt*(th?0.35:1);KS=Math.max(-DRIVEV*0.4,Math.min(DRIVEV,KS));
+    const turn=KTURN*Math.min(1,Math.abs(KS)/5)*(KS<0?-1:1);you.face-=st*turn*dt;
+    const wantX=-Math.sin(you.face)*KS,wantZ=-Math.cos(you.face)*KS;const grip=Math.min(1,(3.5+2.5*(1-Math.abs(st)))*dt);
+    you.vx+=(wantX-you.vx)*grip;you.vz+=(wantZ-you.vz)*grip;sp=Math.hypot(you.vx,you.vz);mag=Math.abs(th);
+    if(sp>0.4)you.moving+=dt;else you.moving=0;
+    if(now-lookAt>900){const dA=wrapA(you.face-you.yaw);you.yaw+=dA*Math.min(1,3.2*dt)}
+  }else{
+    const run=(keys['shift']||RUNNING)?RUN:SPEED;mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
+    const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
+    const wantX=(iz*fx+ix*fz)*run,wantZ=(iz*fz-ix*fx)*run;
+    const k=mag>0.02?ACC:DRAG;
+    you.vx+=(wantX-you.vx)*Math.min(1,k*dt);you.vz+=(wantZ-you.vz)*Math.min(1,k*dt);
+    sp=Math.hypot(you.vx,you.vz);
+    /* you face where you are going. The camera eases round behind you while you walk on ahead, never while you side step or come back toward it */
+    if(mag>0.02){you.face+=wrapA(Math.atan2(-wantX,-wantZ)-you.face)*Math.min(1,14*dt);you.moving+=dt}else you.moving=0;
+    if(you.moving>0.5&&now-lookAt>1400){const dA=wrapA(you.face-you.yaw);if(Math.abs(dA)<0.95)you.yaw+=dA*Math.min(1,1.8*dt)}
+  }
   if(sp>0.01){
     const nx=you.x+you.vx*dt,nz=you.z+you.vz*dt;
     if(!blocked(nx,you.z))you.x=nx;else you.vx*=0.2;
