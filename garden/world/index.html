@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="5.4">
+<meta name="world-build" content="6.0">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -679,7 +679,11 @@ FLOWERS.forEach(t=>{const c=CAT[t];c.cap=3;c.cv=2});
    U metres per plan unit. the plan's 1000 box becomes a 70 m parterre: cross
    paths 4.2 m wide, the big bed 12 m long, the outer hedge 1.8 m thick. */
 const U=0.07;
-const px2w=(x,y)=>[(x-500)*U,(y-500)*U];   /* plan units -> world metres (x east, z south) */
+/* 6.0 THE SHARED WORLD: one room, up to four estates off one avenue. Every estate is the same plan placed at its seat; the
+   market row stands across the avenue's south end and everyone spawns there. EOX/EOZ is the offset the plan is read at */
+const SEATXZ=[[-52,65],[52,65],[-52,-65],[52,-65]],SEATNAME=['south west','south east','north west','north east'];
+let EOX=0,EOZ=0,MYSEAT=0;const ROOMB={x:118,z0:-140,z1:125};
+const px2w=(x,y)=>[(x-500)*U+EOX,(y-500)*U+EOZ];   /* plan units -> world metres (x east, z south) */
 
 /* ---------- pictures: plain img tags, each file once, shared ---------- */
 const IMGC=new Map();
@@ -749,7 +753,7 @@ function polyDist(P,closed,x,z){let d=1e9;const n=P.length,segs=closed?n:n-1;for
    one number per 25 cm cell: how high the thing standing there is. you can
    step up 28 cm, jump 72 cm, and anything taller stops you. if you are ever
    inside something you are simply stood on top of it, so nothing can trap you. */
-const CELL=0.25, EXT=64, GN=Math.round(EXT*2/CELL);
+const CELL=0.25, EXT=146, GN=Math.round(EXT*2/CELL);
 const GRID=new Float32Array(GN*GN);
 const gi=(x,z)=>{const ix=Math.floor((x+EXT)/CELL),iz=Math.floor((z+EXT)/CELL);return(ix<0||iz<0||ix>=GN||iz>=GN)?-1:iz*GN+ix};
 function markCell(x,z,h){const i=gi(x,z);if(i>=0&&GRID[i]<h)GRID[i]=h}
@@ -1062,17 +1066,20 @@ function mergeGeos(list){let vc=0,ic=0;list.forEach(g=>{vc+=g.attributes.positio
   list.forEach(g=>{pos.set(g.attributes.position.array,vo*3);uv.set(g.attributes.uv.array,vo*2);const ia=g.index.array;for(let i=0;i<ia.length;i++)idx[io+i]=ia[i]+vo;vo+=g.attributes.position.count;io+=ia.length});
   const out=new THREE.BufferGeometry();out.setAttribute('position',new THREE.BufferAttribute(pos,3));out.setAttribute('uv',new THREE.BufferAttribute(uv,2));out.setIndex(new THREE.BufferAttribute(idx,1));out.computeVertexNormals();return out}
 function flatGeo(path,y){const sh=new THREE.Shape(path.map(p=>new THREE.Vector2(p[0],-p[1])));const g=new THREE.ShapeGeometry(sh);g.rotateX(-Math.PI/2);g.translate(0,y,0);return g}
-function mesh(g,m,shadow){const o=new THREE.Mesh(g,m);if(shadow){o.castShadow=true;o.receiveShadow=true}else o.receiveShadow=true;scene.add(o);return o}
+let MESHTARGET=null;function mesh(g,m,shadow){const o=new THREE.Mesh(g,m);if(shadow){o.castShadow=true;o.receiveShadow=true}else o.receiveShadow=true;(MESHTARGET||scene).add(o);return o}
 
 /* ======================================================================
    THE GROUND
    ====================================================================== */
 const HALF=28.9;                 /* the outer hedge's outer face */
-const lawn=mesh(new THREE.PlaneGeometry(360,360),MAT.lawn);lawn.rotation.x=-Math.PI/2;
+const lawn=mesh(new THREE.PlaneGeometry(520,520),MAT.lawn);lawn.rotation.x=-Math.PI/2;
 const gravelG=[];
-{const g=new THREE.PlaneGeometry(HALF*2,HALF*2);g.rotateX(-Math.PI/2);g.translate(0,0.012,0);gravelG.push(g);
- [[0,-(HALF+9)],[0,HALF+9]].forEach(([x,z])=>{const p=new THREE.PlaneGeometry(4.2,18);p.rotateX(-Math.PI/2);p.translate(x,0.012,z);gravelG.push(p)});
- {const p=new THREE.PlaneGeometry(16,6.4);p.rotateX(-Math.PI/2);p.translate(0,0.012,45.2);gravelG.push(p)}}   /* the market apron across the end of the south avenue */
+{const strip=(w,d,x,z)=>{const p=new THREE.PlaneGeometry(w,d);p.rotateX(-Math.PI/2);p.translate(x,0.012,z);gravelG.push(p)};
+ SEATXZ.forEach(([ox,oz])=>{strip(HALF*2,HALF*2,ox,oz);strip(4.2,18,ox,oz-(HALF+9));strip(4.2,18,ox,oz+(HALF+9))});   /* each estate's square and its two approaches */
+ strip(4.2,146,0,36);                 /* THE AVENUE: from the market apron north to the far gates */
+ strip(108,4.2,0,100);strip(108,4.2,0,-22);   /* the two cross paths to the gates */
+ strip(26,26,0,-16);                  /* the square where the avenue meets the north row */
+ strip(16,6.4,0,110.2)}               /* the market apron across the end of the avenue */   /* the market apron across the end of the south avenue */
 const gravelMesh=mesh(mergeGeos(gravelG),MAT.gravel);
 /* ShapeGeometry and PlaneGeometry carry uv 0..1 or metre uv; make gravel and lawn repeat in metres */
 {const fix=(m,per)=>{const a=m.geometry.attributes.position,uv=m.geometry.attributes.uv;for(let i=0;i<a.count;i++){uv.setXY(i,a.getX(i)/per*1,a.getZ(i)/per*1)}uv.needsUpdate=true};
@@ -1084,13 +1091,13 @@ const gravelMesh=mesh(mergeGeos(gravelG),MAT.gravel);
    ====================================================================== */
 const quadPath=q=>{const [tx,ty,sx,sy]=QT[q];return resample(rrectPath(0,0,400,400,[12,12,110,12],10).map(([lx,ly])=>px2w(tx+lx*sx,ty+ly*sy)),true,0.14)};
 const bedPathLocal=b=>b.k==='c'?ellipsePath(b.cx,b.cy,b.r,b.r,40):b.k==='e'?ellipsePath(b.cx,b.cy,b.rx,b.ry,56):triPath(b.cx,b.cy,b.s,b.rot);
-const BED=[];                     /* per plot: world path, centre, extents */
-for(let plot=0;plot<40;plot++){const q=Math.floor(plot/10),b=BEDS[plot%10];const [tx,ty,sx,sy]=QT[q];
+function computeBED(){const B=[];for(let plot=0;plot<40;plot++){const q=Math.floor(plot/10),b=BEDS[plot%10];const [tx,ty,sx,sy]=QT[q];
   const P=resample(bedPathLocal(b).map(([lx,ly])=>px2w(tx+lx*sx,ty+ly*sy)),true,0.12);
   let cx=0,cz=0;P.forEach(p=>{cx+=p[0];cz+=p[1]});cx/=P.length;cz/=P.length;
   const area=polyArea(P);
   let rmax=0;P.forEach(p=>{rmax=Math.max(rmax,Math.hypot(p[0]-cx,p[1]-cz))});
-  BED.push({plot,P,cx,cz,area,rmax,q})}
+  B.push({plot,P,cx,cz,area,rmax,q})}return B}
+const BED=computeBED();           /* per plot: world path, centre, extents; re-read at your seat by bindSeat() */
 
 /* the four quadrant hedges, one mesh. Each is cut twice, an opening in the middle of the side that faces the avenue and one in the
    middle of the side that faces the cross path, so every quadrant can be walked into from the paths (the cut ends are capped with leaves) */
@@ -1102,61 +1109,66 @@ const quadRuns=q=>{const [tx,ty,sx,sy]=QT[q];
   const runs=[];let cur=[];D.forEach(p=>{if(inGap(p)){if(cur.length>1)runs.push(cur);cur=[]}else cur.push(p)});
   if(cur.length>1){if(runs.length&&!inGap(D[0]))runs[0]=cur.concat(runs[0]);else runs.push(cur)}
   return runs.map(R=>resample(R.map(([lx,ly])=>px2w(tx+lx*sx,ty+ly*sy)),false,0.14))};
-mesh(mergeGeos([0,1,2,3].flatMap(q=>quadRuns(q).map((P,i)=>{markBand(P,false,0.36,0.85);return sweepGeo(P,QPROF,false,0.9,1.9,0.022,100+q*4+i)}))),MAT.hedge,true);
-
 /* the forty bed edgings, one mesh, and their soil, one mesh */
 const BPROF=boxProfile(0.56,0.42,0.15);
-mesh(mergeGeos(BED.map(b=>{markPoly(b.P,0.12);markBand(b.P,true,0.29,0.26);return sweepGeo(b.P,BPROF,true,0.9,1.2,0.016,200+b.plot)})),MAT.hedge,true);   /* the edging is a step, not a wall: you can walk into any bed */
-mesh(mergeGeos(BED.map(b=>flatGeo(b.P,0.10))),MAT.soil);
-
 /* the fountain court: a low planted ring hugs the basin, low enough to step over, so the whole court walks */
 const RPROF=boxProfile(0.62,0.26,0.30,5);
-{const P=resample(ellipsePath(0,0,3.76,3.76,72),true,0.14);markBand(P,true,0.31,0.2);mesh(sweepGeo(P,RPROF,true,0.9,1.0,0.02,300),MAT.hedge,true)}
 /* eight stone finials where the quadrant hedges end at the court, an urn on a plinth */
+/* the outer hedge, tall, in two runs so the north and south openings stay open */
+const OPROF=boxProfile(1.82,2.6,0.62,6);
+/* the four stone piers with a lantern on top */
+const LANTERNS=[];{for(let i=0;i<4;i++){const light=new THREE.PointLight(0xffb86a,0,26,2);scene.add(light);LANTERNS.push(light)}}   /* your estate's four lantern lights, placed by bindSeat */
+/* 6.0 THE SHELL: everything of an estate that is the same for every owner, built once per seat: gravel is in the ground, here the
+   hedges, the edgings and soil, the court ring and finials, the outer hedge, the piers, the fountain's footprint */
+function buildShell(seat){const [ox,oz]=SEATXZ[seat];const sx=EOX,sz=EOZ;EOX=ox;EOZ=oz;const B=computeBED();
+mesh(mergeGeos([0,1,2,3].flatMap(q=>quadRuns(q).map((P,i)=>{markBand(P,false,0.36,0.85);return sweepGeo(P,QPROF,false,0.9,1.9,0.022,100+q*4+i)}))),MAT.hedge,true);
+mesh(mergeGeos(B.map(b=>{markPoly(b.P,0.12);markBand(b.P,true,0.29,0.26);return sweepGeo(b.P,BPROF,true,0.9,1.2,0.016,200+b.plot)})),MAT.hedge,true);
+mesh(mergeGeos(B.map(b=>flatGeo(b.P,0.10))),MAT.soil);
+{const P=resample(ellipsePath(ox,oz,3.76,3.76,72),true,0.14);markBand(P,true,0.31,0.2);mesh(sweepGeo(P,RPROF,true,0.9,1.0,0.02,300),MAT.hedge,true)}
+markDisk(ox,oz,3.36,0.82);
 {const urn=new THREE.LatheGeometry([[0,0],[0.24,0],[0.24,0.05],[0.13,0.08],[0.13,0.14],[0.22,0.24],[0.27,0.42],[0.24,0.55],[0.15,0.62],[0.17,0.68],[0.28,0.71],[0.28,0.75],[0,0.75]].map(p=>new THREE.Vector2(p[0],p[1])),24);
- [[2.6,9.0],[-2.6,9.0],[2.6,-9.0],[-2.6,-9.0],[9.0,2.6],[9.0,-2.6],[-9.0,2.6],[-9.0,-2.6]].forEach(([x,z])=>{
+ [[2.6,9.0],[-2.6,9.0],[2.6,-9.0],[-2.6,-9.0],[9.0,2.6],[9.0,-2.6],[-9.0,2.6],[-9.0,-2.6]].forEach(([x,z])=>{x+=ox;z+=oz;
    const plinth=mesh(new THREE.BoxGeometry(0.56,0.62,0.56),MAT.ashlar,true);plinth.position.set(x,0.31,z);
    const cap=mesh(new THREE.BoxGeometry(0.66,0.08,0.66),MAT.stone,true);cap.position.set(x,0.66,z);
    const u=mesh(urn,MAT.stone,true);u.position.set(x,0.70,z);markDisk(x,z,0.42,1.4)})}
 
-/* the outer hedge, tall, in two runs so the north and south openings stay open */
 const OPROF=boxProfile(1.82,2.6,0.62,6);
 {const c=(x,y)=>px2w(x,y);
  const west=resample([c(485,900),c(106,900),c(100,894),c(100,106),c(106,100),c(485,100)],false,0.16);
  const east=resample([c(515,100),c(894,100),c(900,106),c(900,894),c(894,900),c(515,900)],false,0.16);
  [west,east].forEach((P,i)=>{markBand(P,false,0.91,2.6);mesh(sweepGeo(P,OPROF,false,1.1,3.2,0.03,400+i),MAT.hedge,true)})}
 
-/* the four stone piers with a lantern on top */
-const LANTERNS=[];
 [[80,80],[920,80],[80,920],[920,920]].forEach(([x,y],i)=>{const [wx,wz]=px2w(x,y);
   const pier=mesh(new THREE.BoxGeometry(2.8,3.0,2.8),MAT.ashlar,true);pier.position.set(wx,1.5,wz);
   const cap=mesh(new THREE.BoxGeometry(3.15,0.28,3.15),MAT.stone,true);cap.position.set(wx,3.14,wz);
   const lb=mesh(new THREE.BoxGeometry(0.62,0.72,0.62),MAT.lantern,true);lb.position.set(wx,3.66,wz);
   const roof=mesh(new THREE.ConeGeometry(0.55,0.42,4),MAT.iron,true);roof.position.set(wx,4.22,wz);roof.rotation.y=Math.PI/4;
-  const light=new THREE.PointLight(0xffb86a,0,26,2);light.position.set(wx,3.9,wz);scene.add(light);LANTERNS.push(light);
-  markRect(wx-1.45,wz-1.45,wx+1.45,wz+1.45,3.0)});
+    markRect(wx-1.45,wz-1.45,wx+1.45,wz+1.45,3.0)});
+
+EOX=sx;EOZ=sz}
+SEATXZ.forEach((_,i)=>buildShell(i));
 
 /* ======================================================================
    THE FOUNTAIN
    ====================================================================== */
+const FG=new THREE.Group();scene.add(FG);MESHTARGET=FG;   /* 6.0: your fountain, placed at your seat */
 const lathe=(pts,seg)=>new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg||56);
 mesh(lathe([[0,0.02],[3.2,0.02],[3.2,0.68],[3.3,0.72],[3.3,0.82],[2.92,0.82],[2.8,0.74],[2.8,0.6],[2.5,0.56],[0,0.56]]),MAT.stone,true);
 const water=mesh(new THREE.CircleGeometry(2.82,56),MAT.water);water.rotation.x=-Math.PI/2;water.position.y=0.66;
 const fountainTop=mesh(lathe([[0,0.56],[0.62,0.56],[0.62,0.66],[0.46,0.76],[0.40,1.32],[0.56,1.42],[1.42,1.42],[1.52,1.5],[1.52,1.6],[1.12,1.66],[0.9,1.62],[0.3,1.58],[0.22,1.66],[0.22,2.08],[0.36,2.14],[0.36,2.26],[0.12,2.34],[0,2.4]],40),MAT.stone,true);
 const rimGold=mesh(new THREE.TorusGeometry(3.05,0.07,10,72),MAT.gold,true);rimGold.rotation.x=Math.PI/2;rimGold.position.y=0.84;rimGold.visible=false;
-const springLight=new THREE.PointLight(0xffd27a,0,16,2);springLight.position.set(0,3.4,0);scene.add(springLight);let SPRUNG=false;
+const springLight=new THREE.PointLight(0xffd27a,0,16,2);springLight.position.set(0,3.4,0);FG.add(springLight);let SPRUNG=false;
 const water2=mesh(new THREE.CircleGeometry(1.14,40),MAT.water);water2.rotation.x=-Math.PI/2;water2.position.y=1.56;
-markDisk(0,0,3.36,0.82);
 /* the jet: a hundred drops on their own arcs, one draw */
 const DROPS=110,dropMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.045,6,5),new THREE.MeshBasicMaterial({color:0xeef8ff,transparent:true,opacity:0.85}),DROPS);
-scene.add(dropMesh);
+FG.add(dropMesh);
 const dropSeed=[];{const r=rng(77);for(let i=0;i<DROPS;i++){const a=r()*6.28,el=1.18+r()*0.32,sp=3.3+r()*1.2;dropSeed.push({vx:Math.cos(a)*Math.cos(el)*sp,vy:Math.sin(el)*sp,vz:Math.sin(a)*Math.cos(el)*sp,t0:r()*1.6})}}
 const dropM=new THREE.Matrix4();
 function tickDrops(t){for(let i=0;i<DROPS;i++){const d=dropSeed[i];let u=(t+d.t0)%1.6;let x=d.vx*u,y=2.38+d.vy*u-4.9*u*u,z=d.vz*u;
   if(y<1.6){u=(t+d.t0+0.8)%1.6;x=d.vx*u;y=2.38+d.vy*u-4.9*u*u;z=d.vz*u}
   dropM.makeTranslation(x,y,z);dropMesh.setMatrixAt(i,dropM)}dropMesh.instanceMatrix.needsUpdate=true}
 /* THE SPRING: once the parterre is full the fountain throws a tall plume from the top, high over the court, the stone turns gold and fish come to the basin */
-const SDROPS=260,springMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.062,6,5),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.88}),SDROPS);springMesh.visible=false;scene.add(springMesh);
+const SDROPS=260,springMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(0.062,6,5),new THREE.MeshBasicMaterial({color:0xf4fbff,transparent:true,opacity:0.88}),SDROPS);springMesh.visible=false;FG.add(springMesh);
 const springSeed=[];{const r=rng(78);for(let i=0;i<SDROPS;i++){const col=i<150;const a=r()*6.28,el=col?1.50+r()*0.07:1.22+r()*0.2,sp=col?9.6+r()*2.2:6.8+r()*2.0;
   const vx=Math.cos(a)*Math.cos(el)*sp,vy=Math.sin(el)*sp,vz=Math.sin(a)*Math.cos(el)*sp,T=(vy+Math.sqrt(vy*vy+4*4.9*1.8))/9.8;   /* the flight from the crown at 2.4 m back to the water at 0.6 */
   springSeed.push({vx,vy,vz,T,t0:r()*T})}}
@@ -1168,18 +1180,19 @@ const FISHES=[];{const body=new THREE.SphereGeometry(0.27,14,10);body.scale(1,0.
  const fm=new THREE.MeshStandardMaterial({color:0xF07A1F,roughness:0.42,metalness:0.3,emissive:0x4a2205,emissiveIntensity:0.3}),fm2=new THREE.MeshStandardMaterial({color:0xFFB347,roughness:0.5,side:THREE.DoubleSide});
  const ring=new THREE.RingGeometry(0.28,0.46,28);
  for(let i=0;i<9;i++){const G=new THREE.Group();G.add(new THREE.Mesh(body,fm));const T=new THREE.Mesh(tail,fm2);T.rotation.z=Math.PI/2;T.position.x=-0.36;G.add(T);const F=new THREE.Mesh(fin,fm2);F.position.set(0.02,0.17,0);G.add(F);
-   const R=new THREE.Mesh(ring,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.35,depthWrite:false}));R.rotation.x=-Math.PI/2;R.visible=false;scene.add(R);G.visible=false;scene.add(G);FISHES.push({g:G,tail:T,ring:R})}}
+   const R=new THREE.Mesh(ring,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.35,depthWrite:false}));R.rotation.x=-Math.PI/2;R.visible=false;FG.add(R);G.visible=false;FG.add(G);FISHES.push({g:G,tail:T,ring:R})}}
 function tickFish(t,n){FISHES.forEach((f,i)=>{const on=i<n;f.g.visible=on;f.ring.visible=on;if(!on)return;const a=t*(0.46+0.05*i)+i*0.7,r=1.55+0.55*Math.sin(t*0.23+i*1.3),x=Math.cos(a)*r,z=Math.sin(a)*r;
   f.g.position.set(x,0.70+0.035*Math.sin(t*2.6+i),z);f.g.rotation.y=-a-Math.PI/2+Math.sin(t*2+i)*0.15;f.tail.rotation.y=Math.sin(t*9+i)*0.45;
   const k=(t*0.9+i*0.37)%1,s=1+0.5*k;f.ring.position.set(x,0.672,z);f.ring.scale.set(s,s,1);f.ring.material.opacity=0.38*(1-k)})}
 
+MESHTARGET=scene;
 /* ======================================================================
    THE MARKET ROW, on the lawn west of the south avenue, just outside the gate: the seed stand first, the florist beside it, a third place kept for the fish market.
    Each stall is built in a local frame (front = local -x, width along local z) and turned by its rot to face the avenue; the seller stands behind the counter.
    ====================================================================== */
-const MKZ=45.2,MKF=42.7;   /* 4.20: the market row stands across the end of the south avenue, facing the gate, so you see it from the garden */
+const MKZ=110.2,MKF=107.7;   /* 4.20: the market row stands across the end of the south avenue, facing the gate, so you see it from the garden */
 /* 5.1 THE CIRCLE: a ring of light on the market square east of the stalls. Step in and it takes you to the club; the same door will open other worlds later */
-const PORTAL={x:11,z:41,r:1.5};
+const PORTAL={x:11,z:106,r:1.5};const PADS=[[11,106],[-11,106]];   /* 6.0: the circle stands east of the fish stall; the west pad waits for the next world */
 const STAND={x:0,z:MKZ,rot:-Math.PI/2,front:{x:0,z:MKF}};
 /* where someone stands, seen from a stall's own frame: the angle a seller turns the head by (the face is on local -x) */
 const localLook=(dx,dz,th)=>Math.atan2(Math.sin(th)*dx+Math.cos(th)*dz,-(Math.cos(th)*dx-Math.sin(th)*dz));
@@ -1335,15 +1348,15 @@ function roomLevels(){const r=S.rooms||roomsOf(0,0);return [Math.max(r.down,ROOM
 let INSIDE=false,OUTPOS=null,ROOM='hall';
 const OAKS=[[-9,-42],[-14,-45.5],[-20,-43],[-11,-49],[-17,-52],[-23,-49.5],[9,-42],[14,-45.5],[20,-43],[11,-49],[17,-52],[23,-49.5]];
 const RINGS=[[-9.5,-33.0],[-15.0,-32.0],[-21.0,-33.5],[-12.0,-38.0],[-18.0,-37.5],[-24.0,-39.0],[9.5,-33.0],[15.0,-32.0],[21.0,-33.5],[12.0,-38.0],[18.0,-37.5],[24.0,-39.0],[-27.0,-42.0],[-32.5,-44.5],[-38.0,-42.5],[-29.0,-48.0],[-34.5,-50.5],[-40.0,-47.5],[27.0,-42.0],[32.5,-44.5],[38.0,-42.5],[29.0,-48.0],[34.5,-50.5],[40.0,-47.5],[-27.0,-32.0],[-33.0,-30.0],[-39.0,-31.5],[-27.5,-37.0],[-32.5,-39.5],[-39.5,-37.0],[27.0,-32.0],[33.0,-30.0],[39.0,-31.5],[27.5,-37.0],[32.5,-39.5],[39.5,-37.0],[-27.0,-55.0],[-33.5,-54.5],[-39.0,-55.5],[-29.5,-59.5],[-35.5,-58.5],[-41.0,-60.0],[27.0,-55.0],[33.5,-54.5],[39.0,-55.5],[29.5,-59.5],[35.5,-58.5],[41.0,-60.0]];   /* 3.4: the preset tree rings, four groves of twelve (six west, six east) that fill in with saplings from the Keeper, one grove at a time */
-const TREEPOS=OAKS.concat(RINGS),RING_BLOCK=12,RING_NAMES=['the front grove','the outer grove','the south corner','the north corner'];
-const CHEST_SPOTS=[[45,-31],[54,-11],[53,13],[41,36],[17,52],[-22,50],[-46,30],[-54,-8],[-45,-32],[-24,-45]];   /* 4.19: every spot inside the 61 m play radius (four sat beyond it and could be seen but never reached) */
+const TREEPOS=OAKS.concat(RINGS),TREEPOS0=TREEPOS.map(p=>p.slice()),SPOTS0=SPOTS.map(p=>p.slice()),RING_BLOCK=12,RING_NAMES=['the front grove','the outer grove','the south corner','the north corner'];
+const CHEST_SPOTS=[[104,-104],[-104,-104],[110,20],[-110,20],[104,112],[-104,112],[0,-118],[74,-60],[-74,-60],[-30,118]];   /* 6.0: ten hiding places in the wood round the room */   /* 4.19: every spot inside the 61 m play radius (four sat beyond it and could be seen but never reached) */
 const PLINTHS=[];
 const CAPS=[];
-SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);CAPS.push(cap);markDisk(x,z,0.62,1.0);PLINTHS.push({x,z,i})});
+SPOTS.forEach(([x,z],i)=>{const base=mesh(new THREE.BoxGeometry(1.0,0.52,1.0),MAT.ashlar,true);base.position.set(x,0.26,z);const cap=mesh(new THREE.BoxGeometry(1.12,0.08,1.12),MAT.stone,true);cap.position.set(x,0.56,z);CAPS.push(cap);PLINTHS.push({x,z,i,base,cap})});
 
 
 /* the golden dot: where you start, facing the garden through the south gap */
-const SPAWN={x:0,z:HALF+1.6,yaw:0};const GATE={x:0,z:HALF+0.9};   /* 4.0: the south gate, where friends' gardens are a step away */
+const SPAWN={x:0,z:MKF-4.5,yaw:0};const GATE={x:0,z:HALF+0.9};   /* 6.0: everyone spawns on the avenue in front of the market; GATE is your estate's south gate once bound */   /* 4.0: the south gate, where friends' gardens are a step away */
 
 /* ======================================================================
    BILLBOARDS: his flowers and trees, standing on the ground, one draw per kind
@@ -1440,23 +1453,29 @@ const WILD=[];   /* every wild tree in the wood and down the avenue: {x,z,h,h0,k
 {const r=rng(1234);const put={};const all=[];
  const add=(kind,x,z,h)=>{const it={x,z,y:0,h,h0:h,flip:r()>.5,kind};(put[kind]=put[kind]||[]).push(it);all.push(it);markDisk(x,z,kind==='cypress'?0.42:0.55,3)};
  /* the avenue: cypress pairs down both openings */
- [-1,1].forEach(side=>{for(let k=0;k<6;k++){if(side<0&&k>=4)continue;if(side>0&&k>=3)continue;const z=side*(HALF+3.4+k*4.1);const hs=side<0?(1-k*0.13):1;add('cypress',-3.1,z,(7.6+r()*1.2)*hs);add('cypress',3.1,z,(7.6+r()*1.2)*hs)}});   /* north side steps down 13% a pair, the last pair about two thirds */   /* no cypress in front of the market */
+ for(let k=0;k<8;k++){const z=MKF-8-k*4.1;add('cypress',-3.1,z,7.6+r()*1.2);add('cypress',3.1,z,7.6+r()*1.2)}   /* 6.0: cypress pairs up the avenue from the market */
+ for(let k=0;k<5;k++){const z=-34+k*4.1;add('cypress',-3.1,z,(7.6+r()*1.2)*(1-k*0.1));add('cypress',3.1,z,(7.6+r()*1.2)*(1-k*0.1))}   /* north side steps down 13% a pair, the last pair about two thirds */   /* no cypress in front of the market */
  /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
- while(all.length<150&&tries<6000){tries++;const a=r()*6.28,d=HALF+3.6+Math.pow(r(),0.8)*31;const x=Math.cos(a)*d,z=Math.sin(a)*d;
-   if(Math.abs(x)<5.2&&Math.abs(z)<HALF+20)continue;              /* the two paths out */
-   if(Math.max(Math.abs(x),Math.abs(z))<HALF+2.6)continue;          /* inside the hedge */
+ while(all.length<330&&tries<30000){tries++;const x=(r()-0.5)*2*(ROOMB.x+18),z=ROOMB.z0-16+r()*(ROOMB.z1-ROOMB.z0+32);
+   let inEst=false;for(const [ox,oz] of SEATXZ){const dx=x-ox,dz=z-oz;
+     if(Math.abs(dx)<5.2&&Math.abs(dz)<HALF+20){inEst=true;break}                 /* the estate's two paths */
+     if(Math.max(Math.abs(dx),Math.abs(dz))<HALF+2.6){inEst=true;break}             /* inside its hedge */
+     if(Math.hypot(dx,dz+61)<17){inEst=true;break}                                   /* its house and lawn */
+     if(TREEPOS0.some(([tx,tz])=>Math.hypot(dx-tx,dz-tz)<3.6)){inEst=true;break}      /* its oaks and rings */
+     if(SPOTS0.some(([sx,sz])=>Math.hypot(dx-sx,dz-sz)<3.2)){inEst=true;break}}       /* its plinths */
+   if(inEst)continue;
+   if(Math.abs(x)<7.4&&z>-42&&z<MKZ+6)continue;                      /* the avenue */
+   if(Math.abs(x)<56&&(Math.abs(z-100)<5||Math.abs(z+22)<5))continue; /* the cross paths */
+   if(Math.abs(x)<17&&Math.abs(z+16)<17)continue;                     /* the square */
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
    if(Math.hypot(x-MARKET3.x,z-MARKET3.z)<5.2)continue;             /* the fish market */
-   if(Math.hypot(x-PORTAL.x,z-PORTAL.z)<5.5)continue;               /* 5.2: the circle stands in the open */
-   if(Math.hypot(x-HOUSE.x,z-HOUSE.z)<17)continue;                   /* the house and its lawn */
-   if(TREEPOS.some(([ox,oz])=>Math.hypot(x-ox,z-oz)<3.6))continue;    /* the oak groves and the tree rings */
+   if(PADS.some(([px,pz])=>Math.hypot(x-px,z-pz)<5.5))continue;      /* the circle and its pad */
    if(CHEST_SPOTS.some(([cx,cz])=>Math.hypot(x-cx,z-cz)<2.6))continue;/* room to stand at the chest */
-   if(SPOTS.some(([sx,sz])=>Math.hypot(x-sx,z-sz)<3.2))continue;     /* the plinths */
    let ok=true;for(const o of all){if(Math.hypot(o.x-x,o.z-z)<3.6){ok=false;break}}if(!ok)continue;
-   const kind=kinds[Math.floor(r()*kinds.length)];const far=(d-HALF)/34;
+   const kind=kinds[Math.floor(r()*kinds.length)];const far=Math.min(1,Math.max(0,(Math.max(Math.abs(x)-93,Math.abs(z)-93))/40));
    add(kind,x,z,kind==='cypress'?6.5+r()*3:6.2+r()*2.6+far*3)}
  Object.entries(put).forEach(([k,items])=>{const im=placeStand(kindOf('tree-'+k,TREES[k][0],()=>treeCanvas(TREES[k][1]),0.012),items);items.forEach((it,i)=>{it.im=im;it.idx=i;it.w=WILD.length;WILD.push(it)})});
  shadowBatch(all.filter(t=>t.kind!=='cypress').map(t=>({x:t.x,z:t.z,h:t.h*0.9})),0.9,0.03);
@@ -1617,7 +1636,7 @@ function fireflyTick(t){if(ffMat.opacity<=0)return;const a=ffGeo.attributes.posi
    ====================================================================== */
 const SB_URL='https://helqqdygwaihrliglbvw.supabase.co',SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
 let sb=null,LIVE=false,ADMIN=false,ME=null,BUSY=false;
-let VISIT=null,MYHANDLE='',PRES=null,PRESENCE={},FR={},POSAT=0,POSLAST=null;const GHANDLE=(QS.get('g')||'').trim();   /* 4.0: the garden you are in, when it is a friend's */
+let VISIT=null,MYHANDLE='',PRES=null,PRESENCE={},FR={},POSAT=0,POSLAST=null;const GHANDLE='';   /* 6.0: ?g= joins that friend's world instead (RHANDLE) */   /* 4.0: the garden you are in, when it is a friend's */
 const APP=ON_SITE?'/':'https://deeds.fun/';
 const TESTING=false;                               /* demo watering: once a day, like live */
 const freeWater=()=>LIVE?ADMIN:TESTING;
@@ -1729,12 +1748,12 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
 function lumberDone(l){if(!l||!(+l.felled>0))return;const L=gardAt(GARD_MAX);SND.chip();toast('The lumberjack \u00B7 '+plural(+l.felled,'bundle')+' to the builder'+(l.raised?' \u00B7 the house rises':'')+'.');if(l.raised)refresh()}
 function refresh(){if(!sb||!LIVE||!PATCH44)return;Promise.resolve(VISIT?sb.rpc(PATCH64?'garden_visit_state2':'garden_visit_state',{p_owner:VISIT.owner}):sb.rpc(PATCH69?'garden_state12':PATCH64?'garden_state11':PATCH62?'garden_state10':PATCH61?'garden_state9':PATCH60?'garden_state8':PATCH55?'garden_state7':PATCH50?'garden_state6':PATCH47?'garden_state5':PATCH46?'garden_state4':PATCH45?'garden_state3':'garden_state2')).then(r=>{if(!r.error&&r.data)hydrate(r.data)}).catch(()=>{})}
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
-  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;loadLook();
-    return loadState().then(r2=>{
+  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s){bindSeat(0);return}ME=s.user.id;loadLook();
+    return roomEnter().then(loadState).then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
         if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
         toast(rpcFail(r2.error,'The garden could not load your sack.'));return}
-      hydrate(r2.data||{});joinGarden(VISIT?VISIT.owner:ME);if(PATCH69&&!VISIT)roomJoin();
+      hydrate(r2.data||{});joinGarden(VISIT?VISIT.owner:(WROOM&&WROOM.host)||ME);roomStart();
       if(VISIT)setTimeout(()=>toast('You are in '+VISIT.handle+'\u2019s garden. What you pick, sell or chop is theirs.'),1200);else Promise.resolve(sb.rpc('garden_visit_recent')).then(r=>{if(!r.error)showAway(r.data)}).catch(()=>{});
       try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w||VISIT)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}
       try{sb.channel('garden-gc-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'garden_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w||VISIT)return;S.gc=+w.balance;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}})}).catch(()=>{})}
@@ -2500,7 +2519,7 @@ const TREE={n:TREEPOS.length,blobs:[],fall:{},marked:{}};
  const sg=new THREE.CylinderGeometry(0.44,0.5,0.55,12);sg.translate(0,0.27,0);TREE.stump=inst(sg,bark);
  const dg=new THREE.CircleGeometry(0.95,24);dg.rotateX(-Math.PI/2);dg.translate(0,0.015,0);TREE.disc=inst(dg,soil,false);
  const rg=new THREE.RingGeometry(0.95,1.12,24);rg.rotateX(-Math.PI/2);rg.translate(0,0.02,0);TREE.rim=inst(rg,rim,false);
- OAKS.forEach(([x,z],i)=>{markDisk(x,z,0.62,3);TREE.marked[i]=1})}
+ }
 const _tm=new THREE.Matrix4(),_tq=new THREE.Quaternion(),_te=new THREE.Euler(),_tp=new THREE.Vector3(),_ts=new THREE.Vector3(),_tz=new THREE.Matrix4().makeScale(0,0,0);
 function treeMatrix(i,s,rx,rz){const [x,z]=TREEPOS[i];_te.set(rx||0,0,rz||0);_tq.setFromEuler(_te);_tp.set(x,0,z);_ts.set(s,s,s);_tm.compose(_tp,_tq,_ts);return _tm}
 function setTree(i,vis,s,rx,rz){const m=vis?treeMatrix(i,s,rx,rz):_tz;TREE.trunk.setMatrixAt(i,m);TREE.blobs.forEach(b=>b.setMatrixAt(i,m))}
@@ -2709,7 +2728,7 @@ function facadeTex(kind){const S=256,c=document.createElement('canvas');c.width=
    [-1,1].forEach(s=>at(s*0.88,1.5,0.08,0.24,3.0,0.2));at(0,3.06,0.1,2.1,0.2,0.26);at(0,0.03,0.12,1.9,0.06,0.3)}
  /* bake the kit: one InstancedMesh per stage and part */
  Object.entries(INST).forEach(([k,ms])=>{const [st,part]=k.split(':');const [g,m]=PART[part];const im=new THREE.InstancedMesh(g,m,ms.length);ms.forEach((mm,i)=>im.setMatrixAt(i,mm));im.instanceMatrix.needsUpdate=true;im.castShadow=true;im.receiveShadow=true;HG.add(im);STAGE[+st].push(im)});
- markRect(HOUSE.x-11,HOUSE.z-3.5,HOUSE.x+11,HOUSE.z+4.1,4.6)}
+}
 function renderHouse(){const st=LIVE?S.house.stage:Math.max(S.house.stage,HOUSE_PREVIEW);for(let k=1;k<=3;k++)STAGE[k].forEach(o=>o.visible=k<=st);STAGE[2].forEach(o=>{if(o.userData&&o.userData.roof2)o.visible=st===2});renderPile()}
 /* the builder and his woodpile */
 const BUILDER={swing:-1};
@@ -2727,11 +2746,10 @@ const BUILDER={swing:-1};
    const F=new THREE.Group();F.position.set(0,-0.33,0);A.add(F);km(new THREE.CylinderGeometry(0.05,0.045,0.28,10),skin,0,-0.14,0,F);km(new THREE.SphereGeometry(0.055,10,8),skin,0,-0.3,0,F);A.fore=F;return A};
  BUILDER.armL=arm(-1);BUILDER.armR=arm(1);BUILDER.armL.rotation.x=0.15;BUILDER.armL.fore.rotation.x=-0.5;BUILDER.armR.rotation.x=-0.2;BUILDER.armR.fore.rotation.x=-0.9;
  km(new THREE.CylinderGeometry(0.02,0.02,0.42,8),wood,0,-0.3,0.1,BUILDER.armR.fore);km(new THREE.BoxGeometry(0.16,0.07,0.07),steel,0,-0.3,0.3,BUILDER.armR.fore);
- markDisk(HOUSE.front.x,HOUSE.front.z-1.6,0.4,1.2);
- /* the woodpile */
- const P=new THREE.Group();P.position.set(HOUSE.front.x+2.4,0,HOUSE.front.z-2.2);scene.add(P);BUILDER.pile=[];
+  /* the woodpile */
+ const P=new THREE.Group();P.position.set(HOUSE.front.x+2.4,0,HOUSE.front.z-2.2);scene.add(P);BUILDER.pile=[];BUILDER.pileG=P;
  const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});for(let k=0;k<12;k++){const row=k<5?0:k<9?1:2,c=k<5?k:k<9?k-5:k-9,n=k<5?5:k<9?4:3;const l=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,1.4,10),bark);l.rotation.z=Math.PI/2;l.position.set(0,0.16+row*0.3,(c-(n-1)/2)*0.36);l.castShadow=true;l.visible=false;P.add(l);BUILDER.pile.push(l)}
- markRect(HOUSE.front.x+1.6,HOUSE.front.z-3.2,HOUSE.front.x+3.2,HOUSE.front.z-1.2,0.9)}
+}
 function renderPile(){const n=Math.min(12,S.house.stage>=3?12:S.house.wood);BUILDER.pile.forEach((l,k)=>l.visible=k<n)}
 function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood from the oaks.');return}
   const done=(wood,stage,dl)=>{const was=S.house.stage,rb=S.rooms||roomsOf(0,0);S.wood=0;S.house.wood=wood;S.house.stage=stage;S.rooms=roomsOf(wood,stage);save();renderHud();paintBundle();renderHouse();
@@ -2940,7 +2958,7 @@ function bedNear(){let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];if(
 function bedHere(){const n=bedNear();return n.b&&n.d<1.3?n.b:null}
 function plinthNear(){let best=null,bd=1e9;PLINTHS.forEach(p=>{const d=Math.hypot(p.x-you.x,p.z-you.z);if(d<bd){bd=d;best=p}});return {p:best,d:bd}}
 function distTo(kind,id){if(kind==='compass')return Math.hypot(you.x-COMPASS.x,you.z-COMPASS.z);if(kind==='wild'){const it=WILD[id];return it?Math.hypot(you.x-it.x,you.z-it.z):1e9}if(kind==='gate')return Math.hypot(you.x-GATE.x,you.z-GATE.z);if(kind==='stand')return Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z);if(kind==='florist')return Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z);
-  if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x,you.z);
+  if(kind==='fish')return Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z);if(kind==='fountain')return Math.hypot(you.x-EOX,you.z-EOZ);
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
   if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);if(kind==='door')return Math.hypot(DOORW.x-you.x,DOORW.z-you.z);return bedDist(BED[id])}
 function oakNear(){let best=-1,bd=1e9;const awake=treesAwake();TREEPOS.forEach(([ox,oz],i)=>{if(isRing(i)&&(!awake||(!planted(i)&&!ringOpen(i))))return;const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
@@ -2973,7 +2991,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   const T=pickTarget();
   if(T.kind==='door'){showAct('Go inside.','enter',null,null,houseLocked()?'locked \u00B7 '+mmss(lockLeft())+' left':roomsWord(),(houseLvl()>=1&&!VISIT)?[{l:houseLocked()?'Lock again.':'Lock the house.',f:lockHouse}].concat(EST().fence?[]:[{l:'Picket fence \u00B7 '+FENCE_GC.toLocaleString()+'.',f:fenceBuy}]):null,[DOORW.x,2.6,DOORW.z]);return}
   if(T.kind==='portal'){showAct('Step into the circle.','portal',null,null,ph==='night'?'the club is open':'the club, any hour',null,[PORTAL.x,2.2,PORTAL.z]);return}
-  if(T.kind==='gate'){const at=[GATE.x,2.4,GATE.z];if(!LIVE)showAct('Friends can walk into your garden. Sign in on DEEDS.',null,null,null,'the gate',null,at);else if(VISIT)showAct('Go home to your garden.','home',null,null,'you are in '+VISIT.handle+'\u2019s garden',null,at);else if(ROOMJ&&!ROOMJ.home&&ROOMJ.host_handle)showAct('Join '+ROOMJ.host_handle+' \u00B7 '+(+ROOMJ.here||1)+' there.','room',null,null,'friends are in the garden',[{l:'Other gardens.',f:openFriends}],at);else showAct('Visit a friend\u2019s garden.','friends',null,null,'friends who follow you back',null,at);return}
+  if(T.kind==='gate'){const at=[GATE.x,2.4,GATE.z];if(!LIVE)showAct('Friends can walk into your garden. Sign in on DEEDS.',null,null,null,'the gate',null,at);else if(VISIT)showAct('Go home to your garden.','home',null,null,'you are in '+VISIT.handle+'\u2019s garden',null,at);else if(WROOM&&WROOM.members&&WROOM.members.length>1)showAct(roomWords(),'roomlist',null,null,WROOM.home?'your world':WROOM.host_handle+'\u2019s world',[{l:'Other gardens.',f:openFriends}],at);else showAct('Visit a friend\u2019s garden.','friends',null,null,'friends who follow you back',null,at);return}
   if(T.kind==='stand'){if(!ATSTAND){ATSTAND=true;SND.hello()}showAct('The Shop.','stand',null,null,'\u201CSeeds are '+gcv(Math.min(...FLOWERS.map(id=>CAT[id].price)))+' to '+gcv(Math.max(...FLOWERS.map(id=>CAT[id].price)))+'. Gardencoin first, Deedcoins fill in.\u201D',null,stallAt(STAND));return}
   ATSTAND=false;
   if(T.kind==='florist'){if(!ATFLORIST){ATFLORIST=true;SND.hello()}const bq=basketQty();
@@ -3039,7 +3057,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='room'){if(ROOMJ&&ROOMJ.host_handle)location.href=location.pathname+'?g='+encodeURIComponent(ROOMJ.host_handle)}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);updateAct()}
+function act(){if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -3061,6 +3079,19 @@ addEventListener('pointerup',()=>{cutEnd();setTimeout(()=>{PRESSED=false},0)});a
    and the camera hangs behind and above you and eases round behind you as you walk on. Nothing locks the mouse.
    ====================================================================== */
 const SPEED=4.5,RUN=7.0,ACC=22,DRAG=14,STEP=0.28,GRAV=20,JUMPV=6.1;   /* 16 studs a second; a hop of 0.93 m clears a quadrant hedge, never the outer one */
+/* 6.0 bindSeat: your estate is the plan placed at your seat. Everything that reads the plan (beds, house, oaks, plinths, the pen,
+   the fountain, the gate, the lantern lights) is moved once, before the game binds to your state */
+let BOUND=-1;
+function bindSeat(seat){seat=Math.max(0,Math.min(3,seat|0));if(BOUND===seat)return;const [ox,oz]=SEATXZ[seat];const px=BOUND<0?0:SEATXZ[BOUND][0],pz=BOUND<0?0:SEATXZ[BOUND][1];const dx=ox-px,dz=oz-pz;BOUND=seat;MYSEAT=seat;EOX=ox;EOZ=oz;
+  const nb=computeBED();BED.length=0;nb.forEach(b=>BED.push(b));
+  HOUSE.x+=dx;HOUSE.z+=dz;HOUSE.front.x+=dx;HOUSE.front.z+=dz;DOORW.x+=dx;DOORW.z+=dz;HG.position.set(HOUSE.x,0,HOUSE.z);
+  if(BUILDER.g){BUILDER.g.position.x+=dx;BUILDER.g.position.z+=dz}if(BUILDER.pileG){BUILDER.pileG.position.x+=dx;BUILDER.pileG.position.z+=dz}
+  TREEPOS.forEach(p=>{p[0]+=dx;p[1]+=dz});SPOTS.forEach(p=>{p[0]+=dx;p[1]+=dz});
+  PLINTHS.forEach(p=>{p.x+=dx;p.z+=dz;p.base.position.x+=dx;p.base.position.z+=dz;p.cap.position.x+=dx;p.cap.position.z+=dz;markDisk(p.x,p.z,0.62,1.0)});
+  CORRAL.x+=dx;CORRAL.z+=dz;FG.position.set(ox,0,oz);GATE.x=ox;GATE.z=oz+HALF+0.9;
+  [[80,80],[920,80],[80,920],[920,920]].forEach(([x,y],i)=>{const [wx,wz]=px2w(x,y);LANTERNS[i].position.set(wx,3.9,wz)});
+  markRect(HOUSE.x-11,HOUSE.z-3.5,HOUSE.x+11,HOUSE.z+4.1,4.6);markDisk(HOUSE.front.x,HOUSE.front.z-1.6,0.4,1.2);markRect(HOUSE.front.x+1.6,HOUSE.front.z-3.2,HOUSE.front.x+3.2,HOUSE.front.z-1.2,0.9);
+  if(typeof TREE!=='undefined'&&TREE.marked)TREE.marked.length=0}
 const you={x:SPAWN.x,z:SPAWN.z,yaw:SPAWN.yaw,pitch:-0.36,face:SPAWN.yaw,dist:COARSE?5.2:4.6,vx:0,vz:0,feet:0,vy:0,grounded:true,stepOff:0,moving:0};
 let camDist=you.dist;
 camera.rotation.order='YXZ';
@@ -3112,7 +3143,7 @@ function tapAt(cx,cy){if(STORE_ON||BLOOM||INSIDE||$('#forms').classList.contains
   if(Math.hypot(hx-STAND.x,hz-STAND.z)<2.6&&Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<3.4){openStore('stand');return true}
   if(Math.hypot(hx-FLORIST.x,hz-FLORIST.z)<2.6&&Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<3.4){sellFlowers();return true}
   if(Math.hypot(hx-MARKET3.x,hz-MARKET3.z)<2.6&&Math.hypot(you.x-MARKET3.front.x,you.z-MARKET3.front.z)<3.4){sellFish();return true}
-  if(Math.hypot(hx,hz)<3.1&&Math.hypot(you.x,you.z)<ENTER.fountain){catchFish();return true}
+  if(Math.hypot(hx-EOX,hz-EOZ)<3.1&&Math.hypot(you.x-EOX,you.z-EOZ)<ENTER.fountain){catchFish();return true}
   const pl=plinthHere();if(pl&&Math.hypot(hx-pl.x,hz-pl.z)<1.1&&ACT&&(ACT.mode==='marble'||ACT.mode==='chip')){act();return true}
   return false}
 /* a tap is a press that neither moves nor lingers. A press held still on a planted bed brings up Dig, and its release does nothing. */
@@ -3176,7 +3207,7 @@ const areaEl=$('#area'),nearEl=$('#near'),walkEl=$('#walkin');
 let areaNow='';
 function labels(){
   if(INSIDE){const nm=(INTERIOR.R[ROOM]||{}).name||'Your house';if(nm!==areaNow){areaNow=nm;areaEl.innerHTML=nm+'<span>.</span>'}nearEl.textContent='';return}
-  let name='The Parterre';const d0=Math.hypot(you.x,you.z);
+  let name='The Parterre';const d0=Math.hypot(you.x-EOX,you.z-EOZ);
   if(d0<6.2)name='The Fountain';
   else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(Math.abs(you.x)<8&&you.z>40.5&&you.z<49)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
   if(name!==areaNow){areaNow=name;areaEl.innerHTML=name+'<span>.</span>'}
@@ -3206,13 +3237,13 @@ function loop(now){
     const nx=you.x+you.vx*dt,nz=you.z+you.vz*dt;
     if(!blocked(nx,you.z))you.x=nx;else you.vx*=0.2;
     if(!blocked(you.x,nz))you.z=nz;else you.vz*=0.2;
-    const rr=Math.hypot(you.x,you.z);if(!INSIDE&&rr>61){you.x*=61/rr;you.z*=61/rr}
+    if(!INSIDE){you.x=Math.max(-ROOMB.x,Math.min(ROOMB.x,you.x));you.z=Math.max(ROOMB.z0,Math.min(ROOMB.z1,you.z))}
   }
   /* up and down: stand on whatever is under you, never inside it */
   const fl=floorAt(you.x,you.z);
   if(jumpQ){jumpQ=false;if(you.grounded){you.vy=JUMPV;you.grounded=false}}
   if(you.grounded){if(fl>you.feet+1e-3){you.stepOff-=(fl-you.feet);you.feet=fl}else if(fl<you.feet-1e-3)you.grounded=false}
-  if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);if(!INSIDE&&you.vy<-1.5&&fl>0.8&&Math.hypot(you.x,you.z)<3.4)fountainDive();you.feet=fl;you.vy=0;you.grounded=true}}
+  if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);if(!INSIDE&&you.vy<-1.5&&fl>0.8&&Math.hypot(you.x-EOX,you.z-EOZ)<3.4)fountainDive();you.feet=fl;you.vy=0;you.grounded=true}}
   you.stepOff+=(0-you.stepOff)*Math.min(1,12*dt);
   /* the body, then the camera: behind and above, pulled in when a hedge or a tree would come between */
   AV.g.position.set(you.x,you.feet+you.stepOff,you.z);AV.g.rotation.y=you.face;avatarTick(t,dt,sp,mag);friendsTick(dt);pulsePos(now,sp);
@@ -3476,8 +3507,22 @@ function sackRows69(){const row=(a,b,m)=>'<div class="srow"><span>'+a+(m?' <span
   const lv=Object.values(LEVELS).filter(v=>v>0).length;if(lv)h+=row('Bed levels',lv,'picks there pay more');
   if(WX)h+=row('Weather',WX.kind==='golden'?'a golden day':WX.kind,WX.next?'tomorrow '+WX.next:'');return h}
 /* where the friends are */
-function roomJoin(){if(!sb)return;Promise.resolve(sb.rpc('room_join')).then(r=>{const d=r.data||{};if(r.error||!d.ok)return;ROOMJ=d;if(!d.home&&d.host_handle)setTimeout(()=>toast(d.host_handle+' is in the garden'+(+d.here>1?' with '+(+d.here-1)+' more':'')+'. The gate takes you there.'),2600)}).catch(()=>{})}
-
+/* 6.0 THE WROOM (patch 70): world_room sits you in a world. The first friend in opens it, the next three land in it, each at a seat
+   with their own estate; a fifth opens their own. Re-asked every 45 s; if the host changes the page comes back in the new world */
+let WROOM=null,ROOMT=null;const RHANDLE=(QS.get('r')||QS.get('g')||'').trim();
+function roomWords(){if(!WROOM||!WROOM.members)return '';const o=WROOM.members.filter(m=>m.id!==ME).map(m=>m.handle+' ('+SEATNAME[(m.seat|0)-1]+')');return o.length?(o.length===1?o[0]+' is':o.join(', ')+' are')+' in the world with you.':'Nobody else is here yet.'}
+function roomAsk(id){return Promise.race([Promise.resolve(sb.rpc('world_room',id?{p_room:id}:{})).then(r=>(r.error||!r.data||!r.data.ok)?null:r.data).catch(()=>null),new Promise(res=>setTimeout(()=>res(null),8000))])}
+function roomEnter(){if(!sb||!ME){bindSeat(0);return Promise.resolve()}
+  const host=RHANDLE?Promise.resolve(sb.from('profiles').select('id').ilike('handle',RHANDLE).limit(1)).then(r=>(r.data&&r.data[0]&&r.data[0].id)||null).catch(()=>null):Promise.resolve(null);
+  return host.then(roomAsk).then(d=>{if(!d){bindSeat(0);return}WROOM=d;bindSeat((d.seat|0)-1);
+    if(!d.home)setTimeout(()=>toast('You are in '+d.host_handle+'\u2019s world. Your estate is the '+SEATNAME[(d.seat|0)-1]+' one.'),1400);
+    else if(d.members&&d.members.length>1)setTimeout(()=>toast(roomWords()),1400)})}
+function roomStart(){if(ROOMT||!sb||!ME)return;ROOMT=setInterval(()=>{if(document.hidden||!WROOM)return;roomAsk(WROOM.home?null:WROOM.host).then(d=>{if(!d)return;
+    if(d.host!==WROOM.host||d.seat!==WROOM.seat){toast('The world has moved. One moment.');setTimeout(()=>{location.href=location.pathname+(d.home?'':'?r='+encodeURIComponent(d.host_handle))},900);return}
+    const was=(WROOM.members||[]).map(m=>m.id).join(),now=(d.members||[]).map(m=>m.id).join();WROOM=d;
+    if(was!==now){const fresh=(d.members||[]).filter(m=>m.id!==ME&&was.indexOf(m.id)<0);fresh.forEach(m=>toast(m.handle+' is in the world, at the '+SEATNAME[(m.seat|0)-1]+' estate.'))}})},45000);
+  const bye=()=>{try{Promise.resolve(sb.rpc('world_leave')).then(()=>{},()=>{})}catch(e){}};window.addEventListener('pagehide',bye)}
+setTimeout(()=>{if(BOUND<0&&!sb)bindSeat(0)},7000);   /* no CDN, no session: the plan still needs a seat */
 /* 5.1 THE CIRCLE. A ring on the ground that breathes cyan and pink, a slow column of light motes rising inside it; step in and the world fades to the club. */
 const PORTALG=new THREE.Group();PORTALG.position.set(PORTAL.x,0.05,PORTAL.z);scene.add(PORTALG);
 const PORTAL_RING=new THREE.Mesh(new THREE.TorusGeometry(PORTAL.r,0.07,8,64),new THREE.MeshBasicMaterial({color:0x28e0ff}));PORTAL_RING.rotation.x=Math.PI/2;PORTALG.add(PORTAL_RING);
@@ -3490,7 +3535,7 @@ function portalTick(t,dt){const k=ph==='night'?1.35:1;PORTAL_RING.material.color
   PORTAL_MOTES.forEach(p=>{p.y+=p.v*dt*(PORTAL_GOING?6:1);if(p.y>2.8)p.y=0;p.a+=dt*0.8;p.m.position.set(Math.cos(p.a)*p.r,p.y,Math.sin(p.a)*p.r);p.m.material.opacity=0.85*Math.min(1,(2.8-p.y)/0.6)})}
 function portalGo(){if(PORTAL_GOING)return;PORTAL_GOING=true;SND.tier();toast('The circle takes you.');const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:#07060a;opacity:0;transition:opacity .9s;z-index:80;pointer-events:none';document.body.appendChild(v);requestAnimationFrame(()=>{v.style.opacity='1'});
   setTimeout(()=>{location.href=(/(^|\.)deeds\.fun$/.test(location.hostname)?'/garden/club/':'../club/')},1000)}
-window.__walk={VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomJoin,room:()=>ROOMJ,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();paintBundle();paintBar();renderHud();labels();updateAct();
