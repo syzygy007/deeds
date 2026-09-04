@@ -213,7 +213,10 @@ const DECK={x:0,z:-13.2,y:0.9,front:{x:0,z:-11.2}};
  /* the light bars behind the DJ */
  DECK.bars=[];for(let k=0;k<7;k++){const b=mesh(new THREE.BoxGeometry(0.16,5.2,0.16),neonMat(NEONS[k%5],0.6),-4.2+k*1.4,3.6,-1.7,G);DECK.bars.push(b)}
  /* the sign over the decks */
- const sign=mesh(new THREE.BoxGeometry(6.4,1.1,0.12),neonMat(NEON.pink,0.9),0,7.4,-1.85,G);DECK.sign=sign;
+ const signM=neonMat(NEON.pink,0.9);const sign=mesh(new THREE.BoxGeometry(6.5,0.08,0.1),signM,0,7.4+0.6,-1.83,G);DECK.sign=sign;mesh(new THREE.BoxGeometry(6.5,0.08,0.1),signM,0,7.4-0.6,-1.83,G);mesh(new THREE.BoxGeometry(0.08,1.28,0.1),signM,-3.25,7.4,-1.83,G);mesh(new THREE.BoxGeometry(0.08,1.28,0.1),signM,3.25,7.4,-1.83,G);
+ mesh(new THREE.BoxGeometry(6.4,1.1,0.06),new THREE.MeshStandardMaterial({color:0x07060b,roughness:0.3,metalness:0.6}),0,7.4,-1.86,G);
+ DECK.signCv=document.createElement('canvas');DECK.signCv.width=1024;DECK.signCv.height=176;DECK.signTex=new THREE.CanvasTexture(DECK.signCv);DECK.signTex.minFilter=THREE.LinearFilter;
+ DECK.signText=mesh(new THREE.PlaneGeometry(6.0,1.03),new THREE.MeshBasicMaterial({map:DECK.signTex,transparent:true,depthWrite:false,toneMapped:false}),0,7.4,-1.79,G);DECK.signNames=null;
  mesh(new THREE.BoxGeometry(6.8,1.5,0.06),M.black,0,7.4,-1.92,G)}
 
 /* THE BAR along the west wall, THE BOOTHS along the east wall, TWO VIP TERRACES in the south corners */
@@ -326,7 +329,9 @@ const BOTTLES=[{k:'moonlight',n:'A bottle of Moonlight',d:'sparkling elderflower
 function openMenu(kind){const rows=$('#mRows');const item=(it,tag)=>'<div class="it" style="color:#'+new THREE.Color(it.c).getHexString()+'"><i class="dot"></i><div class="nm" style="color:var(--ivory)">'+it.n+'<small>'+it.d+'</small></div><div class="pr" style="color:var(--ivory)">'+it.gc.toLocaleString()+' gc</div><button data-k="'+it.k+'" data-t="'+tag+'">'+(tag==='bottle'?'Send it':'Order')+'</button></div>';
   if(kind==='bar'){$('#mTitle').innerHTML='The bar<span style="color:var(--amber)">.</span>';$('#mSub').textContent='NOTHING HERE IS ALCOHOL. EVERYTHING HERE IS COLD.';rows.innerHTML='<div class="lab">DRINKS · BUY ONE FOR ANYONE AND CARRY IT OVER</div>'+DRINKS.map(d=>item(d,'drink')).join('')+'<div class="lab">PIZZA · THE OVEN BY THE BAR</div>'+PIZZA.map(p=>item(p,'pizza')).join('')}
   else{$('#mTitle').innerHTML='Bottle service<span style="color:var(--amber)">.</span>';$('#mSub').textContent='A RUNNER BRINGS IT OVER THEIR HEAD. THE ROOM WATCHES.';rows.innerHTML='<div class="lab">THE BOTTLES · NAMED FOR WHAT THE GARDEN GIVES</div>'+BOTTLES.map(b=>item(b,'bottle')).join('')}
-  $$('#mRows button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,t=b.dataset.t;closeMenu();if(t==='bottle')runBottle(BOTTLES.find(x=>x.k===k));else if(t==='drink'){toast('A '+DRINKS.find(x=>x.k===k).n.toLowerCase()+'. The till opens with patch 70, this one is on the house.');addHype(1)}else if(k==='goldpie')runBottle(PIZZA.find(x=>x.k===k));else toast('Pizza. The oven lights with patch 70.')});
+  $$('#mRows button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,t=b.dataset.t;closeMenu();const it=(t==='bottle'?BOTTLES:t==='drink'?DRINKS:PIZZA).find(x=>x.k===k);if(!it)return;
+    const show=()=>{if(t==='bottle'||k==='goldpie'||k==='pie')runBottle(it);else if(t==='drink'){toast('A '+it.n.toLowerCase()+'. Cold.');sparks(YOU.x,1.9,YOU.z,6,it.c);AV.armR.rotation.x=-2.4;setTimeout(()=>{if(!ATDECK)AV.armR.rotation.x=-0.3},900);addHype(2)}else{toast('A slice. Hot from the oven by the bar.');sparks(YOU.x,1.9,YOU.z,4,it.c);addHype(1)}};
+    buy(t,k,d=>{const money=it.n+'. '+(+d.price).toLocaleString()+' gc. '+(+d.balance).toLocaleString()+' left.';if(t==='drink'||k==='slice'){show();toast(money)}else{toast(money);show()}sendAct({bought:it.n.toLowerCase(),show:(t==='bottle'||k==='goldpie'||k==='pie')?it:null})},show)});
   $('#menu').classList.add('on')}
 function closeMenu(){$('#menu').classList.remove('on')}
 $('#mClose').onclick=closeMenu;$('#menu').addEventListener('click',e=>{if(e.target===e.currentTarget)closeMenu()});
@@ -410,7 +415,8 @@ function spawnCrowd(n,seed){const r=rng(seed);for(let i=0;i<n;i++){const look=CL
     CROWD.push(Object.assign(d,{x,z,hx:x,hz:z,spot,body:look.eq.body,look,ph:r()*6.28,rate:0.8+r()*0.5,dance:DANCES[Math.floor(r()*DANCES.length)],mood:0,hands:0,jump:0,face:d.g.rotation.y,turn:0,glow:NEONS[Math.floor(r()*5)]}))}}
 spawnCrowd(COARSE?36:66,2026);
 function redress(){TOY=!!(window.Figure&&window.Wardrobe&&window.Wardrobe.util);if(!TOY)return 0;let n=0;CROWD.forEach(c=>{if(c.toy)return;const d=makeToy(c.look);if(!d)return;scene.remove(c.g);d.g.position.copy(c.g.position);d.g.rotation.copy(c.g.rotation);Object.assign(c,{g:d.g,fig:d.fig,s:d.s,d:d.d,legL:d.legL,legR:d.legR,armL:d.armL,armR:d.armR,head:d.head,toy:true});scene.add(c.g);n++});
-  if(AV&&!AV.toy){const d=makeToy(AV.look);if(d){scene.remove(AV.g);const look=AV.look;AV=Object.assign(d,{look});scene.add(AV.g)}}return n}
+  if(AV&&!AV.toy){const d=makeToy(AV.look);if(d){scene.remove(AV.g);const look=AV.look;AV=Object.assign(d,{look});scene.add(AV.g)}}
+  try{Object.values(FR).forEach(f=>{if(f.av&&!f.av.toy&&f.look)dressFriend(f)})}catch(e){}return n}
 window.__toyReady.then(ok=>{if(ok){const n=redress();if(n)console.log('club: the wardrobe landed, '+n+' redressed')}else toast('The wardrobe did not load. Drawn dancers tonight.')});
 /* 0.2: PAIRS who talk (turned to each other, nodding, a hand now and then) and a few who WANT TO TALK to you (they watch you come, wave, and answer a tap) */
 {const floor=CROWD.filter(c=>c.spot==='floor');let k=0;for(let i=0;i+1<floor.length&&k<9;i+=6){const a=floor[i],b=floor[i+1];b.x=a.x+1.1;b.z=a.z+0.2;b.g.position.x=b.x;b.g.position.z=b.z;a.g.rotation.y=a.face=Math.atan2(-(b.x-a.x),-(b.z-a.z));b.g.rotation.y=b.face=Math.atan2(-(a.x-b.x),-(a.z-b.z));a.dance='talk';b.dance='talk';a.pair=b;b.pair=a;a.ph=0;b.ph=3.1;k++}
@@ -641,7 +647,7 @@ function hypeTick(dt){if(HYPE>0){HYPE=Math.max(0,HYPE-dt*1.1);$('#hypeN').textCo
 const deckEl=$('#deck');
 {const more=$('#more');const lab=()=>{more.textContent=deckEl.classList.contains('mini')?'Sampler \u25B4':'Less \u25BE'};if(COARSE)deckEl.classList.add('mini');lab();more.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();deckEl.classList.toggle('mini');lab();PANF=0})}
 function setDeck(on){ATDECK=on;deckEl.classList.toggle('on',on);$('#hint').textContent=on?'Tap the pads. The room is watching you.':'Drag left to walk · drag right to look · walk up to the decks';
-  if(on){YOU.x=DECK.x;YOU.z=DECK.z-0.6;YOU.face=Math.PI;YOU.yaw=Math.PI;YOU.y=YOU.feet=floorAt(YOU.x,YOU.z);AV.armL.rotation.x=-0.9;AV.armR.rotation.x=-0.6;AV.armL.rotation.z=0.2;AV.armR.rotation.z=-0.2;toast('You are on the decks. The whole room turned to look.');CROWD.forEach(c=>{c.turn=3});MUSIC.start();surge(true);PANF=0}else{surge(false);walkCam()}document.body.classList.toggle('ondeck',on);
+  if(on){YOU.x=DECK.x;YOU.z=DECK.z-0.6;YOU.face=Math.PI;YOU.yaw=Math.PI;YOU.y=YOU.feet=floorAt(YOU.x,YOU.z);AV.armL.rotation.x=-0.9;AV.armR.rotation.x=-0.6;AV.armL.rotation.z=0.2;AV.armR.rotation.z=-0.2;toast('You are on the decks. The whole room turned to look.');CROWD.forEach(c=>{c.turn=3});MUSIC.start();surge(true);PANF=0}else{surge(false);walkCam()}document.body.classList.toggle('ondeck',on);deckChanged();
   hideAct()}
 /* 1.4 THE DJ VIEW. The old deck camera sat at z -16.4, behind the north wall (the room ends at z -15), so from the decks you looked at the back of a wall. Now it rides over your right shoulder inside the room,
    the projection is lifted so the floor sits in the clear above the pad panel (a view offset the height of the panel), and the lens opens on a phone held upright */
@@ -649,14 +655,14 @@ function deckCam(t){if((PANF++%20)===0)PANH=deckEl.classList.contains('on')?Math
   const W=innerWidth,H=innerHeight,full=H+PANH,fovV=COARSE&&H>W?78:BASEFOV;camera.aspect=W/full;camera.fov=Math.min(104,2*Math.atan(Math.tan(fovV*Math.PI/360)*full/H)*180/Math.PI);camera.setViewOffset(W,full,0,PANH,W,H);camera.updateProjectionMatrix();
   camera.position.set(YOU.x+1.15+Math.sin(t*0.13)*0.5,3.55+Math.sin(t*0.21)*0.1,DECK.z-1.35);camera.lookAt(YOU.x-0.25,1.25,YOU.z+8.5)}
 function walkCam(){PANH=0;camera.clearViewOffset();camera.aspect=innerWidth/innerHeight;camera.fov=BASEFOV;camera.updateProjectionMatrix()}
-function padHit(kind){if(!ATDECK)return;MUSIC.pad(kind);hypeCrowd(kind);const el=$('.pad[data-pad='+kind+']');if(el){el.classList.add('hit','lit');setTimeout(()=>el.classList.remove('hit'),120);setTimeout(()=>el.classList.remove('lit'),kind==='riser'?3600:500)}
+function padHit(kind){if(!ATDECK)return;MUSIC.pad(kind);hypeCrowd(kind);sendAct({pad:kind});const el=$('.pad[data-pad='+kind+']');if(el){el.classList.add('hit','lit');setTimeout(()=>el.classList.remove('hit'),120);setTimeout(()=>el.classList.remove('lit'),kind==='riser'?3600:500)}
   const k=['drop','riser','strobe','lasers','horn','filter','flames','confetti'].indexOf(kind);if(k>=0&&DECK.pads[k]){DECK.pads[k].material.color.set(NEONS[k%5]);setTimeout(()=>DECK.pads[k].material.color.set(new THREE.Color(NEONS[k%5]).multiplyScalar(0.25)),500)}
   if(kind==='drop')FLOOR.until=performance.now()+3000;
   if(AV){AV.armR.rotation.x=-2.6;setTimeout(()=>{if(ATDECK)AV.armR.rotation.x=-0.6},260)}}
 $$('.pad').forEach(b=>{const kind=b.dataset.pad;if(kind==='filter'){b.addEventListener('pointerdown',e=>{e.preventDefault();if(!ATDECK)return;b.classList.add('lit');MUSIC.filterHold(true);CROWD.forEach(c=>{if(Math.random()<0.6)c.hands=1.5})});const up=e=>{b.classList.remove('lit');MUSIC.filterHold(false);if(ATDECK){hypeCrowd('release')}};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up)}
   else b.addEventListener('pointerdown',e=>{e.preventDefault();padHit(kind)})});
-$$('.sp').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();if(!ATDECK)return;MUSIC.hit(b.dataset.s);if(Math.random()<0.4)hypeCrowd('sample');AV.armL.rotation.x=-1.6;setTimeout(()=>{if(ATDECK)AV.armL.rotation.x=-0.9},140)}));
-addEventListener('keydown',e=>{if(!ATDECK||e.repeat)return;const map={q:'hey',w:'oh',e:'yeah',a:'woo',s:'choir',d:'brass',z:'808',x:'snare',c:'rim'};const k=map[e.key.toLowerCase()];if(k){MUSIC.hit(k);if(Math.random()<0.4)hypeCrowd('sample')}});
+$$('.sp').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();if(!ATDECK)return;MUSIC.hit(b.dataset.s);sendAct({s:b.dataset.s});if(Math.random()<0.4)hypeCrowd('sample');AV.armL.rotation.x=-1.6;setTimeout(()=>{if(ATDECK)AV.armL.rotation.x=-0.9},140)}));
+addEventListener('keydown',e=>{if(!ATDECK||e.repeat)return;const map={q:'hey',w:'oh',e:'yeah',a:'woo',s:'choir',d:'brass',z:'808',x:'snare',c:'rim'};const k=map[e.key.toLowerCase()];if(k){MUSIC.hit(k);sendAct({s:k});if(Math.random()<0.4)hypeCrowd('sample')}});
 {const el=$('#scratch'),disc=el.querySelector('.disc');let id=null,lastX=0,lastT=0,ang=0;el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(!ATDECK)return;id=e.pointerId;lastX=e.clientX;lastT=performance.now();el.setPointerCapture(id);MUSIC.scratch(0)});
  let vel=0;el.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const now=performance.now(),dt=Math.max(4,now-lastT);const dx=e.clientX-lastX;lastX=e.clientX;lastT=now;vel=dx/dt*1.6;ang+=dx*0.9;disc.style.transform='rotate('+ang+'deg)';MUSIC.scratch(vel);if(Math.abs(vel)>1&&Math.random()<0.15)hypeCrowd('sample')});
  const up=e=>{if(e.pointerId!==id)return;id=null;vel=0;MUSIC.scratchStop()};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
@@ -666,7 +672,7 @@ addEventListener('keydown',e=>{if(!ATDECK)return;const map={'1':'drop','2':'rise
 /* 1.0 THE DRESSING ROOM opens over the club in a frame (avatar.html at the root). Close it, or tap its back link, and you come out wearing what you picked. */
 function openDressing(){const d=$('#dressing');let f=d.querySelector('iframe');if(!f){f=document.createElement('iframe');f.setAttribute('allow','autoplay');d.appendChild(f)}f.src=(ON_SITE?'/':'../../')+'avatar.html?back=club&t='+Date.now();d.classList.add('on');mvX=mvZ=0;lookDX=lookDY=0;hideAct();toast('Through the curtain.')}
 function closeDressing(){const d=$('#dressing');d.classList.remove('on');const f=d.querySelector('iframe');if(f)f.src='about:blank';
-  try{const j=JSON.parse(localStorage.getItem('deeds_look')||'null');if(j&&j.eq&&j.eq.body&&TOY){const nd=makeToy({eq:j.eq,cw:j.cw||{}});if(nd){scene.remove(AV.g);nd.g.position.copy(AV.g.position);nd.g.rotation.copy(AV.g.rotation);AV=Object.assign(nd,{look:{eq:j.eq,cw:j.cw||{}}});scene.add(AV.g);toast('Looking good.');sparks(YOU.x,1.8,YOU.z,8,NEON.pink)}}}catch(e){}updateAct()}
+  try{const j=JSON.parse(localStorage.getItem('deeds_look')||'null');if(j&&j.eq&&j.eq.body&&TOY){const nd=makeToy({eq:j.eq,cw:j.cw||{}});if(nd){scene.remove(AV.g);nd.g.position.copy(AV.g.position);nd.g.rotation.copy(AV.g.rotation);AV=Object.assign(nd,{look:{eq:j.eq,cw:j.cw||{}}});scene.add(AV.g);toast('Looking good.');sparks(YOU.x,1.8,YOU.z,8,NEON.pink);lookChanged()}}}catch(e){}updateAct()}
 $('#dressX').addEventListener('click',closeDressing);addEventListener('message',e=>{if(e.data&&e.data.deeds==='wardrobe_done')closeDressing()});
 /* the prompt over what you are near */
 const actEl=$('#act'),actMain=$('#actMain');let ACT=null,ANCHOR=null,TALK=null;
@@ -717,7 +723,7 @@ let last=performance.now(),SIM=false;
 function loop(now){const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now;const t=now/1000;
   if($('#menu').classList.contains('on')||$('#dressing').classList.contains('on')){mvX=mvZ=0;lookDX=lookDY=0}if(!ATDECK)walkTick(dt);else{AV.g.position.set(YOU.x,YOU.y,YOU.z);AV.g.rotation.y=Math.PI;deckCam(t);
     const p=BEATPH*6.28;AV.legL.rotation.x=Math.sin(p)*0.12;AV.legR.rotation.x=-Math.sin(p)*0.12;AV.g.position.y=YOU.y+Math.abs(Math.sin(p))*0.04}
-  danceTick(t,dt,BEATPH+BEATN,ENERGY*(MUSIC.on()?1:0.35));talkTick(t,dt);runnerTick(t,dt);lightsTick(t,dt);sparkTick(dt);hypeTick(dt);surgeTick(dt);flamesTick(dt);confettiTick(dt);poolTick(t,dt);
+  danceTick(t,dt,BEATPH+BEATN,ENERGY*(MUSIC.on()?1:0.35));talkTick(t,dt);runnerTick(t,dt);lightsTick(t,dt);sparkTick(dt);hypeTick(dt);surgeTick(dt);friendsTick(dt,t,BEATPH);pulsePos(now);flamesTick(dt);confettiTick(dt);poolTick(t,dt);
   if(!SIM){updateAct();placeAct();renderer.render(scene,camera);requestAnimationFrame(loop)}}
 /* 0.9 the sound gate. On a phone the ringer switch silences Web Audio unless a real media element has played, so a silent clip plays on the same tap; every later touch resumes the context; the chip shows the state */
 let SILENT=null;
@@ -727,13 +733,105 @@ function unlockAudio(){try{if(!SILENT){SILENT=document.createElement('audio');SI
 function testTone(){try{const a=MUSIC.ctx();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.setValueAtTime(0.0001,a.currentTime);g.gain.exponentialRampToValueAtTime(0.4,a.currentTime+0.01);g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.35);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+0.4)}catch(e){shout('tone: '+e.message)}}
 function paintSnd(){const el=$('#snd');const st=MUSIC.state();if(!MUSIC.on()){el.classList.remove('on');return}el.classList.add('on');const ok=st==='running';const a=MUSIC.ctx();el.textContent=ok?'Sound on \u00B7 '+Math.round(a.currentTime)+'s \u00B7 beat '+(MUSIC.stepAt()>>2):'Tap for sound \u00B7 '+st;el.classList.toggle('warn',!ok)}
 setInterval(paintSnd,800);
-function paintPurse(){const el=$('#purse');let gc=null;try{gc=localStorage.getItem('deeds_gc')}catch(e){}if(gc==null||isNaN(+gc)){el.classList.remove('on');return}el.textContent=(+gc).toLocaleString()+' gc';el.classList.add('on')}paintPurse();setInterval(paintPurse,3000);
+let GC=null;function paintPurse(){const el=$('#purse');let gc=GC;if(gc==null){try{gc=localStorage.getItem('deeds_gc')}catch(e){}}if(gc==null||isNaN(+gc)){el.classList.remove('on');return}el.textContent=(+gc).toLocaleString()+' gc';el.classList.add('on')}paintPurse();setInterval(paintPurse,3000);
 $('#snd').addEventListener('pointerdown',e=>{e.preventDefault();unlockAudio();MUSIC.start();testTone();setTimeout(paintSnd,300)});
 document.addEventListener('pointerdown',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});document.addEventListener('touchend',()=>{if(MUSIC.on())MUSIC.resume()},{passive:true});
 $('#enter').addEventListener('click',()=>{unlockAudio();MUSIC.start();$('#load').style.opacity='0';setTimeout(()=>{$('#load').style.display='none'},600);toast('Welcome in. Walk up to the decks.');requestAnimationFrame(loop)});
 $('#enter').addEventListener('touchend',()=>{unlockAudio()},{passive:true});
-$('#leave').addEventListener('click',()=>{location.href=ON_SITE?'/garden/world/':'../world/'});
-window.__club={YOU,CROWD,MUSIC,DECK,BOOTHS,VIP,POOL,BAR,DRESS,openDressing,closeDressing,FLAMES,CONFETTI,RIG,rigShow,BLACK,blackout,TALKERS,talk:()=>TALK,confettiFire,DRINKS,PIZZA,BOTTLES,openMenu,closeMenu,runBottle,RUNNER,bottleShow,setDeck,padHit,hypeCrowd,hype:()=>HYPE,surge,surgeTick,deckCam,walkCam,tier:()=>TIER,floorAt,updateAct,act:()=>ACT,go:(x,z)=>{YOU.x=x;YOU.z=z;YOU.y=YOU.feet=floorAt(x,z)},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},STYLES,TILES,HEADS,toy:TOY};
+/* ======================================================================
+   1.5 THE ROOM. Real people in the club: one presence channel (club:main), everyone you see is drawn from the look they
+   send, a neon name over the head, and whoever holds the decks has their name in neon on the sign. The same doors and
+   channel shape as the garden world (patch 61 presence_ping, the garden:<owner> channel), so the two games agree.
+   ====================================================================== */
+const SB_URL='https://helqqdygwaihrliglbvw.supabase.co',SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
+let sb=null,ME=null,MYHANDLE='',PRES=null,PRESOK=false,POSAT=0,POSLAST=null,PRESENCE={},DECKAT=0,PINGT=0,BUYING=false;
+const FR={};
+function myColor(id){const h=hashId(id||'x');return NEONS[h%5]}
+function hashId(s){let h=7;for(let i=0;i<(s||'').length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
+/* the neon name over a head: white core, coloured glow, tinted by the material so it reads as a tube */
+function nameSprite(text,hex){const c=document.createElement('canvas');c.width=512;c.height=128;const g=c.getContext('2d');const t=String(text||'').toUpperCase().slice(0,16);
+  g.font='800 58px ui-monospace,Menlo,Consolas,monospace';g.textAlign='center';g.textBaseline='middle';const col='#'+new THREE.Color(hex).getHexString();
+  g.shadowColor=col;g.shadowBlur=26;g.fillStyle=col;g.fillText(t,256,66);g.fillText(t,256,66);g.shadowBlur=0;g.fillStyle='#ffffff';g.fillText(t,256,66);
+  const tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));sp.scale.set(2.3,0.575,1);sp.renderOrder=6;return sp}
+/* the sign over the decks: whoever holds them, in neon */
+function paintSign(names){const c=DECK.signCv,g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);let t=names.length?names.map(n=>String(n).toUpperCase().slice(0,14)).join(' b2b '):'OPEN DECKS';
+  let size=118;g.font='800 '+size+'px ui-monospace,Menlo,Consolas,monospace';while(g.measureText(t).width>c.width-80&&size>40){size-=6;g.font='800 '+size+'px ui-monospace,Menlo,Consolas,monospace'}
+  g.textAlign='center';g.textBaseline='middle';g.shadowColor='#ffffff';g.shadowBlur=30;g.fillStyle='#ffffff';g.fillText(t,c.width/2,c.height/2+4);g.fillText(t,c.width/2,c.height/2+4);g.shadowBlur=0;g.fillText(t,c.width/2,c.height/2+4);
+  DECK.signTex.needsUpdate=true;DECK.signNames=names.slice()}
+function djNames(){const list=[];if(ATDECK)list.push({h:MYHANDLE||'YOU',at:DECKAT||1});Object.values(FR).forEach(f=>{if(f.deck)list.push({h:f.h||'A FRIEND',at:f.deckAt||2})});list.sort((a,b)=>a.at-b.at);return list.map(x=>x.h)}
+function signTick(){if(DECK.signText)DECK.signText.material.color.copy(DECK.sign.material.color);const n=djNames();const cur=DECK.signNames||[];if(n.length!==cur.length||n.some((x,i)=>x!==cur[i]))paintSign(n)}
+/* the channel */
+function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
+  sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s)return;ME=s.user.id;
+    Promise.resolve(sb.from('profiles').select('handle').eq('id',ME).limit(1)).then(r2=>{const p=r2.data&&r2.data[0];if(p&&p.handle)MYHANDLE=p.handle;joinRoom();signTick()}).catch(joinRoom);
+    purseRead();pingStart();
+    try{sb.channel('club-gc-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'garden_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(w&&w.balance!=null)setGc(+w.balance)}).subscribe()}catch(e){}
+  }).catch(()=>{})}
+function myState(){return {id:ME,h:MYHANDLE,x:+YOU.x.toFixed(2),z:+YOU.z.toFixed(2),yaw:+YOU.face.toFixed(2),m:false,deck:ATDECK?1:0,dk:DECKAT||0,av:AV&&AV.look||null,t:Date.now()}}
+function joinRoom(){if(!sb||!ME||PRES)return;const ch=sb.channel('club:main',{config:{presence:{key:ME},broadcast:{self:false,ack:false}}});
+  ch.on('presence',{event:'sync'},()=>{onPresence(ch.presenceState())}).on('broadcast',{event:'pos'},m=>onPos(m&&m.payload)).on('broadcast',{event:'act'},m=>onAct(m&&m.payload))
+    .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;trackMe()}});PRES=ch}
+function trackMe(){if(!PRES||!PRESOK)return;try{PRES.track(myState())}catch(e){}}
+function leaveRoom(){if(PRES){try{sb.removeChannel(PRES)}catch(e){}PRES=null;PRESOK=false}Object.keys(FR).forEach(dropFriend);PRESENCE={}}
+function pingStart(){const ping=()=>{if(!sb||!ME)return;try{Promise.resolve(sb.rpc('presence_ping',{p_game:'club',p_room:'main'})).then(()=>{},()=>{})}catch(e){}};ping();if(!PINGT)PINGT=setInterval(()=>{if(!document.hidden)ping()},45000)}
+function pingLeave(){if(!sb||!ME)return;try{Promise.resolve(sb.rpc('presence_leave',{})).then(()=>{},()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pingLeave();else if(sb&&ME){pingStart();trackMe()}});
+window.addEventListener('pagehide',()=>{pingLeave();leaveRoom()});
+function onPresence(state){state=state||{};const seen={};Object.keys(state).forEach(k=>{if(k===ME)return;const p=(state[k]||[])[0];if(!p||!p.id)return;seen[k]=Object.assign(PRESENCE[k]||{},p)});PRESENCE=seen;syncFriends()}
+function onPos(p){if(!p||!p.id||p.id===ME)return;if(!FR[p.id]){if(!PRESENCE[p.id])PRESENCE[p.id]={id:p.id,h:p.h||'',av:p.av||null};syncFriends()}const f=FR[p.id];if(!f)return;
+  f.tx=+p.x||0;f.tz=+p.z||0;f.tyaw=+p.yaw||0;f.moving=!!p.m;f.last=performance.now();if(p.h&&p.h!==f.h){f.h=p.h;relabel(f)}
+  if(p.deck!==undefined){const was=f.deck;f.deck=!!p.deck;f.deckAt=+p.dk||f.deckAt||Date.now();if(f.deck&&!was){toast((f.h||'A friend')+' took the decks.');CROWD.forEach(c=>{c.turn=3});sparks(DECK.x,3.2,DECK.z,8,myColor(f.id))}if(!f.deck&&was)toast((f.h||'A friend')+' stepped off the decks.')}
+  if(p.av&&p.av.eq&&lookKey(p.av)!==f.lookKey){f.look=p.av;dressFriend(f)}}
+function onAct(p){if(!p||!p.id||p.id===ME)return;const f=FR[p.id];const who=(f&&f.h)||p.h||'A friend';
+  if(p.pad){if(MUSIC.on())MUSIC.pad(p.pad);hypeCrowd(p.pad);const el=$('.pad[data-pad='+p.pad+']');if(el){el.classList.add('lit');setTimeout(()=>el.classList.remove('lit'),p.pad==='riser'?3600:500)}}
+  if(p.s){if(MUSIC.on())MUSIC.hit(p.s)}
+  if(p.bought){toast(who+' bought '+p.bought+'.');if(p.show)runBottle(p.show)}}
+function sendAct(o){if(!PRES||!PRESOK)return;try{PRES.send({type:'broadcast',event:'act',payload:Object.assign({id:ME,h:MYHANDLE},o)})}catch(e){}}
+function lookKey(l){try{return JSON.stringify(l)}catch(e){return ''}}
+/* the figures */
+function dressFriend(f){const look=f.look&&f.look.eq?f.look:null;let d=(TOY&&look)?makeToy(look):null;if(!d)d=makeDrawn(rng(hashId(f.id)));
+  if(f.av){scene.remove(f.av.g);if(f.label)f.av.g.remove(f.label)}f.av=d;f.lookKey=look?lookKey(look):'';f.av.ph=Math.random()*6;
+  if(!f.label)f.label=nameSprite(f.h||'friend',myColor(f.id));f.label.position.set(0,AVH+0.34,0);f.av.g.add(f.label);f.av.g.position.set(f.x,floorAt(f.x,f.z),f.z);f.av.g.rotation.y=f.yaw;scene.add(f.av.g)}
+function relabel(f){if(f.label){f.av.g.remove(f.label);f.label.material.map.dispose();f.label=null}f.label=nameSprite(f.h||'friend',myColor(f.id));f.label.position.set(0,AVH+0.34,0);f.av.g.add(f.label)}
+function syncFriends(){Object.keys(PRESENCE).forEach(id=>{const p=PRESENCE[id];if(FR[id]){const f=FR[id];if(p.h&&p.h!==f.h){f.h=p.h;relabel(f)}if(p.av&&p.av.eq&&lookKey(p.av)!==f.lookKey){f.look=p.av;dressFriend(f)}return}
+    const x=+p.x||0,z=+p.z||0;const f={id,h:p.h||'',look:p.av||null,x,z,yaw:+p.yaw||0,tx:x,tz:z,tyaw:+p.yaw||0,moving:false,last:performance.now(),deck:!!p.deck,deckAt:+p.dk||0,av:null,label:null,lookKey:''};
+    FR[id]=f;dressFriend(f);if(f.h)toast(f.h+' is here.');if(f.deck)toast((f.h||'A friend')+' is on the decks.')});
+  Object.keys(FR).forEach(id=>{if(!PRESENCE[id]){const h=FR[id].h;dropFriend(id);if(h)toast(h+' left.')}})}
+function dropFriend(id){const f=FR[id];if(!f)return;if(f.av)scene.remove(f.av.g);if(f.label&&f.label.material.map)f.label.material.map.dispose();delete FR[id]}
+function friendsTick(dt,t,beatPh){const k=Math.min(1,dt*9);signTick();Object.values(FR).forEach(f=>{
+    /* on the decks their own client stands them at the console; if we are both up there, they stand beside us */
+    let tx=f.tx,tz=f.tz;if(f.deck){tx=DECK.x+(ATDECK?(hashId(f.id)%2?1.5:-1.5):0);tz=DECK.z-0.6}
+    f.x+=(tx-f.x)*k;f.z+=(tz-f.z)*k;let a=f.tyaw-f.yaw;while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;f.yaw+=a*k;
+    const av=f.av;const walk=f.moving?1:0;av.ph=(av.ph||0)+dt*(1.2+walk*7);const sw=Math.sin(av.ph)*0.7*walk;
+    if(walk){av.legL.rotation.x=sw;av.legR.rotation.x=-sw;av.armL.rotation.x=-sw*0.8;av.armR.rotation.x=sw*0.8}
+    else if(f.deck){const p=beatPh*6.28;av.legL.rotation.x=Math.sin(p)*0.12;av.legR.rotation.x=-Math.sin(p)*0.12;av.armL.rotation.x=-0.9+Math.sin(p*2)*0.15;av.armR.rotation.x=-0.6;av.armL.rotation.z=0.2;av.armR.rotation.z=-0.2}
+    else{const p=beatPh*6.28+av.ph*0.1;av.legL.rotation.x=Math.sin(p)*0.12;av.legR.rotation.x=-Math.sin(p)*0.12;av.armL.rotation.x=-0.3-Math.sin(p)*0.3;av.armR.rotation.x=-0.3+Math.sin(p)*0.3}
+    const bob=walk?Math.abs(Math.sin(av.ph))*0.045:Math.abs(Math.sin(beatPh*6.28))*0.05;
+    av.g.position.set(f.x,floorAt(f.x,f.z)+bob,f.z);av.g.rotation.y=f.deck?Math.PI:f.yaw;if(f.moving&&performance.now()-f.last>1500)f.moving=false})}
+/* your own position, a few times a second while it changes */
+function pulsePos(now){if(!PRES||!PRESOK)return;const cur={x:+YOU.x.toFixed(2),z:+YOU.z.toFixed(2),yaw:+YOU.face.toFixed(2),m:!ATDECK&&(Math.abs(mvX)+Math.abs(mvZ)+(keys.w||0)+(keys.a||0)+(keys.s||0)+(keys.d||0))>0.05,deck:ATDECK?1:0,dk:DECKAT||0};
+  if(POSLAST&&now-POSAT<250)return;if(POSLAST&&Math.abs(POSLAST.x-cur.x)<0.03&&Math.abs(POSLAST.z-cur.z)<0.03&&Math.abs(POSLAST.yaw-cur.yaw)<0.05&&POSLAST.m===cur.m&&POSLAST.deck===cur.deck)return;
+  POSAT=now;POSLAST=cur;try{PRES.send({type:'broadcast',event:'pos',payload:Object.assign({id:ME,h:MYHANDLE},cur)})}catch(e){}}
+function deckChanged(){DECKAT=ATDECK?Date.now():0;signTick();trackMe();POSLAST=null;pulsePos(performance.now())}
+function lookChanged(){trackMe()}
+/* THE TILL (patch 70). The page sends the kind and the item; the price is the menu's, the purse is garden_wallets. */
+function setGc(v){GC=v;try{localStorage.setItem('deeds_gc',String(v))}catch(e){}paintPurse()}
+function purseRead(){if(!sb||!ME)return;Promise.resolve(sb.rpc('club_purse')).then(r=>{if(r.error)return;const d=r.data||{};if(d.balance!=null)setGc(+d.balance)}).catch(()=>{})}
+function buy(kind,item,onPaid,preview){const it=(kind==='drink'?DRINKS:kind==='pizza'?PIZZA:BOTTLES).find(x=>x.k===item);if(!it)return;
+  if(!sb||!ME){toast('Sign in on deeds.fun to open a tab. This one is on the house.');preview();return}
+  if(BUYING)return;BUYING=true;
+  Promise.resolve(sb.rpc('club_buy',{p_kind:kind,p_item:item})).then(r=>{BUYING=false;
+    if(r.error){const m=String(r.error.message||r.error.hint||r.error.code||'');
+      if(/not_enough/.test(m)){toast('Not enough. '+it.n+' is '+it.gc.toLocaleString()+' gc.');return}
+      if(/no_wallet/.test(m)){toast('Your purse is not open yet. Walk the garden once.');return}
+      if(/not find|function|schema cache|does not exist/i.test(m)){toast('Run patch 70 on DEEDS first. This one is on the house.');preview();return}
+      toast('The bar said: '+(m||'nothing'));return}
+    const d=r.data||{};if(d.balance!=null)setGc(+d.balance);onPaid(d)}).catch(e=>{BUYING=false;toast('The bar did not answer.')})}
+
+paintSign([]);
+{const c=document.createElement('script');c.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';c.onload=goLive;c.onerror=()=>{};document.head.appendChild(c)}
+$('#leave').addEventListener('click',()=>{pingLeave();leaveRoom();location.href=ON_SITE?'/garden/world/':'../world/'});
+window.__club={YOU,CROWD,MUSIC,DECK,BOOTHS,VIP,POOL,BAR,DRESS,openDressing,closeDressing,FLAMES,CONFETTI,RIG,rigShow,BLACK,blackout,TALKERS,talk:()=>TALK,confettiFire,DRINKS,PIZZA,BOTTLES,openMenu,closeMenu,runBottle,RUNNER,bottleShow,setDeck,padHit,hypeCrowd,hype:()=>HYPE,surge,surgeTick,deckCam,walkCam,tier:()=>TIER,FR,onPresence,onPos,onAct,paintSign,djNames,sign:()=>DECK.signNames,setMe:(id,h)=>{ME=id;MYHANDLE=h},me:()=>ME,buy,goLive,room:()=>PRES,floorAt,updateAct,act:()=>ACT,go:(x,z)=>{YOU.x=x;YOU.z=z;YOU.y=YOU.feet=floorAt(x,z)},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},STYLES,TILES,HEADS,toy:TOY};
 </script>
 </body>
 </html>
