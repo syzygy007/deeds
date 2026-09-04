@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.0">
+<meta name="world-build" content="6.1">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -3091,7 +3091,7 @@ function bindSeat(seat){seat=Math.max(0,Math.min(3,seat|0));if(BOUND===seat)retu
   CORRAL.x+=dx;CORRAL.z+=dz;FG.position.set(ox,0,oz);GATE.x=ox;GATE.z=oz+HALF+0.9;
   [[80,80],[920,80],[80,920],[920,920]].forEach(([x,y],i)=>{const [wx,wz]=px2w(x,y);LANTERNS[i].position.set(wx,3.9,wz)});
   markRect(HOUSE.x-11,HOUSE.z-3.5,HOUSE.x+11,HOUSE.z+4.1,4.6);markDisk(HOUSE.front.x,HOUSE.front.z-1.6,0.4,1.2);markRect(HOUSE.front.x+1.6,HOUSE.front.z-3.2,HOUSE.front.x+3.2,HOUSE.front.z-1.2,0.9);
-  if(typeof TREE!=='undefined'&&TREE.marked)TREE.marked.length=0}
+  if(typeof TREE!=='undefined'&&TREE.marked)TREE.marked.length=0;if(typeof paintSigns==='function')setTimeout(paintSigns,0)}
 const you={x:SPAWN.x,z:SPAWN.z,yaw:SPAWN.yaw,pitch:-0.36,face:SPAWN.yaw,dist:COARSE?5.2:4.6,vx:0,vz:0,feet:0,vy:0,grounded:true,stepOff:0,moving:0};
 let camDist=you.dist;
 camera.rotation.order='YXZ';
@@ -3357,7 +3357,7 @@ function joinGarden(owner){if(!sb||!ME||!owner)return;leaveGarden();pingStart(ow
       .on('broadcast',{event:'act'},m=>onAct(m&&m.payload))
       .subscribe(st=>{if(st==='SUBSCRIBED'){PRESOK=true;try{ch.track({id:ME,h:MYHANDLE,x:+you.x.toFixed(2),z:+you.z.toFixed(2),yaw:+you.face.toFixed(2),k:S.worn||'',tool:TOOL,kite:KITE.up,in:INSIDE?1:0,feet:INSIDE?+you.feet.toFixed(2):0,av:lookOut(),t:Date.now()})}catch(e){}}});
     PRES=ch};
-  if(MYHANDLE)go();else sb.from('profiles').select('handle').eq('id',ME).limit(1).then(r=>{const p=r.data&&r.data[0];if(p&&p.handle)MYHANDLE=p.handle;go()}).catch(go)}
+  if(MYHANDLE)go();else sb.from('profiles').select('handle').eq('id',ME).limit(1).then(r=>{const p=r.data&&r.data[0];if(p&&p.handle){MYHANDLE=p.handle;paintSigns()}go()}).catch(go)}
 function leaveGarden(){if(PRES){try{sb.removeChannel(PRES)}catch(e){}PRES=null;PRESOK=false}Object.keys(FR).forEach(dropFriend);PRESENCE={}}
 /* 4.22: who is online, and in which game (patch 61). The root app pings 'app'; here we ping 'garden' with the room = the garden you stand in */
 let PINGROOM=null,PINGT=0;
@@ -3510,16 +3510,21 @@ function sackRows69(){const row=(a,b,m)=>'<div class="srow"><span>'+a+(m?' <span
 /* 6.0 THE WROOM (patch 70): world_room sits you in a world. The first friend in opens it, the next three land in it, each at a seat
    with their own estate; a fifth opens their own. Re-asked every 45 s; if the host changes the page comes back in the new world */
 let WROOM=null,ROOMT=null;const RHANDLE=(QS.get('r')||QS.get('g')||'').trim();
+const SEATWAY=['up the avenue, the first gate on your left','up the avenue, the first gate on your right','past the square, on your left','past the square, on your right'];
+const SIGNS=[];   /* 6.1: a name over every south gate, so you know whose estate is whose */
+function paintSigns(){SIGNS.forEach(s=>scene.remove(s));SIGNS.length=0;for(let i=0;i<4;i++){const [ox,oz]=SEATXZ[i];let t='';
+  if(i===BOUND)t=(MYHANDLE||'YOU')+' \u00B7 YOURS';else if(WROOM&&WROOM.members){const m=WROOM.members.find(m=>(m.seat|0)-1===i);if(m)t=m.handle}
+  if(!t)continue;const sp=nameSprite(t);sp.scale.set(5.2,1.3,1);sp.position.set(ox,3.6,oz+HALF+1.4);scene.add(sp);SIGNS.push(sp)}}
+function seatToast(){toast('Your estate is the '+SEATNAME[BOUND]+' one: '+SEATWAY[BOUND]+'.',5200)}
 function roomWords(){if(!WROOM||!WROOM.members)return '';const o=WROOM.members.filter(m=>m.id!==ME).map(m=>m.handle+' ('+SEATNAME[(m.seat|0)-1]+')');return o.length?(o.length===1?o[0]+' is':o.join(', ')+' are')+' in the world with you.':'Nobody else is here yet.'}
 function roomAsk(id){return Promise.race([Promise.resolve(sb.rpc('world_room',id?{p_room:id}:{})).then(r=>(r.error||!r.data||!r.data.ok)?null:r.data).catch(()=>null),new Promise(res=>setTimeout(()=>res(null),8000))])}
 function roomEnter(){if(!sb||!ME){bindSeat(0);return Promise.resolve()}
   const host=RHANDLE?Promise.resolve(sb.from('profiles').select('id').ilike('handle',RHANDLE).limit(1)).then(r=>(r.data&&r.data[0]&&r.data[0].id)||null).catch(()=>null):Promise.resolve(null);
-  return host.then(roomAsk).then(d=>{if(!d){bindSeat(0);return}WROOM=d;bindSeat((d.seat|0)-1);
-    if(!d.home)setTimeout(()=>toast('You are in '+d.host_handle+'\u2019s world. Your estate is the '+SEATNAME[(d.seat|0)-1]+' one.'),1400);
-    else if(d.members&&d.members.length>1)setTimeout(()=>toast(roomWords()),1400)})}
+  return host.then(roomAsk).then(d=>{if(!d){bindSeat(0);setTimeout(seatToast,1400);return}WROOM=d;bindSeat((d.seat|0)-1);
+    setTimeout(()=>{if(!d.home)toast('You are in '+d.host_handle+'\u2019s world.');seatToast();if(d.members&&d.members.length>1)setTimeout(()=>toast(roomWords()),3000)},1400)})}
 function roomStart(){if(ROOMT||!sb||!ME)return;ROOMT=setInterval(()=>{if(document.hidden||!WROOM)return;roomAsk(WROOM.home?null:WROOM.host).then(d=>{if(!d)return;
     if(d.host!==WROOM.host||d.seat!==WROOM.seat){toast('The world has moved. One moment.');setTimeout(()=>{location.href=location.pathname+(d.home?'':'?r='+encodeURIComponent(d.host_handle))},900);return}
-    const was=(WROOM.members||[]).map(m=>m.id).join(),now=(d.members||[]).map(m=>m.id).join();WROOM=d;
+    const was=(WROOM.members||[]).map(m=>m.id).join(),now=(d.members||[]).map(m=>m.id).join();WROOM=d;if(was!==now)paintSigns();
     if(was!==now){const fresh=(d.members||[]).filter(m=>m.id!==ME&&was.indexOf(m.id)<0);fresh.forEach(m=>toast(m.handle+' is in the world, at the '+SEATNAME[(m.seat|0)-1]+' estate.'))}})},45000);
   const bye=()=>{try{Promise.resolve(sb.rpc('world_leave')).then(()=>{},()=>{})}catch(e){}};window.addEventListener('pagehide',bye)}
 setTimeout(()=>{if(BOUND<0&&!sb)bindSeat(0)},7000);   /* no CDN, no session: the plan still needs a seat */
