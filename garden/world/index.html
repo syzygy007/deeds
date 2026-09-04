@@ -39,15 +39,16 @@ canvas{display:block;touch-action:none;cursor:default}
 #pnBar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 #pnChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
 #pnKeys{position:relative;height:min(34vh,200px);touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;overflow:hidden;background:#0d0c0a}
-.pk{position:absolute;top:0;box-sizing:border-box;cursor:pointer}
-.pk.w{height:100%;background:linear-gradient(#fbf8f0,#e7e0cf);border:1px solid #8f8774;border-radius:0 0 5px 5px;z-index:1}
-.pk.b{height:60%;background:linear-gradient(#2c2823,#0b0a0a);border-radius:0 0 4px 4px;z-index:2;box-shadow:0 3px 0 #000}
-.pk.w.down{background:#d6cfbc}.pk.b.down{background:#3b352e;box-shadow:none}
-.pk.now{background:var(--gold)!important;box-shadow:0 0 16px rgba(201,162,39,.85)!important}.pk.next{box-shadow:inset 0 -26px 0 rgba(201,162,39,.32)!important}
-.pk span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:#6c6455;font-weight:800;letter-spacing:.08em;pointer-events:none}
+.pnk{position:absolute;top:0;box-sizing:border-box;cursor:pointer}
+.pnk.w{height:100%;background:linear-gradient(#fbf8f0,#e7e0cf);border:1px solid #8f8774;border-radius:0 0 5px 5px;z-index:1}
+.pnk.b{height:60%;background:linear-gradient(#2c2823,#0b0a0a);border-radius:0 0 4px 4px;z-index:2;box-shadow:0 3px 0 #000}
+.pnk.w.down{background:#d6cfbc}.pnk.b.down{background:#3b352e;box-shadow:none}
+.pnk.now{background:var(--gold)!important;box-shadow:0 0 16px rgba(201,162,39,.85)!important}.pnk.next{box-shadow:inset 0 -26px 0 rgba(201,162,39,.32)!important}
+.pnk span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:#6c6455;font-weight:800;letter-spacing:.08em;pointer-events:none}
 #pnList{display:none;flex-wrap:wrap;gap:6px;margin-bottom:8px}#pnList.on{display:flex}
 .sng small{display:block;font-weight:400;letter-spacing:.06em;text-transform:none;opacity:.7;font-size:10px;margin-top:2px}
 #pnSong{display:none;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}#pnSong.on{display:flex}#pnSong b{letter-spacing:.06em}#pnStep{opacity:.7;font-size:11px}
+@media(max-width:520px){.shead{flex-direction:column;gap:2px}.sbal{white-space:normal;padding-top:0;opacity:.8}}
 body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.seated #hotbar{display:none!important}
 #pianoBuy .fin{padding:14px 18px;font-size:.72rem}#pianoBuy .fin small{display:block;font-weight:400;text-transform:none;letter-spacing:.04em;opacity:.75;margin-top:4px}
 .panel{width:min(600px,100%);max-height:88vh;overflow:auto;background:#1a1812;border:1px solid rgba(246,243,235,.28);border-radius:18px;padding:18px 18px 14px;color:var(--ivory);box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -2337,10 +2338,10 @@ let PHAND=0;function pianoKeyDown(m,on){const k=PKEYS[m];if(k)k.mesh.rotation.x=
 let PN_LO=48,PN_N=null;const PN_PTR={};
 function pianoOctaves(){return innerWidth<560?2:innerWidth<900?3:4}
 function pianoPaint(){const wrap=$('#pnKeys');if(!wrap)return;const oct=pianoOctaves();const hi=Math.min(108,PN_LO+oct*12);let h='';let wi=0;const W=100/(oct*7);
-  for(let m=PN_LO;m<=hi;m++){if(pBlack(m))continue;h+='<div class="pk w" data-m="'+m+'" style="left:'+(wi*W)+'%;width:'+W+'%"><span>'+(m%12===0?'C'+(Math.floor(m/12)-1):'')+'</span></div>';wi++}
-  wi=0;for(let m=PN_LO;m<=hi;m++){if(!pBlack(m)){wi++;continue}h+='<div class="pk b" data-m="'+m+'" style="left:'+(wi*W-W*0.3)+'%;width:'+(W*0.6)+'%"></div>'}
+  for(let m=PN_LO;m<=hi;m++){if(pBlack(m))continue;h+='<div class="pnk w" data-m="'+m+'" style="left:'+(wi*W)+'%;width:'+W+'%"><span>'+(m%12===0?'C'+(Math.floor(m/12)-1):'')+'</span></div>';wi++}
+  wi=0;for(let m=PN_LO;m<=hi;m++){if(!pBlack(m)){wi++;continue}h+='<div class="pnk b" data-m="'+m+'" style="left:'+(wi*W-W*0.3)+'%;width:'+(W*0.6)+'%"></div>'}
   wrap.innerHTML=h;$('#pnOct').textContent=pName(PN_LO)+' to '+pName(hi);songLight()}
-function pnKeyAt(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const k=el.closest?el.closest('.pk'):null;if(!k)return null;const r=k.getBoundingClientRect();return {m:+k.dataset.m,vel:0.35+0.65*Math.max(0,Math.min(1,(y-r.top)/r.height))}}
+function pnKeyAt(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const k=el.closest?el.closest('.pnk'):null;if(!k)return null;const r=k.getBoundingClientRect();return {m:+k.dataset.m,vel:0.35+0.65*Math.max(0,Math.min(1,(y-r.top)/r.height))}}
 function pianoBind(){const wrap=$('#pnKeys');if(!wrap||wrap.bound)return;wrap.bound=true;
   const down=e=>{const k=pnKeyAt(e.clientX,e.clientY);if(!k)return;e.preventDefault();PN_PTR[e.pointerId]=k.m;PIANO_SND.noteOn(k.m,e.pressure>0&&e.pressure<1?0.4+e.pressure*0.6:k.vel);try{wrap.setPointerCapture(e.pointerId)}catch(x){}};
   const move=e=>{if(PN_PTR[e.pointerId]==null)return;const k=pnKeyAt(e.clientX,e.clientY);if(!k||k.m===PN_PTR[e.pointerId])return;PIANO_SND.noteOff(PN_PTR[e.pointerId]);PN_PTR[e.pointerId]=k.m;PIANO_SND.noteOn(k.m,k.vel)};
@@ -2385,7 +2386,7 @@ function songStop(){if(SONG_T){clearTimeout(SONG_T);SONG_T=null}if(SONG&&SONG.au
 function songTick(){if(!SONG||!SONG.auto)return;const st=SONG.s.steps[SONG.k];if(!st){SONG_T=setTimeout(()=>{if(SONG)songStop()},600);return}const ms=60000/SONG.s.bpm*st.b;
   const was=SONG;st.n.forEach(m=>PIANO_SND.noteOn(m,0.72));SONG_T=setTimeout(()=>{if(SONG!==was)return;st.n.forEach(m=>PIANO_SND.noteOff(m));SONG.k++;SONG.hit={};songLight();songTick()},ms*0.92)}
 function songHit(m){if(!SONG||SONG.auto)return;const st=SONG.s.steps[SONG.k];if(!st)return;if(st.n.indexOf(m)<0)return;SONG.hit[m]=1;if(st.n.every(x=>SONG.hit[x])){SONG.k++;SONG.hit={};if(!SONG.s.steps[SONG.k]){toast('The whole sheet. Bravo.');SND.buy(9);SONG.k=0}songLight()}}
-function songLight(){$$('#pnKeys .pk').forEach(k=>{k.classList.remove('now','next')});if(!SONG)return;const st=SONG.s.steps[SONG.k],nx=SONG.s.steps[SONG.k+1];const lit=st?st.n:[];const nxt=nx?nx.n:[];
+function songLight(){$$('#pnKeys .pnk').forEach(k=>{k.classList.remove('now','next')});if(!SONG)return;const st=SONG.s.steps[SONG.k],nx=SONG.s.steps[SONG.k+1];const lit=st?st.n:[];const nxt=nx?nx.n:[];
   const oct=pianoOctaves(),hi=PN_LO+oct*12;if(lit.length&&(Math.min.apply(null,lit)<PN_LO||Math.max.apply(null,lit)>hi)){const lo=Math.min.apply(null,lit);const want=Math.max(21,Math.min(108-oct*12,Math.floor(lo/12)*12));if(want!==PN_LO){PN_LO=want;pianoPaint();return}}   /* a step wider than the panel keeps the low end in view */
   lit.forEach(m=>{const el=document.querySelector('#pnKeys [data-m="'+m+'"]');if(el)el.classList.add('now')});nxt.forEach(m=>{const el=document.querySelector('#pnKeys [data-m="'+m+'"]');if(el&&lit.indexOf(m)<0)el.classList.add('next')});
   $('#pnStep').textContent=st?(SONG.k+1)+' of '+SONG.s.steps.length+' \u00B7 '+st.n.map(pName).join(' '):''}
