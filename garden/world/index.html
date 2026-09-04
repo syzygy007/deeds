@@ -33,6 +33,23 @@ canvas{display:block;touch-action:none;cursor:default}
 #status.on{opacity:1}
 .sheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(21,19,14,.6);z-index:30;pointer-events:auto;padding:14px}
 .sheet.on{display:flex}
+/* 6.7 the piano panel */
+#pianoUI{position:fixed;left:0;right:0;bottom:0;z-index:26;display:none;flex-direction:column;background:linear-gradient(180deg,rgba(21,19,14,0),rgba(21,19,14,.94) 22%);padding:22px 10px max(10px,env(safe-area-inset-bottom));pointer-events:auto;color:var(--ivory)}
+#pianoUI.on{display:flex}
+#pnBar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#pnChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
+#pnKeys{position:relative;height:min(34vh,200px);touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;overflow:hidden;background:#0d0c0a}
+.pk{position:absolute;top:0;box-sizing:border-box;cursor:pointer}
+.pk.w{height:100%;background:linear-gradient(#fbf8f0,#e7e0cf);border:1px solid #8f8774;border-radius:0 0 5px 5px;z-index:1}
+.pk.b{height:60%;background:linear-gradient(#2c2823,#0b0a0a);border-radius:0 0 4px 4px;z-index:2;box-shadow:0 3px 0 #000}
+.pk.w.down{background:#d6cfbc}.pk.b.down{background:#3b352e;box-shadow:none}
+.pk.now{background:var(--gold)!important;box-shadow:0 0 16px rgba(201,162,39,.85)!important}.pk.next{box-shadow:inset 0 -26px 0 rgba(201,162,39,.32)!important}
+.pk span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:#6c6455;font-weight:800;letter-spacing:.08em;pointer-events:none}
+#pnList{display:none;flex-wrap:wrap;gap:6px;margin-bottom:8px}#pnList.on{display:flex}
+.sng small{display:block;font-weight:400;letter-spacing:.06em;text-transform:none;opacity:.7;font-size:10px;margin-top:2px}
+#pnSong{display:none;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}#pnSong.on{display:flex}#pnSong b{letter-spacing:.06em}#pnStep{opacity:.7;font-size:11px}
+body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.seated #hotbar{display:none!important}
+#pianoBuy .fin{padding:14px 18px;font-size:.72rem}#pianoBuy .fin small{display:block;font-weight:400;text-transform:none;letter-spacing:.04em;opacity:.75;margin-top:4px}
 .panel{width:min(600px,100%);max-height:88vh;overflow:auto;background:#1a1812;border:1px solid rgba(246,243,235,.28);border-radius:18px;padding:18px 18px 14px;color:var(--ivory);box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .panel.small{width:min(420px,100%)}
 .panel h2{margin:2px 0 6px;font-size:26px;font-weight:800;letter-spacing:-.01em}
@@ -190,6 +207,11 @@ canvas{display:block;touch-action:none;cursor:default}
 <div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
 <div id="status" class="micro"></div>
 <div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="wxchip"></div><div id="offchip">Get off</div><div id="floats"></div><div id="chestPick"><div class="card"><h3>Five in hand.</h3><div class="sub" id="cpSub">The rest wait in the chest in the hall.</div><div id="cpRows"></div><div class="foot"><div class="n" id="cpN"></div><button class="btn" id="cpClose">Close</button><button class="btn on" id="cpSave">Keep these</button></div></div></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
+<div id="pianoUI"><div id="pnBar"><button class="btn" id="pnStand">Stand up</button><button class="btn" id="pnSus">Sustain off</button><button class="btn" id="pnLeft">&#9664;</button><span class="micro" id="pnOct"></span><button class="btn" id="pnRight">&#9654;</button><button class="btn" id="pnSheets">Sheets</button><span id="pnChip"></span></div>
+<div id="pnList"></div><div id="pnSong"><b id="pnTitle"></b><span id="pnStep"></span><button class="btn" id="pnListen">Listen</button><button class="btn" id="pnStop">Close the sheet</button></div><div id="pnKeys"></div></div>
+<div id="pianoBuy" class="sheet"><div class="panel small"><h2>The piano<span>.</span></h2><p>A grand for the music room. Sit at it and play: every key, sustain, and sheets that light the notes.</p>
+<div style="display:flex;gap:10px;margin-top:12px"><button class="btn fin" data-fin="black" style="flex:1">Black lacquer<small>5,000 gardencoin</small></button><button class="btn fin" data-fin="gold" style="flex:1;border-color:var(--gold);color:var(--gold)">Gold<small>10,000 gardencoin</small></button></div>
+<div class="sfoot" style="margin-top:12px"><button class="btn" id="pbClose">Not now.</button></div></div></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SHOP</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
   <div class="tabs" id="stTabs"></div>
@@ -572,12 +594,12 @@ function furnish(){const RUG=rugTex('#8E4A5C','#2E4A36','#E9DFC8'),RUG2=rugTex('
  at(0,2,3);rug(-0.8,4.4,2.8,2.0,RUG2,0,2);sconce(-1.6,2.9,5.84,Math.PI,0,2);sconce(1.6,2.9,5.84,Math.PI,0,2);painting(-2.83,3.0,-3.6,Math.PI/2,1.2,1.6,3,0,2,false);
  at(0,3,3);chandelier(-0.8,5.0,1.2,0,3);wainscot('hall');[-0.15,1.95].forEach(z=>cyl('trim',-2.86,2.8,z,0.12,5.6));painting(-2.83,3.1,3.6,Math.PI/2,1.3,1.7,4,0,3,true);
  /* THE MUSIC ROOM (x 3..9): a bench, then the upright, then the grand and the harp */
- at(0,1,1);box('wood',6,0.45,0.75,1.4,0.08,0.4);[5.4,6.6].forEach(x=>box('wood',x,0.2,0.75,0.08,0.4,0.36));mark(5.3,0.55,6.7,0.95,0.5);
+ /* 6.7: the bench and the kit pianos gave way to the piano you buy (PIANO module); its footprint is marked here */
  at(0,1,2);cyl('brass',7.8,0.6,-1.5,0.02,1.2);box('brass',7.8,1.25,-1.5,0.34,0.4,0.02,0,-0.4);
  at(0,1,3);lantern(6,GH-0.6,0.5,0,1,2);
- piano(6,-4.6,0,0,false);
+ mark(4.7,-2.2,7.7,0.85,1.0);
  at(0,2,3);rug(6,1.2,4.8,5.0,RUG,0,2);armchair(8.0,3.9,-2.4,'mulberry');sidetable(8.3,2.4,0,2);lamp(8.3,2.4,0.62,0,2);
- at(0,3,3);chandelier(6,5.0,0.5,0,3);wainscot('music');piano(6.4,-0.5,0.6,0,true);harp(4.0,-3.3,0.4,0);painting(8.83,3.2,-3.3,-Math.PI/2,1.6,1.2,5,0,3,true);
+ at(0,3,3);chandelier(6,5.0,0.5,0,3);wainscot('music');harp(4.0,-3.3,0.4,0);painting(8.83,3.2,-3.3,-Math.PI/2,1.6,1.2,5,0,3,true);
  /* THE DINING ROOM (x 9..16.2): a plain table, then chairs and the sideboard, then the long cloth and the chandelier */
  at(0,1,1);table(12.6,0.75,3.0,1.1,0.76,'wood');
  at(0,1,3);lantern(12.6,GH-0.6,0.75,0,1,2);
@@ -1629,7 +1651,7 @@ const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
 let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
 const FIRST_GC=1000,SECOND_GC=1000,REARM_S=3600,CHEST_TOYS=['chainsaw','bubbles','kite'],CHEST_GC=1000,AXE_DC=0,STATUES_TO_WAKE=12;let CHOPS=3,HOUSE_TIERS=[4,7,10],REGROW_S=600,GROW_S=600,SAPLING_GC=0,PATCH47=false,PATCH50=false,PATCH51=false,PATCH52=false,PATCH53=false,PATCH55=false,PATCH60=false,RINGS_OPEN=null,WOOD_CAPS=null,PACK_GC=1000,PACKL=null,PACKG=null;   /* the chest 1000 gardencoin every plain open (patch 54), the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
-const TOOLS={mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. The plant keeps growing.'}};
+const TOOLS={piano_black:{n:'Black grand',dc:3333.34,slot:0,hidden:true,line:'A grand for the music room.'},piano_gold:{n:'Gold grand',dc:6666.67,slot:0,hidden:true,line:'A grand for the music room, in gold.'},mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. The plant keeps growing.'}};
 let PATCH61=false,PATCH62=false,RAIDS=[];   /* 4.18 · the wolves, the sword, the flamethrower */
 const PACKS={pack_basic:{n:'The Gardener'},pack_ivory:{n:'The Ivory'},pack_sun:{n:'The Golden Sun'},pack_cyber:{n:'The Cyber Sprout'},pack_starlight:{n:'The Starlight'},pack_neon:{n:'The Neon Tulip'}};
 const packImg=k=>BASE+'garden-pack-'+k.slice(5)+'.webp';
@@ -1800,6 +1822,7 @@ const SND=(()=>{
     muted:()=>MUTE,
     setMute(v){MUTE=!!v;try{localStorage.setItem('garden_mute',v?'1':'0')}catch(e){}if(!v){ctx();keepAlive(true)}else keepAlive(false)},
     unlock(){ctx();keepAlive(true)},
+    ac:()=>ctx(),bus:()=>{ctx();return BUS},noiseBuf:()=>{const a=ctx();return a?noise(a):null},   /* 6.7: the piano plays through the same context and bus */
     /* small */
     tickUp(i){if(!gate('tick',40))return;tone(740*Math.pow(2,((i||0)%10)/12),0,0.07,0.07,'triangle')},
     tickDown(){if(!gate('tick',40))return;tone(520,0,0.07,0.06,'triangle')},
@@ -2197,6 +2220,177 @@ let TCHESTG=null;function placeToolChest(){if(TCHESTG)return;const wood=new THRE
   const box=new THREE.Mesh(new THREE.BoxGeometry(1.15,0.55,0.62),wood);box.position.y=0.28;box.castShadow=true;g.add(box);const lid=new THREE.Mesh(new THREE.BoxGeometry(1.19,0.14,0.66),wood);lid.position.y=0.62;g.add(lid);
   [-0.42,0.42].forEach(x=>{const st=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.72,0.68),brass);st.position.set(x,0.36,0);g.add(st)});const lk=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.05),brass);lk.position.set(0,0.48,0.34);g.add(lk);
   g.position.set(CHEST_AT.x,0,CHEST_AT.z);g.rotation.y=Math.PI/2;INTERIOR.scene.add(g);TCHESTG=g}
+/* 6.7 THE PIANO (5,000 gardencoin black, 10,000 gold): a grand in the music room you sit at and play. Real keys (88, each its own
+   mesh), a bench, a propped lid. Under a dust sheet until it is bought. Sit and a keyboard slides up: play with fingers (many at
+   once), the computer keys, sustain on and off, and the sheets: public domain classics that light the keys you need next.
+   The tone is a real sampled grand (one file a note, loaded the first time you sit; the repo folder garden/world/piano/ wins if
+   his own samples ever land there, then the public FluidR3 grand); a modelled piano plays if nothing loads */
+const PIANO_AT={x:6.2,z:-0.6,ry:0.6};   /* interior frame, the music room; local +z is the keys, the bench sits at local z 1.55 */
+const PIANO_NAMES=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const pName=m=>PIANO_NAMES[m%12]+(Math.floor(m/12)-1);   /* midi 60 = C4 */
+const pFreq=m=>440*Math.pow(2,(m-69)/12);
+const pBlack=m=>[1,3,6,8,10].indexOf(m%12)>=0;
+let PIANOG=null,PSHEET=null,PKEYS={},PFIN='',SEATED=false,PCAM={x:0,y:0,z:0,yaw:0,pitch:0},SEAT_YAW=0;
+function pianoFinish(){if(!S.tools)return '';return S.tools.piano_gold?'gold':S.tools.piano_black?'black':''}
+function pianoLocal(lx,ly,lz){const c=Math.cos(PIANO_AT.ry),s=Math.sin(PIANO_AT.ry);return [PIANO_AT.x+lx*c+lz*s,ly,PIANO_AT.z-lx*s+lz*c]}
+function grandShape(sc,front){sc=sc||1;front=front==null?0.95:front;const sh=new THREE.Shape();sh.moveTo(-0.76*sc,front*sc);sh.lineTo(0.76*sc,front*sc);sh.lineTo(0.76*sc,0.15*sc);
+  sh.bezierCurveTo(0.76*sc,-0.45*sc,0.45*sc,-0.85*sc,0.1*sc,-1.1*sc);sh.bezierCurveTo(-0.15*sc,-1.28*sc,-0.45*sc,-1.38*sc,-0.76*sc,-1.38*sc);sh.lineTo(-0.76*sc,front*sc);return sh}
+function buildPiano(fin){const gold=fin==='gold';
+  const lac=new THREE.MeshPhysicalMaterial(gold?{color:0xE6BE45,metalness:0.85,roughness:0.24,clearcoat:0.7,clearcoatRoughness:0.15,emissive:0x2e2208}:{color:0x0c0b0b,metalness:0.15,roughness:0.12,clearcoat:1,clearcoatRoughness:0.06});
+  const inner=new THREE.MeshStandardMaterial({color:gold?0x8a6a1e:0x1a1614,roughness:0.5});const felt=new THREE.MeshStandardMaterial({color:0x7a1f1f,roughness:1});
+  const ivory=new THREE.MeshStandardMaterial({color:0xF3EEE2,roughness:0.35});const ebony=new THREE.MeshStandardMaterial({color:0x121010,roughness:0.4});
+  const brass=new THREE.MeshStandardMaterial({color:0xC69C3E,metalness:0.8,roughness:0.3});const wood=new THREE.MeshStandardMaterial({color:gold?0x2a2118:0x4a2c17,roughness:0.6});
+  const g=new THREE.Group();const M=(geo,mat,x,y,z)=>{const o=new THREE.Mesh(geo,mat);o.castShadow=true;o.receiveShadow=true;o.position.set(x,y,z);g.add(o);return o};
+  /* the case: the rim is the grand's outline extruded, the soundboard sits inside it, the lid is the same outline propped on the treble side */
+  const outer=grandShape(1,0.5);outer.holes.push(grandShape(0.91,0.42));const rimG=new THREE.ExtrudeGeometry(outer,{depth:0.3,bevelEnabled:true,bevelThickness:0.015,bevelSize:0.015,bevelSegments:2});rimG.rotateX(Math.PI/2);
+  M(rimG,lac,0,1.0,0);const caseG=new THREE.ExtrudeGeometry(grandShape(1,0.95),{depth:0.14,bevelEnabled:false});caseG.rotateX(Math.PI/2);M(caseG,lac,0,0.84,0);   /* the walls, then the case floor the keybed sits on */
+  const board=new THREE.ExtrudeGeometry(grandShape(0.9,0.4),{depth:0.02,bevelEnabled:false});board.rotateX(Math.PI/2);M(board,inner,0,0.79,0);
+  const lidG=new THREE.ExtrudeGeometry(grandShape(1,0.5),{depth:0.035,bevelEnabled:true,bevelThickness:0.01,bevelSize:0.01,bevelSegments:1});lidG.rotateX(Math.PI/2);lidG.translate(0.76,0,0);
+  const lid=M(lidG,lac,-0.76,1.04,0);lid.rotation.z=0.62;g.lid=lid;
+  [-0.73,0.73].forEach(x=>M(new THREE.BoxGeometry(0.06,0.18,0.45),lac,x,0.94,0.72));   /* the cheeks either side of the keyboard */
+  const prop=M(new THREE.CylinderGeometry(0.014,0.014,0.86,8),wood,0.55,1.4,-0.2);prop.rotation.z=-0.5;
+  /* strings under the lid: a fan of fine lines, gold on the gold piano */
+  {const pts=[];for(let i=0;i<40;i++){const x=-0.66+i*0.033;const L=1.9-Math.pow(i/40,1.4)*1.5;pts.push(x,0.8,0.8,x,0.8,0.8-L)}const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+   g.add(new THREE.LineSegments(sg,new THREE.LineBasicMaterial({color:gold?0xE8CC6A:0xB89A5A,transparent:true,opacity:0.7})))}
+  /* three legs, the pedal lyre, the fallboard and the music desk */
+  [[-0.62,0.72],[0.62,0.72],[-0.5,-1.15]].forEach(([x,z])=>{M(new THREE.CylinderGeometry(0.045,0.07,0.74,10),lac,x,0.37,z);M(new THREE.CylinderGeometry(0.03,0.03,0.05,10),brass,x,0.03,z)});
+  M(new THREE.BoxGeometry(0.04,0.5,0.06),lac,-0.12,0.45,0.55);M(new THREE.BoxGeometry(0.04,0.5,0.06),lac,0.12,0.45,0.55);M(new THREE.BoxGeometry(0.3,0.03,0.12),lac,0,0.2,0.55);
+  [-0.07,0,0.07].forEach(x=>M(new THREE.BoxGeometry(0.03,0.015,0.11),brass,x,0.22,0.6));
+  M(new THREE.BoxGeometry(1.4,0.08,0.16),lac,0,1.12,0.55);   /* the fallboard, folded back over the keys */
+  const desk=M(new THREE.BoxGeometry(0.62,0.34,0.012),lac,0,1.36,0.36);desk.rotation.x=-0.42;g.desk=desk;
+  const sheet=M(new THREE.PlaneGeometry(0.5,0.3),new THREE.MeshStandardMaterial({color:0xF6F3EB,roughness:0.9,side:THREE.DoubleSide}),0,1.37,0.375);sheet.rotation.x=-0.42;g.sheet=sheet;sheet.visible=false;
+  /* the keybed and the 88 keys, A0 to C8: 52 whites 22.5 mm wide, the blacks set back between them. Each key pivots at its back edge */
+  M(new THREE.BoxGeometry(1.4,0.06,0.38),lac,0,0.925,0.74);M(new THREE.BoxGeometry(1.24,0.02,0.02),felt,0,0.965,0.62);
+  const W=0.0225,KL=0.15,BL=0.095;let wi=0;const keys={};
+  for(let m=21;m<=108;m++){const b=pBlack(m);if(!b){const geo=new THREE.BoxGeometry(W-0.0015,0.02,KL);geo.translate(0,0,KL/2);const k=new THREE.Mesh(geo,ivory);k.position.set(-0.585+wi*W+W/2,0.975,0.62);g.add(k);k.castShadow=true;keys[m]={mesh:k,black:false,idx:wi};wi++}
+    else{const geo=new THREE.BoxGeometry(0.0135,0.022,BL);geo.translate(0,0,BL/2);const k=new THREE.Mesh(geo,ebony);k.position.set(-0.585+wi*W,0.995,0.62);g.add(k);k.castShadow=true;keys[m]={mesh:k,black:true,idx:wi-0.5}}}
+  g.keys=keys;
+  /* the bench, in the same finish, a cushion on top */
+  M(new THREE.BoxGeometry(1.0,0.06,0.4),lac,0,0.5,1.55);M(new THREE.BoxGeometry(0.96,0.05,0.36),felt,0,0.555,1.55);
+  [[-0.44,1.4],[0.44,1.4],[-0.44,1.7],[0.44,1.7]].forEach(([x,z])=>M(new THREE.CylinderGeometry(0.025,0.035,0.47,8),lac,x,0.235,z));
+  const [px,py,pz]=pianoLocal(0,0,0);g.position.set(px,py,pz);g.rotation.y=PIANO_AT.ry;return g}
+function buildDustSheet(){const g=new THREE.Group();const cloth=new THREE.MeshStandardMaterial({color:0xE9E1CE,roughness:1});
+  const sh=new THREE.ExtrudeGeometry(grandShape(1.06),{depth:0.62,bevelEnabled:true,bevelThickness:0.08,bevelSize:0.12,bevelSegments:3});sh.rotateX(Math.PI/2);const body=new THREE.Mesh(sh,cloth);body.position.y=1.04;body.castShadow=true;body.receiveShadow=true;g.add(body);
+  const skirt=new THREE.ExtrudeGeometry(grandShape(1.1),{depth:0.55,bevelEnabled:false});skirt.rotateX(Math.PI/2);const sk=new THREE.Mesh(skirt,cloth);sk.position.y=0.6;g.add(sk);
+  const bench=new THREE.Mesh(new THREE.BoxGeometry(1.06,0.5,0.46),cloth);bench.position.set(0,0.3,1.55);g.add(bench);
+  const tag=new THREE.Mesh(new THREE.PlaneGeometry(0.18,0.1),new THREE.MeshStandardMaterial({color:0xC9A227,side:THREE.DoubleSide}));tag.position.set(0.5,1.1,1.02);g.add(tag);
+  const [px,py,pz]=pianoLocal(0,0,0);g.position.set(px,py,pz);g.rotation.y=PIANO_AT.ry;return g}
+function placePiano(){const fin=VISIT?'':pianoFinish();if(PIANOG&&PFIN===fin)return;if(PIANOG){INTERIOR.scene.remove(PIANOG);PIANOG=null}
+  PFIN=fin;PIANOG=fin?buildPiano(fin):buildDustSheet();INTERIOR.scene.add(PIANOG);PKEYS=PIANOG.keys||{}}
+/* the piano's own prompt in the music room: the sheet before you own one, the bench after */
+function pianoAct(){if(you.feet>=1)return false;const [bx,,bz]=pianoLocal(0,0,1.55);const d=Math.hypot(you.x-bx,you.z-bz);if(d>2.6)return false;
+  const [ax,,az]=pianoLocal(0,0,0.9);const fin=pianoFinish();
+  if(VISIT){if(!fin)return false;showAct('Sit at the piano.','piano',null,null,VISIT.handle+'\u2019s '+fin+' grand',null,[ax,1.6,az]);return true}
+  if(!fin){showAct('The piano, under its sheet.','pianobuy',null,null,'5,000 black \u00B7 10,000 gold',null,[ax,1.7,az]);return true}
+  showAct('Sit at the piano.','piano',null,null,'the '+fin+' grand',null,[ax,1.6,az]);return true}
+function openPianoBuy(){$('#pianoBuy').classList.add('on');$$('#pianoBuy .btn.fin').forEach(b=>b.onclick=()=>pianoBuy(b.dataset.fin));$('#pbClose').onclick=()=>$('#pianoBuy').classList.remove('on')}
+function pianoBuy(fin){if(visitGuard('buy the piano'))return;if(pianoFinish()){toast('The piano is yours already.');return}const key='piano_'+fin,cost=gcv(TOOLS[key].dc);
+  const done=()=>{S.tools=S.tools||{};S.tools[key]=1;save();renderHud();SND.buy(10);$('#pianoBuy').classList.remove('on');placePiano();hideAct();toast('The '+fin+' grand is yours. Sit and play.')};
+  if(LIVE){if(BUSY)return;BUSY=true;RPC('piano_buy',{p_finish:fin}).then(r=>{BUSY=false;
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'The piano is yours already.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The '+fin+' grand',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+  if(reach()<cost){showShort(cost);return}S.gc-=cost;ledger('The '+fin+' grand',-cost,'the Keeper');done()}
+/* sitting: you go to the bench facing the keys, the camera settles over your shoulder looking down at the keyboard, the panel slides up */
+function pianoSit(){if(SEATED||!PIANOG||!PIANOG.keys)return;SEATED=true;hideAct();if(CAN)setCan(false);
+  const [bx,,bz]=pianoLocal(0,0,1.55);you.x=bx;you.z=bz;you.vx=you.vy=you.vz=0;you.face=PIANO_AT.ry;SEAT_YAW=PIANO_AT.ry;
+  const [cx,,cz]=pianoLocal(0.35,0,3.0);PCAM={x:cx,y:you.feet+2.25,z:cz,yaw:PIANO_AT.ry,pitch:-0.66};
+  document.body.classList.add('seated');$('#pianoUI').classList.add('on');PIANO_SND.load();pianoPaint();pianoSheetPaint();SND.buy(3);
+  toast(COARSE?'Play with your fingers. Sustain holds the notes. Pick a sheet and the keys light up.':'Play with your fingers or the keys: A S D F G H J K L are the white notes, W E T Y U O P the black, Z and X move the octave. Space is sustain.')}
+function pianoStand(){if(!SEATED)return;SEATED=false;PIANO_SND.allOff(true);songStop();document.body.classList.remove('seated');$('#pianoUI').classList.remove('on');
+  const [bx,,bz]=pianoLocal(0,0,2.3);you.x=bx;you.z=bz;you.yaw=SEAT_YAW+Math.PI;you.pitch=-0.34;camDist=2.2;hideAct()}
+/* the sampled grand. One mp3 a note; the first sit loads every third note (30 files, playable in a second), the rest fill in behind.
+   Without the pedal a key up fades the note in a third of a second; with it the note rings to its natural end and lifts with the pedal */
+const PIANO_SND=(()=>{const BUF={},LOAD={},ON={},HELD={};let SUS=false,REV=null,OUT=null,ready=false,loading=false,synthOnly=false;
+  const SRC=[BASE+'world/piano/','https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/acoustic_grand_piano-mp3/'];
+  function out(){const a=SND.ac();if(!a)return null;if(!OUT){OUT=a.createGain();OUT.gain.value=0.9;const bus=SND.bus()||a.destination;OUT.connect(bus);
+      REV=a.createConvolver();const n=Math.floor(a.sampleRate*1.7),b=a.createBuffer(2,n,a.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.6)*0.5}REV.buffer=b;
+      const rg=a.createGain();rg.gain.value=0.16;OUT.connect(REV);REV.connect(rg);rg.connect(bus)}return a}
+  function fetchNote(m){if(BUF[m]||LOAD[m])return LOAD[m]||Promise.resolve();const a=out();if(!a)return Promise.resolve();const name=pName(m)+'.mp3';
+    const tryAt=i=>{if(i>=SRC.length)return Promise.reject(new Error('none'));return fetch(SRC[i]+name,{mode:'cors'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.arrayBuffer()}).then(ab=>a.decodeAudioData(ab)).then(b=>{BUF[m]=b}).catch(()=>tryAt(i+1))};
+    LOAD[m]=tryAt(0).catch(()=>{});return LOAD[m]}
+  function load(){if(loading||synthOnly)return;loading=true;const a=out();if(!a){loading=false;return}
+    const first=[];for(let m=21;m<=108;m+=3)first.push(fetchNote(m));
+    Promise.all(first).then(()=>{ready=Object.keys(BUF).length>0;if(!ready){synthOnly=true;return}pianoChip(ready?'A sampled grand':'');for(let m=21;m<=108;m++)fetchNote(m)})}
+  function nearest(m){if(BUF[m])return [BUF[m],0];for(let d=1;d<4;d++){if(BUF[m-d])return [BUF[m-d],d];if(BUF[m+d])return [BUF[m+d],-d]}return null}
+  /* the modelled piano: eight stretched partials that each die at their own rate, a felt thump, a little body, brighter when struck hard */
+  function synth(a,m,vel,t){const f=pFreq(m),g=a.createGain();g.connect(OUT);const B=0.00035*Math.pow(f/440,0.9);const bright=0.45+vel*0.75;const nodes=[];
+    for(let n=1;n<=8;n++){const o=a.createOscillator();o.type='sine';const fn=f*n*Math.sqrt(1+B*n*n);if(fn>18000)break;o.frequency.value=fn;const og=a.createGain();
+      const amp=vel*0.55*Math.pow(bright,n-1)/Math.pow(n,1.15)*(f>1500?0.55:1);og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(amp,t+0.004+n*0.0006);
+      const tau=(2.6+3.2*Math.pow(110/f,0.5))/(0.55+n*0.42);og.gain.setTargetAtTime(amp*0.28,t+0.05,tau*0.18);og.gain.setTargetAtTime(0.0001,t+0.05+tau*0.3,tau);o.connect(og);og.connect(g);o.start(t);o.stop(t+8);nodes.push(o)}
+    const hm=a.createBufferSource();hm.buffer=SND.noiseBuf();if(hm.buffer){const hf=a.createBiquadFilter();hf.type='bandpass';hf.frequency.value=Math.min(4000,f*2.2);hf.Q.value=1.2;const hg=a.createGain();hg.gain.setValueAtTime(vel*0.12,t);hg.gain.exponentialRampToValueAtTime(0.0001,t+0.035);hm.connect(hf);hf.connect(hg);hg.connect(g);hm.start(t);hm.stop(t+0.05)}
+    return {g,stop:(at,fast)=>{g.gain.setTargetAtTime(0.0001,at,fast?0.08:0.6);nodes.forEach(o=>{try{o.stop(at+(fast?0.5:3))}catch(e){}})}}}
+  function noteOn(m,vel){const a=out();if(!a)return;vel=Math.max(0.15,Math.min(1,vel==null?0.8:vel));const t=a.currentTime;if(ON[m])noteOff(m,true);
+    let v=null;const nb=ready?nearest(m):null;
+    if(nb){const [buf,d]=nb;const s=a.createBufferSource();s.buffer=buf;s.playbackRate.value=Math.pow(2,-d/12);const g=a.createGain();g.gain.value=0.25+vel*0.75;s.connect(g);g.connect(OUT);s.start(t);
+      v={g,stop:(at,fast)=>{g.gain.setTargetAtTime(0.0001,at,fast?0.09:0.35);try{s.stop(at+(fast?0.6:2))}catch(e){}}}}
+    else v=synth(a,m,vel,t);
+    ON[m]=v;delete HELD[m];pianoKeyDown(m,true);if(SONG)songHit(m)}
+  function noteOff(m,fast){const v=ON[m];if(!v)return;const a=out();if(!a)return;if(SUS&&!fast){HELD[m]=v;delete ON[m];pianoKeyDown(m,false);return}
+    v.stop(a.currentTime,fast||false);delete ON[m];pianoKeyDown(m,false)}
+  function sustain(on){SUS=!!on;const a=out();if(!SUS&&a){for(const m in HELD){HELD[m].stop(a.currentTime,false);delete HELD[m]}}}
+  function allOff(fast){const a=out();if(!a)return;for(const m in ON){ON[m].stop(a.currentTime,!!fast);pianoKeyDown(+m,false);delete ON[m]}for(const m in HELD){HELD[m].stop(a.currentTime,!!fast);delete HELD[m]}}
+  return {load,noteOn,noteOff,sustain,allOff,sus:()=>SUS,ready:()=>ready,synthOnly:()=>synthOnly,loaded:()=>Object.keys(BUF).length}})();
+function pianoChip(s){const c=$('#pnChip');if(c)c.textContent=s||''}
+/* the 3D key dips and the figure's hands move when a note sounds, from the panel, the computer keys or a sheet playing itself */
+let PHAND=0;function pianoKeyDown(m,on){const k=PKEYS[m];if(k)k.mesh.rotation.x=on?0.07:0;const el=document.querySelector('#pnKeys [data-m="'+m+'"]');if(el)el.classList.toggle('down',on);if(on)PHAND=performance.now()}
+/* the panel: a strip of keys you can pan by octave, blacks laid over whites, many fingers at once, louder the further down the key you touch */
+let PN_LO=48,PN_N=null;const PN_PTR={};
+function pianoOctaves(){return innerWidth<560?2:innerWidth<900?3:4}
+function pianoPaint(){const wrap=$('#pnKeys');if(!wrap)return;const oct=pianoOctaves();const hi=Math.min(108,PN_LO+oct*12);let h='';let wi=0;const W=100/(oct*7);
+  for(let m=PN_LO;m<=hi;m++){if(pBlack(m))continue;h+='<div class="pk w" data-m="'+m+'" style="left:'+(wi*W)+'%;width:'+W+'%"><span>'+(m%12===0?'C'+(Math.floor(m/12)-1):'')+'</span></div>';wi++}
+  wi=0;for(let m=PN_LO;m<=hi;m++){if(!pBlack(m)){wi++;continue}h+='<div class="pk b" data-m="'+m+'" style="left:'+(wi*W-W*0.3)+'%;width:'+(W*0.6)+'%"></div>'}
+  wrap.innerHTML=h;$('#pnOct').textContent=pName(PN_LO)+' to '+pName(hi);songLight()}
+function pnKeyAt(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const k=el.closest?el.closest('.pk'):null;if(!k)return null;const r=k.getBoundingClientRect();return {m:+k.dataset.m,vel:0.35+0.65*Math.max(0,Math.min(1,(y-r.top)/r.height))}}
+function pianoBind(){const wrap=$('#pnKeys');if(!wrap||wrap.bound)return;wrap.bound=true;
+  const down=e=>{const k=pnKeyAt(e.clientX,e.clientY);if(!k)return;e.preventDefault();PN_PTR[e.pointerId]=k.m;PIANO_SND.noteOn(k.m,e.pressure>0&&e.pressure<1?0.4+e.pressure*0.6:k.vel);try{wrap.setPointerCapture(e.pointerId)}catch(x){}};
+  const move=e=>{if(PN_PTR[e.pointerId]==null)return;const k=pnKeyAt(e.clientX,e.clientY);if(!k||k.m===PN_PTR[e.pointerId])return;PIANO_SND.noteOff(PN_PTR[e.pointerId]);PN_PTR[e.pointerId]=k.m;PIANO_SND.noteOn(k.m,k.vel)};
+  const up=e=>{if(PN_PTR[e.pointerId]==null)return;PIANO_SND.noteOff(PN_PTR[e.pointerId]);delete PN_PTR[e.pointerId]};
+  wrap.addEventListener('pointerdown',down);wrap.addEventListener('pointermove',move);wrap.addEventListener('pointerup',up);wrap.addEventListener('pointercancel',up);wrap.addEventListener('lostpointercapture',up);
+  wrap.addEventListener('contextmenu',e=>e.preventDefault());
+  $('#pnSus').onclick=()=>{const on=!PIANO_SND.sus();PIANO_SND.sustain(on);$('#pnSus').classList.toggle('on',on);$('#pnSus').textContent=on?'Sustain on':'Sustain off'};
+  $('#pnLeft').onclick=()=>{PN_LO=Math.max(21,PN_LO-12);pianoPaint()};$('#pnRight').onclick=()=>{PN_LO=Math.min(108-pianoOctaves()*12,PN_LO+12);pianoPaint()};
+  $('#pnStand').onclick=()=>pianoStand();$('#pnSheets').onclick=()=>{$('#pnList').classList.toggle('on')};
+  $('#pnListen').onclick=()=>{if(SONG&&SONG.auto)songStop();else if(SONG)songPlay(SONG.i,true)};$('#pnStop').onclick=()=>songStop();
+  addEventListener('resize',()=>{if(SEATED)pianoPaint()})}
+/* the computer keys: a row of white notes, the blacks above them, an octave either way */
+const PN_KMAP={a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12,o:13,l:14,p:15,';':16,"'":17};let PN_KOCT=60;const PN_KDOWN={};
+function pianoKey(e,down){const k=e.key.toLowerCase();if(k==='escape'&&down){pianoStand();return true}
+  if(k===' '){if(!e.repeat){if(down){PIANO_SND.sustain(true);$('#pnSus').classList.add('on');$('#pnSus').textContent='Sustain on'}else{PIANO_SND.sustain(false);$('#pnSus').classList.remove('on');$('#pnSus').textContent='Sustain off'}}e.preventDefault();return true}
+  if(down&&!e.repeat&&(k==='z'||k==='x')){PN_KOCT=Math.max(21,Math.min(96,PN_KOCT+(k==='z'?-12:12)));PN_LO=Math.max(21,Math.min(108-pianoOctaves()*12,PN_KOCT-12));pianoPaint();return true}
+  if(!(k in PN_KMAP))return true;const m=PN_KOCT+PN_KMAP[k];if(down){if(!PN_KDOWN[k]){PN_KDOWN[k]=m;PIANO_SND.noteOn(m,0.8)}}else{if(PN_KDOWN[k]!=null){PIANO_SND.noteOff(PN_KDOWN[k]);delete PN_KDOWN[k]}}e.preventDefault();return true}
+/* THE SHEETS. Every song is a list of steps: the notes that sound together and how long they last in beats. Playing along, the keys
+   of the current step glow gold and the next step faint; strike them all and the sheet turns the page. Listen and it plays itself */
+const N=s=>{const m=/^([A-G])(b|#)?(-?\d)$/.exec(s);const base={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);return (+m[3]+1)*12+base};
+const ST=(notes,b)=>({n:(Array.isArray(notes)?notes:[notes]).map(N),b:b||1});
+const SONGS=[
+ {name:'F\u00FCr Elise',by:'Beethoven, 1810',bpm:132,steps:(()=>{const a=[['E5',.5],['Eb5',.5],['E5',.5],['Eb5',.5],['E5',.5],['B4',.5],['D5',.5],['C5',.5],['A4',1],['C4',.5],['E4',.5],['A4',.5],['B4',1],['E4',.5],['Ab4',.5],['B4',.5],['C5',1],['E4',.5]];
+   const b=[['E5',.5],['Eb5',.5],['E5',.5],['Eb5',.5],['E5',.5],['B4',.5],['D5',.5],['C5',.5],['A4',1],['C4',.5],['E4',.5],['A4',.5],['B4',1],['E4',.5],['C5',.5],['B4',.5],['A4',2]];return a.concat(b).map(x=>ST(x[0],x[1]))})()},
+ {name:'Ode to Joy',by:'Beethoven, 1824',bpm:108,steps:(()=>{const q=[['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],['C4',1],['C4',1],['D4',1],['E4',1],['E4',1.5],['D4',.5],['D4',2]];
+   const r=[['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],['C4',1],['C4',1],['D4',1],['E4',1],['D4',1.5],['C4',.5],['C4',2]];return q.concat(r).map(x=>ST(x[0],x[1]))})()},
+ {name:'Moonlight Sonata',by:'Beethoven, 1801 \u00B7 the opening',bpm:96,steps:(()=>{const bar=(bass,tri)=>{const s=[];for(let i=0;i<4;i++)s.push(ST(i===0?bass.concat(tri[i]):tri[i],1));return s};
+   const e=['Ab3','Db4','E4'];return [].concat(bar(['Db2','Db3'],[e,e,e,e]),bar(['B1','B2'],[e,e,e,e]),bar(['A1','A2'],[['A3','Db4','E4'],['A3','Db4','E4'],['A3','D4','Gb4'],['A3','D4','Gb4']]),bar(['Ab1','Ab2'],[['Ab3','C4','Gb4'],['Ab3','C4','Gb4'],['Ab3','Db4','E4'],['Ab3','Db4','E4']]),
+   [ST(['Db2','Db3','Ab3','Db4','E4'],1),ST(['Ab3','Db4','E4'],1),ST(['Ab3','Db4','E4','Ab4'],1.5),ST(['Ab4'],.5),ST(['Ab3','Db4','E4','Ab4'],1)])})()},
+ {name:'Gymnop\u00E9die No. 1',by:'Satie, 1888',bpm:80,steps:(()=>{const G=[ST('G2',1),ST(['B3','D4','Gb4'],2)],D=[ST('D2',1),ST(['Gb3','A3','Db4'],2)];
+   const mel=[['Gb5','B3','D4','Gb4'],['A5'],['G5'],['Gb5','Gb3','A3','Db4'],['Db5'],['B4'],['Db5','B3','D4','Gb4'],['D5'],['A4'],['A4','Gb3','A3','Db4'],['A4'],['A4']];
+   const s=[].concat(G,D,G,D);const bass=['G2','D2','G2','D2'];for(let i=0;i<12;i++){const beat=i%3;const bar=Math.floor(i/3);if(beat===0)s.push(ST([bass[bar]].concat(mel[i]),1));else if(beat===1)s.push(ST(mel[i],1));else s.push(ST(mel[i],1))}return s})()}
+];
+let SONG=null,SONG_T=null;
+function pianoSheetPaint(){const l=$('#pnList');if(!l)return;l.innerHTML=SONGS.map((s,i)=>'<button class="btn sng" data-i="'+i+'">'+s.name+'<small>'+s.by+'</small></button>').join('')+'<button class="btn sng off" data-i="-1">No sheet<small>just play</small></button>';
+  $$('#pnList .sng').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;$('#pnList').classList.remove('on');if(i<0){songStop();return}songPlay(i,false)})}
+function songPlay(i,auto){songStop();const s=SONGS[i];SONG={i,s,k:0,auto,hit:{}};$('#pnTitle').textContent=s.name;$('#pnSong').classList.add('on');$('#pnListen').textContent=auto?'Pause':'Listen';
+  if(PIANOG&&PIANOG.sheet)PIANOG.sheet.visible=true;
+  const lo=Math.min.apply(null,s.steps.map(st=>Math.min.apply(null,st.n)));const oct=pianoOctaves();PN_LO=Math.max(21,Math.min(108-oct*12,Math.floor(lo/12)*12));pianoPaint();
+  if(auto)songTick()}
+function songStop(){if(SONG_T){clearTimeout(SONG_T);SONG_T=null}if(SONG&&SONG.auto)PIANO_SND.allOff(false);SONG=null;$('#pnSong').classList.remove('on');$('#pnListen').textContent='Listen';if(PIANOG&&PIANOG.sheet)PIANOG.sheet.visible=false;songLight()}
+function songTick(){if(!SONG||!SONG.auto)return;const st=SONG.s.steps[SONG.k];if(!st){SONG_T=setTimeout(()=>{if(SONG)songStop()},600);return}const ms=60000/SONG.s.bpm*st.b;
+  const was=SONG;st.n.forEach(m=>PIANO_SND.noteOn(m,0.72));SONG_T=setTimeout(()=>{if(SONG!==was)return;st.n.forEach(m=>PIANO_SND.noteOff(m));SONG.k++;SONG.hit={};songLight();songTick()},ms*0.92)}
+function songHit(m){if(!SONG||SONG.auto)return;const st=SONG.s.steps[SONG.k];if(!st)return;if(st.n.indexOf(m)<0)return;SONG.hit[m]=1;if(st.n.every(x=>SONG.hit[x])){SONG.k++;SONG.hit={};if(!SONG.s.steps[SONG.k]){toast('The whole sheet. Bravo.');SND.buy(9);SONG.k=0}songLight()}}
+function songLight(){$$('#pnKeys .pk').forEach(k=>{k.classList.remove('now','next')});if(!SONG)return;const st=SONG.s.steps[SONG.k],nx=SONG.s.steps[SONG.k+1];const lit=st?st.n:[];const nxt=nx?nx.n:[];
+  const oct=pianoOctaves(),hi=PN_LO+oct*12;if(lit.length&&(Math.min.apply(null,lit)<PN_LO||Math.max.apply(null,lit)>hi)){const lo=Math.min.apply(null,lit);const want=Math.max(21,Math.min(108-oct*12,Math.floor(lo/12)*12));if(want!==PN_LO){PN_LO=want;pianoPaint();return}}   /* a step wider than the panel keeps the low end in view */
+  lit.forEach(m=>{const el=document.querySelector('#pnKeys [data-m="'+m+'"]');if(el)el.classList.add('now')});nxt.forEach(m=>{const el=document.querySelector('#pnKeys [data-m="'+m+'"]');if(el&&lit.indexOf(m)<0)el.classList.add('next')});
+  $('#pnStep').textContent=st?(SONG.k+1)+' of '+SONG.s.steps.length+' \u00B7 '+st.n.map(pName).join(' '):''}
+setTimeout(pianoBind,0);
+function pianoPose(t){AV.g.position.y-=0.42;AV.g.rotation.y=SEAT_YAW;AV.legL.rotation.x=-1.5;AV.legR.rotation.x=-1.5;const pl=performance.now()-PHAND<220?-1.3:-1.05;AV.armL.rotation.x=pl+Math.sin(t*3)*0.02;AV.armR.rotation.x=pl;if(AV.armL.fore)AV.armL.fore.rotation.x=-0.55;if(AV.armR.fore)AV.armR.fore.rotation.x=-0.55}
 function paintHotbar(){const on=hasPack();['sword','flamethrower'].forEach(k=>{$('#'+k).style.display=(on||!owns(k)||!inHand(k))?'none':''});['rocket','launcher','chainsaw','bubbles','kite'].forEach(k=>{$('#'+k).style.display=(on||(owns(k)&&!inHand(k)))?'none':''});
  $('#packSlot').style.display=on?'':'none';if(!on)$('#packFan').classList.remove('on');paintBar()}
 function renderFan(){const ks=['can','rocket','launcher','chainsaw','bubbles','kite','sword','flamethrower'].filter(k=>k==='can'||(owns(k)&&inHand(k)));
@@ -2740,19 +2934,19 @@ function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood fro
   const done=(wood,stage,dl)=>{const was=S.house.stage,rb=S.rooms||roomsOf(0,0);S.wood=0;S.house.wood=wood;S.house.stage=stage;S.rooms=roomsOf(wood,stage);save();renderHud();paintBundle();renderHouse();
     if(stage>was){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast(['','The builder raises the fireplace wing.','The main house goes up, with the library.','The mansion. Portico, columns, the upper floor and your bedroom.'][stage])}
     else if(S.rooms.down>rb.down||S.rooms.up>rb.up){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));const r=S.rooms;
-      toast(r.down>rb.down?['','Downstairs is built. The stairs, the hall, the rooms. Go inside.','Downstairs is nice now \u00B7 rugs, curtains, books, the piano.','Downstairs is elegant \u00B7 chandeliers, marble, the grand piano, the fires lit.'][r.down]:['','Upstairs is built \u00B7 the bedroom, the gallery, the study.','Upstairs is nice now \u00B7 rugs, curtains, lamps, paintings.','Upstairs is elegant \u00B7 the four poster, the chandeliers, the gallery hung.'][r.up]);
+      toast(r.down>rb.down?['','Downstairs is built. The stairs, the hall, the rooms. Go inside.','Downstairs is nice now \u00B7 rugs, curtains, books, lamps.','Downstairs is elegant \u00B7 chandeliers, marble, the fires lit.'][r.down]:['','Upstairs is built \u00B7 the bedroom, the gallery, the study.','Upstairs is nice now \u00B7 rugs, curtains, lamps, paintings.','Upstairs is elegant \u00B7 the four poster, the chandeliers, the gallery hung.'][r.up]);
       if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
     else{SND.clink();const n=S.rooms.next;toast((dl>1?dl+' bundles delivered':'Delivered')+' \u00B7 '+(stage<3?wood+' of '+HOUSE_TIERS[stage]+' bundles.':n?n.have+' of '+n.need+' bundles \u00B7 '+stepName(n)+'.':'the house is finished.'))}updateAct()};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();toast('Bring a bundle of wood from the oaks.');return}done(+d.wood||0,+d.stage||0,+d.delivered||1)}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
   const dl=S.wood;const wood=S.house.wood+dl;let stage=S.house.stage;while(stage<3&&wood>=HOUSE_TIERS[stage])stage++;done(wood,stage,dl)}
 /* 4.16 in through the front door: the gardener steps into the interior scene, the rooms at their levels, and the world waits outside where you left it */
-function enterHouse(){if(INSIDE)return;if(DRIVE)mowerToggle();OUTPOS={x:you.x,z:you.z};INSIDE=true;hideAct();LOCK.kind=null;LOCK.id=-1;if(CAN)setCan(false);
+function enterHouse(){if(INSIDE)return;if(DRIVE)mowerToggle();if(SEATED)pianoStand();OUTPOS={x:you.x,z:you.z};INSIDE=true;hideAct();LOCK.kind=null;LOCK.id=-1;if(CAN)setCan(false);
   scene.remove(AV.g);INTERIOR.scene.add(AV.g);const L=roomLevels();INTERIOR.setLevels(L[0],L[1]);INTERIOR.setPhase(ph);
   you.x=INTERIOR.ENTER_AT.x;you.z=INTERIOR.ENTER_AT.z;you.feet=0;you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=0;you.face=0;you.pitch=-0.34;camDist=2.2;ROOM='hall';areaNow='';camera.fov=78;camera.updateProjectionMatrix();camera.position.set(0,2.8,INTERIOR.ENTER_AT.z+1.6);camera.rotation.set(-0.34,0,0);SND.knock();
   toast(L[0]?'Your house \u00B7 '+roomsWord()+'.':'The bare shell \u00B7 bring the builder 20 bundles for downstairs.')}
 function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g);scene.add(AV.g);hideAct();LOCK.kind=null;LOCK.id=-1;
   you.x=DOORW.x;you.z=DOORW.z+2.9;you.feet=floorAtW(you.x,you.z);   /* 4.26: always out on the path, clear of the steps and the door prompt */you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
-function insideAct(){const L=roomLevels();placeToolChest();
+function insideAct(){const L=roomLevels();placeToolChest();placePiano();if(SEATED){hideAct();return}if(pianoAct())return;   /* 6.7 */
   if(you.feet<1&&!VISIT&&Math.hypot(you.x-CHEST_AT.x,you.z-CHEST_AT.z)<2.4){const c=chestList().length;showAct('The tool chest.','toolchest',null,null,c?plural(c,'tool')+' inside \u00B7 five in hand':'five in hand, nothing inside',null,[CHEST_AT.x,1.6,CHEST_AT.z]);return}
   if(you.feet<1&&!owns('sword')&&Math.hypot(you.x-SWORD_AT.x,you.z-SWORD_AT.z)<2.8){showAct('Take the sword.','takesword',null,null,'it hangs over the hearth',null,[SWORD_AT.x+0.4,2.6,SWORD_AT.z]);return}
   if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<2.0){showAct('Go outside.','leave',null,null,'the front door',null,[0,3.0,INTERIOR.DOOR.z+0.3]);return}
@@ -3044,7 +3238,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -3184,12 +3378,13 @@ $('#hint').textContent=COARSE?'Drag left to walk \u00B7 drag right to look \u00B
 
 const keys={};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+  if(SEATED){pianoKey(e,true);return}   /* 6.7 */
   if(k==='escape'){closeStore();closeSack();$('#menu').classList.remove('on');$('#forms').classList.remove('on');return}
   if($('#forms').classList.contains('on'))return;
   if(STORE_ON)return;
   if(k==='e'&&!e.repeat){if(ACT&&(ACT.mode==='wild'||ACT.mode==='saw')){cutStart(ACT.mode,ACT.plot);return}act();return}if(k==='q'&&!e.repeat){cycleSeed();return}if(/^[1-9]$/.test(k)&&!e.repeat){setTool(['hand','can','rocket','launcher','chainsaw','bubbles','kite','sword','flamethrower'][+k-1]);return}
   if(k===' '&&!keys[' ']&&!e.repeat)jumpQ=true;keys[k]=1;if(/^arrow| $/.test(k))e.preventDefault()});
-addEventListener('keyup',e=>{if(e.key.toLowerCase()==='e')cutEnd();keys[e.key.toLowerCase()]=0});
+addEventListener('keyup',e=>{if(SEATED){pianoKey(e,false);return}if(e.key.toLowerCase()==='e')cutEnd();keys[e.key.toLowerCase()]=0});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=0});
 
 /* ======================================================================
@@ -3246,6 +3441,7 @@ function loop(now){
   const dt=Math.max(0,Math.min(0.05,(now-last)/1000));last=now;const t=now/1000;frame++;   /* never a negative step */
   if(STORE_ON||$('#forms').classList.contains('on')){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0}
   if(DRIVE){DRIVE_DX+=lookDX;lookDX=lookDY=0}
+  if(SEATED){lookDX=lookDY=0;mvX=mvZ=0;for(const k in keys)keys[k]=0;jumpQ=false}   /* 6.7: at the piano the stick and the keys belong to the piano */
   if(lookDX||lookDY){you.yaw-=lookDX*0.0046;you.pitch=Math.max(-1.1,Math.min(0.42,you.pitch-lookDY*0.0036));lookDX=lookDY=0}
   let ix=mvX,iz=mvZ;
   if(keys['w']||keys['arrowup'])iz-=1;if(keys['s']||keys['arrowdown'])iz+=1;
@@ -3298,6 +3494,7 @@ function loop(now){
   camDist+=(want-camDist)*Math.min(1,(want<camDist?20:4)*dt);AV.g.visible=!INSIDE||camDist>1.0;
   camera.position.set(you.x-lookV.x*camDist,Math.max(0.32,ty-lookV.y*camDist),you.z-lookV.z*camDist);if(INSIDE)camera.position.y=Math.min(camera.position.y,(you.feet>INTERIOR.H.SWITCH?INTERIOR.H.UH:INTERIOR.H.GH)-0.2);
   camera.rotation.y=you.yaw;camera.rotation.x=you.pitch;
+  if(SEATED){camera.position.set(PCAM.x,PCAM.y,PCAM.z);camera.rotation.y=PCAM.yaw;camera.rotation.x=PCAM.pitch;AV.g.visible=true;pianoPose(t)}   /* 6.7 */
   camera.updateMatrixWorld(true);camera.matrixWorldInverse.copy(camera.matrixWorld).invert();   /* so the prompt is placed from this frame's camera, not the last one's */
   placeAct();
 
@@ -3585,7 +3782,7 @@ function portalTick(t,dt){const k=ph==='night'?1.35:1;PORTAL_RING.material.color
   PORTAL_MOTES.forEach(p=>{p.y+=p.v*dt*(PORTAL_GOING?6:1);if(p.y>2.8)p.y=0;p.a+=dt*0.8;p.m.position.set(Math.cos(p.a)*p.r,p.y,Math.sin(p.a)*p.r);p.m.material.opacity=0.85*Math.min(1,(2.8-p.y)/0.6)})}
 function portalGo(){if(PORTAL_GOING)return;PORTAL_GOING=true;SND.tier();toast('The circle takes you.');const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:#07060a;opacity:0;transition:opacity .9s;z-index:80;pointer-events:none';document.body.appendChild(v);requestAnimationFrame(()=>{v.style.opacity='1'});
   setTimeout(()=>{location.href=(/(^|\.)deeds\.fun$/.test(location.hostname)?'/garden/club/':'../club/')},1000)}
-window.__walk={ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,SONGS,songPlay,songStop,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
