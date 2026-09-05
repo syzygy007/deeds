@@ -40,6 +40,10 @@ canvas{display:block}
 .lv em{font-style:normal;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#d9b45a}
 .lv.you{border-color:#d9b45a}
 .sheet .acts{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;justify-content:center}
+#frow{max-height:min(46vh,420px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px;scrollbar-width:thin}
+#fsearch{font:inherit;font-size:16px;width:min(340px,92vw);box-sizing:border-box;padding:12px 16px;margin:0 0 10px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;outline:none;-webkit-user-select:text;user-select:text}
+#fsearch::placeholder{color:rgba(255,255,255,.45)}#fsearch:focus{border-color:#d9b45a}
+#fcount{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin:8px 0 0}
 #end h1{font-size:min(18vw,96px);letter-spacing:-.03em}
 #end .xp{font-size:15px;color:#d9b45a;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
 #view{position:fixed;inset:0;z-index:50;display:none;background:#0a0908;overflow:auto;-webkit-overflow-scrolling:touch}
@@ -73,7 +77,7 @@ canvas{display:block}
 <div id="dark"></div>
 <div id="gate"><h1>The Study.</h1><p id="gatep">A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button><a id="gateback" href="../world/" style="display:none;color:#f4f2ea;opacity:.7;margin-top:18px;font-size:14px">Back to the garden</a></div>
 <div class="sheet" id="levels"><h1>Who do you want to play.</h1><p>Wins earn XP. Harder opponents pay more. Or invite a friend.</p><div class="row" id="lvrow"></div><div class="acts"><button class="b" id="lvback">Back</button></div></div>
-<div class="sheet" id="friends"><h1>Invite a friend.</h1><p>People you follow on DEEDS. They get a card on their phone. You play white.</p><div class="row" id="frow"></div><div class="acts"><button class="b" id="frback">Back</button></div></div>
+<div class="sheet" id="friends"><h1>Invite a friend.</h1><p>People you follow on DEEDS. They get a card on their phone. You play white.</p><input id="fsearch" type="search" placeholder="Search a name" autocomplete="off" autocapitalize="none" spellcheck="false"><div class="row" id="frow"></div><div id="fcount"></div><div class="acts"><button class="b" id="frback">Back</button></div></div>
 <div class="sheet" id="wait"><h1>Waiting.</h1><div class="xp" id="waitn"></div><p id="waitp">has a card on their phone. The game starts when they sit down.</p><div class="acts"><button class="b" id="waitcancel">Never mind</button></div></div>
 <div class="sheet" id="ask"><h1>A game.</h1><div class="xp" id="askn"></div><p id="askp">asks for a game of chess. You would play black. A win is 150 xp.</p><div class="acts"><button class="b gold" id="asksit">Sit down</button><button class="b" id="askno">Not now</button></div></div>
 <div class="sheet" id="end"><h1 id="endword">You won.</h1><div class="xp" id="endxp"></div><p id="endsub"></p><div class="acts"><button class="b gold" id="again">Run it back</button><button class="b" id="tothewall">The wall</button></div></div>
@@ -441,9 +445,11 @@ function hashId(s){let h=7;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>
 function uci(m){return CH.sqName(m.from)+CH.sqName(m.to)+(m.promo||'')}
 function fromUci(u){const f=(8-(+u[1]))*8+'abcdefgh'.indexOf(u[0]),t=(8-(+u[3]))*8+'abcdefgh'.indexOf(u[2]),pr=u[4]||'';return CH.legal(STATE).find(m=>m.from===f&&m.to===t&&(m.promo||'')===pr)||null}
 function frLevel(handle,id){return {id:0,name:handle,sub:'',win:FRIEND.win,draw:FRIEND.draw,seed:hashId(id)}}
-function openFriends(){if(!sb||!ME){toast('Sign in on deeds.fun to invite a friend.');return}const row=$('#frow');row.innerHTML='<div style="opacity:.6;font-size:13px">One moment.</div>';$('#levels').style.display='none';$('#friends').style.display='flex';
-  sb.rpc('chess_friends').then(r=>{if(r.error)throw r.error;const list=r.data||[];row.innerHTML='';if(!list.length){row.innerHTML='<div style="opacity:.7;font-size:14px;line-height:1.5">You follow nobody yet. Follow someone on deeds.fun and they appear here.</div>';return}
-    list.forEach(f=>{const b=document.createElement('button');b.className='lv fr';b.innerHTML='<div><b>'+esc(f.handle)+'</b><span>'+(f.mutual?'follows you back':'you follow them')+'</span></div><div style="text-align:right"><em>invite</em></div>';b.addEventListener('click',()=>invite(f));row.appendChild(b)})})
+let FRL=[];function paintFriends(){const row=$('#frow');const q=($('#fsearch').value||'').trim().toLowerCase();const list=FRL.filter(f=>!q||String(f.handle||'').toLowerCase().includes(q));row.innerHTML='';row.scrollTop=0;$('#fcount').textContent=FRL.length?(q?list.length+' of '+FRL.length:FRL.length+(FRL.length===1?' friend':' friends')):'';if(!list.length){row.innerHTML='<div style="opacity:.7;font-size:14px;line-height:1.5">'+(q?'Nobody called '+esc(q)+'.':'You follow nobody yet. Follow someone on deeds.fun and they appear here.')+'</div>';return}
+  list.forEach(f=>{const b=document.createElement('button');b.className='lv fr';b.innerHTML='<div><b>'+esc(f.handle)+'</b><span>'+(f.mutual?'follows you back':'you follow them')+'</span></div><div style="text-align:right"><em>invite</em></div>';b.addEventListener('click',()=>invite(f));row.appendChild(b)})}
+$('#fsearch').addEventListener('input',paintFriends);
+function openFriends(){if(!sb||!ME){toast('Sign in on deeds.fun to invite a friend.');return}const row=$('#frow');row.innerHTML='<div style="opacity:.6;font-size:13px">One moment.</div>';$('#fsearch').value='';$('#fcount').textContent='';$('#levels').style.display='none';$('#friends').style.display='flex';
+  sb.rpc('chess_friends').then(r=>{if(r.error)throw r.error;FRL=r.data||[];paintFriends()})
   .catch(e=>{row.innerHTML='';toast(/chess_friends|function/.test(String(e.message||e))?'Run patch 78 on DEEDS first.':'The Keeper did not answer.')})}
 function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function invite(f){$('#friends').style.display='none';$('#waitn').textContent=f.handle;$('#wait').style.display='flex';
