@@ -75,13 +75,13 @@ canvas{display:block}
 <div id="line">Tap a piece.<small id="sub"></small></div>
 <div id="bottom"><button class="b" id="bnew">New game</button><button class="b" id="bhint" style="display:none">Hint</button><button class="b" id="bback" style="display:none">Take back</button><button class="b" id="bwall">The wall</button><button class="b" id="bleave">Leave</button></div>
 <div id="dark"></div>
-<div id="gate"><h1>The Study.</h1><p id="gatep">A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button><a id="gateback" href="../world/" style="display:none;color:#f4f2ea;opacity:.7;margin-top:18px;font-size:14px">Back to the garden</a></div>
+<div id="gate"><h1>The Study.</h1><p id="gatep">A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button><a id="gateback" href="../world/?in=house" style="display:none;color:#f4f2ea;opacity:.7;margin-top:18px;font-size:14px">Back to the garden</a></div>
 <div class="sheet" id="levels"><h1>Who do you want to play.</h1><p>Wins earn XP. Harder opponents pay more. Or invite a friend.</p><div class="row" id="lvrow"></div><div class="acts"><button class="b" id="lvback">Back</button></div></div>
 <div class="sheet" id="friends"><h1>Invite a friend.</h1><p>People you follow on DEEDS. They get a card on their phone. You play white.</p><input id="fsearch" type="search" placeholder="Search a name" autocomplete="off" autocapitalize="none" spellcheck="false"><div class="row" id="frow"></div><div id="fcount"></div><div class="acts"><button class="b" id="frback">Back</button></div></div>
 <div class="sheet" id="wait"><h1>Waiting.</h1><div class="xp" id="waitn"></div><p id="waitp">has a card on their phone. The game starts when they sit down.</p><div class="acts"><button class="b" id="waitcancel">Never mind</button></div></div>
 <div class="sheet" id="ask"><h1>A game.</h1><div class="xp" id="askn"></div><p id="askp">asks for a game of chess. You would play black. A win is 150 xp.</p><div class="acts"><button class="b gold" id="asksit">Sit down</button><button class="b" id="askno">Not now</button></div></div>
 <div class="sheet" id="end"><h1 id="endword">You won.</h1><div class="xp" id="endxp"></div><p id="endsub"></p><div class="acts"><button class="b gold" id="again">Run it back</button><button class="b" id="tothewall">The wall</button></div></div>
-<div class="sheet" id="quit"><h1>Leave the study.</h1><p>The game on the board will be lost.</p><div class="acts"><button class="b gold" id="stay">Keep playing</button><a class="b" id="garden" href="../world/">Back to the garden</a></div></div>
+<div class="sheet" id="quit"><h1>Leave the study.</h1><p>The game on the board will be lost.</p><div class="acts"><button class="b gold" id="stay">Keep playing</button><a class="b" id="garden" href="../world/?in=house">Back to the garden</a></div></div>
 <div id="view"><button class="b" id="close">Close</button><div class="wrap"><div class="pic" id="vpic"></div><div class="cap"><h2 id="vname"></h2><div class="y" id="vyears"></div><p id="vtext"></p><p class="more" id="vmore"></p><div class="lock" id="vlock"></div><div class="acts"><button class="b" id="learn">Learn more</button><a class="b" id="vlink" target="_blank" rel="noopener">Read the whole story</a></div></div></div></div>
 <div id="toast"></div>
 <div id="err"></div>
@@ -332,7 +332,7 @@ const LOOK=(r)=>{const tops=['torso.tee','torso.zip','torso.hoodie','torso.track
   const eq={body:r()>0.5?'body.a':'body.b',skin:skins[Math.floor(r()*skins.length)],hair:h,torso:top,legs:leg,feet:feet[Math.floor(r()*feet.length)],neck:'neck.none',ears:'ears.none'};
   const cw={};cw[top]=cols[Math.floor(r()*cols.length)];cw[leg]=cols[Math.floor(r()*cols.length)];cw[eq.feet]=r()>0.5?'white':'black';cw[h]='h'+(1+Math.floor(r()*8));return {eq,cw}};
 function makeToy(look){let built;try{built=Figure.build({eq:look.eq,colorway:look.cw,slots:TOY_SLOTS})}catch(e){return null}
-  const d=built.dims,s=AVH/(d.headRy-d.ground),fig=built.fig;fig.scale.setScalar(s);fig.position.y=-d.ground*s;fig.rotation.y=Math.PI;
+  const d=built.dims,s=AVH/(d.headRy-d.ground),fig=built.fig;fig.scale.setScalar(s);fig.position.y=-d.ground*s;   /* 1.3: no PI turn, the toy's +z is its face; seat() turns the player to face the board */
   const G=new THREE.Group();G.add(fig);fig.traverse(o=>{if(o.isMesh)o.castShadow=true});return {g:G,fig,s,d,legL:built.legs[1],legR:built.legs[0],armL:built.arms[1],armR:built.arms[0],head:built.head,toy:true}}
 function makeDrawn(r){const G=new THREE.Group();const skin=mat([0xD3A882,0x8d5a3c,0xf1d3b8,0x5a3a26][Math.floor(r()*4)],0.85),cloth=mat([0x111015,0xf0efec,0x1f2a44,0x22362d][Math.floor(r()*4)],0.9);
   const add=(g,m,x,y,z,p)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;(p||G).add(o);return o};
@@ -553,13 +553,13 @@ $('#go').addEventListener('click',()=>{SFX.unlock();
   $('#gate').style.display='none';openLevels()});
 function paintPurse(bal){if(bal==null)return;const el=$('#purse');el.style.display='';el.textContent=bal.toLocaleString()+' gc';try{localStorage.setItem('deeds_gc',String(bal))}catch(e){}}
 $('#bnew').addEventListener('click',()=>{if(MODE==='friend'&&GAMEON&&!OVER){$('#quit').style.display='flex';return}openLevels()});
-$('#garden').addEventListener('click',e=>{if(MODE==='friend'&&GAMEON&&!OVER){e.preventDefault();frResign();setTimeout(()=>{location.href='../world/'},350)}});
+$('#garden').addEventListener('click',e=>{if(MODE==='friend'&&GAMEON&&!OVER){e.preventDefault();frResign();setTimeout(()=>{location.href='../world/?in=house'},350)}});
 $('#lvback').addEventListener('click',()=>{$('#levels').style.display='none';if(!GAMEON&&!OVER)line('Sit down whenever you like.','new game to start')});
 $('#again').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');if(MODE==='friend'){const f=FR;if(f){$('#levels').style.display='none';invite({id:f.id,handle:f.handle})}else openLevels();return}newGame(LEVEL)});
 $('#tothewall').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='wall';$('#bwall').textContent='The board';line('Tap a painting.','')});
 $('#bwall').addEventListener('click',()=>{if(CAM.mode==='board'){CAM.mode='wall';CAM.yaw=0;$('#bwall').textContent='The board';line('Tap a painting.','')}else{CAM.mode='board';CAM.yaw=0;CAM.pitch=0;$('#bwall').textContent='The wall';line(GAMEON?(BUSY?LEVEL.name+' is thinking.':(STATE.turn===MYC?'Your move.':LEVEL.name+' is thinking.')):'New game to start.','')}});
 $('#rank').addEventListener('click',()=>{if(CAM.mode!=='wall'){$('#bwall').click()}});
-$('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href='../world/'});
+$('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href='../world/?in=house'});
 $('#stay').addEventListener('click',()=>{$('#quit').style.display='none'});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#view').style.display==='block')$('#close').click();else if($('#quit').style.display==='flex')$('#stay').click()}});
 
