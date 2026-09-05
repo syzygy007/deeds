@@ -317,6 +317,7 @@ input,textarea{font:inherit;color:var(--ink)}
 .mrow{display:flex;gap:10px;flex-wrap:wrap}
 .mbtn{background:var(--forest);color:var(--ivory);font-weight:800;font-size:14px;padding:11px 22px;border-radius:999px}
 .mghost{border:1px solid var(--line);font-weight:800;font-size:14px;padding:11px 22px;border-radius:999px}
+#chcard{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-140%);z-index:190;width:min(400px,92vw);background:var(--ivory);color:var(--ink);border:1px solid var(--line);border-top:3px solid var(--forest);border-radius:16px;box-shadow:0 14px 40px rgba(21,19,14,.22);padding:14px 16px 12px;transition:transform .4s cubic-bezier(.2,.8,.2,1);display:none}#chcard.on{display:block;transform:translate(-50%,0)}.chk{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800;margin-bottom:4px}.chl{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.25;margin-bottom:10px}.chl b{color:var(--forest)}.chb{display:flex;gap:8px;align-items:center}.chb button{font:inherit;cursor:pointer}body.rd-lock #chcard{z-index:190}
 #toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);z-index:120;background:var(--ink);color:var(--ivory);border-top:3px solid var(--forest);border-radius:14px;padding:14px 22px;font-size:13px;font-weight:800;letter-spacing:.06em;opacity:0;transition:all .35s;max-width:88vw;text-align:center;pointer-events:none}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 /* reels + lightbox */
@@ -2394,6 +2395,7 @@ body.gsky-on .tab.on{color:var(--ivory)}
 </div>
 
 <div id="toast"></div>
+<div id="chcard"><div class="chk">A game of chess</div><div class="chl"><b id="chwho"></b> wants to play chess with you.</div><div class="chb"><a class="xonb" id="chsit" href="garden/chess/">Sit down</a><button class="xonb ghost" id="chno" type="button">Not now</button></div></div>
 
 <div id="reels">
   <canvas id="reelcanvas"></canvas>
@@ -5086,6 +5088,18 @@ if(ONBOOT)return;ONBOOT=true;
 document.addEventListener('visibilitychange',function(){if(document.hidden){presenceLeave()}else{presencePing();loadOnline()}});
 window.addEventListener('pagehide',function(){presenceLeave()})}
 var _applyProfile0=applyProfile;applyProfile=function(){var r=_applyProfile0.apply(this,arguments);try{startPresence()}catch(e){}try{wireAvTap()}catch(e){}return r};
+/* ---- v10: the chess card. A pending invite from chess_inbox pops a card at the top of any page, and rides the 'chess:inv:<id>' broadcast the Study rings on send. Activity lists it too. ---- */
+var CHINBOX=[],CHTIMER=null,CHCH=null,CHSHOWN='',CHNO={};
+function chessInbox(){if(!sb||!PROFILE)return Promise.resolve();return sb.rpc('chess_inbox').then(function(r){if(r.error)return;CHINBOX=(r.data||[]).filter(function(a){return !CHNO[a.invite]});chessCard();try{renderAlerts()}catch(e){}}).catch(function(){})}
+function chessCard(){var el=$('#chcard');if(!el)return;var a=CHINBOX[0];if(!a){if(el.classList.contains('on')){el.classList.remove('on');setTimeout(function(){if(!el.classList.contains('on'))el.style.display='none'},450)}CHSHOWN='';return}
+if(CHSHOWN===a.invite)return;CHSHOWN=a.invite;el.dataset.inv=a.invite;$('#chwho').textContent=a.from_handle||'A friend';$('#chsit').href='garden/chess/';el.style.display='block';requestAnimationFrame(function(){el.classList.add('on')})}
+function chessNo(){var el=$('#chcard');var inv=el.dataset.inv;if(!inv)return;CHNO[inv]=1;CHINBOX=CHINBOX.filter(function(a){return a.invite!==inv});chessCard();try{renderAlerts()}catch(e){}if(sb)sb.rpc('chess_invite_answer',{p_invite:inv,p_yes:false}).then(function(){}).catch(function(){});toast('Told them. Not now.')}
+function chessListen(){if(!sb||!PROFILE)return;chessInbox();if(CHTIMER)clearInterval(CHTIMER);CHTIMER=setInterval(function(){if(!document.hidden)chessInbox()},30000);
+if(CHCH)return;try{CHCH=sb.channel('chess:inv:'+PROFILE.id);CHCH.on('broadcast',{event:'inv'},function(){chessInbox()});CHCH.subscribe()}catch(e){}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)chessInbox()})}
+function chessAltRows(){var h='';CHINBOX.forEach(function(a){h+='<a class="altrow new" href="garden/chess/"><div>'+DeedsTypes.svg('doer',40,{})+'</div><div class="in"><div class="l">'+esc(a.from_handle||'A friend')+' wants a game of chess.</div><div class="s">Sit down at the board.</div></div><span class="p-time">now</span></a>'});return h}
+var _ch_no=$('#chno');if(_ch_no)_ch_no.onclick=chessNo;
+var _startPresence1=startPresence;startPresence=function(){var r=_startPresence1.apply(this,arguments);try{chessListen()}catch(e){}return r};
 var _renderMeet1=renderMeet;renderMeet=function(){var r=_renderMeet1.apply(this,arguments);try{paintOnline();if(Date.now()-ONLAST>20000)loadOnline()}catch(e){}return r};
 
 /* ---- QR ENCODER (qrcode-generator, inlined so the tree never waits on a network) ---- */
@@ -5740,8 +5754,8 @@ return fetchNames(need)}).then(function(){indexNames();paintNoteDot()}).catch(fu
 
 function renderAlerts(){var el=$('#altlist');if(!el)return;
 if(!PROFILE){el.innerHTML='<p class="remnote">Sign in and your activity shows up here.</p>';return}
-if(!ALERTS.length){el.innerHTML='<p class="remnote">Nothing yet. It starts the first time someone finds one of your deeds.</p>';return}
-var h='';
+if(!ALERTS.length&&!(typeof CHINBOX!=='undefined'&&CHINBOX.length)){el.innerHTML='<p class="remnote">Nothing yet. It starts the first time someone finds one of your deeds.</p>';return}
+var h=(typeof chessAltRows==='function')?chessAltRows():'';
 ALERTS.forEach(function(a,i){
 var nm=a.actor?(NAMES[a.actor]||{handle:'A Member',type:'doer',v:false}):{handle:'',type:'doer',v:false};
 var line='',sub='';
