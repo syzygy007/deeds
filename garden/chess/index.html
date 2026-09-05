@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="deeds-chess" content="1.0">
+<meta name="deeds-chess" content="1.1">
 <title>The Study · DEEDS</title>
 <style>
 html,body{margin:0;height:100%;background:#0d1512;overflow:hidden;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#f4f2ea;-webkit-user-select:none;user-select:none}
@@ -29,6 +29,7 @@ canvas{display:block}
 #gate{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at 50% 55%,#1e3a30 0%,#0d1512 70%)}
 #gate h1{font-size:64px;line-height:.95;margin:0 0 10px;font-weight:800;letter-spacing:-.02em;text-align:center}
 #gate p{margin:0 0 30px;opacity:.7;font-size:15px;text-align:center;max-width:280px;line-height:1.45}
+#gate button:disabled{opacity:.5}
 #gate button{font:inherit;font-size:16px;font-weight:700;padding:16px 34px;border-radius:999px;border:0;background:#f4f2ea;color:#0d1512}
 .sheet{position:fixed;inset:0;z-index:45;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(6,10,8,.82);text-align:center;padding:24px;backdrop-filter:blur(8px)}
 .sheet h1{font-size:44px;font-weight:800;margin:0 0 6px;letter-spacing:-.02em;line-height:1}
@@ -61,11 +62,11 @@ canvas{display:block}
 </style>
 </head>
 <body>
-<div id="hud"><div class="tag">The Study<b id="who">Your move.</b></div><div id="right"><button class="chip" id="sound">Tap for sound</button><div id="rank"><b>Pawn</b><i>0 xp</i><div id="bar"><i></i></div></div></div></div>
+<div id="hud"><div class="tag">The Study<b id="who">Your move.</b></div><div id="right"><button class="chip" id="sound">Tap for sound</button><span class="chip" id="purse" style="display:none"></span><div id="rank"><b>Pawn</b><i>0 xp</i><div id="bar"><i></i></div></div></div></div>
 <div id="line">Tap a piece.<small id="sub"></small></div>
 <div id="bottom"><button class="b" id="bnew">New game</button><button class="b" id="bwall">The wall</button><button class="b" id="bleave">Leave</button></div>
 <div id="dark"></div>
-<div id="gate"><h1>The Study.</h1><p>A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button></div>
+<div id="gate"><h1>The Study.</h1><p id="gatep">A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button><a id="gateback" href="../world/" style="display:none;color:#f4f2ea;opacity:.7;margin-top:18px;font-size:14px">Back to the garden</a></div>
 <div class="sheet" id="levels"><h1>Who do you want to play.</h1><p>Wins earn XP. Harder opponents pay more.</p><div class="row" id="lvrow"></div><div class="acts"><button class="b" id="lvback">Back</button></div></div>
 <div class="sheet" id="end"><h1 id="endword">You won.</h1><div class="xp" id="endxp"></div><p id="endsub"></p><div class="acts"><button class="b gold" id="again">Run it back</button><button class="b" id="tothewall">The wall</button></div></div>
 <div class="sheet" id="quit"><h1>Leave the study.</h1><p>The game on the board will be lost.</p><div class="acts"><button class="b gold" id="stay">Keep playing</button><a class="b" id="garden" href="../world/">Back to the garden</a></div></div>
@@ -362,13 +363,13 @@ function camTick(dt){PEND.forEach(p=>p.visible=CAM.mode==='board');const p=camPo
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
 
 /* ---------- the game ---------- */
-let STATE=CH.start(),LEVEL=LEVELS[suggested()-1],SEL=-1,LEGAL=[],BUSY=false,OVER=false,GAMEON=false,LASTM=null,ANIM=[],THINK=0;
+let STATE=CH.start(),LEVEL=LEVELS[suggested()-1],SEL=-1,LEGAL=[],BUSY=false,OVER=false,GAMEON=false,LASTM=null,ANIM=[],THINK=0,PLIES=0;
 function line(a,b){$('#line').firstChild.textContent=a;$('#sub').textContent=b||''}
 function toast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',2600)}
 function clearHL(){HL.forEach(h=>h.visible=false);selRing.visible=false;SEL=-1;LEGAL=[]}
 function showLast(m){if(!m){lastA.visible=lastB.visible=false;return}const [ax,az]=sqPos(m.from),[bx,bz]=sqPos(m.to);lastA.position.set(ax,BY+0.0135,az);lastB.position.set(bx,BY+0.0135,bz);lastA.visible=lastB.visible=true}
 function showCheck(){checkSq.visible=false;if(CH.inCheck(STATE)){const k=STATE.b.indexOf(STATE.turn==='w'?'K':'k');const [x,z]=sqPos(k);checkSq.position.set(x,BY+0.0136,z);checkSq.visible=true}}
-function newGame(level){LEVEL=level;dressOpp(level);STATE=CH.start();placeAll(STATE.b);clearHL();showLast(null);checkSq.visible=false;OVER=false;BUSY=false;GAMEON=true;LASTM=null;$('#who').textContent=level.name;line('Your move.','you play white');SFX.set()}
+function newGame(level){LEVEL=level;dressOpp(level);STATE=CH.start();placeAll(STATE.b);clearHL();showLast(null);checkSq.visible=false;OVER=false;BUSY=false;GAMEON=true;LASTM=null;$('#who').textContent=level.name;line('Your move.','you play white');PLIES=0;SFX.set()}
 function doMove(m,then){const g=PIECES[m.from];const target=PIECES[m.to];const [x,z]=sqPos(m.to);
   const next=CH.make(STATE,m);const san=CH.san(STATE,m);
   /* the flags: castling moves the rook too, en passant takes the pawn beside */
@@ -378,17 +379,20 @@ function doMove(m,then){const g=PIECES[m.from];const target=PIECES[m.to];const [
   ANIM.push({g,x,z,t:0,d:0.38,lift:0.1});if(extra){const [ex,ez]=sqPos(extra.to);ANIM.push({g:extra.g,x:ex,z:ez,t:0,d:0.38,lift:0.06})}
   if(taken){setTimeout(()=>{toTray(taken);SFX.capture()},260)}else setTimeout(()=>SFX.click(),300);
   if(m.promo){setTimeout(()=>{const [px,pz]=sqPos(m.to);boardG.remove(g);const q=makePiece(STATE.turn==='w'?m.promo.toUpperCase():m.promo);q.position.set(px,BY+0.012,pz);boardG.add(q);PIECES[m.to]=q},400)}
-  STATE=next;LASTM=m;showLast(m);
+  STATE=next;LASTM=m;PLIES++;showLast(m);
   setTimeout(()=>{showCheck();if(CH.inCheck(STATE))SFX.check();then&&then(san)},420)}
 function afterMove(){const st=CH.status(STATE);if(st!=='play'){finish(st);return true}return false}
 function finish(st){OVER=true;GAMEON=false;BUSY=false;clearHL();let word,sub,xp=0,won=false;
   if(st==='mate'){if(STATE.turn==='b'){word='You won.';sub='Checkmate. '+LEVEL.name+' tips the king.';xp=LEVEL.win;won=true}else{word=LEVEL.name.replace('The ','The ')+' won.';sub='Checkmate.';xp=LOSS_XP}}
   else{word='A draw.';sub=st==='stalemate'?'Stalemate.':st==='fifty'?'Fifty moves without a capture.':'Not enough left on the board to mate.';xp=LEVEL.draw}
-  const before=rankOf(SAVE.xp);SAVE.xp+=xp;SAVE.games++;if(won)SAVE.wins++;save();paintRank();const after=rankOf(SAVE.xp);
-  $('#endword').textContent=word;$('#endxp').textContent='+'+xp+' xp';$('#endsub').textContent=sub;line(word,'');
+  const result=won?'win':st==='mate'?'loss':'draw';
+  $('#endword').textContent=word;$('#endsub').textContent=sub;line(word,'');
   if(won)SFX.win();else if(xp>LOSS_XP)SFX.draw();else SFX.lose();
-  setTimeout(()=>{$('#end').style.display='flex'},900);
-  if(after>before){setTimeout(()=>rankUp(after),2200)}}
+  const settle=(gained,after,before,note)=>{paintRank();$('#endxp').textContent=(gained>0?'+'+gained+' xp':note||'no xp');setTimeout(()=>{$('#end').style.display='flex'},900);if(after>before){setTimeout(()=>rankUp(after),2200)}};
+  const before=rankOf(SAVE.xp);
+  if(sb&&ME){$('#endxp').textContent='';sb.rpc('chess_result',{p_level:LEVEL.id,p_result:result,p_plies:PLIES}).then(r=>{if(r.error)throw r.error;const d=r.data;SAVE.xp=d.xp;SAVE.games=d.games;SAVE.wins=d.wins;save();
+      settle(d.gained,rankOf(d.xp),before,d.reason==='too_short'?'too short to count':d.reason==='twelve_a_day'?'twelve paid games a day':'no xp')}).catch(e=>{SAVE.xp+=xp;SAVE.games++;if(won)SAVE.wins++;save();settle(xp,rankOf(SAVE.xp),before);toast('The Keeper did not answer. Kept on this phone.')})}
+  else{SAVE.xp+=xp;SAVE.games++;if(won)SAVE.wins++;save();settle(xp,rankOf(SAVE.xp),before)}}
 function rankUp(r){const pic=WALL.find(w=>w.rank===r);$('#endword').textContent=RANKS[r].n+'.';$('#endxp').textContent='a new rank';$('#endsub').textContent=pic?pic.name.split(' ').slice(-1)[0]+' hangs on your wall now. Go and look.':'Keep climbing.';SFX.rank();paintWall(true);if(pic)$('#tothewall').classList.add('gold')}
 function think(){if(OVER)return;BUSY=true;THINK=performance.now();line(LEVEL.name+' is thinking.','');const id=Math.random();const s={b:STATE.b,turn:STATE.turn,cs:STATE.cs,ep:STATE.ep,half:STATE.half,n:STATE.n,hist:[]};const seed=(SAVE.games*97+STATE.n*13+LEVEL.seed)>>>0;
   const reply=r=>{if(!r||OVER)return;const wait=Math.max(0,700-(performance.now()-THINK));setTimeout(()=>{doMove(r.move,()=>{BUSY=false;if(!afterMove())line('Your move.',CH.inCheck(STATE)?'check':'')})},wait)};
@@ -443,7 +447,16 @@ addEventListener('pointerdown',()=>{SFX.unlock()},{passive:true});
 
 /* ---------- the sheets ---------- */
 function openLevels(){const row=$('#lvrow');row.innerHTML='';const sug=suggested();LEVELS.forEach(l=>{const b=document.createElement('button');b.className='lv'+(l.id===sug?' you':'');b.innerHTML='<div><b>'+l.name+'</b><span>'+l.sub+'</span></div><div style="text-align:right"><em>'+(l.id===sug?'your level<br>':'')+'</em><span style="color:#d9b45a">+'+l.win+' xp</span></div>';b.addEventListener('click',()=>{$('#levels').style.display='none';$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='board';newGame(l)});row.appendChild(b)});$('#levels').style.display='flex'}
-$('#go').addEventListener('click',()=>{SFX.unlock();$('#gate').style.display='none';openLevels()});
+const DOOR={known:false,signed:null,owned:null,price:3000};
+function paintGate(){const g=$('#go'),p=$('#gatep'),b=$('#gateback');if(!DOOR.known){g.textContent='Sit down';g.disabled=false;return}
+  if(!DOOR.signed){p.textContent='The board is in your house on DEEDS. Sign in on deeds.fun to buy it.';g.textContent='Sign in';g.disabled=false;b.style.display='block';return}
+  if(!DOOR.owned){p.textContent='The board is for sale. Yours to keep, and it goes on a table in your house.';g.textContent='Buy the board · '+DOOR.price.toLocaleString()+' gc';g.disabled=false;b.style.display='block';return}
+  p.textContent='A board by the fire. Play the house, climb the ranks, hang the greats on your wall.';g.textContent='Sit down';g.disabled=false;b.style.display='none'}
+$('#go').addEventListener('click',()=>{SFX.unlock();
+  if(DOOR.known&&!DOOR.signed){location.href='/';return}
+  if(DOOR.known&&!DOOR.owned){const g=$('#go');g.disabled=true;g.textContent='One moment.';sb.rpc('chess_buy').then(r=>{if(r.error)throw r.error;DOOR.owned=true;paintPurse(r.data.balance);SFX.rank();toast(r.data.already?'You already own the board.':'The board is yours. 3,000 gc.');paintGate()}).catch(e=>{const m=String(e.message||e);toast(/not_enough/.test(m)?'Not enough. The board is 3,000 gc.':/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':/chess_buy|function/.test(m)?'Run patch 74 on DEEDS first.':'The Keeper did not answer.');g.disabled=false;paintGate()});return}
+  $('#gate').style.display='none';openLevels()});
+function paintPurse(bal){if(bal==null)return;const el=$('#purse');el.style.display='';el.textContent=bal.toLocaleString()+' gc';try{localStorage.setItem('deeds_gc',String(bal))}catch(e){}}
 $('#bnew').addEventListener('click',()=>{openLevels()});
 $('#lvback').addEventListener('click',()=>{$('#levels').style.display='none';if(!GAMEON&&!OVER)line('Sit down whenever you like.','new game to start')});
 $('#again').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');newGame(LEVEL)});
@@ -453,6 +466,15 @@ $('#rank').addEventListener('click',()=>{if(CAM.mode!=='wall'){$('#bwall').click
 $('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href='../world/'});
 $('#stay').addEventListener('click',()=>{$('#quit').style.display='none'});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#view').style.display==='block')$('#close').click();else if($('#quit').style.display==='flex')$('#stay').click()}});
+
+/* ---------- DEEDS: who you are, what you own, your rank on the server ---------- */
+const SB_URL='https://helqqdygwaihrliglbvw.supabase.co',SB_KEY='sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA';
+let sb=null,ME=null;
+function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
+  sb.auth.getSession().then(r=>{const u=r&&r.data&&r.data.session&&r.data.session.user;DOOR.known=true;if(!u){DOOR.signed=false;paintGate();return}ME=u.id;DOOR.signed=true;
+    sb.rpc('chess_state').then(q=>{if(q.error)throw q.error;const d=q.data||{};DOOR.owned=!!d.owned;DOOR.price=d.price||3000;paintPurse(d.balance);
+      if(typeof d.xp==='number'){SAVE.xp=d.xp;SAVE.games=d.games||0;SAVE.wins=d.wins||0;save();paintRank();paintWall(false)}paintGate()}).catch(e=>{DOOR.known=false;paintGate();toast('Run patch 74 on DEEDS first. Playing on this phone for now.')})}).catch(()=>{})}
+{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=goLive;s.onerror=()=>{};document.head.appendChild(s)}
 
 /* ---------- the loop ---------- */
 let last=performance.now();
