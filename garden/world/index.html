@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.19">
+<meta name="world-build" content="6.20">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -151,6 +151,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 .tool{border:1px solid rgba(246,243,235,.22);border-radius:14px;padding:12px;background:rgba(246,243,235,.05);display:flex;gap:12px;align-items:center;margin-top:10px}
 .tool svg{width:44px;height:44px;flex:none;fill:none;stroke:var(--ivory);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .tool .nm{font-size:12px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}.tool .pr{font-size:12px;color:rgba(246,243,235,.7);margin:3px 0 8px;line-height:1.45}
+#chcard{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-140%);z-index:70;width:min(400px,92vw);background:#F6F3EB;color:#15130E;border:1px solid rgba(21,19,14,.14);border-top:3px solid #1F4B3A;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.35);padding:14px 16px 12px;transition:transform .4s cubic-bezier(.2,.8,.2,1);display:none;text-align:left}#chcard.on{display:block;transform:translate(-50%,0)}#chcard .chk{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#BE9A4E;font-weight:800;margin-bottom:4px}#chcard .chl{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.25;margin-bottom:10px}#chcard .chl b{color:#1F4B3A}#chcard .chb{display:flex;gap:8px}#chcard .chb a,#chcard .chb button{font:inherit;font-size:12px;font-weight:800;letter-spacing:.02em;padding:7px 15px;border-radius:999px;text-decoration:none;cursor:pointer;background:#1F4B3A;color:#F6F3EB;border:1px solid #1F4B3A}#chcard .chb button{background:none;color:#1F4B3A}
 </style>
 </head>
 <body>
@@ -1757,6 +1758,7 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
     PATCH62=+d.patch>=62;PATCH64=+d.patch>=64;PATCH67=+d.patch>=67;if(d.estate&&d.estate.tick&&d.estate.tick.lumber&&!VISIT)setTimeout(()=>lumberDone(d.estate.tick.lumber),300);if(VISIT&&Array.isArray(d.my_tools)){S.tools=S.tools||{};d.my_tools.forEach(t=>{if(TOOLS[t])S.tools[t]=1});HAND=(d.my_hand||[]).filter(t=>TOOLS[t])}if(PATCH62&&d.estate)estateHydrate(d.estate);   /* 4.25: a guest sees the owner's gardeners, sprinklers, fence and lock */
     PATCH69=+d.patch>=69;if(PATCH69&&!VISIT)hydrate69(d);pianoSync();chessSync();farmSync();   /* 6.13, 6.15 */
     if(QS.get('in')==='house'&&!VISIT&&!INSIDE&&!window.__HOMEIN){window.__HOMEIN=1;setTimeout(()=>{try{enterHouse();you.x=CHESS_AT.x+1.6;you.z=CHESS_AT.z+0.4;you.vx=0;you.vz=0;insideAct()}catch(e){console.warn('homein',e)}},450)}   /* 6.19: ?in=house lands you inside, by the chess table (the Study's way home) */
+    chessListen();   /* 6.20: the chess card, an invite pops here too */
     PATCH60=+d.patch>=60;if(PATCH60&&Array.isArray(d.room_tiers)&&d.room_tiers.length===6)ROOM_TIERS=d.room_tiers.map(Number);S.rooms=(PATCH60&&d.rooms&&typeof d.rooms.down==='number')?d.rooms:roomsOf(S.house.wood,S.house.stage);if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
@@ -2623,6 +2625,15 @@ const placeMozart=placePortraits;
 const CHESS_AT={x:-14.5,z:-2.2};const CHX={known:false,owned:false,xp:0,rank:'Pawn'};let CHESSG=null,CHPORT=null,CH_SYNC='';
 const CH_RANKS=[['Master',8000],['King',4000],['Queen',2000],['Rook',1000],['Bishop',500],['Knight',200],['Pawn',0]];
 function chessRank(xp){for(const [nm,at] of CH_RANKS)if(xp>=at)return nm;return 'Pawn'}
+/* 6.20: THE CHESS CARD. A pending invite from chess_inbox pops a card in the garden, rides 'chess:inv:<id>' from the Study, polls every 30 s. */
+let CHINBOX=[],CHTIMER=null,CHCH=null,CHSHOWN='';const CHNO={};
+function chessInbox(){if(!sb||!ME)return;RPC('chess_inbox').then(r=>{if(r.error)return;CHINBOX=(r.data||[]).filter(a=>!CHNO[a.invite]);chessCard()}).catch(()=>{})}
+function chessCard(){const el=document.getElementById('chcard');if(!el)return;const a=CHINBOX[0];if(!a){if(el.classList.contains('on')){el.classList.remove('on');setTimeout(()=>{if(!el.classList.contains('on'))el.style.display='none'},450)}CHSHOWN='';return}
+  if(CHSHOWN===a.invite)return;CHSHOWN=a.invite;el.dataset.inv=a.invite;document.getElementById('chwho').textContent=a.from_handle||'A friend';el.style.display='block';requestAnimationFrame(()=>el.classList.add('on'));try{SND.tier()}catch(e){}}
+function chessListen(){if(!sb||!ME||VISIT)return;chessInbox();if(CHTIMER)clearInterval(CHTIMER);CHTIMER=setInterval(()=>{if(!document.hidden)chessInbox()},30000);if(CHCH)return;
+  try{CHCH=sb.channel('chess:inv:'+ME);CHCH.on('broadcast',{event:'inv'},()=>chessInbox());CHCH.subscribe()}catch(e){}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)chessInbox()});
+  const no=document.getElementById('chno');if(no)no.onclick=()=>{const el=document.getElementById('chcard');const inv=el.dataset.inv;if(!inv)return;CHNO[inv]=1;CHINBOX=CHINBOX.filter(a=>a.invite!==inv);chessCard();sb.rpc('chess_invite_answer',{p_invite:inv,p_yes:false}).then(()=>{}).catch(()=>{});toast('Told them. Not now.')}}
 function chessSync(){if(!LIVE||VISIT||CH_SYNC==='me')return;CH_SYNC='me';RPC('chess_state').then(r=>{const d=r.data||{};if(r.error||!d.signed_in){CH_SYNC='';return}CHX.known=true;CHX.owned=!!d.owned;CHX.xp=+d.xp||0;CHX.rank=d.rank||chessRank(CHX.xp);if(INSIDE)placeChess()},()=>{CH_SYNC=''})}
 function buildChessTable(){const g=new THREE.Group();const walnut=new THREE.MeshStandardMaterial({color:0x3a2414,roughness:0.55}),dark=new THREE.MeshStandardMaterial({color:0x22150c,roughness:0.6}),velvet=new THREE.MeshStandardMaterial({color:0x6a1f2b,roughness:0.95}),gilt=new THREE.MeshPhysicalMaterial({color:0xE0B84A,metalness:0.9,roughness:0.3,clearcoat:0.5}),cream=new THREE.MeshStandardMaterial({color:0xf1e7cf,roughness:0.3}),black=new THREE.MeshStandardMaterial({color:0x161311,roughness:0.28});
   const add=(geo,m,x,y,z,ry)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);if(ry)o.rotation.y=ry;o.castShadow=true;o.receiveShadow=true;g.add(o);return o};
@@ -4345,5 +4356,6 @@ setTimeout(()=>{const l=$('#load');l.style.opacity='0';setTimeout(()=>l.remove()
 /* on the site every picture is expected; say plainly if one is missing */
 setTimeout(()=>{if(ON_SITE&&FAIL.length)shout(FAIL.length+' pictures did not load from '+BASE+': '+FAIL.slice(0,6).join(', ')+(FAIL.length>6?' …':''))},9000);
 </script>
+<div id="chcard"><div class="chk">A game of chess</div><div class="chl"><b id="chwho"></b> wants to play chess with you.</div><div class="chb"><a id="chsit" href="../chess/">Sit down</a><button id="chno" type="button">Not now</button></div></div>
 </body>
 </html>
