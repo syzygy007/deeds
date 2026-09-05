@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.15">
+<meta name="world-build" content="6.16">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -722,7 +722,7 @@ const U=0.07;
 /* 6.0 THE SHARED WORLD: one room, up to four estates off one avenue. Every estate is the same plan placed at its seat; the
    market row stands across the avenue's south end and everyone spawns there. EOX/EOZ is the offset the plan is read at */
 const SEATXZ=[[-34,34],[34,34],[-34,-34],[34,-34]],SEATNAME=['south west','south east','north west','north east'],SEATROT=[-Math.PI/2,Math.PI/2,0,0];   /* 6.3: the four parterres are the quadrants of one garden round one fountain; the south pair's houses turn out to the west and east, the north pair's stand at the top */
-let EOX=0,EOZ=0,MYSEAT=0;const ROOMB={x:124,z0:-124,z1:92};
+let EOX=0,EOZ=0,MYSEAT=0;const ROOMB={x:150,z0:-150,z1:92};   /* 6.16: the room grows to make room for the farms behind the houses */
 const px2w=(x,y)=>[(x-500)*U+EOX,(y-500)*U+EOZ];   /* plan units -> world metres (x east, z south) */
 
 /* ---------- pictures: plain img tags, each file once, shared ---------- */
@@ -1173,8 +1173,8 @@ markDisk(ox,oz,3.36,0.82);
 EOX=sx;EOZ=sz}
 SEATXZ.forEach((_,i)=>buildShell(i));
 /* 6.2 ONE HEDGE round the whole garden, tall, in two runs so the south gate (the market) and the north gap (into the wood) stay open */
-{const west=resample([[-8,80],[-104,80],[-108,76],[-108,-104],[-104,-108],[-8,-108]],false,0.16);
- const east=resample([[8,-108],[104,-108],[108,-104],[108,76],[104,80],[8,80]],false,0.16);
+{const west=resample([[-8,80],[-132,80],[-136,76],[-136,-132],[-132,-136],[-8,-136]],false,0.16);   /* 6.16: the great hedge moves out 28 m so the farms behind the houses are inside it */
+ const east=resample([[8,-136],[132,-136],[136,-132],[136,76],[132,80],[8,80]],false,0.16);
  [west,east].forEach((P,i)=>{markBand(P,false,0.91,2.6);mesh(sweepGeo(P,OPROF,false,1.1,3.2,0.03,400+i),MAT.hedge,true)})}
 /* 6.3 THE GREAT FOUNTAIN in the middle of the cross, a bigger basin of the same stone; the four estate fountains stay in their courts */
 {const K=1.7;const bpts=[[0,0.02],[3.2,0.02],[3.2,0.68],[3.3,0.72],[3.3,0.82],[2.92,0.82],[2.8,0.74],[2.8,0.6],[2.5,0.56],[0,0.56]].map(p=>new THREE.Vector2(p[0]*K,p[1]*K));
@@ -1491,8 +1491,8 @@ const WILD=[];   /* every wild tree in the wood and down the avenue: {x,z,h,h0,k
  /* the wood: three rings, thicker further out, the path corridors kept clear, the stand kept clear */
  const kinds=['green','green','apple','cherry','green','pear','plum','orchard','green','cypress'];
  let tries=0;
- while(all.length<300&&tries<40000){tries++;const x=(r()-0.5)*2*(ROOMB.x+16),z=ROOMB.z0-16+r()*(ROOMB.z1-ROOMB.z0+32);
-   if(Math.abs(x)<112&&z>-112&&z<84)continue;                        /* nothing grows on the lawn inside the hedge; the wood is outside it */
+ while(all.length<380&&tries<60000){tries++;const x=(r()-0.5)*2*(ROOMB.x+16),z=ROOMB.z0-16+r()*(ROOMB.z1-ROOMB.z0+32);
+   if(Math.abs(x)<141&&z>-141&&z<84)continue;                        /* nothing grows on the lawn inside the hedge; the wood is outside it */
    if(Math.hypot(x-STAND.x,z-STAND.z)<5.2)continue;                 /* the seed stand */
    if(Math.hypot(x-FLORIST.x,z-FLORIST.z)<5.2)continue;             /* the florist */
    if(Math.hypot(x-MARKET3.x,z-MARKET3.z)<5.2)continue;             /* the fish market */
@@ -1755,7 +1755,7 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
     PATCH55=+d.patch>=55;if(PATCH55){S.packs={};(d.packs||[]).forEach(k=>{if(PACKS[k])S.packs[k]=1});S.worn=PACKS[d.worn]?d.worn:null;if(+d.wood_cap>0)WOOD_CAPS=+d.wood_cap;if(+d.pack_gc>0)PACK_GC=+d.pack_gc;setPack(S.worn);paintHotbar()}
     PATCH61=+d.patch>=61;if(PATCH61){S.tools=S.tools||{};if(d.sword)S.tools.sword=1;if(d.flame)S.tools.flamethrower=1;if(+d.flame_dc>0)TOOLS.flamethrower.dc=+d.flame_dc;RAIDS=Array.isArray(d.raids)?d.raids:[];raidNews()}
     PATCH62=+d.patch>=62;PATCH64=+d.patch>=64;PATCH67=+d.patch>=67;if(d.estate&&d.estate.tick&&d.estate.tick.lumber&&!VISIT)setTimeout(()=>lumberDone(d.estate.tick.lumber),300);if(VISIT&&Array.isArray(d.my_tools)){S.tools=S.tools||{};d.my_tools.forEach(t=>{if(TOOLS[t])S.tools[t]=1});HAND=(d.my_hand||[]).filter(t=>TOOLS[t])}if(PATCH62&&d.estate)estateHydrate(d.estate);   /* 4.25: a guest sees the owner's gardeners, sprinklers, fence and lock */
-    PATCH69=+d.patch>=69;if(PATCH69&&!VISIT)hydrate69(d);pianoSync();chessSync();   /* 6.13, 6.15 */
+    PATCH69=+d.patch>=69;if(PATCH69&&!VISIT)hydrate69(d);pianoSync();chessSync();farmSync();   /* 6.13, 6.15 */
     PATCH60=+d.patch>=60;if(PATCH60&&Array.isArray(d.room_tiers)&&d.room_tiers.length===6)ROOM_TIERS=d.room_tiers.map(Number);S.rooms=(PATCH60&&d.rooms&&typeof d.rooms.down==='number')?d.rooms:roomsOf(S.house.wood,S.house.stage);if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
@@ -3414,6 +3414,7 @@ function hideAct(){ACT=null;ANCHOR=null;actEl.classList.remove('on')}
 const stallAt=s=>[s.x+1.72,2.7,s.z];
 function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(INSIDE){insideAct();return}
+  if(farmAct())return;   /* 6.16 */
   const T=pickTarget();
   if(T.kind==='door'){showAct('Go inside.','enter',null,null,houseLocked()?'locked \u00B7 '+mmss(lockLeft())+' left':roomsWord(),(houseLvl()>=1&&!VISIT)?[{l:houseLocked()?'Lock again.':'Lock the house.',f:lockHouse}].concat(EST().fence?[]:[{l:'Picket fence \u00B7 '+FENCE_GC.toLocaleString()+'.',f:fenceBuy}]):null,[DOORW.x,2.6,DOORW.z]);return}
   if(T.kind==='mower'){showAct('Ride the mower.','mower',null,null,'parked by the house',null,[MOWER.position.x,1.9,MOWER.position.z]);return}
@@ -3485,7 +3486,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -3547,7 +3548,8 @@ function mowerBuy(){if(visitGuard('buy the mower'))return;if(S.tools.mower){toas
   if(!payGc(cost)){showShort(cost);return}done()}
 
 function rotXZ(x,z,th){const c=Math.cos(th),sn=Math.sin(th);return [x*c-z*sn,x*sn+z*c]}
-function bindSeat(seat){seat=Math.max(0,Math.min(3,seat|0));if(BOUND===seat)return;const [ox,oz]=SEATXZ[seat],th=SEATROT[seat];
+function bindSeat(seat){bindSeat0(seat);if(typeof farmPlace==="function")farmPlace(true)}   /* 6.16: the farm turns with the seat */
+function bindSeat0(seat){seat=Math.max(0,Math.min(3,seat|0));if(BOUND===seat)return;const [ox,oz]=SEATXZ[seat],th=SEATROT[seat];
   if(!SEATBASE)SEATBASE={house:[HOUSE.x,HOUSE.z],front:[HOUSE.front.x,HOUSE.front.z],door:[DOORW.x,DOORW.z],corral:[CORRAL.x,CORRAL.z],b:BUILDER.g?[BUILDER.g.position.x,BUILDER.g.position.z]:null,p:BUILDER.pileG?[BUILDER.pileG.position.x,BUILDER.pileG.position.z]:null};
   BOUND=seat;MYSEAT=seat;EOX=ox;EOZ=oz;const W=(x,z)=>{const [rx,rz]=rotXZ(x,z,th);return [ox+rx,oz+rz]};
   const nb=computeBED();BED.length=0;nb.forEach(b=>BED.push(b));
@@ -3681,7 +3683,7 @@ function labels(){
   if(INSIDE){const nm=(INTERIOR.R[ROOM]||{}).name||'Your house';if(nm!==areaNow){areaNow=nm;areaEl.innerHTML=nm+'<span>.</span>'}nearEl.textContent='';return}
   let name='The Parterre';const d0=Math.hypot(you.x-EOX,you.z-EOZ);
   if(d0<6.2)name='The Fountain';
-  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(Math.abs(you.x)<8&&you.z>40.5&&you.z<49)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
+  else if(Math.max(Math.abs(you.x),Math.abs(you.z))>HALF+0.4)name=(typeof farmL==='function'&&FX.owned&&(()=>{const [lx,lz]=farmL(you.x,you.z);return Math.abs(lx)<=FARM_AT.hw+1&&lz<=-75&&lz>=-101})())?'The Farm':(Math.abs(you.x)<8&&you.z>40.5&&you.z<49)?'The Market':Math.abs(you.x)<3.6?'The Avenue':'The Wood';
   if(name!==areaNow){areaNow=name;areaEl.innerHTML=name+'<span>.</span>'}
   let best=null,bd=1e9;for(let i=0;i<40;i++){const b=BED[i];const d=Math.hypot(b.cx-you.x,b.cz-you.z)-b.rmax;if(d<bd){bd=d;best=b}}
   if(best&&bd<1.3){const inside=inPoly(best.P,you.x,you.z);nearEl.textContent='Bed '+(best.plot+1)+' · '+(bedLabel[best.plot]||'empty, waiting for a seed')+(inside?' · you are standing in it':'')}
@@ -3758,7 +3760,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);flagTick(t,dt);tickWorld(t,dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);flagTick(t,dt);farmTick(t,dt);tickWorld(t,dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -4054,6 +4056,177 @@ const FLAG_MESH=new THREE.Mesh(FLAG_GEO,new THREE.MeshStandardMaterial({color:0x
 /* a pale cross on the flag so it reads as a flag and not a red rag */
 const FLAG_BAR=new THREE.Mesh(new THREE.PlaneGeometry(0.16,0.72,1,7),new THREE.MeshBasicMaterial({color:0xfff2f5,side:THREE.DoubleSide,transparent:true,opacity:0.85}));FLAG_BAR.geometry.translate(0,0.35,0);FLAG_BAR.position.set(0.4,0.02,0.004);FLAGF.add(FLAG_BAR);
 const FLAG_BASE=FLAG_GEO.attributes.position.array.slice(0);
+/* ---------- 6.16 THE FARM: the field behind the house ----------
+   Seat relative like the house: FARM_AT is the field's centre in the plan's own frame, farmPlace() turns it with the seat.
+   The farmer stands in the empty field; pay him and he ploughs eight rows inside a white fence. Plant a row from his list, it
+   grows on its own clock (irrigation halves the wait), pick when it holds a harvest and the coin goes straight to your purse.
+   Every sowing rolls the lottery: gold 1 in 40 (x5), moonlit 1 in 300 (x12), rainbow 1 in 1,000 (x25). A hit shows on the
+   standing plant from across the garden. Server = patch 75 (farm_state, farm_buy, farm_irrigate, farm_sow, farm_pick, farm_clear). */
+const FARM_GC=2500,FARM_IRR_GC=1500,FARM_N=8;
+const FARM_AT={x:0,z:-88,hw:18,hd:12};                 /* plan frame: 36 m wide, 24 m deep, behind the house */
+const FARM_GATE={x:0,z:-76};                            /* the gap in the fence, on the house side */
+const FARM_PLOTS=[[-13.5,-82],[-4.5,-82],[4.5,-82],[13.5,-82],[-13.5,-94],[-4.5,-94],[4.5,-94],[13.5,-94]];   /* plan frame centres, 7.2 x 7.6 each */
+const FARM_PW=7.2,FARM_PD=7.6;
+const CROPS={
+ strawberries:{n:'Strawberries',p:'strawberries',img:'strawberries_plant',price:60,m:120,r:120,cap:3,w:24,tier:0,kind:'ground',h:0.95,tone:'#c93a4a'},
+ tomatoes:{n:'Tomatoes',p:'tomatoes',img:'tomatoes_plant',price:150,m:240,r:240,cap:3,w:60,tier:0,kind:'row',h:1.55,tone:'#d94a3a'},
+ corn:{n:'Corn',p:'corn',img:'corn_stalks',price:300,m:360,r:360,cap:3,w:120,tier:0,kind:'row',h:2.5,tone:'#e2c24a'},
+ pumpkins:{n:'Pumpkins',p:'pumpkins',img:'pumpkin_large',price:500,m:480,r:480,cap:3,w:200,tier:0,kind:'ground',h:1.0,tone:'#e07a2a'},
+ blackberries:{n:'Blackberries',p:'blackberries',img:'blackberries_bush',price:900,m:600,r:600,cap:3,w:360,tier:1,kind:'bush',h:1.7,tone:'#3a2a5a'},
+ grapes:{n:'Grapes',p:'grapes',img:'grapes_vineyard',price:1800,m:900,r:900,cap:3,w:720,tier:1,kind:'vine',h:2.0,tone:'#6a3a8a'},
+ apples:{n:'Apples',p:'apples',img:'apple_tree_no_fruit',price:3500,m:1200,r:1200,cap:3,w:1400,tier:2,kind:'tree',h:5.4,tone:'#c0303a'}
+};
+const CROP_KEYS=Object.keys(CROPS);
+const FARM_VAR={gold:{mult:5,col:0xffc84a,name:'GOLDEN'},moonlit:{mult:12,col:0xbfd8ff,name:'MOONLIT'},rainbow:{mult:25,col:0xff66cc,name:'RAINBOW'}};
+/* the state: the server's when signed in (farm_state), the phone's S.farm in the demo */
+let FX={known:false,owned:false,irr:false,plots:{},owner:''},PATCH75=false,FARMG=null,FARMER=null,MOUNTG=null,FARM_STANDS=[],FARM_GLOW=[],FARM_BUILT=null,FARM_SHEET=null,FARM_LAST=0,FARM_SYNC='';
+const farmLocal=()=>{if(!S.farm)S.farm={owned:false,irr:false,plots:{}};return S.farm};
+function farmTh(){return BOUND>=0?SEATROT[BOUND]:0}
+function farmW(x,z){const [rx,rz]=rotXZ(x,z,farmTh());return [EOX+rx,EOZ+rz]}                 /* plan frame -> world */
+function farmL(x,z){return rotXZ(x-EOX,z-EOZ,-farmTh())}                                       /* world -> plan frame */
+function farmCrop(k){return CROPS[k]||null}
+/* harvests a plot holds now, like ripe() for the beds: n held, frac of the way to the next, seconds to it */
+function farmRipe(p,at){const c=farmCrop(p.crop);if(!c)return {n:0,frac:0,next:0,full:false};const now=(at||snow())/1000;
+  let e=Math.max(0,now-((p.at||now*1000)/1000));if(FX.irr)e*=2;const t1=p.est?c.r:c.m,cap=c.cap||3;
+  let n=e<t1?0:Math.min(cap,Math.floor((e-t1)/Math.max(1,c.r))+1);let frac,next;
+  if(n>=cap){frac=1;next=0}else{const st=n===0?0:t1+(n-1)*c.r,d=n===0?t1:c.r;frac=Math.min(1,Math.max(0,(e-st)/Math.max(1,d)));next=Math.max(0,Math.ceil((d-(e-st))/(FX.irr?2:1)))}
+  return {n,frac,next,full:n>=cap}}
+function farmHydrate(d){if(!d)return;FX.known=true;FX.owned=!!d.owned;FX.irr=!!d.irrigation;FX.plots={};(d.plots||[]).forEach(p=>{FX.plots[+p.plot]={crop:String(p.crop||''),at:(+p.sown_at||0)*1000,est:!!p.est,variant:String(p.variant||''),picks:+p.picks||0}});
+  (d.crops||[]).forEach(c=>{const k=CROPS[c.crop];if(!k)return;k.price=+c.price||k.price;k.m=+c.m||k.m;k.r=+c.r||k.r;k.cap=+c.cap||k.cap;k.w=+c.w||k.w});
+  if(d.balance!=null&&!VISIT&&LIVE){S.gc=+d.balance;renderHud()}farmBuild()}
+function farmFromLocal(){const f=farmLocal();FX.known=true;FX.owned=!!f.owned;FX.irr=!!f.irr;FX.plots={};Object.entries(f.plots||{}).forEach(([k,p])=>{FX.plots[+k]=Object.assign({},p)});farmBuild()}
+function farmSync(){if(!LIVE){farmFromLocal();return}const key=VISIT?VISIT.owner:'me';if(FARM_SYNC===key)return;FARM_SYNC=key;
+  RPC('farm_state',{p_owner:VISIT?VISIT.owner:null}).then(r=>{if(r.error){FARM_SYNC='';PATCH75=false;FX.known=true;farmBuild();return}const d=r.data||{};PATCH75=+d.patch>=75;farmHydrate(d)},()=>{FARM_SYNC=''})}
+/* ---------- the pictures ---------- */
+function cropFallback(c){const cv=document.createElement('canvas');cv.width=160;cv.height=200;const g=cv.getContext('2d');g.clearRect(0,0,160,200);
+  const r=rng(hash32(c.img));g.strokeStyle='#3f7a3a';g.lineWidth=6;for(let i=0;i<7;i++){const x=30+i*16;g.beginPath();g.moveTo(x,198);g.quadraticCurveTo(x+(r()-.5)*40,120,x+(r()-.5)*60,60+r()*40);g.stroke()}
+  g.fillStyle='#4e8a3a';for(let i=0;i<14;i++){g.beginPath();g.ellipse(20+r()*120,60+r()*110,14,8,r()*3,0,6.28);g.fill()}
+  g.fillStyle=c.tone;for(let i=0;i<6;i++){g.beginPath();g.arc(30+r()*100,80+r()*90,9,0,6.28);g.fill()}return cv}
+function appleFallback(col){const cv=document.createElement('canvas');cv.width=64;cv.height=64;const g=cv.getContext('2d');g.fillStyle=col;g.beginPath();g.arc(32,36,22,0,6.28);g.fill();g.strokeStyle='#5a3a1a';g.lineWidth=4;g.beginPath();g.moveTo(32,16);g.lineTo(34,4);g.stroke();return cv}
+function cropKind(k){const c=CROPS[k];return kindOf('crop_'+k,'farm/'+c.img+'.webp',()=>cropFallback(c),c.kind==='tree'?0.15:0.55)}
+function appleKind(v){const f=v==='gold'?'apple_gold':v==='rainbow'?'apple_rainbow':'apple_red';return kindOf('crop_'+f,'farm/'+f+'.webp',()=>appleFallback(v==='gold'?'#e8b830':v==='rainbow'?'#d060c0':'#c8303a'),0)}
+/* ---------- geometry ---------- */
+function farmMat(col,rough){return new THREE.MeshStandardMaterial({color:col,roughness:rough==null?0.9:rough})}
+function farmBox(g,w,h,d,mat,x,y,z,ry){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);if(ry)m.rotation.y=ry;m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
+function buildFence(g){const white=farmMat(0xf4efe4,0.85),post=farmMat(0xe9e2d2,0.9);const hw=FARM_AT.hw,hd=FARM_AT.hd,gap=1.6;
+  const runs=[[-hw,-hd,hw,-hd],[hw,-hd,hw,hd],[-hw,hd,-hw,-hd],[-hw,hd,-gap,hd],[gap,hd,hw,hd]];   /* local to the field's centre; +z is the house side, where the gate is */
+  const pk=new THREE.BoxGeometry(0.09,1.05,0.03);pk.translate(0,0.6,0);let count=0;runs.forEach(([x0,z0,x1,z1])=>{count+=Math.floor(Math.hypot(x1-x0,z1-z0)/0.42)+1});
+  const im=new THREE.InstancedMesh(pk,white,count);im.castShadow=true;let i=0;const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),P=new THREE.Vector3(),SC=new THREE.Vector3(1,1,1);
+  runs.forEach(([x0,z0,x1,z1])=>{const L=Math.hypot(x1-x0,z1-z0),n=Math.floor(L/0.42)+1,ang=Math.atan2(x1-x0,z1-z0)+Math.PI/2;Q.setFromAxisAngle(new THREE.Vector3(0,1,0),ang);
+    for(let k=0;k<n;k++){const t=n>1?k/(n-1):0;P.set(x0+(x1-x0)*t,0.02,z0+(z1-z0)*t);M.compose(P,Q,SC);im.setMatrixAt(i++,M)}
+    /* two rails and a post every 2.4 m */
+    const rail=new THREE.BoxGeometry(L,0.06,0.04);[0.42,0.88].forEach(y=>{const r=new THREE.Mesh(rail,white);r.position.set((x0+x1)/2,y,(z0+z1)/2);r.rotation.y=ang;r.castShadow=true;g.add(r)});
+    for(let s=0;s<=L;s+=2.4){const t=s/L;farmBox(g,0.13,1.25,0.13,post,x0+(x1-x0)*t,0.62,z0+(z1-z0)*t);farmBox(g,0.2,0.08,0.2,post,x0+(x1-x0)*t,1.28,z0+(z1-z0)*t)}});
+  im.count=i;g.add(im);
+  /* the gate posts, taller, with caps, and a little arch board */
+  [-gap,gap].forEach(x=>{farmBox(g,0.2,1.9,0.2,post,x,0.95,hd);farmBox(g,0.3,0.1,0.3,post,x,1.92,hd)});farmBox(g,gap*2+0.2,0.16,0.06,white,0,2.02,hd)}
+function buildSoil(g){const soil=farmMat(0x4a3423,1),ridge=farmMat(0x6b4d33,1);FARM_PLOTS.forEach(([px,pz])=>{const x=px-FARM_AT.x,z=pz-FARM_AT.z;farmBox(g,FARM_PW,0.12,FARM_PD,soil,x,0.06,z).receiveShadow=true;
+    for(let k=0;k<4;k++){const r=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.42,FARM_PD-0.6,8),ridge);r.rotation.x=Math.PI/2;r.position.set(x-2.55+k*1.7,0.16,z);r.castShadow=true;r.receiveShadow=true;g.add(r)}})}
+function buildStakes(g){const wood=farmMat(0x8b6a3f),red=farmMat(0xc03a2a,0.7);const hw=FARM_AT.hw,hd=FARM_AT.hd;[[-hw,-hd],[hw,-hd],[hw,hd],[-hw,hd]].forEach(([x,z])=>{farmBox(g,0.08,1.1,0.08,wood,x,0.55,z);farmBox(g,0.3,0.05,0.02,red,x,0.95,z)});
+  /* a rough furrow across the middle, where the farmer leans on his hoe */
+  farmBox(g,6,0.1,0.6,farmMat(0x5a4030,1),0,0.03,0.6)}
+function buildPump(g){const stone=farmMat(0x9a9284,0.95),roof=farmMat(0x8a3a2a,0.9),pipe=farmMat(0x6d7d8a,0.5),wood=farmMat(0x8b6a3f);const hw=FARM_AT.hw,hd=FARM_AT.hd;
+  const px=hw-2.2,pz=-hd+2;farmBox(g,2.2,1.6,1.8,stone,px,0.8,pz);const rf=new THREE.Mesh(new THREE.ConeGeometry(1.7,1.0,4),roof);rf.position.set(px,2.1,pz);rf.rotation.y=Math.PI/4;rf.castShadow=true;g.add(rf);
+  const wheel=new THREE.Mesh(new THREE.TorusGeometry(0.55,0.06,8,20),wood);wheel.position.set(px-1.2,1.1,pz);wheel.rotation.y=Math.PI/2;g.add(wheel);g.userData.wheel=wheel;
+  /* the line down the middle path and a riser at every row */
+  const main=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,hw*2-2,8),pipe);main.rotation.z=Math.PI/2;main.position.set(0,0.12,0);g.add(main);
+  FARM_PLOTS.forEach(([px2,pz2])=>{const x=px2-FARM_AT.x,z=pz2-FARM_AT.z;const dz=z>0?-1:1;const r=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.9,6),pipe);r.position.set(x,0.45,z+dz*FARM_PD/2*0.95);g.add(r);
+    const h=new THREE.Mesh(new THREE.SphereGeometry(0.09,8,6),pipe);h.position.set(x,0.92,z+dz*FARM_PD/2*0.95);g.add(h)})}
+function buildScarecrow(g){const wood=farmMat(0x8b6a3f),shirt=farmMat(0x8a4a3a,0.9),straw=farmMat(0xd9bc6a,0.95),sack=farmMat(0xd8c49a,0.95);const x=0,z=-FARM_AT.hd+1.2;
+  farmBox(g,0.1,2.6,0.1,wood,x,1.3,z);farmBox(g,1.6,0.08,0.08,wood,x,1.9,z);farmBox(g,0.6,0.7,0.35,shirt,x,1.75,z);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,10,8),sack);head.position.set(x,2.35,z);g.add(head);const hat=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.03,14),straw);hat.position.set(x,2.5,z);g.add(hat);
+  const crown=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.22,0.16,12),straw);crown.position.set(x,2.58,z);g.add(crown)}
+function buildMountains(){if(MOUNTG)return;MOUNTG=new THREE.Group();const rr=rng(6160);const mat=new THREE.MeshStandardMaterial({color:0x8899ad,roughness:1,flatShading:true,fog:false}),snowm=new THREE.MeshStandardMaterial({color:0xe9eef4,roughness:1,flatShading:true,fog:false});
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2+rr()*0.3,R=212+rr()*22,h=42+rr()*38,w=38+rr()*40;const x=Math.cos(a)*R,z=Math.sin(a)*R;
+    const c=new THREE.Mesh(new THREE.ConeGeometry(w,h,5+Math.floor(rr()*3)),mat);c.position.set(x,h/2-2,z);c.rotation.y=rr()*6.28;MOUNTG.add(c);
+    const s=new THREE.Mesh(new THREE.ConeGeometry(w*0.26,h*0.26,c.geometry.parameters.radialSegments),snowm);s.position.set(x,h-h*0.13-2,z);s.rotation.y=c.rotation.y;MOUNTG.add(s);
+    if(rr()>0.5){const c2=new THREE.Mesh(new THREE.ConeGeometry(w*0.7,h*0.6,5),mat);c2.position.set(x+Math.cos(a+1.4)*w*0.6,h*0.3-2,z+Math.sin(a+1.4)*w*0.6);c2.rotation.y=rr()*6.28;MOUNTG.add(c2)}}
+  scene.add(MOUNTG)}
+/* the farmer: the gardener's figure in denim, a red kerchief, hoe in hand */
+function buildFarmer(){if(FARMER)return FARMER;const F=buildGardFigure();F.g.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){const c=o.material.color;if(c.g>c.r*1.3&&c.g>c.b*1.3){o.material=o.material.clone();o.material.color.setHex(0x3f5f8f)}}});
+  const k=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.035,6,14),farmMat(0xc03a2a,0.8));k.position.set(0,0.82,0);k.rotation.x=Math.PI/2;F.body.add(k);F.g.visible=true;F.on=true;F.t=0;FARMER=F;return F}
+/* ---------- build and place ---------- */
+function farmBuild(){if(!FX.known)return;const key=(FX.owned?'o':'e')+(FX.irr?'i':'')+':'+BOUND;
+  if(FARM_BUILT!==key){if(FARMG){scene.remove(FARMG);FARMG=null}FARMG=new THREE.Group();if(FX.owned){buildFence(FARMG);buildSoil(FARMG);buildScarecrow(FARMG);if(FX.irr)buildPump(FARMG)}else buildStakes(FARMG);scene.add(FARMG);FARM_BUILT=key;farmPlace(true)}
+  buildMountains();farmPlants()}
+function farmPlace(force){if(!FARMG)return;const [wx,wz]=farmW(FARM_AT.x,FARM_AT.z);FARMG.position.set(wx,0,wz);FARMG.rotation.y=-farmTh();
+  const F=buildFarmer();const at=FX.owned?[FARM_GATE.x+2.6,FARM_GATE.z+1.5]:[FARM_AT.x,FARM_AT.z+0.6];const [fx,fz]=farmW(at[0],at[1]);F.x=fx;F.z=fz;F.g.position.set(fx,0,fz);F.g.rotation.y=-farmTh()+(FX.owned?Math.PI*0.75:0);
+  F.g.visible=!(VISIT&&!FX.owned);
+  if(FX.owned&&BOUND>=0&&FARMG.userData.marked!==BOUND){   /* never before the seat is bound: a mark at the unturned spot would be a wall in the wrong place */FARMG.userData.marked=BOUND;const hw=FARM_AT.hw,hd=FARM_AT.hd,gap=1.6;const seg=(x0,z0,x1,z1)=>{const L=Math.hypot(x1-x0,z1-z0);for(let s=0;s<=L;s+=0.15){const t=s/L;const [x,z]=farmW(FARM_AT.x+x0+(x1-x0)*t,FARM_AT.z+z0+(z1-z0)*t);markDisk(x,z,0.36,1.2)}};
+    seg(-hw,-hd,hw,-hd);seg(hw,-hd,hw,hd);seg(-hw,hd,-hw,-hd);seg(-hw,hd,-gap,hd);seg(gap,hd,hw,hd)}
+  if(force)farmPlants()}
+function farmPlants(){FARM_STANDS.forEach(dropStand);FARM_STANDS.length=0;FARM_GLOW.forEach(g=>{scene.remove(g);g.traverse(o=>{if(o.geometry)o.geometry.dispose()})});FARM_GLOW.length=0;if(!FX.owned)return;
+  const byKind={};const put=(k,it)=>{(byKind[k.key]=byKind[k.key]||{k,items:[]}).items.push(it)};
+  Object.entries(FX.plots).forEach(([k,p])=>{const i=+k,c=farmCrop(p.crop),P=FARM_PLOTS[i];if(!c||!P)return;const rp=farmRipe(p);const r=rng(6100+i);
+    const grown=p.est||rp.n>0||rp.frac>=0.32;const sc=p.est||rp.n>0?1:0.42+0.58*Math.min(1,(rp.frac-0.32)/0.68);
+    const spots=c.kind==='tree'?[[0,0]]:c.kind==='ground'?[[-2.3,-1.6],[0.1,1.4],[2.3,-1.2]]:c.kind==='vine'?[[-1.9,0],[1.9,0]]:[[-1.8,0.3],[1.8,-0.3]];
+    spots.forEach(([ox,oz],j)=>{const [x,z]=farmW(P[0]+ox,P[1]+oz);if(!grown)put(sproutKind(),{x,z,y:0.12,h:0.35+0.7*Math.min(1,rp.frac/0.32),flip:r()>.5});
+      else put(cropKind(p.crop),{x,z,y:0.1,h:c.h*sc*(c.kind==='tree'?1:0.92+r()*0.16),flip:r()>.5})});
+    if(c.kind==='tree'&&grown&&rp.n>0){const ak=appleKind(p.variant);for(let a=0;a<rp.n*3;a++){const ang=a/(rp.n*3)*6.28+r()*0.5,rad=1.1+r()*1.1;const [x,z]=farmW(P[0]+Math.cos(ang)*rad,P[1]+Math.sin(ang)*rad*0.4);put(ak,{x,z,y:2.2+r()*1.9,h:0.42,flip:false})}}
+    if(p.variant&&FARM_VAR[p.variant]){const v=FARM_VAR[p.variant];const [x,z]=farmW(P[0],P[1]);const G=new THREE.Group();G.position.set(x,0,z);
+      const ring=new THREE.Mesh(new THREE.RingGeometry(2.6,3.4,40),new THREE.MeshBasicMaterial({color:v.col,transparent:true,opacity:0.55,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-Math.PI/2;ring.position.y=0.16;G.add(ring);
+      const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.9,2.2,9,18,1,true),new THREE.MeshBasicMaterial({color:v.col,transparent:true,opacity:0.16,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));beam.position.y=4.6;G.add(beam);
+      const L=new THREE.PointLight(v.col,1.4,14);L.position.y=2.2;G.add(L);G.userData={v:p.variant,ring,beam,L,ripe:rp.n>0};scene.add(G);FARM_GLOW.push(G)}});
+  Object.values(byKind).forEach(({k,items})=>{const im=placeStand(k,items);if(im)FARM_STANDS.push(im)})}
+function farmTick(t,dt){if(FARMER&&FARMER.on&&FARMER.g.visible){FARMER.t+=dt;const s=Math.sin(FARMER.t*1.3);FARMER.body.rotation.z=s*0.03;if(FARMER.arm)FARMER.arm.rotation.x=FX.owned?-0.35+Math.max(0,Math.sin(FARMER.t*2.2))*-0.9:-0.6+s*0.05}
+  if(FARMG&&FARMG.userData.wheel)FARMG.userData.wheel.rotation.x+=dt*1.5;
+  FARM_GLOW.forEach(g=>{const u=g.userData;const pulse=0.5+0.5*Math.sin(t/1000*(u.ripe?4:1.6));u.ring.material.opacity=0.3+0.4*pulse;u.beam.material.opacity=0.1+0.14*pulse;u.L.intensity=1+1.2*pulse;
+    if(u.v==='rainbow'){const c=new THREE.Color().setHSL((t/1000*0.35)%1,0.9,0.62);u.ring.material.color.copy(c);u.beam.material.color.copy(c);u.L.color.copy(c)}});
+  if(FX.owned&&t-FARM_LAST>4000){FARM_LAST=t;farmPlants()}}   /* the pictures grow every few seconds */
+/* ---------- the prompts ---------- */
+function farmPlotAt(){const [lx,lz]=farmL(you.x,you.z);let best=-1,bd=1e9;FARM_PLOTS.forEach(([px,pz],i)=>{const d=Math.hypot(lx-px,lz-pz);if(d<bd){bd=d;best=i}});return bd<4.7?{i:best,d:bd}:null}
+function farmWords(i){const p=FX.plots[i],c=farmCrop(p.crop),rp=farmRipe(p);const v=p.variant&&FARM_VAR[p.variant];let s=(v?v.name+' ':'')+c.n+' \u00B7 ';
+  if(rp.full)s+=c.cap+' ready, full. Pick them';else if(rp.n>0)s+=rp.n+' ready, the next in '+mmss(rp.next);else if(p.est)s+='growing back, '+mmss(rp.next)+' to the next';else if(rp.frac>=0.32)s+='growing, '+mmss(rp.next)+' to ripe';else s+='sown, '+mmss(rp.next)+' to ripe';
+  if(v)s+=' \u00B7 pays '+v.mult+'\u00D7';if(FX.irr)s+=' \u00B7 irrigated';return s}
+function farmAct(){if(INSIDE||!FX.known||you.feet>=1)return false;const F=FARMER;
+  if(F&&F.g.visible){const df=Math.hypot(you.x-F.x,you.z-F.z);if(df<3.2){const at=[F.x,2.1,F.z];
+    if(!FX.owned){if(VISIT)showAct('The far field waits for a farmer.',null,null,null,'\u201COnly '+VISIT.handle+' can break this ground.\u201D',null,at);
+      else showAct('Break ground here.','farmbuy',null,null,'\u201C'+FARM_GC.toLocaleString()+' gardencoin and I plough it. Eight rows, a white fence, and the far field is yours.\u201D',null,at);return true}
+    if(VISIT)showAct('The farmer.',null,null,null,'\u201C'+VISIT.handle+'\u2019s field. Look all you like.\u201D',null,at);
+    else if(!FX.irr)showAct('The farmer.',null,null,null,'\u201CPlant the rows. Pick when they are ripe. Irrigation and everything grows twice as fast.\u201D',[{l:'Irrigation \u00B7 '+FARM_IRR_GC.toLocaleString()+'.',f:farmIrrigate}],at);
+    else showAct('The farmer.',null,null,null,'\u201CThe lines are in. Everything grows twice as fast. Plant the rows.\u201D',null,at);return true}}
+  if(!FX.owned)return false;const q=farmPlotAt();if(!q)return false;const i=q.i,P=FARM_PLOTS[i],[wx,wz]=farmW(P[0],P[1]),at=[wx,1.6,wz],p=FX.plots[i];
+  if(!p){if(VISIT)showAct('An empty row.',null,null,null,VISIT.handle+'\u2019s field',null,at);else showAct('Plant this row.','farmsow',i,null,'\u201CPick a crop from my list.\u201D',null,at);return true}
+  const c=farmCrop(p.crop);if(!c){return false}const rp=farmRipe(p);
+  if(rp.n>0){if(VISIT)showAct(farmWords(i),null,null,null,VISIT.handle+'\u2019s '+c.p,null,at);else showAct('Pick the '+c.p+'.','farmpick',i,null,farmWords(i)+' \u00B7 '+(rp.n*c.w*(FARM_VAR[p.variant]?FARM_VAR[p.variant].mult:1)).toLocaleString()+' gardencoin',null,at);return true}
+  showAct(farmWords(i),null,i,null,VISIT?VISIT.handle+'\u2019s '+c.p:'\u201CGive it time.\u201D',VISIT?null:[{l:'Pull it up.',f:()=>farmClear(i)}],at);return true}
+/* ---------- the doors ---------- */
+function farmFail(e,fb){const m=String(e&&e.message||e||'');if(/not_enough/.test(m))return null;if(/no_wallet/.test(m))return 'Your purse is not open yet. Walk the garden once.';if(/no_farm/.test(m))return 'Pay the farmer first.';if(/taken/.test(m))return 'That row is planted.';if(/not_yet/.test(m))return 'Not ripe yet.';if(/empty/.test(m))return 'Nothing in that row.';if(/not find|function|schema cache/i.test(m))return 'Run patch 75 on DEEDS first.';return rpcFail(e,fb)}
+function farmBuy(){if(visitGuard('buy the field'))return;if(BUSY)return;
+  if(!LIVE){const r=payGc(FARM_GC);if(!r){showShort(FARM_GC);return}const f=farmLocal();f.owned=true;save();renderHud();farmFromLocal();SND.buy(10);SND.tier();burst(FARMER.x,1.2,FARMER.z);hideAct();toast('The field is yours. '+FARM_GC.toLocaleString()+' gardencoin. Eight rows, ploughed. Plant them.');updateAct();return}
+  BUSY=true;RPC('farm_buy').then(r=>{BUSY=false;if(r.error){const w=farmFail(r.error,'The farmer did not answer.');if(w===null)showShort(FARM_GC);else toast(w);return}const d=r.data||{};if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}
+    FX.owned=true;farmBuild();SND.buy(10);SND.tier();burst(FARMER.x,1.2,FARMER.z);hideAct();toast(d.already?'The field is yours already.':'The field is yours. '+FARM_GC.toLocaleString()+' gardencoin. Eight rows, ploughed. Plant them.');updateAct()},()=>{BUSY=false;toast('The farmer did not answer.')})}
+function farmIrrigate(){if(visitGuard('buy irrigation'))return;if(BUSY||FX.irr)return;
+  if(!LIVE){const r=payGc(FARM_IRR_GC);if(!r){showShort(FARM_IRR_GC);return}farmLocal().irr=true;save();renderHud();farmFromLocal();SND.buy(6);SND.splash();toast('Irrigation. Everything in the field grows twice as fast.');updateAct();return}
+  BUSY=true;RPC('farm_irrigate').then(r=>{BUSY=false;if(r.error){const w=farmFail(r.error,'The farmer did not answer.');if(w===null)showShort(FARM_IRR_GC);else toast(w);return}const d=r.data||{};if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}FX.irr=true;farmBuild();SND.buy(6);SND.splash();toast('Irrigation. Everything in the field grows twice as fast.');updateAct()},()=>{BUSY=false;toast('The farmer did not answer.')})}
+function farmVariantCheer(p,c){const v=p.variant&&FARM_VAR[p.variant];if(!v)return;const P=FARM_PLOTS[p.plot],[x,z]=farmW(P[0],P[1]);
+  if(p.variant==='rainbow'){[0,260,520].forEach(t=>setTimeout(()=>SND.tier(),t));if(navigator.vibrate)navigator.vibrate([60,40,60,40,180]);burst(x,1.4,z);burst(x,2.4,z)}
+  else if(p.variant==='moonlit'){SND.tier();setTimeout(()=>SND.bloom(),220);burst(x,1.6,z)}else{SND.tier();burst(x,1.2,z)}
+  const fl=document.createElement('div');fl.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:70;background:#'+v.col.toString(16).padStart(6,'0')+';opacity:.55;transition:opacity 1.1s';document.body.appendChild(fl);requestAnimationFrame(()=>{fl.style.opacity='0'});setTimeout(()=>fl.remove(),1300);
+  setTimeout(()=>toast(v.name+' '+c.p.toUpperCase()+'. Everything this plant gives pays '+v.mult+' times.'),400)}
+function farmSow(i,k){const c=farmCrop(k);if(!c||FX.plots[i])return;if(visitGuard('plant here'))return;if(BUSY)return;farmSheetClose();
+  if(!LIVE){const r=payGc(c.price);if(!r){showShort(c.price);return}const x=Math.random();const variant=x<1/1000?'rainbow':x<1/300?'moonlit':x<1/40?'gold':'';const p={crop:k,at:snow(),est:false,variant,picks:0,plot:i};farmLocal().plots[i]=p;save();renderHud();farmFromLocal();SND.sow();toast('Sown. '+c.n+' in row '+(i+1)+'. Ripe in '+mmss(Math.round(c.m/(FX.irr?2:1)))+'.');farmVariantCheer(p,c);updateAct();return}
+  BUSY=true;RPC('farm_sow',{p_plot:i,p_crop:k}).then(r=>{BUSY=false;if(r.error){const w=farmFail(r.error,'That row did not take the seed.');if(w===null)showShort(c.price);else toast(w);return}const d=r.data||{};if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}
+    const q=d.plot||{};const p={crop:k,at:(+q.sown_at||snow()/1000)*1000,est:!!q.est,variant:String(q.variant||''),picks:0,plot:i};FX.plots[i]=p;farmPlants();SND.sow();toast('Sown. '+c.n+' in row '+(i+1)+'. Ripe in '+mmss(Math.round(c.m/(FX.irr?2:1)))+'.');farmVariantCheer(p,c);updateAct()},()=>{BUSY=false;toast('The farmer did not answer.')})}
+function farmPick(i){const p=FX.plots[i];if(!p)return;const c=farmCrop(p.crop);if(!c)return;if(visitGuard('pick here'))return;if(BUSY)return;const P=FARM_PLOTS[i],[x,z]=farmW(P[0],P[1]);
+  const done=(n,coins)=>{if(n>=c.cap)SND.allWatered();else SND.bloom();floatGc(coins,null);burst(x,1.0,z);toast('Picked. '+n+' '+c.p+(FARM_VAR[p.variant]?', '+FARM_VAR[p.variant].name.toLowerCase():'')+' \u00B7 '+coins.toLocaleString()+' gardencoin.');updateAct()};
+  if(!LIVE){const rp=farmRipe(p);if(rp.n<1){SND.knock();toast('Not ripe yet. '+mmss(rp.next)+'.');return}const mult=FARM_VAR[p.variant]?FARM_VAR[p.variant].mult:1;const coins=rp.n*c.w*mult;S.gc+=coins;const L=farmLocal().plots[i];L.at=snow();L.est=true;L.picks=(L.picks||0)+rp.n;save();renderHud();farmFromLocal();done(rp.n,coins);return}
+  BUSY=true;RPC('farm_pick',{p_plot:i}).then(r=>{BUSY=false;if(r.error){toast(farmFail(r.error,'That did not pick.')||'Not enough.');return}const d=r.data||{};if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}
+    const q=d.plot||{};p.at=(+q.sown_at||snow()/1000)*1000;p.est=true;p.picks=+q.picks||p.picks;farmPlants();done(+d.n||0,+d.coins||0)},()=>{BUSY=false;toast('The farmer did not answer.')})}
+function farmClear(i){const p=FX.plots[i];if(!p)return;if(visitGuard('pull this up'))return;if(BUSY)return;
+  if(!LIVE){delete farmLocal().plots[i];save();farmFromLocal();SND.rustle();toast('Pulled up. The row is bare.');updateAct();return}
+  BUSY=true;RPC('farm_clear',{p_plot:i}).then(r=>{BUSY=false;if(r.error){toast(farmFail(r.error,'That did not clear.')||'Not done.');return}delete FX.plots[i];farmPlants();SND.rustle();toast('Pulled up. The row is bare.');updateAct()},()=>{BUSY=false;toast('The farmer did not answer.')})}
+/* ---------- the farmer's list ---------- */
+function farmSheet(){if(FARM_SHEET)return FARM_SHEET;const d=document.createElement('div');d.id='farmSheet';d.className='sheet';d.innerHTML='<div class="panel"><div class="shead"><div><div class="micro">THE FARMER</div><h2>Plant a row<span>.</span></h2></div><div class="sbal micro" id="fmBal"></div></div><p class="micro" id="fmSay" style="opacity:.75;margin:6px 0 0">\u201CEvery sowing rolls the dice. One in forty comes up gold and pays five times. Rarer ones pay more.\u201D</p><div class="grid" id="fmGrid"></div><div class="sfoot"><button class="btn" id="fmClose">Not now.</button></div></div>';
+  document.body.appendChild(d);d.querySelector('#fmClose').onclick=farmSheetClose;d.addEventListener('pointerdown',e=>{if(e.target===d)farmSheetClose()});FARM_SHEET=d;return d}
+function farmSheetClose(){if(FARM_SHEET)FARM_SHEET.classList.remove('on');FARM_SHEET_PLOT=-1}
+let FARM_SHEET_PLOT=-1;
+function openFarmSheet(i){if(FX.plots[i]||!FX.owned)return;const d=farmSheet();FARM_SHEET_PLOT=i;d.querySelector('#fmBal').textContent=S.gc.toLocaleString()+' GARDENCOIN';
+  let h='';CROP_KEYS.forEach(k=>{const c=CROPS[k];const can=reach()>=c.price;h+='<div class="pk'+(can?'':' locked')+'" data-crop="'+k+'"><img src="'+BASE+'farm/'+c.img+'.webp" alt=""><div class="nm">'+c.n+'</div><div class="pr">'+c.price.toLocaleString()+' \u00B7 ripe in '+mmss(Math.round(c.m/(FX.irr?2:1)))+' \u00B7 a pick pays '+c.w.toLocaleString()+', '+c.cap+' a plant</div><button class="btn" data-plant="'+k+'">Plant</button></div>'});
+  d.querySelector('#fmGrid').innerHTML=h;d.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>farmSow(FARM_SHEET_PLOT,b.dataset.plant));d.classList.add('on')}
+function hash32(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+setTimeout(()=>{if(!LIVE&&!FX.known)farmFromLocal()},2500);   /* the demo: the field is on the phone; signed in, farmSync() runs from hydrate */
+
 function flagTick(t,dt){const k=ph==='night'?1.35:1;
   FLAG_RING.material.color.set(0xff4d7d).multiplyScalar(k*(0.75+0.25*Math.sin(t*2.2+0.7)));FLAG_RING2.material.color.set(0x5f6bff).multiplyScalar(k*(0.75+0.25*Math.sin(t*2.2+2.2)));
   FLAGG.rotation.y=-t*0.25;FLAG_LIGHT.intensity=(0.9+0.4*Math.sin(t*2.2+0.7))*k*(PORTAL_GOING?4:1);
@@ -4065,7 +4238,7 @@ function portalTick(t,dt){const k=ph==='night'?1.35:1;PORTAL_RING.material.color
   PORTAL_MOTES.forEach(p=>{p.y+=p.v*dt*(PORTAL_GOING?6:1);if(p.y>2.8)p.y=0;p.a+=dt*0.8;p.m.position.set(Math.cos(p.a)*p.r,p.y,Math.sin(p.a)*p.r);p.m.material.opacity=0.85*Math.min(1,(2.8-p.y)/0.6)})}
 function portalGo(dest){if(PORTAL_GOING)return;PORTAL_GOING=true;SND.tier();toast(dest==='flag'?'The circle takes you to the flag.':dest==='chess'?'The board takes you to the study.':'The circle takes you.');const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:#07060a;opacity:0;transition:opacity .9s;z-index:80;pointer-events:none';document.body.appendChild(v);requestAnimationFrame(()=>{v.style.opacity='1'});
   setTimeout(()=>{const p=dest==='flag'?'flag':dest==='chess'?'chess':'club';location.href=(/(^|\.)deeds\.fun$/.test(location.hostname)?'/garden/'+p+'/':'../'+p+'/')},1000)}
-window.__walk={CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
