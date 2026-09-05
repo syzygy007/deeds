@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.18">
+<meta name="world-build" content="6.19">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1756,6 +1756,7 @@ function hydrate(d){LIVE=true;VISIT=(d.visit&&!d.visit.home)?{owner:d.visit.owne
     PATCH61=+d.patch>=61;if(PATCH61){S.tools=S.tools||{};if(d.sword)S.tools.sword=1;if(d.flame)S.tools.flamethrower=1;if(+d.flame_dc>0)TOOLS.flamethrower.dc=+d.flame_dc;RAIDS=Array.isArray(d.raids)?d.raids:[];raidNews()}
     PATCH62=+d.patch>=62;PATCH64=+d.patch>=64;PATCH67=+d.patch>=67;if(d.estate&&d.estate.tick&&d.estate.tick.lumber&&!VISIT)setTimeout(()=>lumberDone(d.estate.tick.lumber),300);if(VISIT&&Array.isArray(d.my_tools)){S.tools=S.tools||{};d.my_tools.forEach(t=>{if(TOOLS[t])S.tools[t]=1});HAND=(d.my_hand||[]).filter(t=>TOOLS[t])}if(PATCH62&&d.estate)estateHydrate(d.estate);   /* 4.25: a guest sees the owner's gardeners, sprinklers, fence and lock */
     PATCH69=+d.patch>=69;if(PATCH69&&!VISIT)hydrate69(d);pianoSync();chessSync();farmSync();   /* 6.13, 6.15 */
+    if(QS.get('in')==='house'&&!VISIT&&!INSIDE&&!window.__HOMEIN){window.__HOMEIN=1;setTimeout(()=>{try{enterHouse();you.x=CHESS_AT.x+1.6;you.z=CHESS_AT.z+0.4;you.vx=0;you.vz=0;insideAct()}catch(e){console.warn('homein',e)}},450)}   /* 6.19: ?in=house lands you inside, by the chess table (the Study's way home) */
     PATCH60=+d.patch>=60;if(PATCH60&&Array.isArray(d.room_tiers)&&d.room_tiers.length===6)ROOM_TIERS=d.room_tiers.map(Number);S.rooms=(PATCH60&&d.rooms&&typeof d.rooms.down==='number')?d.rooms:roomsOf(S.house.wood,S.house.stage);if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
   (d.catalog||[]).forEach(c=>{const k=CAT[c.t];if(!k)return;k.price=+c.price;k.tier=Math.max(0,TIERS.indexOf(+c.min_deeds));
     if(+c.mature_s>0)k.m=+c.mature_s;if(+c.regrow_s>0)k.r=+c.regrow_s;if(+c.bloom_cap>0)k.cap=+c.bloom_cap;if(+c.curve>0)k.cv=+c.curve;if(c.worth!==undefined&&c.worth!==null)k.w=+c.worth});
