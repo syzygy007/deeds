@@ -58,16 +58,24 @@ canvas{display:block}
 #close{position:fixed;top:calc(env(safe-area-inset-top) + 14px);right:16px;z-index:51}
 #dark{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:38;transition:opacity .5s}
 #toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 66px);transform:translateX(-50%);z-index:60;background:rgba(13,21,18,.9);border:1px solid rgba(255,255,255,.18);padding:10px 16px;border-radius:999px;font-size:13px;display:none;white-space:nowrap}
+.lv.fr{border-color:#7fb6ff;background:rgba(127,182,255,.08)}
+.lv.fr em{color:#7fb6ff}
+.fr b{color:#cfe3ff}
+#waitn,#askn{font-size:26px;letter-spacing:0;text-transform:none;font-weight:800;color:#fff;margin-bottom:6px}
+.fr.off{opacity:.45}
 #err{position:fixed;left:0;right:0;bottom:0;background:#7a1f2b;color:#fff;font-size:11px;padding:6px 10px;display:none;z-index:99;font-family:monospace}
 </style>
 </head>
 <body>
 <div id="hud"><div class="tag">The Study<b id="who">Your move.</b></div><div id="right"><button class="chip" id="sound">Tap for sound</button><span class="chip" id="purse" style="display:none"></span><div id="rank"><b>Pawn</b><i>0 xp</i><div id="bar"><i></i></div></div></div></div>
 <div id="line">Tap a piece.<small id="sub"></small></div>
-<div id="bottom"><button class="b" id="bnew">New game</button><button class="b" id="bwall">The wall</button><button class="b" id="bleave">Leave</button></div>
+<div id="bottom"><button class="b" id="bnew">New game</button><button class="b" id="bhint" style="display:none">Hint</button><button class="b" id="bback" style="display:none">Take back</button><button class="b" id="bwall">The wall</button><button class="b" id="bleave">Leave</button></div>
 <div id="dark"></div>
 <div id="gate"><h1>The Study.</h1><p id="gatep">A board by the fire. Play the house, climb the ranks, hang the greats on your wall.</p><button id="go">Sit down</button><a id="gateback" href="../world/" style="display:none;color:#f4f2ea;opacity:.7;margin-top:18px;font-size:14px">Back to the garden</a></div>
-<div class="sheet" id="levels"><h1>Who do you want to play.</h1><p>Wins earn XP. Harder opponents pay more.</p><div class="row" id="lvrow"></div><div class="acts"><button class="b" id="lvback">Back</button></div></div>
+<div class="sheet" id="levels"><h1>Who do you want to play.</h1><p>Wins earn XP. Harder opponents pay more. Or invite a friend.</p><div class="row" id="lvrow"></div><div class="acts"><button class="b" id="lvback">Back</button></div></div>
+<div class="sheet" id="friends"><h1>Invite a friend.</h1><p>People you follow on DEEDS. They get a card on their phone. You play white.</p><div class="row" id="frow"></div><div class="acts"><button class="b" id="frback">Back</button></div></div>
+<div class="sheet" id="wait"><h1>Waiting.</h1><div class="xp" id="waitn"></div><p id="waitp">has a card on their phone. The game starts when they sit down.</p><div class="acts"><button class="b" id="waitcancel">Never mind</button></div></div>
+<div class="sheet" id="ask"><h1>A game.</h1><div class="xp" id="askn"></div><p id="askp">asks for a game of chess. You would play black. A win is 150 xp.</p><div class="acts"><button class="b gold" id="asksit">Sit down</button><button class="b" id="askno">Not now</button></div></div>
 <div class="sheet" id="end"><h1 id="endword">You won.</h1><div class="xp" id="endxp"></div><p id="endsub"></p><div class="acts"><button class="b gold" id="again">Run it back</button><button class="b" id="tothewall">The wall</button></div></div>
 <div class="sheet" id="quit"><h1>Leave the study.</h1><p>The game on the board will be lost.</p><div class="acts"><button class="b gold" id="stay">Keep playing</button><a class="b" id="garden" href="../world/">Back to the garden</a></div></div>
 <div id="view"><button class="b" id="close">Close</button><div class="wrap"><div class="pic" id="vpic"></div><div class="cap"><h2 id="vname"></h2><div class="y" id="vyears"></div><p id="vtext"></p><p class="more" id="vmore"></p><div class="lock" id="vlock"></div><div class="acts"><button class="b" id="learn">Learn more</button><a class="b" id="vlink" target="_blank" rel="noopener">Read the whole story</a></div></div></div></div>
@@ -134,13 +142,21 @@ function evaluate(s){var b=s.b,e=0,i,p;for(i=0;i<64;i++){p=b[i];if(p==='')contin
 var NODES=0;
 function quiesce(s,a,bt,d){NODES++;var st=evaluate(s);if(st>=bt)return bt;if(st>a)a=st;if(d<=0)return a;var ms=legal(s).filter(function(m){return m.cap||m.promo});order(ms,s);for(var i=0;i<ms.length;i++){var v=-quiesce(make(s,ms[i]),-bt,-a,d-1);if(v>=bt)return bt;if(v>a)a=v}return a}
 function order(ms,s){ms.forEach(function(m){var t=s.b[m.to];m.o=(t?VAL[t.toLowerCase()]*10-VAL[s.b[m.from].toLowerCase()]:0)+(m.promo?800:0)});ms.sort(function(x,y){return y.o-x.o})}
-function search(s,depth,a,bt){NODES++;var ms=legal(s);if(ms.length===0)return inCheck(s)?-30000-depth:0;if(s.half>=100)return 0;if(depth<=0)return quiesce(s,a,bt,3);order(ms,s);var best=-99999;for(var i=0;i<ms.length;i++){var v=-search(make(s,ms[i]),depth-1,-bt,-a);if(v>best)best=v;if(v>a)a=v;if(a>=bt)break}return best}
+function search(s,depth,a,bt){NODES++;var ms=legal(s);if(ms.length===0)return inCheck(s)?-30000-depth:0;if(s.half>=100)return 0;if(depth<=0)return quiesce(s,a,bt,QD);order(ms,s);var best=-99999;for(var i=0;i<ms.length;i++){var v=-search(make(s,ms[i]),depth-1,-bt,-a);if(v>best)best=v;if(v>a)a=v;if(a>=bt)break}return best}
 /* pick: depth by level, fuzz = how often a weaker move is chosen */
-function pick(s,level,seed){var ms=legal(s);if(ms.length===0)return null;var depth=level<=1?1:level===2?2:level===3?3:4;var fuzz=level<=1?0.45:level===2?0.2:level===3?0.06:0;
+var QD=3;
+/* pick: the gardener makes moves a beginner makes; the neighbour looks one move ahead and misses things; the keeper two; the master four */
+function pick(s,level,seed){var ms=legal(s);if(ms.length===0)return null;var r=rnd(seed||1);
+  if(level<=1){var caps=ms.filter(function(m){return m.cap});var m;
+    if(r()<0.3){NODES=0;QD=0;var bestv=-1e9;for(var i=0;i<ms.length;i++){var v=-search(make(s,ms[i]),0,-99999,99999);if(v>bestv){bestv=v;m=ms[i]}}QD=3}
+    else if(caps.length&&r()<0.55)m=caps[Math.floor(r()*caps.length)];
+    else m=ms[Math.floor(r()*ms.length)];
+    return {move:m,score:0,nodes:NODES,depth:0}}
+  var depth=level===2?1:level===3?2:4;QD=level===2?0:level===3?2:3;var fuzz=level===2?0.4:level===3?0.15:0;
   NODES=0;order(ms,s);var scored=[];for(var i=0;i<ms.length;i++){var v=-search(make(s,ms[i]),depth-1,-99999,99999);scored.push({m:ms[i],v:v})}
-  scored.sort(function(x,y){return y.v-x.v});var r=rnd(seed||1);var k=0;
-  if(fuzz>0){while(k<scored.length-1&&r()<fuzz&&scored[k+1].v>scored[0].v-(level<=1?350:120))k++}
-  return {move:scored[k].m,score:scored[k].v,nodes:NODES,depth:depth}}
+  scored.sort(function(x,y){return y.v-x.v});var k=0;
+  if(fuzz>0){while(k<scored.length-1&&r()<fuzz&&scored[k+1].v>scored[0].v-(level===2?300:150))k++}
+  QD=3;return {move:scored[k].m,score:scored[k].v,nodes:NODES,depth:depth}}
 function rnd(seed){var t=seed>>>0;return function(){t+=0x6D2B79F5;var r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296}}
 function sqName(i){return 'abcdefgh'[i&7]+(8-(i>>3))}
 function san(s,m){var p=s.b[m.from],L=p.toLowerCase(),out='';if(m.fl===3)return m.to%8===6?'O-O':'O-O-O';if(L!=='p')out+=L.toUpperCase();if(m.cap){if(L==='p')out+='abcdefgh'[m.from&7];out+='x'}out+=sqName(m.to);if(m.promo)out+='='+m.promo.toUpperCase();var n=make(s,m);if(inCheck(n))out+=legal(n).length?'+':'#';return out}
@@ -162,11 +178,11 @@ const PHONE=matchMedia('(pointer:coarse)').matches;
 /* ---------- ranks, levels, the wall ---------- */
 const RANKS=[{n:'Pawn',xp:0},{n:'Knight',xp:200},{n:'Bishop',xp:500},{n:'Rook',xp:1000},{n:'Queen',xp:2000},{n:'King',xp:4000},{n:'Master',xp:8000}];
 const LEVELS=[
- {id:1,name:'The Gardener',sub:'Learning the moves. Plays fast and loose.',win:60,draw:25,seed:31},
- {id:2,name:'The Neighbour',sub:'Knows an opening or two.',win:120,draw:50,seed:77},
+ {id:1,name:'The Gardener',sub:'Learning the moves. Makes mistakes, lots of them.',win:60,draw:25,seed:31},
+ {id:2,name:'The Neighbour',sub:'Knows an opening or two. Misses things.',win:120,draw:50,seed:77},
  {id:3,name:'The Keeper',sub:'Sees three moves ahead. Punishes blunders.',win:220,draw:90,seed:113},
  {id:4,name:'The Master',sub:'The house champion. Bring your best.',win:360,draw:150,seed:199}];
-const LOSS_XP=10;
+const LOSS_XP=10;const FRIEND={win:150,draw:60};
 const WALL=[
  {key:'capablanca',rank:1,name:'José Raúl Capablanca',years:'Havana 1888 to New York 1942',
   text:'World Champion from 1921 to 1927. He learned the moves at four by watching his father and beat the champion of Cuba at twelve. From 1916 to 1924 he went eight years without losing a single game.',
@@ -364,13 +380,16 @@ addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.a
 
 /* ---------- the game ---------- */
 let STATE=CH.start(),LEVEL=LEVELS[suggested()-1],SEL=-1,LEGAL=[],BUSY=false,OVER=false,GAMEON=false,LASTM=null,ANIM=[],THINK=0,PLIES=0;
+let MODE='bot',MYC='w',FR=null,HIST=[],HINT=null,HELPS=0;
+function beginnerUI(){const on=MODE==='bot'&&GAMEON&&!OVER&&LEVEL.id<=2;$('#bhint').style.display=on?'':'none';$('#bback').style.display=on?'':'none'}
+function clearHint(){if(!HINT)return;HINT=null;HL.forEach(h=>{h.visible=false;h.scale.setScalar(1)});selRing.visible=false}
 function line(a,b){$('#line').firstChild.textContent=a;$('#sub').textContent=b||''}
 function toast(t){const el=$('#toast');el.textContent=t;el.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display='none',2600)}
 function clearHL(){HL.forEach(h=>h.visible=false);selRing.visible=false;SEL=-1;LEGAL=[]}
 function showLast(m){if(!m){lastA.visible=lastB.visible=false;return}const [ax,az]=sqPos(m.from),[bx,bz]=sqPos(m.to);lastA.position.set(ax,BY+0.0135,az);lastB.position.set(bx,BY+0.0135,bz);lastA.visible=lastB.visible=true}
 function showCheck(){checkSq.visible=false;if(CH.inCheck(STATE)){const k=STATE.b.indexOf(STATE.turn==='w'?'K':'k');const [x,z]=sqPos(k);checkSq.position.set(x,BY+0.0136,z);checkSq.visible=true}}
-function newGame(level){LEVEL=level;dressOpp(level);STATE=CH.start();placeAll(STATE.b);clearHL();showLast(null);checkSq.visible=false;OVER=false;BUSY=false;GAMEON=true;LASTM=null;$('#who').textContent=level.name;line('Your move.','you play white');PLIES=0;SFX.set()}
-function doMove(m,then){const g=PIECES[m.from];const target=PIECES[m.to];const [x,z]=sqPos(m.to);
+function newGame(level){MODE='bot';MYC='w';FR=null;boardG.rotation.y=0;HIST=[];HELPS=0;clearHint();LEVEL=level;dressOpp(level);STATE=CH.start();placeAll(STATE.b);clearHL();showLast(null);checkSq.visible=false;OVER=false;BUSY=false;GAMEON=true;LASTM=null;$('#who').textContent=level.name;line('Your move.','you play white');PLIES=0;SFX.set();beginnerUI()}
+function doMove(m,then){HIST.push({s:CH.clone(STATE),last:LASTM,plies:PLIES});clearHint();const g=PIECES[m.from];const target=PIECES[m.to];const [x,z]=sqPos(m.to);
   const next=CH.make(STATE,m);const san=CH.san(STATE,m);
   /* the flags: castling moves the rook too, en passant takes the pawn beside */
   let extra=null;if(m.fl===3){const rf=m.to===62?63:m.to===58?56:m.to===6?7:0,rt=m.to===62?61:m.to===58?59:m.to===6?5:3;extra={g:PIECES[rf],to:rt};delete PIECES[rf];PIECES[rt]=extra.g}
@@ -382,7 +401,7 @@ function doMove(m,then){const g=PIECES[m.from];const target=PIECES[m.to];const [
   STATE=next;LASTM=m;PLIES++;showLast(m);
   setTimeout(()=>{showCheck();if(CH.inCheck(STATE))SFX.check();then&&then(san)},420)}
 function afterMove(){const st=CH.status(STATE);if(st!=='play'){finish(st);return true}return false}
-function finish(st){OVER=true;GAMEON=false;BUSY=false;clearHL();let word,sub,xp=0,won=false;
+function finish(st){OVER=true;GAMEON=false;BUSY=false;clearHL();clearHint();beginnerUI();if(MODE==='friend'){finishFriend(st);return}let word,sub,xp=0,won=false;
   if(st==='mate'){if(STATE.turn==='b'){word='You won.';sub='Checkmate. '+LEVEL.name+' tips the king.';xp=LEVEL.win;won=true}else{word=LEVEL.name.replace('The ','The ')+' won.';sub='Checkmate.';xp=LOSS_XP}}
   else{word='A draw.';sub=st==='stalemate'?'Stalemate.':st==='fifty'?'Fifty moves without a capture.':'Not enough left on the board to mate.';xp=LEVEL.draw}
   const result=won?'win':st==='mate'?'loss':'draw';
@@ -398,11 +417,81 @@ function think(){if(OVER)return;BUSY=true;THINK=performance.now();line(LEVEL.nam
   const reply=r=>{if(!r||OVER)return;const wait=Math.max(0,700-(performance.now()-THINK));setTimeout(()=>{doMove(r.move,()=>{BUSY=false;if(!afterMove())line('Your move.',CH.inCheck(STATE)?'check':'')})},wait)};
   if(WORKER){const h=e=>{if(e.data.id!==id)return;WORKER.removeEventListener('message',h);reply(e.data.r)};WORKER.addEventListener('message',h);WORKER.postMessage({id,s,level:LEVEL.id,seed})}
   else setTimeout(()=>reply(CH.pick(STATE,LEVEL.id,seed)),30)}
-function tapSquare(i){if(!GAMEON||BUSY||OVER||STATE.turn!=='w')return;const p=STATE.b[i];
-  if(SEL>=0){const m=LEGAL.find(x=>x.to===i&&(!x.promo||x.promo==='q'));if(m){clearHL();BUSY=true;doMove(m,()=>{if(!afterMove())think()});return}}
-  if(p&&CH.col(p)==='w'){clearHL();const all=CH.legal(STATE).filter(x=>x.from===i);if(!all.length){toast('That one cannot move.');return}SEL=i;LEGAL=all;const [x,z]=sqPos(i);selRing.position.set(x,BY+0.014,z);selRing.visible=true;
+function tapSquare(i){if(!GAMEON||BUSY||OVER||STATE.turn!==MYC)return;const p=STATE.b[i];
+  if(SEL>=0){const m=LEGAL.find(x=>x.to===i&&(!x.promo||x.promo==='q'));if(m){clearHL();BUSY=true;doMove(m,()=>{if(MODE==='friend'){BUSY=false;frSend(m);if(!afterMove())line((FR?FR.handle:'They')+' is thinking.','')}else if(!afterMove())think()});return}}
+  clearHint();if(p&&CH.col(p)===MYC){clearHL();const all=CH.legal(STATE).filter(x=>x.from===i);if(!all.length){toast('That one cannot move.');return}SEL=i;LEGAL=all;const [x,z]=sqPos(i);selRing.position.set(x,BY+0.014,z);selRing.visible=true;
     all.forEach(x=>{const h=HL[x.to];h.visible=true;h.material.opacity=STATE.b[x.to]||x.fl===2?1:0.9;h.scale.setScalar(STATE.b[x.to]||x.fl===2?2.2:1)});SFX.pick()}
   else clearHL()}
+
+
+/* ---------- beginner mode: a hint, a take back ---------- */
+function askEngine(level,cb){const id=Math.random();const s={b:STATE.b,turn:STATE.turn,cs:STATE.cs,ep:STATE.ep,half:STATE.half,n:STATE.n,hist:[]};const seed=(PLIES*31+7)>>>0;
+  if(WORKER){const h=e=>{if(e.data.id!==id)return;WORKER.removeEventListener('message',h);cb(e.data.r)};WORKER.addEventListener('message',h);WORKER.postMessage({id,s,level,seed})}
+  else setTimeout(()=>cb(CH.pick(STATE,level,seed)),20)}
+$('#bhint').addEventListener('click',()=>{if(!GAMEON||BUSY||OVER||STATE.turn!==MYC||MODE!=='bot')return;clearHL();clearHint();line('Looking.','');const b=$('#bhint');b.disabled=true;
+  askEngine(4,r=>{b.disabled=false;if(!r||!GAMEON||OVER||STATE.turn!==MYC)return;const m=r.move;HELPS++;HINT=m;const [x,z]=sqPos(m.from);selRing.position.set(x,BY+0.014,z);selRing.visible=true;const h=HL[m.to];h.visible=true;h.material.opacity=1;h.scale.setScalar(2.2);line('Try '+CH.san(STATE,m)+'.','a hint from the house')})});
+$('#bback').addEventListener('click',()=>{if(!GAMEON||OVER||MODE!=='bot')return;if(BUSY&&STATE.turn!==MYC){toast('Wait for the reply, then take it back.');return}if(HIST.length<2){toast('Nothing to take back yet.');return}
+  const h=HIST[HIST.length-2];HIST.length-=2;STATE=h.s;LASTM=h.last;PLIES=h.plies;HELPS++;BUSY=false;ANIM.length=0;clearHL();clearHint();placeAll(STATE.b);rebuildTray();showLast(LASTM);showCheck();SFX.pick();line('Your move.','taken back');toast('Taken back. Have another look.')});
+function rebuildTray(){const full={p:8,n:2,b:2,r:2,q:1,k:1};const cnt={};for(let i=0;i<64;i++){const p=STATE.b[i];if(p)cnt[p]=(cnt[p]||0)+1}
+  ['P','N','B','R','Q','p','n','b','r','q'].forEach(ch=>{let miss=full[ch.toLowerCase()]-(cnt[ch]||0);while(miss-->0){toTray(makePiece(ch))}})}
+
+/* ---------- a game with a friend ---------- */
+let CHAN=null,INVCH=null,POLL=0,INBOX=0,INV=null;
+function hashId(s){let h=7;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h||1}
+function uci(m){return CH.sqName(m.from)+CH.sqName(m.to)+(m.promo||'')}
+function fromUci(u){const f=(8-(+u[1]))*8+'abcdefgh'.indexOf(u[0]),t=(8-(+u[3]))*8+'abcdefgh'.indexOf(u[2]),pr=u[4]||'';return CH.legal(STATE).find(m=>m.from===f&&m.to===t&&(m.promo||'')===pr)||null}
+function frLevel(handle,id){return {id:0,name:handle,sub:'',win:FRIEND.win,draw:FRIEND.draw,seed:hashId(id)}}
+function openFriends(){if(!sb||!ME){toast('Sign in on deeds.fun to invite a friend.');return}const row=$('#frow');row.innerHTML='<div style="opacity:.6;font-size:13px">One moment.</div>';$('#levels').style.display='none';$('#friends').style.display='flex';
+  sb.rpc('chess_friends').then(r=>{if(r.error)throw r.error;const list=r.data||[];row.innerHTML='';if(!list.length){row.innerHTML='<div style="opacity:.7;font-size:14px;line-height:1.5">You follow nobody yet. Follow someone on deeds.fun and they appear here.</div>';return}
+    list.forEach(f=>{const b=document.createElement('button');b.className='lv fr';b.innerHTML='<div><b>'+esc(f.handle)+'</b><span>'+(f.mutual?'follows you back':'you follow them')+'</span></div><div style="text-align:right"><em>invite</em></div>';b.addEventListener('click',()=>invite(f));row.appendChild(b)})})
+  .catch(e=>{row.innerHTML='';toast(/chess_friends|function/.test(String(e.message||e))?'Run patch 78 on DEEDS first.':'The Keeper did not answer.')})}
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function invite(f){$('#friends').style.display='none';$('#waitn').textContent=f.handle;$('#wait').style.display='flex';
+  sb.rpc('chess_invite',{p_to:f.id}).then(r=>{if(r.error)throw r.error;INV={invite:r.data.invite,match:r.data.match,to:f};FR={match:r.data.match,handle:f.handle,id:f.id,color:'w'};
+    joinMatch(r.data.match);ring(f.id);toast(r.data.again?'They already have your card.':'Card sent to '+f.handle+'.');
+    clearInterval(POLL);POLL=setInterval(()=>{if(!INV)return;sb.rpc('chess_invite_state',{p_invite:INV.invite}).then(q=>{if(q.error)return;const st=q.data.status;if(st==='accepted')startFriend('w');else if(st!=='pending'){clearInterval(POLL);$('#wait').style.display='none';INV=null;leaveMatch();toast(st==='declined'?f.handle+' cannot right now.':'No answer. The card expired.');openLevels()}})},4000)})
+  .catch(e=>{$('#wait').style.display='none';const m=String(e.message||e);toast(/twenty_a_day/.test(m)?'Twenty invitations a day.':/chess_invite|function/.test(m)?'Run patch 78 on DEEDS first.':'The Keeper did not answer.');openLevels()})}
+function ring(to){try{const c=sb.channel('chess:inv:'+to);c.subscribe(s=>{if(s==='SUBSCRIBED'){c.send({type:'broadcast',event:'inv',payload:{k:'invite'}});setTimeout(()=>sb.removeChannel(c),1500)}})}catch(e){}}
+$('#waitcancel').addEventListener('click',()=>{clearInterval(POLL);$('#wait').style.display='none';if(INV)sb.rpc('chess_invite_cancel',{p_invite:INV.invite}).then(()=>{}).catch(()=>{});INV=null;leaveMatch();openLevels()});
+$('#frback').addEventListener('click',()=>{$('#friends').style.display='none';openLevels()});
+function joinMatch(id){leaveMatch();try{CHAN=sb.channel('chess:m:'+id,{config:{broadcast:{self:false}}});CHAN.on('broadcast',{event:'m'},e=>onWire(e.payload||{}));CHAN.subscribe()}catch(e){CHAN=null}}
+function leaveMatch(){if(CHAN){try{sb.removeChannel(CHAN)}catch(e){}CHAN=null}}
+function wire(p){if(CHAN)try{CHAN.send({type:'broadcast',event:'m',payload:p})}catch(e){}}
+function onWire(p){if(!FR)return;
+  if(p.k==='here'){if(INV&&p.color==='b')startFriend('w');else if(GAMEON)line('Your move.',CH.inCheck(STATE)?'check':'');return}
+  if(p.k==='move'){if(!GAMEON||OVER)return;if(p.ply!==PLIES||STATE.turn===MYC)return;const m=fromUci(p.uci);if(!m)return;BUSY=true;doMove(m,()=>{BUSY=false;if(!afterMove())line('Your move.',CH.inCheck(STATE)?'check':'')});return}
+  if(p.k==='resign'){if(!GAMEON||OVER)return;finish('resign_them');return}}
+function frSend(m){const ply=PLIES-1,u=uci(m);wire({k:'move',ply,uci:u});sb.rpc('chess_move',{p_match:FR.match,p_ply:ply,p_uci:u}).then(r=>{if(r.error&&!/late/.test(String(r.error.message)))toast('The move did not reach the house.')}).catch(()=>{})}
+function replay(list){STATE=CH.start();HIST=[];LASTM=null;PLIES=0;(list||[]).forEach(u=>{const m=fromUci(u);if(!m)return;HIST.push({s:CH.clone(STATE),last:LASTM,plies:PLIES});STATE=CH.make(STATE,m);LASTM=m;PLIES++});placeAll(STATE.b);rebuildTray();showLast(LASTM);showCheck()}
+function startFriend(color){clearInterval(POLL);$('#wait').style.display='none';$('#ask').style.display='none';$('#levels').style.display='none';$('#end').style.display='none';$('#gate').style.display='none';INV=null;
+  MODE='friend';MYC=color;LEVEL=frLevel(FR.handle,FR.id);dressOpp(LEVEL);boardG.rotation.y=color==='b'?Math.PI:0;CAM.mode='board';clearHL();clearHint();OVER=false;BUSY=true;GAMEON=false;HELPS=0;$('#who').textContent=FR.handle;beginnerUI();SFX.set();line('Setting the board.','');
+  const ready=()=>{GAMEON=true;BUSY=false;line(STATE.turn===MYC?'Your move.':FR.handle+' is thinking.',color==='w'?'you play white':'you play black')};
+  sb.rpc('chess_match',{p_match:FR.match}).then(r=>{if(r.error)throw r.error;replay(r.data.moves||[]);if(r.data.status==='done'){GAMEON=true;finish('gone');return}ready()}).catch(()=>{replay([]);ready()});
+  clearInterval(INBOX);INBOX=setInterval(catchUp,6000)}
+function catchUp(){if(MODE!=='friend'||!FR||!GAMEON||OVER||STATE.turn===MYC||BUSY)return;sb.rpc('chess_match',{p_match:FR.match}).then(r=>{if(r.error)return;const mv=r.data.moves||[];if(mv.length>PLIES){const m=fromUci(mv[PLIES]);if(!m)return;BUSY=true;doMove(m,()=>{BUSY=false;if(!afterMove())line('Your move.',CH.inCheck(STATE)?'check':'')})}else if(r.data.status==='done'&&!OVER)finish('resign_them')}).catch(()=>{})}
+function finishFriend(st){const them=FR?FR.handle:'They';let word,sub,mine;
+  if(st==='mate'){mine=STATE.turn!==MYC?'win':'loss';word=mine==='win'?'You won.':them+' won.';sub='Checkmate.'}
+  else if(st==='resign_them'){mine='win';word='You won.';sub=them+' left the board.'}
+  else if(st==='resign_me'){mine='loss';word=them+' won.';sub='You left the board.'}
+  else if(st==='gone'){mine='draw';word='That game is over.';sub='The house had already closed it.'}
+  else{mine='draw';word='A draw.';sub=st==='stalemate'?'Stalemate.':st==='fifty'?'Fifty moves without a capture.':'Not enough left on the board to mate.'}
+  $('#endword').textContent=word;$('#endsub').textContent=sub;line(word,'');if(mine==='win')SFX.win();else if(mine==='draw')SFX.draw();else SFX.lose();
+  const before=rankOf(SAVE.xp);const settle=(gained,after,note)=>{paintRank();$('#endxp').textContent=gained>0?'+'+gained+' xp':(note||'no xp');setTimeout(()=>{$('#end').style.display='flex'},900);if(after>before)setTimeout(()=>rankUp(after),2200)};
+  clearInterval(INBOX);const match=FR&&FR.match;leaveMatch();
+  if(sb&&ME&&match&&st!=='gone'){$('#endxp').textContent='';sb.rpc('chess_friend_end',{p_match:match,p_result:mine,p_plies:PLIES}).then(r=>{if(r.error)throw r.error;const d=r.data;SAVE.xp=d.xp;SAVE.games=(SAVE.games||0)+1;if(d.mine==='win')SAVE.wins=(SAVE.wins||0)+1;save();
+      settle(d.gained,rankOf(d.xp),d.reason==='too_short'?'too short to count':d.reason==='twelve_a_day'?'twelve paid games a day':d.reason==='already'?'already counted':'no xp')}).catch(()=>{settle(0,before,'not counted');toast('The Keeper did not answer.')})}
+  else settle(0,before,'not counted');
+  pollInbox(true)}
+/* the invitee */
+function pollInbox(arm){if(!sb||!ME)return;if(arm){clearInterval(INBOX);INBOX=setInterval(()=>pollInbox(false),12000)}if(GAMEON||INV)return;
+  sb.rpc('chess_inbox').then(r=>{if(r.error)return;const list=r.data||[];if(!list.length){if($('#ask').style.display==='flex'){$('#ask').style.display='none';toast('The card was taken back.')}return}const a=list[0];if($('#ask').style.display==='flex'&&$('#ask').dataset.inv===a.invite)return;
+    $('#ask').dataset.inv=a.invite;$('#ask').dataset.match=a.match;$('#ask').dataset.from=a.from;$('#ask').dataset.handle=a.from_handle;$('#askn').textContent=a.from_handle;$('#ask').style.display='flex';SFX.set()}).catch(()=>{})}
+$('#asksit').addEventListener('click',()=>{SFX.unlock();const d=$('#ask').dataset;const b=$('#asksit');b.disabled=true;sb.rpc('chess_invite_answer',{p_invite:d.inv,p_yes:true}).then(r=>{b.disabled=false;if(r.error)throw r.error;const s=r.data.status;
+  if(s!=='accepted'){$('#ask').style.display='none';toast(s==='cancelled'?'They took the card back.':s==='expired'?'That card expired.':'That game is gone.');return}
+  FR={match:d.match,handle:d.handle,id:d.from,color:'b'};joinMatch(d.match);startFriend('b');setTimeout(()=>wire({k:'here',color:'b'}),600);setTimeout(()=>wire({k:'here',color:'b'}),2400)}).catch(()=>{b.disabled=false;toast('The Keeper did not answer.')})});
+$('#askno').addEventListener('click',()=>{const d=$('#ask').dataset;$('#ask').style.display='none';sb.rpc('chess_invite_answer',{p_invite:d.inv,p_yes:false}).then(()=>{}).catch(()=>{});toast('Told them. Not now.')});
+function listenInvites(){try{INVCH=sb.channel('chess:inv:'+ME);INVCH.on('broadcast',{event:'inv'},()=>pollInbox(false));INVCH.subscribe()}catch(e){}}
+function frResign(){if(MODE!=='friend'||!GAMEON||OVER)return;wire({k:'resign'});const match=FR&&FR.match;if(sb&&ME&&match)try{sb.rpc('chess_friend_end',{p_match:match,p_result:'loss',p_plies:PLIES}).then(()=>{}).catch(()=>{})}catch(e){}}
 
 /* ---------- pointer: tap a square or a frame, drag to look ---------- */
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let DRAG=null;
@@ -446,7 +535,7 @@ $('#sound').addEventListener('pointerdown',e=>{e.preventDefault();SFX.unlock()})
 addEventListener('pointerdown',()=>{SFX.unlock()},{passive:true});
 
 /* ---------- the sheets ---------- */
-function openLevels(){const row=$('#lvrow');row.innerHTML='';const sug=suggested();LEVELS.forEach(l=>{const b=document.createElement('button');b.className='lv'+(l.id===sug?' you':'');b.innerHTML='<div><b>'+l.name+'</b><span>'+l.sub+'</span></div><div style="text-align:right"><em>'+(l.id===sug?'your level<br>':'')+'</em><span style="color:#d9b45a">+'+l.win+' xp</span></div>';b.addEventListener('click',()=>{$('#levels').style.display='none';$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='board';newGame(l)});row.appendChild(b)});$('#levels').style.display='flex'}
+function openLevels(){const row=$('#lvrow');row.innerHTML='';const sug=suggested();{const b=document.createElement('button');b.className='lv fr';b.innerHTML='<div><b>A friend</b><span>Someone you follow. They get a card on their phone.</span></div><div style="text-align:right"><em>invite</em><br><span style="color:#d9b45a">+'+FRIEND.win+' xp</span></div>';b.addEventListener('click',openFriends);row.appendChild(b)}LEVELS.forEach(l=>{const b=document.createElement('button');b.className='lv'+(l.id===sug?' you':'');b.innerHTML='<div><b>'+l.name+'</b><span>'+l.sub+'</span></div><div style="text-align:right"><em>'+(l.id===sug?'your level<br>':'')+'</em><span style="color:#d9b45a">+'+l.win+' xp</span></div>';b.addEventListener('click',()=>{$('#levels').style.display='none';$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='board';newGame(l)});row.appendChild(b)});$('#levels').style.display='flex'}
 const DOOR={known:false,signed:null,owned:null,price:3000};
 function paintGate(){const g=$('#go'),p=$('#gatep'),b=$('#gateback');if(!DOOR.known){g.textContent='Sit down';g.disabled=false;return}
   if(!DOOR.signed){p.textContent='The board is in your house on DEEDS. Sign in on deeds.fun to buy it.';g.textContent='Sign in';g.disabled=false;b.style.display='block';return}
@@ -457,11 +546,12 @@ $('#go').addEventListener('click',()=>{SFX.unlock();
   if(DOOR.known&&!DOOR.owned){const g=$('#go');g.disabled=true;g.textContent='One moment.';sb.rpc('chess_buy').then(r=>{if(r.error)throw r.error;DOOR.owned=true;paintPurse(r.data.balance);SFX.rank();toast(r.data.already?'You already own the board.':'The board is yours. 3,000 gc.');paintGate()}).catch(e=>{const m=String(e.message||e);toast(/not_enough/.test(m)?'Not enough. The board is 3,000 gc.':/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':/chess_buy|function/.test(m)?'Run patch 74 on DEEDS first.':'The Keeper did not answer.');g.disabled=false;paintGate()});return}
   $('#gate').style.display='none';openLevels()});
 function paintPurse(bal){if(bal==null)return;const el=$('#purse');el.style.display='';el.textContent=bal.toLocaleString()+' gc';try{localStorage.setItem('deeds_gc',String(bal))}catch(e){}}
-$('#bnew').addEventListener('click',()=>{openLevels()});
+$('#bnew').addEventListener('click',()=>{if(MODE==='friend'&&GAMEON&&!OVER){$('#quit').style.display='flex';return}openLevels()});
+$('#garden').addEventListener('click',e=>{if(MODE==='friend'&&GAMEON&&!OVER){e.preventDefault();frResign();setTimeout(()=>{location.href='../world/'},350)}});
 $('#lvback').addEventListener('click',()=>{$('#levels').style.display='none';if(!GAMEON&&!OVER)line('Sit down whenever you like.','new game to start')});
-$('#again').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');newGame(LEVEL)});
+$('#again').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');if(MODE==='friend'){const f=FR;if(f){$('#levels').style.display='none';invite({id:f.id,handle:f.handle})}else openLevels();return}newGame(LEVEL)});
 $('#tothewall').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='wall';$('#bwall').textContent='The board';line('Tap a painting.','')});
-$('#bwall').addEventListener('click',()=>{if(CAM.mode==='board'){CAM.mode='wall';CAM.yaw=0;$('#bwall').textContent='The board';line('Tap a painting.','')}else{CAM.mode='board';CAM.yaw=0;CAM.pitch=0;$('#bwall').textContent='The wall';line(GAMEON?(BUSY?LEVEL.name+' is thinking.':'Your move.'):'New game to start.','')}});
+$('#bwall').addEventListener('click',()=>{if(CAM.mode==='board'){CAM.mode='wall';CAM.yaw=0;$('#bwall').textContent='The board';line('Tap a painting.','')}else{CAM.mode='board';CAM.yaw=0;CAM.pitch=0;$('#bwall').textContent='The wall';line(GAMEON?(BUSY?LEVEL.name+' is thinking.':(STATE.turn===MYC?'Your move.':LEVEL.name+' is thinking.')):'New game to start.','')}});
 $('#rank').addEventListener('click',()=>{if(CAM.mode!=='wall'){$('#bwall').click()}});
 $('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href='../world/'});
 $('#stay').addEventListener('click',()=>{$('#quit').style.display='none'});
@@ -473,7 +563,7 @@ let sb=null,ME=null;
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const u=r&&r.data&&r.data.session&&r.data.session.user;DOOR.known=true;if(!u){DOOR.signed=false;paintGate();return}ME=u.id;DOOR.signed=true;
     sb.rpc('chess_state').then(q=>{if(q.error)throw q.error;const d=q.data||{};DOOR.owned=!!d.owned;DOOR.price=d.price||3000;paintPurse(d.balance);
-      if(typeof d.xp==='number'){SAVE.xp=d.xp;SAVE.games=d.games||0;SAVE.wins=d.wins||0;save();paintRank();paintWall(false)}paintGate()}).catch(e=>{DOOR.known=false;paintGate();toast('Run patch 74 on DEEDS first. Playing on this phone for now.')})}).catch(()=>{})}
+      if(typeof d.xp==='number'){SAVE.xp=d.xp;SAVE.games=d.games||0;SAVE.wins=d.wins||0;save();paintRank();paintWall(false)}paintGate();listenInvites();pollInbox(true)}).catch(e=>{DOOR.known=false;paintGate();toast('Run patch 74 on DEEDS first. Playing on this phone for now.')})}).catch(()=>{})}
 {const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=goLive;s.onerror=()=>{};document.head.appendChild(s)}
 
 /* ---------- the loop ---------- */
