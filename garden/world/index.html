@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.16.1">
+<meta name="world-build" content="6.17">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -2248,19 +2248,68 @@ function hit(px,pz,pface,reach,arc){if(!alive||st!=='run')return false;const dx=
   alive=false;st='hide';tree=null;g.visible=false;return true}
 function near(px,pz,r){return alive&&st==='run'&&Math.hypot(x-px,z-pz)<=(r||3.2)}
 function init(scene,fa){SC=scene;floorAt=fa||floorAt;g=build();g.visible=false;scene.add(g)}
-return {init,drop,tick,hit,near,trees,alive:()=>alive,state:()=>({st,x,z,tree,tgt,stun}),G:()=>g,treeName:t=>t?(t.k==='oak'?'the oak':'the '+(WILD[t.i]&&WILD[t.i].kind||'tree')):'a tree'}
+return {init,drop,tick,hit,near,trees,build,alive:()=>alive,state:()=>({st,x,z,tree,tgt,stun}),G:()=>g,treeName:t=>t?(t.k==='oak'?'the oak':'the '+(WILD[t.i]&&WILD[t.i].kind||'tree')):'a tree'}
 })();
 let LEP_INIT=false;const LEP_GC=1000;
 function lepGiggle(){try{const a=SND.ac&&SND.ac();if(!a)return;const T=a.currentTime;[[0,1180,0.09],[0.13,1420,0.08],[0.24,1320,0.1],[0.36,1500,0.07],[0.46,1380,0.12]].forEach(([d,f,l])=>{const o=a.createOscillator(),g=a.createGain(),v=a.createOscillator(),vg=a.createGain();o.type='triangle';o.frequency.setValueAtTime(f,T+d);o.frequency.exponentialRampToValueAtTime(f*0.82,T+d+l);
     v.frequency.value=22;vg.gain.value=40;v.connect(vg);vg.connect(o.frequency);g.gain.setValueAtTime(0.0001,T+d);g.gain.exponentialRampToValueAtTime(0.16,T+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,T+d+l);o.connect(g);g.connect(SND.bus()||a.destination);o.start(T+d);v.start(T+d);o.stop(T+d+l+0.02);v.stop(T+d+l+0.02)})}catch(e){}}
-function lepDrop(kind,i,px,pz){if(!LEP_INIT)return;LEP.drop(kind,i,px,pz,{you:{x:you.x,z:you.z},onDrop:same=>{lepGiggle();toast(same?'Te hee hee. Out he tumbles again. Quick.':'Te hee hee. A little man in green falls out and does a jig. Catch him with the sword or the flame before he runs: a thousand gardencoin.')},
+function lepDrop(kind,i,px,pz){if(!LEP_INIT||RAGE.on())return;LEP.drop(kind,i,px,pz,{you:{x:you.x,z:you.z},onDrop:same=>{lepGiggle();toast(same?'Te hee hee. Out he tumbles again. Quick.':'Te hee hee. A little man in green falls out and does a jig. Catch him with the sword or the flame before he runs: a thousand gardencoin.')},
   onHide:tg=>{toast('He is up '+LEP.treeName(tg)+'. Fell it and he falls out.')}})}
-function lepCaught(){const s=LEP.state();SND.tier();floatGc(LEP_GC,s.x,floorAtW(s.x,s.z)+1.4,s.z);
+function lepCaught(){LEP_KILLS++;try{localStorage.setItem('deeds_lep_kills',String(LEP_KILLS))}catch(e){}if(LEP_KILLS>=4){lepRage();return}const s=LEP.state();SND.tier();floatGc(LEP_GC,s.x,floorAtW(s.x,s.z)+1.4,s.z);
   const local=()=>{S.gc=(S.gc|0)+LEP_GC;save();renderHud();ledger('The leprechaun',LEP_GC,'the wood')};
   toast('Got him. A thousand gardencoin, and off he vanishes.');
   if(!LIVE||VISIT){local();return}
   RPC('lep_catch').then(r=>{const d=r.data||{};if(r.error){const m=String(r.error.message||'');if(/function|schema cache|does not exist/i.test(m))toast('Run patch 72 on DEEDS first.');else toast(rpcFail(r.error,'The Keeper did not answer.'));return}
     if(d.balance!=null)S.gc=+d.balance;renderHud();ledger('The leprechaun',+d.pay||LEP_GC,'the wood');if(d.paid===false)toast('He got away with the gold this time. Three a day.')}).catch(()=>{toast('The Keeper did not answer.')})}
+/* 6.17 THE LEPRECHAUN'S REVENGE. Catch him three times and the fourth time he is furious: he and three friends come for you at 10.5 studs a second,
+   faster than a walk, slower than a run. Every grab is a heart. They cannot be killed, only knocked back with the sword or the flame. Get inside,
+   or get forty studs clear and they lose you. After five minutes they giggle and vanish and the count starts again. */
+const RAGE=(()=>{let on=false,until=0,figs=[],SC=null,floorAt=(x,z)=>0,lost=false,grace=0,told=0;
+const KEY='deeds_lep_rage',SP=10.5,N=4;
+function spawn(px,pz,ax){figs.forEach(f=>{SC.remove(f.g)});figs=[];for(let i=0;i<N;i++){const a=(ax||0)+i*Math.PI*2/N+0.4;const r=6.5+i*0.7;const g=LEP.build();g.visible=true;const x=px+Math.sin(a)*r,z=pz+Math.cos(a)*r;g.position.set(x,floorAt(x,z),z);SC.add(g);figs.push({g,x,z,face:a+Math.PI,ph:Math.random()*6,cd:1.2+i*0.35,stun:0,zig:Math.random()*6})}}
+function start(secs,px,pz){if(!SC)return;on=true;lost=false;grace=2.2;until=Date.now()+(secs||300)*1000;try{localStorage.setItem(KEY,String(until))}catch(e){}spawn(px,pz,Math.random()*6.28)}
+function end(quiet){if(!on)return;on=false;figs.forEach(f=>{SC.remove(f.g)});figs=[];try{localStorage.removeItem(KEY)}catch(e){}if(!quiet&&typeof onEnd==='function')onEnd()}
+let onEnd=null;
+function scatter(px,pz,secs){figs.forEach((f,i)=>{const a=i*Math.PI*2/N+0.9;f.x=px+Math.sin(a)*9;f.z=pz+Math.cos(a)*9;f.stun=secs||3;f.g.position.set(f.x,floorAt(f.x,f.z),f.z)});grace=secs||3}
+function tick(t,dt,ctx){if(!on)return;if(Date.now()>until){end(false);return}if(grace>0)grace-=dt;
+  const px=ctx.x,pz=ctx.z;let anyClose=false;
+  figs.forEach(f=>{let tx,tz;const dx0=px-f.x,dz0=pz-f.z,dp=Math.hypot(dx0,dz0);
+    if(ctx.inside){const a=t*0.35+f.ph;tx=ctx.door.x+Math.sin(a)*4.2;tz=ctx.door.z+3+Math.cos(a)*2.4}
+    else if(lost){tx=f.x;tz=f.z}else{tx=px;tz=pz}
+    if(f.stun>0){f.stun-=dt;f.g.rotation.z=Math.sin(t*9)*0.3;f.g.position.y=floorAt(f.x,f.z)+Math.abs(Math.sin(t*7))*0.2;f.g.legs.forEach((L,i)=>{L.rotation.x=Math.sin(t*14+(i?Math.PI:0))*0.8});f.g.arms.forEach((A,i)=>{A.rotation.z=(i?-1:1)*2.4});return}
+    f.g.rotation.z=0;f.g.arms.forEach(A=>{A.rotation.z=0});
+    const dx=tx-f.x,dz=tz-f.z,d=Math.hypot(dx,dz);
+    if(d>0.9){const want=Math.atan2(dx,dz)+(ctx.inside||lost?0:Math.sin(t*3.3+f.zig)*0.18);let da=want-f.face;while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;f.face+=da*Math.min(1,9*dt);
+      const sp=ctx.inside||lost?4:SP;f.x+=Math.sin(f.face)*sp*dt;f.z+=Math.cos(f.face)*sp*dt;f.ph+=dt*14;
+      f.g.legs.forEach((L,k)=>{L.rotation.x=Math.sin(f.ph+(k?Math.PI:0))*1.05});f.g.arms.forEach((A,k)=>{A.rotation.x=Math.sin(f.ph+(k?0:Math.PI))*1.1})}
+    else{f.g.legs.forEach(L=>{L.rotation.x=0});f.g.arms.forEach((A,k)=>{A.rotation.x=-1.6;A.rotation.z=(k?-1:1)*Math.sin(t*10)*0.4})}
+    f.g.position.set(f.x,floorAt(f.x,f.z)+Math.abs(Math.sin(f.ph*0.5))*0.05,f.z);f.g.rotation.y=f.face;f.g.head.rotation.y=Math.sin(t*6+f.ph)*0.3;
+    if(f.cd>0)f.cd-=dt;
+    if(dp<1.25)anyClose=true;
+    if(!ctx.inside&&!lost&&grace<=0&&f.cd<=0&&dp<1.25&&!ctx.dying){f.cd=1.5;if(ctx.onGrab)ctx.onGrab(f)}});
+  if(!ctx.inside){const dmin=Math.min.apply(null,figs.map(f=>Math.hypot(px-f.x,pz-f.z)));if(!lost&&dmin>40){lost=true;if(ctx.onLost)ctx.onLost()}else if(lost&&dmin<28){lost=false;grace=1;if(ctx.onFound)ctx.onFound()}}
+  if(anyClose&&!ctx.inside&&t-told>2.6){told=t;if(ctx.onNear)ctx.onNear()}}
+function knock(px,pz,pface,reach,arc){if(!on)return false;let hitAny=false;figs.forEach(f=>{const dx=f.x-px,dz=f.z-pz,d=Math.hypot(dx,dz);if(d>(reach||2.1))return;let a=Math.atan2(-dx,-dz)-pface;while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;if(Math.abs(a)>(arc||1.45))return;
+    const k=d>0.01?1/d:1;f.x+=dx*k*5;f.z+=dz*k*5;f.stun=1.3;f.cd=1.8;f.g.position.set(f.x,floorAt(f.x,f.z),f.z);hitAny=true});return hitAny}
+function near(px,pz,r){return on&&!lost&&figs.some(f=>Math.hypot(f.x-px,f.z-pz)<=(r||3.2))}
+function resume(px,pz){let u=0;try{u=+localStorage.getItem(KEY)||0}catch(e){}if(u>Date.now()+1000){on=true;until=u;lost=false;grace=3;spawn(px,pz,Math.random()*6.28);return true}return false}
+function init(scene,fa,cb){SC=scene;floorAt=fa||floorAt;onEnd=cb||null}
+return {init,start,end,tick,knock,near,resume,scatter,on:()=>on,left:()=>Math.max(0,Math.ceil((until-Date.now())/1000)),figs:()=>figs}
+})();
+let LEP_KILLS=0;try{LEP_KILLS=+localStorage.getItem('deeds_lep_kills')||0}catch(e){}
+function lepScream(){try{const a=SND.ac&&SND.ac();if(!a)return;const T=a.currentTime;[[0,640,0.16],[0.12,560,0.14],[0.24,720,0.22],[0.5,480,0.4]].forEach(([d,f,l])=>{const o=a.createOscillator(),g=a.createGain(),v=a.createOscillator(),vg=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,T+d);o.frequency.exponentialRampToValueAtTime(f*0.62,T+d+l);
+    v.frequency.value=31;vg.gain.value=90;v.connect(vg);vg.connect(o.frequency);g.gain.setValueAtTime(0.0001,T+d);g.gain.exponentialRampToValueAtTime(0.2,T+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,T+d+l);o.connect(g);g.connect(SND.bus()||a.destination);o.start(T+d);v.start(T+d);o.stop(T+d+l+0.02);v.stop(T+d+l+0.02)});if(navigator.vibrate)navigator.vibrate([60,40,60,40,180])}catch(e){}}
+function lepRage(){const s=LEP.state();lepScream();hideAct();RAGE.start(300,you.x,you.z);LEP_KILLS=0;try{localStorage.setItem('deeds_lep_kills','0')}catch(e){}
+  $('#hurt').classList.add('on');setTimeout(()=>$('#hurt').classList.remove('on'),420);
+  toast('Three times was enough. He is FURIOUS, and he brought three friends. RUN. Get inside, or get clear of them. Five minutes.');paintHearts()}
+function lepGrab(){if(DYING||INSIDE)return;HEARTS=Math.max(0,HEARTS-1);REGEN=0;SND.knock();const h=$('#hurt');h.classList.add('on');setTimeout(()=>h.classList.remove('on'),260);
+  if(HEARTS<=0){lepDeath();return}toast(HEARTS===2?'A leprechaun got you. Two hearts left. Run.':'One heart left. Get inside or get clear.')}
+function lepDeath(){if(DYING)return;DYING=true;paintHearts();hideAct();$('#dead').firstElementChild.textContent='The leprechauns got you.';$('#deadLine').textContent='you took his gold three times too many';$('#dead').classList.add('on');
+  setTimeout(()=>{$('#dead').classList.remove('on');$('#dead').firstElementChild.textContent='The wolves got you.';if(INSIDE)leaveHouse();you.x=DOORW.x;you.z=DOORW.z+1.2;you.feet=floorAtW(you.x,you.z);you.vx=you.vz=you.vy=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;
+    HEARTS=3;DYING=false;RAGE.scatter(you.x,you.z,4);paintHearts();refresh();toast('You wake at your own front door. They are still out there. '+mmss(RAGE.left())+' to go. Get inside.')},2800)}
+function rageTick(t,dt){if(!RAGE.on())return;RAGE.tick(t,dt,{x:you.x,z:you.z,inside:INSIDE,dying:DYING,door:{x:DOORW.x,z:DOORW.z},onGrab:lepGrab,onNear:()=>{lepGiggle()},
+  onLost:()=>{toast('You lost them. They are prowling the garden. Keep your distance.')},onFound:()=>{lepGiggle();toast('They found you. RUN.')}})}
+
 function chipTick(dt){for(let i=CHIPS.length-1;i>=0;i--){const C=CHIPS[i];C.t+=dt;const a=C.pts.geometry.attributes.position;for(let j=0;j<a.count;j++){const v=C.v[j];if(!C.petal)v[1]-=9.8*dt;let y=a.getY(j)+v[1]*dt;if(y<0.05)y=0.05;a.setXYZ(j,a.getX(j)+v[0]*dt+(C.petal?Math.sin(C.t*3+j)*0.4*dt:0),y,a.getZ(j)+v[2]*dt)}a.needsUpdate=true;
   if(C.t>0.9){scene.remove(C.pts);C.pts.geometry.dispose();CHIPS.splice(i,1)}}}
 
@@ -2655,7 +2704,7 @@ function killBeast(kind,w){const wx=w?w.x:you.x,wz=w?w.z:you.z,wy=(w?floorAtW(w.
     if(PATCH69&&d.paid===false){KILLS=KILL_CAP;nightOver();return}
     const got=+d.pay||+d.coins||pay;if(d.balance!=null)S.gc=+d.balance;KILLS_NIGHT=nightN();KILLS=+d.kills||KILLS+1;renderHud();floatGc(got,wx,wy,wz);ledger(kind==='wolf'?'A wolf':'A skeleton',got,'the night');if(d.done||d.night_over)nightOver()}).catch(()=>{})}
 function nightOver(){WOLVES.clear();SKELS.clear();toast(tonightBeast()==='skeleton'?'Five tonight. The rest scatter. The night is yours.':'Five tonight. The pack gives up on you. The night is yours.')}
-function paintHearts(){const on=WOLVES.count()>0||HEARTS<3||DYING;const key=(on?1:0)+':'+HEARTS;if(key===HEARTS_KEY)return;HEARTS_KEY=key;$('#hearts').classList.toggle('on',on);
+function paintHearts(){const on=WOLVES.count()>0||HEARTS<3||DYING||(typeof RAGE!=='undefined'&&RAGE.on());const key=(on?1:0)+':'+HEARTS;if(key===HEARTS_KEY)return;HEARTS_KEY=key;$('#hearts').classList.toggle('on',on);
   $('#hearts').innerHTML=[0,1,2].map(i=>'<i'+(i<HEARTS?'':' class="off"')+'><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg></i>').join('')}
 const wolvesWord=n=>n===1?'one wolf':n+' wolves';
 function ripeBeds(){const out=[];BED.forEach(b=>{const p=S.plants[b.plot];if(!p||p.pending)return;if(ripe(p).flowers>=1)out.push({plot:b.plot,x:b.cx,z:b.cz})});return out}
@@ -2667,7 +2716,7 @@ function skelsTick(t,dt){if(!SKEL_INIT){SKELS.init(scene,floorAtW,EXT-4);SKEL_IN
   if(!DYING)SKELS.tick(t,dt,{x:you.x,z:you.z,night:ph==='night',stage:houseLvl(),done:nightDone(),beast:tonightBeast(),beds,prey:gardPrey(),onPrey:gardenerDeath,onEat:skelEat,
     onRise:()=>{SND.groan();toast('Skeletons. They are out tonight, and they are hungry for your flowers.')},onRattle:()=>SND.rattle()})}
 let SKELS_BEDS=[];
-function wolvesTick(t,dt){if(!WOLF_INIT){WOLVES.init(scene,floorAtW,EXT-4);WOLF_INIT=true}if(!LEP_INIT){LEP.init(scene,floorAtW);LEP_INIT=true}LEP.tick(t,dt,{});skelsTick(t,dt);
+function wolvesTick(t,dt){if(!WOLF_INIT){WOLVES.init(scene,floorAtW,EXT-4);WOLF_INIT=true}if(!LEP_INIT){LEP.init(scene,floorAtW);RAGE.init(scene,floorAtW,()=>{lepGiggle();toast('The little men have cooled off. They giggle and vanish into the wood.');paintHearts()});if(RAGE.resume(you.x,you.z))setTimeout(()=>toast('They are still after you. '+mmss(RAGE.left())+' to go.'),1200);LEP_INIT=true}LEP.tick(t,dt,{});rageTick(t,dt);skelsTick(t,dt);
   if(DRIVE&&!DYING){const mv=Math.abs(KS)>2.5;const k=WOLVES.run(you.x,you.z,you.face,mv?KS:0);k.forEach(w=>{blood(w.x,w.z);SND.howl();killBeast('wolf',w)});const s=SKELS.run(you.x,you.z,you.face,mv?KS:0);s.forEach(w=>{SND.rattle();killBeast('skeleton',w)})}   /* 6.8: the mower */
   if(SAW_T>0)SAW_T-=dt;
   if(!DYING)WOLVES.tick(t,dt,{x:you.x,z:you.z,night:ph==='night',stage:houseLvl(),visit:!!VISIT,inside:INSIDE,door:{x:DOORW.x,z:DOORW.z},moving:DRIVE&&Math.abs(KS)>2.5,onBite:wolfBite,prey:gardPrey(),onPrey:gardenerDeath,done:nightDone(),beast:tonightBeast(),onBurnt:w=>{SND.bloom();blood(w.x,w.z);killBeast('wolf',w)},
@@ -2690,12 +2739,12 @@ function wolfDeath(){if(DYING)return;DYING=true;WOLVES.clear();WOLVES.grace(20);
   setTimeout(()=>{$('#dead').classList.remove('on');if(INSIDE)leaveHouse();you.x=DOORW.x;you.z=DOORW.z+1.2;you.feet=floorAtW(you.x,you.z);you.vx=you.vz=you.vy=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;
     HEARTS=3;DYING=false;paintHearts();refresh();toast('You wake at your own front door. It is still night. Get inside.'+(fl||fish?' The wolves took what you carried.':''))},2800)}
 let SWORD_TIP=false;try{SWORD_TIP=localStorage.getItem('deeds_sword_tip')==='1'}catch(e){}
-function swingSword(){if(SWING.t>0||!owns('sword'))return;SWING.t=0.32;SND.rustle();if(!SWORD_TIP){SWORD_TIP=true;try{localStorage.setItem('deeds_sword_tip','1')}catch(e){}updateAct()}if(LEP.hit(you.x,you.z,you.face,2.1,1.45)){lepCaught();return}const r=WOLVES.swing(you.x,you.z,you.face);
+function swingSword(){if(SWING.t>0||!owns('sword'))return;SWING.t=0.32;SND.rustle();if(!SWORD_TIP){SWORD_TIP=true;try{localStorage.setItem('deeds_sword_tip','1')}catch(e){}updateAct()}if(RAGE.knock(you.x,you.z,you.face,2.1,1.45)){SND.knock();lepGiggle();return}if(LEP.hit(you.x,you.z,you.face,2.1,1.45)){lepCaught();return}const r=WOLVES.swing(you.x,you.z,you.face);
   if(!r){const k=SKELS.swing(you.x,you.z,you.face,1,2.1,1.45);if(k){SND.rattle();killBeast('skeleton',k.w);return}SND.knock();return}if(r.dead){SND.bloom();killBeast('wolf',r.w);if(!r.left&&!nightDone())toast('The pack is down. More will come.')}else{SND.knock()}}
 /* 4.28: the chainsaw and the flamethrower fight too. Two strokes of the saw; the flame takes one, up close, and the wolf keeps coming while it burns */
 function sawStrike(){if(SAW_T>0||!owns('chainsaw'))return;SAW_T=0.5;SND.saw();const r=WOLVES.swing(you.x,you.z,you.face,3,2.1,1.45);if(!r){const k=SKELS.swing(you.x,you.z,you.face,1,2.1,1.45);if(k){SND.rattle();killBeast('skeleton',k.w);return}SND.knock();return}if(r.dead){SND.howl();blood(r.w.x,r.w.z);killBeast('wolf',r.w)}}   /* 6.8: the saw takes a wolf in one, and it howls */
-function flameStrike(){if(FLAME.t>0||!owns('flamethrower'))return;FLAME.t=1.4;SND.saw();if(LEP.hit(you.x,you.z,you.face,2.6,1.7)){lepCaught();return}const r=WOLVES.swing(you.x,you.z,you.face,'burn',2.6,1.7);if(!r){const k=SKELS.swing(you.x,you.z,you.face,1,2.6,1.7);if(k){SND.rattle();killBeast('skeleton',k.w);return}SND.knock();return}SND.howl()}   /* 6.8: it catches, howls and runs */
-function beastNear(){return !!WOLVES.near(you.x,you.z,3.2)||!!SKELS.near(you.x,you.z,3.2)||LEP.near(you.x,you.z,3.2)}
+function flameStrike(){if(FLAME.t>0||!owns('flamethrower'))return;FLAME.t=1.4;SND.saw();if(RAGE.knock(you.x,you.z,you.face,2.6,1.7)){lepGiggle();return}if(LEP.hit(you.x,you.z,you.face,2.6,1.7)){lepCaught();return}const r=WOLVES.swing(you.x,you.z,you.face,'burn',2.6,1.7);if(!r){const k=SKELS.swing(you.x,you.z,you.face,1,2.6,1.7);if(k){SND.rattle();killBeast('skeleton',k.w);return}SND.knock();return}SND.howl()}   /* 6.8: it catches, howls and runs */
+function beastNear(){return RAGE.near(you.x,you.z,3.2)||!!WOLVES.near(you.x,you.z,3.2)||!!SKELS.near(you.x,you.z,3.2)||LEP.near(you.x,you.z,3.2)}
 /* 6.8.1 THE FLAME STAYS ON. Tap once and the flamethrower roars until you tap again (or put it away, or go inside). While it is on,
    everything in the cone burns: every wolf in reach catches fire, skeletons drop, the leprechaun is caught, and a tree in front of you
    burns for a few seconds and comes apart in a cloud of embers, and out he falls. */
@@ -2717,7 +2766,7 @@ function treeFireTick(dt){if(!TREEFIRE)return;const F=TREEFIRE;F.t+=dt;F.em-=dt;
     else{const before=TREE.fall[F.i];chopTree(F.i,true);if(!TREE.fall[F.i]&&!before&&!LIVE)toast('It burns, but the oak will not come down.')}
     toast('It comes apart in embers.')}}
 function flameSweep(t,dt){if(!FLAME.on)return;if(!owns('flamethrower')||INSIDE||DYING){flameToggle(false);return}
-  FLAME.t=1;if(LEP.hit(you.x,you.z,you.face,2.6,1.7)){lepCaught()}
+  FLAME.t=1;if(RAGE.knock(you.x,you.z,you.face,2.6,1.7)){lepGiggle()}else if(LEP.hit(you.x,you.z,you.face,2.6,1.7)){lepCaught()}
   let n=0,lit=0;while(n++<6){const r=WOLVES.swing(you.x,you.z,you.face,'burn',2.8,1.7);if(!r)break;lit++}
   if(lit&&t-FLAME.howl>0.7){FLAME.howl=t;SND.howl()}
   n=0;while(n++<6){const k=SKELS.swing(you.x,you.z,you.face,1,2.8,1.7);if(!k)break;SND.rattle();killBeast('skeleton',k.w)}
