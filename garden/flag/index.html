@@ -25,6 +25,7 @@ canvas{display:block}
 #gate{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at 50% 60%,#131a3d 0%,#070a18 70%)}
 #gate h1{font-size:64px;line-height:.95;margin:0 0 10px;font-weight:800;letter-spacing:-.02em;text-align:center}
 #gate p{margin:0 0 30px;opacity:.7;font-size:15px;text-align:center;max-width:280px;line-height:1.45}
+#gatehome{margin-top:18px;color:#fff;opacity:.6;font-size:13px;letter-spacing:.06em;text-decoration:none}
 #gate button{font:inherit;font-size:16px;font-weight:700;padding:16px 34px;border-radius:999px;border:0;background:#f4f2ea;color:#0a0d1f}
 #flash{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;flex-direction:column;background:#000}
 #flash h1{font-size:min(28vw,180px);font-weight:900;letter-spacing:-.04em;margin:0;line-height:1;text-align:center}
@@ -61,7 +62,7 @@ canvas{display:block}
 </style>
 </head>
 <body>
-<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the open middle with the pack round it. Take it, run it home, and hold it on your pad for five seconds while everyone tries to knock it loose. Then the flag lives at your base and the pack guards it for you: hold out to the clock and the round is yours, everyone else comes for it. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button></div>
+<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the open middle with the pack round it. Take it, run it home, and hold it on your pad for three seconds while everyone tries to knock it loose. Then the flag lives at your base and the pack guards it for you: hold out to the clock and the round is yours, everyone else comes for it. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button><a href="../world/" id="gatehome">Back to the garden</a></div>
 <div id="hold"><b></b></div><div id="hud"><div class="tag">The Flag<b id="who">Stand in a circle</b><div id="hearts"></div><canvas id="radar" width="112" height="112"></canvas></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div style="display:flex;gap:8px"><button id="leave">Leave</button><div id="sound" class="off">Tap for sound</div></div><div id="score"></div></div></div>
 <div id="quit"><h1>Leave the match?</h1><p>Your team plays on without you.</p><a href="#" id="quitno" class="big">Keep playing</a><a href="#" id="quitlobby">Back to the lobby</a><a href="../world/">Back to the garden</a></div>
 <div id="card"><b></b><span></span></div><div id="dark"></div>
@@ -322,7 +323,7 @@ function friendTick(dt){for(const k in FRIENDS){const f=FRIENDS[k];if(f.tx==null
 let MODE='lobby';
 const ON_SITE=/(^|\.)deeds\.fun$/.test(location.hostname);
 const BASE=ON_SITE?'/garden/':'https://raw.githubusercontent.com/syzygy007/deeds/main/garden/';
-const FIELD=44,BASE_R=29,ROUND_S=90,WIN_ROUNDS=2,MAX_ROUNDS=3,HEARTS=4,HOLD_S=5;
+const FIELD=44,BASE_R=29,ROUND_S=90,WIN_ROUNDS=2,MAX_ROUNDS=3,HEARTS=4,HOLD_S=3;
 const WALK=6.4,RUN=9.6,BOT_SP=6.5,WOLF_SP=6.9,BIG_SP=2.9,PACK=5;   /* the garden walks 3.4 and runs 5.2; here nearly double, and run is the default */
 const HR=19,HEDGE_H=2.3,HEDGE_T=1.1,GAP_W=2.6,GAPA=GAP_W/HR,GATE_R=21.4,GATE_SIDE=2.5,LEASH=31;   /* the hedge ring, its four gates on the diagonals, the pack's leash from the dais */
 const GATES=[[1,1],[-1,1],[1,-1],[-1,-1]].map(([sx,sz])=>{const a=Math.atan2(sz,sx);return {sx,sz,a,x:Math.cos(a)*HR,z:Math.sin(a)*HR,team:null}});
@@ -422,7 +423,7 @@ function dropFlag(e,why){const f=G.flag;if(f.st!=='carried'||f.by!==e)return;f.s
   if(e===ME_ENT){say('You dropped the flag.',why||'');sendAct({k:'drop',x:f.x,z:f.z})}else say('The flag is loose.',(e.name||'Someone')+' dropped it'+(why?' · '+why:''))}
 function touchFlag(e){if(e.dead>0||e.remote||G.between>0||G.over)return;const f=G.flag;
   if(!e.carry&&f.st!=='carried'&&f.st!=='held'){const d=Math.hypot(e.x-f.x,e.z-f.z);if(d<1.6){if(f.st==='home'&&defends(e))return;if(f.st==='dropped'&&defends(e)){returnFlag(e);return}takeFlag(e)}}
-  if(e.carry){const b=baseOf(e.team);if(Math.hypot(e.x-b.x,e.z-b.z)<3.2){const was=e.hold||0;e.hold=was+DT;if(was===0&&e===ME_ENT){say('Hold it. Five seconds.');SFX.stab()}if(e.hold>=HOLD_S)score(e)}else e.hold=0}else e.hold=0}
+  if(e.carry){const b=baseOf(e.team);if(Math.hypot(e.x-b.x,e.z-b.z)<3.2){const was=e.hold||0;e.hold=was+DT;if(was===0&&e===ME_ENT){say('Hold it. Three seconds.');SFX.stab()}if(e.hold>=HOLD_S)score(e)}else e.hold=0}else e.hold=0}
 function returnFlag(e){const f=G.flag;setFlagHome();sparks(f.x,1.6,f.z,50,e.team.hex);SFX.take();say(e===ME_ENT?'You returned the flag.':e.team.name+' returned the flag.');if(e===ME_ENT)sendAct({k:'return'})}
 function hurt(e,n){if(e.dead>0||e.grace>0||G.between>0||G.over)return;e.hearts-=n;e.grace=1.2;if(e.carry&&e.hold>0){dropFlag(e,'knocked loose');if(e!==ME_ENT)say('Knocked loose.',e.name+' lost the hold')}if(e===ME_ENT){SFX.bite();paintHearts();shake()}if(e.hearts<=0)die(e)}
 function die(e){e.dead=3;if(e===ME_ENT)flameSet(false);dropFlag(e,'the wolves got you');e.hearts=0;if(e.av)e.av.g.rotation.z=1.4;if(e===ME_ENT){SFX.howl(0.6);blackout(1.2);say('The wolves got you. Back to your base.')}}
@@ -582,10 +583,11 @@ let SHAKE=0,SLOW=0,DT=0;function shake(){SHAKE=0.35}
 function holdRing(){const el=$('#hold');if(!el)return;const c=carrier();const p=c&&c.hold>0?Math.min(1,c.hold/HOLD_S):0;if(p<=0){el.style.display='none';return}const col='#'+new THREE.Color(c.team.hex).getHexString();el.style.display='block';el.style.background='conic-gradient('+col+' '+(p*360)+'deg, rgba(255,255,255,.12) 0)';el.firstElementChild.textContent=Math.ceil(HOLD_S-c.hold)}
 
 /* ---------- quit: any time, back to the lobby or the garden ---------- */
-$('#leave').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();$('#quit').style.display='flex'});
+function openQuit(){const lob=MODE==='lobby';$('#quit h1').textContent=lob?'Leave the lobby?':'Leave the match?';$('#quit p').textContent=lob?'Your circle opens up for someone else.':'Your team plays on without you.';$('#quitno').textContent=lob?'Stay':'Keep playing';$('#quitlobby').style.display=lob?'none':'';$('#quit').style.display='flex'}
+$('#leave').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();openQuit()});
 $('#quitno').addEventListener('click',e=>{e.preventDefault();$('#quit').style.display='none'});
 $('#quitlobby').addEventListener('click',e=>{e.preventDefault();location.reload()});
-addEventListener('keydown',e=>{if(e.key==='Escape'&&MODE==='game'){const q=$('#quit');q.style.display=q.style.display==='flex'?'none':'flex'}});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&started){const q=$('#quit');if(q.style.display==='flex')q.style.display='none';else openQuit()}});
 
 /* ---------- the drop: from the plaza into the garden ---------- */
 let ME_ENT=null;
@@ -704,7 +706,7 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(0.05,(now-last)
   PH.stars.material.opacity=0.7+0.15*Math.sin(T*0.7);if(MODE==='lobby'){skyNum.material.opacity=CLOCK.on?0.9:0;floorNum.material.opacity=CLOCK.on?1:0}
   sparkTick(dt);friendTick(dt);renderer.render(scene,camera)}
 requestAnimationFrame(frame);
-$('#walkin').addEventListener('click',()=>{SFX.unlock();$('#gate').style.display='none';started=true;setTimeout(SFX.chip,300);music('lobby')});
+$('#walkin').addEventListener('click',()=>{SFX.unlock();$('#gate').style.display='none';started=true;$('#leave').style.display='';setTimeout(SFX.chip,300);music('lobby')});
 window.__flag={CIRCLES,YOU,CLOCK,join,leave,fillBots,BOTS,drop,seatOf,TEAMS,G,ENT:()=>ENT,me:()=>ME_ENT,startGame,startRound,endRound,score,swing,swingAt,flameCone,strike,hurt,die,respawn,MATCH,mode:()=>MODE,flag:()=>G.flag,wolves:()=>G.wolves,touchFlag,takeFlag,dropFlag,carrier,gameTick,fieldWalk,setWeapon,weapon:()=>WEAPON,burnWolf,floorY,via,inGap,ringClamp,GATES,HR,hearts:()=>HEARTD,dropHeart,radarTick,holdRound,returnFlag,homeTeam:()=>homeTeam(),home:()=>G.home,flameSet,flameStream,flameOn:()=>FLAME_ON,aimCam,running:()=>RUNNING,sim:(secs,step)=>{step=step||0.05;for(let s=0;s<secs;s+=step){T+=step;fieldWalk(step);gameTick(step);sparkTick(step)}},cam:()=>camera.position.toArray(),music:()=>MUSIC};
 </script>
 </body>
