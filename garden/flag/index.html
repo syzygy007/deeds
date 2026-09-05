@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="deeds-flag" content="1.1">
+<meta name="deeds-flag" content="2.0">
 <title>The Flag · DEEDS</title>
 <style>
 html,body{margin:0;height:100%;background:#070a18;overflow:hidden;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#f4f2ea;-webkit-user-select:none;user-select:none}
@@ -37,6 +37,7 @@ canvas{display:block}
 #score{display:none;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
 .sc{font-size:12px;font-weight:800;letter-spacing:.06em;padding:6px 10px;border-radius:999px;opacity:.85}
 .sc.me{outline:2px solid #fff;opacity:1}
+#radar{display:none;width:112px;height:112px;margin-top:10px;border-radius:50%;box-shadow:0 2px 14px rgba(0,0,0,.5)}
 #hearts{display:none;font-size:20px;letter-spacing:.1em;color:#ff4d7d;margin-top:6px;text-shadow:0 2px 8px #000}
 #swing{bottom:calc(env(safe-area-inset-bottom) + 170px);display:none;background:rgba(255,77,125,.22);border-color:rgba(255,77,125,.6)}
 #run{bottom:calc(env(safe-area-inset-bottom) + 14px);display:none}
@@ -59,8 +60,8 @@ canvas{display:block}
 </style>
 </head>
 <body>
-<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the middle, a pack of wolves round it. Bring it home. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button></div>
-<div id="hud"><div class="tag">The Flag<b id="who">Stand in a circle</b><div id="hearts"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div style="display:flex;gap:8px"><button id="leave">Leave</button><div id="sound" class="off">Tap for sound</div></div><div id="score"></div></div></div>
+<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the middle behind a tall hedge with four gates, two wolves at every gate and the pack round the flag. Run your gate, take it, bring it home. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button></div>
+<div id="hud"><div class="tag">The Flag<b id="who">Stand in a circle</b><div id="hearts"></div><canvas id="radar" width="112" height="112"></canvas></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div style="display:flex;gap:8px"><button id="leave">Leave</button><div id="sound" class="off">Tap for sound</div></div><div id="score"></div></div></div>
 <div id="quit"><h1>Leave the match?</h1><p>Your team plays on without you.</p><a href="#" id="quitno" class="big">Keep playing</a><a href="#" id="quitlobby">Back to the lobby</a><a href="../world/">Back to the garden</a></div>
 <div id="card"><b></b><span></span></div><div id="dark"></div>
 <div id="line">Four circles, four teams. Jump in one.<small id="sub">the count starts when someone joins</small></div>
@@ -307,19 +308,28 @@ function friendTick(dt){for(const k in FRIENDS){const f=FRIENDS[k];if(f.tx==null
 
 
 /* ======================================================================
-   THE FLAG · 1.1 · THE MATCH.
-   One flag, in the middle of the garden, on a stone dais, with a pack of wolves round it and the big one on top.
-   Four bases in the four corners. Grab the flag, run it home, that's the round. Whoever holds it is hunted by every
-   wolf on the field and by every other team: burn or cut the carrier and the flag hits the ground.
-   Everyone runs fast (half again the garden's pace) and everyone carries a flamethrower and a sword.
+   THE FLAG · 2.0 · THE GAUNTLET.
+   One flag, in the middle of the garden, on a stone dais, with a pack of wolves round it and the big one on top,
+   and now a tall hedge ring round all of that with four gates on the diagonals, two gate wolves at every gate.
+   Four bases in the four corners, a long way out. The way in: your gate, the pack, the flag. The way home: any gate.
+   Whoever holds the flag lights a beacon the whole field can see and is hunted by the pack as far as the hedge and
+   a bit beyond, and by every other team: burn or cut the carrier and the flag hits the ground. Every wolf you kill
+   drops a heart. Everyone runs by default (nearly double the garden's pace), with a radar in the corner.
    Ninety seconds a round, first team to two rounds, and every player on that team gets 200 gardencoin
    (patch 73: flag_join at the drop, flag_win at the end). Quit any time.
    ====================================================================== */
 let MODE='lobby';
 const ON_SITE=/(^|\.)deeds\.fun$/.test(location.hostname);
 const BASE=ON_SITE?'/garden/':'https://raw.githubusercontent.com/syzygy007/deeds/main/garden/';
-const FIELD=34,BASE_R=24,ROUND_S=90,WIN_ROUNDS=2,MAX_ROUNDS=5,HEARTS=3;
-const WALK=5.1,RUN=7.6,BOT_SP=4.9,WOLF_SP=6.1,BIG_SP=2.6,PACK=8;   /* the garden walks 3.4 and runs 5.2; here half again */
+const FIELD=44,BASE_R=29,ROUND_S=100,WIN_ROUNDS=2,MAX_ROUNDS=5,HEARTS=3;
+const WALK=6.4,RUN=9.6,BOT_SP=7.2,WOLF_SP=7.4,BIG_SP=2.9,PACK=6;   /* the garden walks 3.4 and runs 5.2; here nearly double, and run is the default */
+const HR=19,HEDGE_H=2.3,HEDGE_T=1.1,GAP_W=2.6,GAPA=GAP_W/HR,GATE_R=21.4,GATE_SIDE=2.5,LEASH=31;   /* the hedge ring, its four gates on the diagonals, the pack's leash from the dais */
+const GATES=[[1,1],[-1,1],[1,-1],[-1,-1]].map(([sx,sz])=>{const a=Math.atan2(sz,sx);return {sx,sz,a,x:Math.cos(a)*HR,z:Math.sin(a)*HR,team:null}});
+function inGap(a){for(let i=0;i<4;i++)if(Math.abs(wrapA(a-GATES[i].a))<GAPA)return true;return false}
+/* the hedge is solid: anyone crossing the ring outside a gap is pushed back to the side they came from */
+function ringClamp(e,pad){pad=pad||0.85;const r=Math.hypot(e.x,e.z)||0.01;if(Math.abs(r-HR)<HEDGE_T/2+pad){const a=Math.atan2(e.z,e.x);if(!inGap(a)){const k=(e.x0!=null?(Math.hypot(e.x0,e.z0)<HR):(r<HR))?HR-HEDGE_T/2-pad:HR+HEDGE_T/2+pad;e.x=Math.cos(a)*k;e.z=Math.sin(a)*k}}}
+/* the way through: if the target is on the other side of the hedge, head for the best gate first */
+function via(x,z,tx,tz){const inA=Math.hypot(x,z)<HR,inB=Math.hypot(tx,tz)<HR;if(inA===inB)return [tx,tz];let best=null,bd=1e9;GATES.forEach(g=>{const d=Math.hypot(g.x-x,g.z-z)+Math.hypot(tx-g.x,tz-g.z);if(d<bd){bd=d;best=g}});const gd=Math.hypot(best.x-x,best.z-z);if(gd<1.6){const k=inA?HR+2.2:HR-2.2;return [Math.cos(best.a)*k,Math.sin(best.a)*k]}return [best.x,best.z]}
 const G={on:false,round:0,t:ROUND_S,score:{rose:0,iris:0,oak:0,frost:0},over:false,between:0,winner:null,flag:null,bases:{},wolves:[],paid:null};
 const MATCH={id:null,mine:false};
 function uuid(){if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();const h='0123456789abcdef';let s='';for(let i=0;i<36;i++)s+=(i===8||i===13||i===18||i===23)?'-':(i===14?'4':(i===19?h[8+Math.floor(Math.random()*4)]:h[Math.floor(Math.random()*16)]));return s}
@@ -334,35 +344,42 @@ const FIELDG=new THREE.Group();
 const TORCHES=[];
 function buildField(){
   FIELDG.clear();scene.add(FIELDG);
-  const gtex=new THREE.CanvasTexture(grassCanvas());gtex.wrapS=gtex.wrapT=THREE.RepeatWrapping;gtex.repeat.set(60,60);gtex.encoding=THREE.sRGBEncoding;
+  const gtex=new THREE.CanvasTexture(grassCanvas());gtex.wrapS=gtex.wrapT=THREE.RepeatWrapping;gtex.repeat.set(80,80);gtex.encoding=THREE.sRGBEncoding;
   const lawn=new THREE.MeshStandardMaterial({map:gtex,roughness:1,color:0xc9d6b8});
-  const ground=mesh(new THREE.CircleGeometry(FIELD+30,72),lawn,0,0,0,FIELDG);ground.rotation.x=-Math.PI/2;
-  loadPic('g2-tile-lawn-clipped.webp',im=>{const t=new THREE.Texture(im);t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(26,26);t.encoding=THREE.sRGBEncoding;lawn.map=t;lawn.color.set(0xffffff);lawn.needsUpdate=true});
+  const ground=mesh(new THREE.CircleGeometry(FIELD+40,72),lawn,0,0,0,FIELDG);ground.rotation.x=-Math.PI/2;
+  loadPic('g2-tile-lawn-clipped.webp',im=>{const t=new THREE.Texture(im);t.needsUpdate=true;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(34,34);t.encoding=THREE.sRGBEncoding;lawn.map=t;lawn.color.set(0xffffff);lawn.needsUpdate=true});
   mesh(new THREE.CylinderGeometry(FIELD+1.2,FIELD+1.2,2.2,64,1,true),new THREE.MeshStandardMaterial({color:0x143418,roughness:1,side:THREE.DoubleSide}),0,1.1,0,FIELDG);
-  /* the cross of gravel paths, the diagonals to the bases, the ring round the dais */
+  /* the diagonals from the corners through the gates to the ring round the dais */
   const gravel=mat(0xcfc3a6,1);
-  [[FIELD*2,4.6],[4.6,FIELD*2]].forEach(([w,h])=>{const p=mesh(new THREE.PlaneGeometry(w,h),gravel,0,0.02,0,FIELDG);p.rotation.x=-Math.PI/2});
-  [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([sx,sz])=>{const p=mesh(new THREE.PlaneGeometry(3.2,44),gravel,sx*17,0.02,sz*17,FIELDG);p.rotation.x=-Math.PI/2;p.rotation.z=sx*sz>0?-Math.PI/4:Math.PI/4});
+  [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([sx,sz])=>{const p=mesh(new THREE.PlaneGeometry(3.4,58),gravel,sx*22,0.02,sz*22,FIELDG);p.rotation.x=-Math.PI/2;p.rotation.z=sx*sz>0?-Math.PI/4:Math.PI/4});
   const ringp=mesh(new THREE.RingGeometry(6.2,9.4,64),gravel,0,0.021,0,FIELDG);ringp.rotation.x=-Math.PI/2;
   /* THE DAIS: three stone steps up to the flag, torches round the top */
   const stone=mat(0xd9d4c5,0.6),dark=mat(0x8c8677,0.8);
   mesh(new THREE.CylinderGeometry(6.2,6.4,0.5,48),stone,0,0.25,0,FIELDG);mesh(new THREE.CylinderGeometry(4.9,5.1,0.5,48),dark,0,0.75,0,FIELDG);mesh(new THREE.CylinderGeometry(3.6,3.8,0.5,48),stone,0,1.25,0,FIELDG);
   mesh(new THREE.CylinderGeometry(0.9,1.1,0.9,16),dark,0,1.95,0,FIELDG);
   for(let i=0;i<8;i++){const a=i/8*6.283,x=Math.cos(a)*4.3,z=Math.sin(a)*4.3;mesh(new THREE.CylinderGeometry(0.07,0.1,1.6,8),mat(0x3a2f26,0.8),x,2.3,z,FIELDG);const f=mesh(new THREE.SphereGeometry(0.22,10,8),glow(0xffa030,1),x,3.15,z,FIELDG);const l=new THREE.PointLight(0xff9a3a,0.9,12,2);l.position.set(x,3.2,z);FIELDG.add(l);TORCHES.push({f,l,a})}
-  /* the parterres: low hedge frames with open corners, a bed of flowers in each */
+  /* the parterres inside the ring, on the cardinals between the diagonals */
   const hedge=mat(0x14351a,1);const hb=(x,z,w,d)=>{mesh(new THREE.BoxGeometry(w,0.7,d),hedge,x,0.35,z,FIELDG)};
-  [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([sx,sz])=>{const cx=sx*15,cz=sz*15;
-    hb(cx,cz-8,6,0.6);hb(cx,cz+8,6,0.6);hb(cx-8,cz,0.6,6);hb(cx+8,cz,0.6,6);
-    mesh(new THREE.CylinderGeometry(3.2,3.2,0.25,24),mat(0x3b2a1e,1),cx,0.12,cz,FIELDG);
-    const r=rng(cx*7+cz*3+11);for(let i=0;i<26;i++){const a=r()*6.28,d=r()*2.8;mesh(new THREE.SphereGeometry(0.22+r()*0.16,8,6),mat([0xff6a8a,0xffd166,0xf7f0ff,0xb388ff,0xff8f5a][Math.floor(r()*5)],0.9),cx+Math.cos(a)*d,0.45+r()*0.2,cz+Math.sin(a)*d,FIELDG)}});
-  /* lamps along the paths */
-  const lampM=mat(0x2a2d38,0.6);[12,20,28].forEach(d=>{[[d,2.6],[-d,2.6],[2.6,d],[2.6,-d],[d,-2.6],[-d,-2.6],[-2.6,d],[-2.6,-d]].forEach(([x,z])=>{mesh(new THREE.CylinderGeometry(0.06,0.09,2.6,8),lampM,x,1.3,z,FIELDG);mesh(new THREE.SphereGeometry(0.22,10,8),glow(0xffd28a,0.95),x,2.75,z,FIELDG)})});
-  [[12,2.6],[-12,2.6],[2.6,12],[2.6,-12],[28,2.6],[-28,2.6],[2.6,28],[2.6,-28]].forEach(([x,z])=>{const l=new THREE.PointLight(0xffc98a,0.6,14,2);l.position.set(x,2.6,z);FIELDG.add(l)});
-  /* cypress beyond the wall, the garden's own if it lands */
-  const cyp=[];for(let i=0;i<30;i++){const a=i/30*6.28,d=FIELD+3.5;cyp.push([Math.cos(a)*d,Math.sin(a)*d])}
-  const cone=mat(0x173d1d,1);const cypG=[];cyp.forEach(([x,z])=>{cypG.push(mesh(new THREE.ConeGeometry(1.1,7.5,9),cone,x,3.75,z,FIELDG))});
+  [[13,0],[-13,0],[0,13],[0,-13]].forEach(([cx,cz])=>{
+    hb(cx,cz-3.6,5,0.5);hb(cx,cz+3.6,5,0.5);hb(cx-3.6,cz,0.5,5);hb(cx+3.6,cz,0.5,5);
+    mesh(new THREE.CylinderGeometry(2.6,2.6,0.25,24),mat(0x3b2a1e,1),cx,0.12,cz,FIELDG);
+    const r=rng(cx*7+cz*3+11);for(let i=0;i<22;i++){const a=r()*6.28,d=r()*2.2;mesh(new THREE.SphereGeometry(0.22+r()*0.16,8,6),mat([0xff6a8a,0xffd166,0xf7f0ff,0xb388ff,0xff8f5a][Math.floor(r()*5)],0.9),cx+Math.cos(a)*d,0.45+r()*0.2,cz+Math.sin(a)*d,FIELDG)}});
+  /* THE HEDGE RING: a tall hedge round the heart of the garden, four gates on the diagonals, each lit in the colour of the base beyond it */
+  const tall=new THREE.MeshStandardMaterial({color:0x0f2c15,roughness:1});const N=64;
+  for(let i=0;i<N;i++){const a0=i/N*6.283,a1=(i+1)/N*6.283,am=(a0+a1)/2;if(inGap(am))continue;const len=(a1-a0)*HR+0.06;const b=mesh(new THREE.BoxGeometry(HEDGE_T,HEDGE_H,len),tall,Math.cos(am)*HR,HEDGE_H/2,Math.sin(am)*HR,FIELDG);b.rotation.y=-am;
+    const top=mesh(new THREE.BoxGeometry(HEDGE_T+0.25,0.28,len),mat(0x1b4a22,1),Math.cos(am)*HR,HEDGE_H+0.1,Math.sin(am)*HR,FIELDG);top.rotation.y=-am}
+  GATES.forEach(g=>{const t=TEAMS.find(tt=>Math.sign(tt.x)===g.sx&&Math.sign(tt.z)===g.sz)||TEAMS[0];g.team=t;const px=-Math.sin(g.a),pz=Math.cos(g.a);
+    [-1,1].forEach(k=>{const x=g.x+px*k*(GAP_W+0.55),z=g.z+pz*k*(GAP_W+0.55);mesh(new THREE.BoxGeometry(0.9,HEDGE_H+1.1,0.9),stone,x,(HEDGE_H+1.1)/2,z,FIELDG);mesh(new THREE.BoxGeometry(1.15,0.3,1.15),dark,x,HEDGE_H+1.25,z,FIELDG);mesh(new THREE.SphereGeometry(0.24,12,8),glow(t.hex,0.95),x,HEDGE_H+1.7,z,FIELDG);const l=new THREE.PointLight(t.hex,1.2,13,2);l.position.set(x,HEDGE_H+1.7,z);FIELDG.add(l)});
+    const arch=mesh(new THREE.BoxGeometry(GAP_W*2+2,0.4,0.6),dark,g.x,HEDGE_H+1.1,g.z,FIELDG);arch.rotation.y=-g.a+Math.PI/2;
+    const sign=nameSprite(t.name+' gate',t.hex);sign.scale.set(3.4,0.85,1);sign.position.set(Math.cos(g.a)*(HR+1.2),HEDGE_H+2.3,Math.sin(g.a)*(HR+1.2));FIELDG.add(sign)});
+  /* lamps along the diagonals, outside the ring */
+  const lampM=mat(0x2a2d38,0.6);[[24,1.9],[24,-1.9],[30,1.9],[30,-1.9]].forEach(([d,o])=>{[[1,1],[-1,1],[1,-1],[-1,-1]].forEach(([sx,sz])=>{const a=Math.atan2(sz,sx),x=Math.cos(a)*d-Math.sin(a)*o,z=Math.sin(a)*d+Math.cos(a)*o;mesh(new THREE.CylinderGeometry(0.06,0.09,2.6,8),lampM,x,1.3,z,FIELDG);mesh(new THREE.SphereGeometry(0.22,10,8),glow(0xffd28a,0.95),x,2.75,z,FIELDG);if(o>0){const l=new THREE.PointLight(0xffc98a,0.55,13,2);l.position.set(x,2.6,z);FIELDG.add(l)}})});
+  /* cover on the lawns: cypress clusters between the diagonals, and the cypress wall beyond the hedge at the edge */
+  const cone=mat(0x173d1d,1);const cyp=[];for(let i=0;i<34;i++){const a=i/34*6.28,d=FIELD+3.5;cyp.push([Math.cos(a)*d,Math.sin(a)*d])}
+  const rr2=rng(77);[0,Math.PI/2,Math.PI,-Math.PI/2].forEach(a0=>{for(let i=0;i<7;i++){const a=a0+(rr2()-0.5)*0.9,d=25+rr2()*13;cyp.push([Math.cos(a)*d,Math.sin(a)*d])}});
+  const cypG=[];cyp.forEach(([x,z])=>{cypG.push(mesh(new THREE.ConeGeometry(1.1,7.5,9),cone,x,3.75,z,FIELDG))});
   loadPic('g2-cypress-column.webp',im=>{const t=new THREE.Texture(im);t.needsUpdate=true;t.encoding=THREE.sRGBEncoding;const sm=new THREE.SpriteMaterial({map:t,transparent:true,alphaTest:0.4});cypG.forEach((m,i)=>{m.visible=false;const s=new THREE.Sprite(sm);s.scale.set(3.6,9.5,1);s.position.set(cyp[i][0],4.7,cyp[i][1]);FIELDG.add(s)})});
-  scene.background=new THREE.Color(0x1a1a3a);scene.fog=new THREE.FogExp2(0x1a1a3a,0.011);
+  scene.background=new THREE.Color(0x1a1a3a);scene.fog=new THREE.FogExp2(0x1a1a3a,0.0085);
   moon.intensity=0.5;moon.color.set(0xd8dcff);
   mesh(new THREE.SphereGeometry(9,24,16),new THREE.MeshBasicMaterial({color:0xe8ecff,fog:false}),-160,180,-260,FIELDG);
   /* the bases in the corners */
@@ -376,27 +393,30 @@ function buildField(){
   const fg=new THREE.Group();mesh(new THREE.CylinderGeometry(0.035,0.045,2.2,8),mat(0xf2e6c8,0.6),0,1.1,0,fg);mesh(new THREE.SphereGeometry(0.09,10,8),glow(0xffd066,1),0,2.25,0,fg);
   const cloth=mesh(new THREE.PlaneGeometry(1.4,0.85,14,6),new THREE.MeshStandardMaterial({color:0xfff6e0,emissive:0xffd066,emissiveIntensity:0.35,side:THREE.DoubleSide,roughness:0.9}),0.02,1.7,0,fg);cloth.geometry.translate(0.7,0,0);
   const fl=new THREE.PointLight(0xffd066,1.2,10,2);fl.position.y=2;fg.add(fl);FIELDG.add(fg);
-  G.flag={g:fg,cloth,st:'home',by:null,x:0,z:0,drop:0};setFlagHome()}
+  /* THE BEACON: a column of light over the flag that the whole field can see, gold when it is free, the carrier's colour when it is taken */
+  const beacon=mesh(new THREE.CylinderGeometry(0.28,1.1,60,14,1,true),new THREE.MeshBasicMaterial({color:0xffd066,transparent:true,opacity:0.16,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}),0,30,0,FIELDG);
+  G.flag={g:fg,cloth,st:'home',by:null,x:0,z:0,drop:0,beacon};setFlagHome()}
 function setFlagHome(){const f=G.flag;f.st='home';f.by=null;f.x=0;f.z=0;f.g.position.set(0,2.4,0);f.g.rotation.set(0,0,0);f.g.scale.setScalar(1)}
 function flagTick(t,dt){const f=G.flag;const pos=f.cloth.geometry.attributes.position;for(let i=0;i<pos.count;i++){const x=pos.getX(i);pos.setZ(i,Math.sin(t*4+x*3)*0.07*x/1.4)}pos.needsUpdate=true;
   if(f.st==='carried'&&f.by){f.x=f.by.x;f.z=f.by.z;f.g.position.set(f.by.x,f.by.y+1.8,f.by.z);f.g.rotation.y=f.by.face+Math.PI;f.g.rotation.z=0.3;f.g.scale.setScalar(0.85)}
-  else if(f.st==='dropped'){f.g.position.set(f.x,floorY(f.x,f.z)+0.3+Math.abs(Math.sin(t*3))*0.08,f.z);f.g.rotation.z=1.1;f.g.scale.setScalar(1);f.drop-=dt;if(f.drop<=0){setFlagHome();sparks(0,3,0,40,0xffd066);say('The flag is back on the dais.')}}
+  else if(f.st==='dropped'){f.g.position.set(f.x,floorY(f.x,f.z)+0.3+Math.abs(Math.sin(t*3))*0.08,f.z);f.g.rotation.z=1.1;f.g.scale.setScalar(1);f.drop-=dt;if(f.drop<=0){setFlagHome();sparks(0,3,0,40,0xffd066);SFX.bell();say('The flag is back on the dais.')}}
   else if(f.st==='home'){f.g.position.y=2.4+Math.sin(t*1.3)*0.05}
-  TORCHES.forEach(o=>{o.f.scale.setScalar(0.8+0.35*Math.abs(Math.sin(t*7+o.a*3)));o.l.intensity=0.8+0.4*Math.sin(t*9+o.a*5)})}
+  if(f.beacon){const bx=f.st==='held'?f.g.position.x:f.x,bz=f.st==='held'?f.g.position.z:f.z;f.beacon.position.set(bx,30,bz);f.beacon.material.color.set(f.st==='carried'&&f.by?f.by.team.hex:0xffd066);f.beacon.material.opacity=(f.st==='carried'?0.22:0.14)+0.05*Math.sin(t*5);f.beacon.visible=f.st!=='held'}
+  heartTick(t,dt);  TORCHES.forEach(o=>{o.f.scale.setScalar(0.8+0.35*Math.abs(Math.sin(t*7+o.a*3)));o.l.intensity=0.8+0.4*Math.sin(t*9+o.a*5)})}
 
 /* ---------- runners: you, bots, friends ---------- */
 const ENT=[];
 function baseOf(team){return G.bases[team.id]}
 function spawnAt(e,team){const b=baseOf(team);const a=Math.random()*6.28;e.x=b.x+Math.cos(a)*2;e.z=b.z+Math.sin(a)*2;e.y=0;e.vy=0;e.face=Math.atan2(-(0-e.x),-(0-e.z));e.hearts=HEARTS;e.dead=0;e.grace=2;e.carry=false;e.stun=0;e.burn=0}
-function clampField(e){const rr=Math.hypot(e.x,e.z);if(rr>FIELD-0.8){e.x*=(FIELD-0.8)/rr;e.z*=(FIELD-0.8)/rr}
+function clampField(e){const rr=Math.hypot(e.x,e.z);if(rr>FIELD-0.8){e.x*=(FIELD-0.8)/rr;e.z*=(FIELD-0.8)/rr}ringClamp(e);
   const d=Math.hypot(e.x,e.z);if(d<1.35){const dd=d||0.01;e.x=(e.x||0.01)/dd*1.35;e.z=e.z/dd*1.35}
   for(const id in G.bases){const b=G.bases[id];const dx=e.x-b.x,dz=e.z-b.z,bd=Math.hypot(dx,dz);if(bd<0.5){e.x=b.x+dx/(bd||1)*0.5;e.z=b.z+dz/(bd||1)*0.5}}}
 function floorY(x,z){const d=Math.hypot(x,z);return d<3.8?1.5:d<5.1?1:d<6.4?0.5:0}
 function carrier(){return G.flag.st==='carried'?G.flag.by:null}
 function takeFlag(e){const f=G.flag;if(f.st==='carried')return;f.st='carried';f.by=e;e.carry=true;sparks(e.x,1.6,e.z,60,0xffd066);SFX.take();
-  if(e===ME_ENT){say('You have the flag. Run home.','every wolf is on you now');sendAct({k:'take'})}else say((e.name||'Someone')+' of '+e.team.name+' has the flag.','')}
+  SFX.horn(e.team.hex);if(e===ME_ENT){say('You have the flag. Run home.','the pack is on you. any gate is a way out');sendAct({k:'take'})}else{say((e.name||'Someone')+' of '+e.team.name+' has the flag.','the beacon is '+e.team.name.toLowerCase());if(YOU.team&&e.team.id!==YOU.team.t.id)card(e.team.name+' has it.','burn the carrier and it drops',1300)}}
 function dropFlag(e,why){const f=G.flag;if(f.st!=='carried'||f.by!==e)return;f.st='dropped';f.by=null;f.x=e.x;f.z=e.z;f.drop=8;e.carry=false;
-  if(e===ME_ENT){say('You dropped the flag.',why||'');sendAct({k:'drop',x:f.x,z:f.z})}else say((e.name||'Someone')+' dropped the flag.',why||'')}
+  if(e===ME_ENT){say('You dropped the flag.',why||'');sendAct({k:'drop',x:f.x,z:f.z})}else say('The flag is loose.',(e.name||'Someone')+' dropped it'+(why?' · '+why:''))}
 function touchFlag(e){if(e.dead>0||e.remote||G.between>0||G.over)return;const f=G.flag;
   if(!e.carry&&f.st!=='carried'&&f.st!=='held'){const d=Math.hypot(e.x-f.x,e.z-f.z);if(d<1.6)takeFlag(e)}
   if(e.carry){const b=baseOf(e.team);if(Math.hypot(e.x-b.x,e.z-b.z)<3.2)score(e)}}
@@ -435,19 +455,37 @@ function wolfBody(big){const g=new THREE.Group();
   const arms=[];[-1,1].forEach(k=>{const up=new THREE.Group();up.position.set(k*0.5,0.95,0);torso.add(up);seg(0.13,0.1,0.75,-0.37,0,fur,up,0);const lo=new THREE.Group();lo.position.set(0,-0.75,0);up.add(lo);seg(0.1,0.08,0.7,-0.35,0,dark,lo,0);for(let c=0;c<3;c++){const cl=new THREE.Mesh(new THREE.ConeGeometry(0.03,0.22,5),mat(0xe8e0cc,0.4));cl.position.set((c-1)*0.07,-0.78,-0.05);cl.rotation.x=Math.PI;lo.add(cl)}up.rotation.x=-0.4;up.rotation.z=k*0.25;arms.push({up,lo})});
   const tail=new THREE.Group();tail.position.set(0,0.1,0.35);torso.add(tail);seg(0.09,0.05,0.8,0,0.35,fur,tail);tail.rotation.x=-1.1;
   return {g,legs,arms,head,tail,torso}}
-function makeWolf(big,i){const b=wolfBody(big);FIELDG.add(b.g);const a=big?0:i/PACK*6.283;const w=Object.assign(b,{big,x:big?0:Math.cos(a)*7.4,z:big?0:Math.sin(a)*7.4,hp:big?8:3,alive:true,bite:0,ph:Math.random()*6,orbit:a,respawn:0,speed:big?BIG_SP:WOLF_SP,burn:0,fire:null,dir:i%2?1:-1,lunge:0});w.g.position.set(w.x,floorY(w.x,w.z),w.z);G.wolves.push(w);return w}
-function wolfTarget(w){/* the carrier first, wherever they are; else anyone close */const c=carrier();if(c&&c.dead<=0)return c;let tgt=null,td=w.big?7:10;ENT.forEach(e=>{if(e.dead>0)return;const d=Math.hypot(e.x-w.x,e.z-w.z);if(d<td){td=d;tgt=e}});return tgt}
+function wolfHome(w){if(w.kind==='gate')return [w.post.x,w.post.z];if(w.big)return [0,0];const a=w.orbit;return [Math.cos(a)*7.4,Math.sin(a)*7.4]}
+function makeWolf(kind,i,post){const big=kind==='big';const b=wolfBody(big);FIELDG.add(b.g);const a=big?0:i/PACK*6.283;
+  const w=Object.assign(b,{kind,big,post:post||null,x:0,z:0,hp:big?8:3,alive:true,bite:0,ph:Math.random()*6,orbit:a,respawn:0,speed:big?BIG_SP:(kind==='gate'?WOLF_SP*0.92:WOLF_SP),burn:0,fire:null,dir:i%2?1:-1,lunge:0,awake:0});
+  const h=wolfHome(w);w.x=h[0];w.z=h[1];w.g.position.set(w.x,floorY(w.x,w.z),w.z);G.wolves.push(w);return w}
+function wolfReset(w){w.alive=true;w.hp=w.big?8:3;w.g.visible=true;w.burn=0;w.awake=0;if(w.fire){w.fire.forEach(m=>w.g.remove(m));w.fire=null}const h=wolfHome(w);if(w.kind==='pack')w.orbit=Math.random()*6.28;const hh=wolfHome(w);w.x=hh[0];w.z=hh[1]}
+/* HEARTS: every wolf you kill drops one; walk over it with a heart missing and it is yours */
+const HEARTD=[];
+function dropHeart(x,z){const g=new THREE.Group();g.position.set(x,0,z);FIELDG.add(g);mesh(new THREE.OctahedronGeometry(0.3),glow(0xff4d7d,0.95),0,0.9,0,g);mesh(new THREE.OctahedronGeometry(0.16),glow(0xffffff,0.9),0,0.9,0,g);HEARTD.push({g,x,z,t:15,ph:Math.random()*6})}
+function heartTick(t,dt){for(let i=HEARTD.length-1;i>=0;i--){const h=HEARTD[i];h.t-=dt;h.ph+=dt;h.g.rotation.y=h.ph*2;h.g.position.y=floorY(h.x,h.z)+Math.sin(h.ph*3)*0.12;h.g.scale.setScalar(h.t<2?Math.max(0.05,h.t/2):1);
+    let took=null;ENT.forEach(e=>{if(took||e.dead>0||e.remote||e.hearts>=HEARTS)return;if(Math.hypot(e.x-h.x,e.z-h.z)<1.15)took=e});
+    if(took){took.hearts=Math.min(HEARTS,took.hearts+1);sparks(h.x,1.1,h.z,30,0xff4d7d);if(took===ME_ENT){SFX.take();paintHearts();say('A heart.','')}}
+    if(took||h.t<=0){FIELDG.remove(h.g);HEARTD.splice(i,1)}}}
+function clearHearts(){HEARTD.forEach(h=>FIELDG.remove(h.g));HEARTD.length=0}
+function wolfTarget(w){const c=carrier();
+  if(w.kind==='gate'){/* the gate wolves bite anyone who comes to their gate, carrier or not, and never leave it far */
+    let tgt=null,td=w.awake>0?13:9;const hx=w.post.x,hz=w.post.z;ENT.forEach(e=>{if(e.dead>0)return;const d=Math.hypot(e.x-hx,e.z-hz);if(d<td){td=d;tgt=e}});return tgt}
+  /* the pack: the carrier first, as far as the leash; else anyone close to the heart */
+  if(c&&c.dead<=0&&Math.hypot(w.x,w.z)<LEASH)return c;let tgt=null,td=w.big?7:10;ENT.forEach(e=>{if(e.dead>0)return;const d=Math.hypot(e.x-w.x,e.z-w.z);if(d<td&&Math.hypot(e.x,e.z)<HR+3){td=d;tgt=e}});return tgt}
 function wolfTick(t,dt){const f=G.flag;const gx=f.st==='dropped'?f.x:0,gz=f.st==='dropped'?f.z:0;   /* the pack guards the flag where it lies, the dais otherwise */
   G.wolves.forEach(w=>{
-    if(!w.alive){w.respawn-=dt;w.g.visible=false;if(w.respawn<=0){w.alive=true;w.hp=w.big?8:3;w.g.visible=true;const a=Math.random()*6.28;w.x=w.big?0:Math.cos(a)*7.4;w.z=w.big?0:Math.sin(a)*7.4;sparks(w.x,0.6,w.z,20,0xff3a3a)}return}
-    if(w.burn>0){w.burn-=dt;if(w.fire)w.fire.forEach((m,i)=>{m.position.y=0.45+Math.abs(Math.sin(t*9+i))*0.5;m.scale.setScalar(0.7+Math.random()*0.6)});const dx=w.x-ME_ENT.x,dz=w.z-ME_ENT.z,d=Math.hypot(dx,dz)||1;w.x+=dx/d*8*dt;w.z+=dz/d*8*dt;w.g.rotation.y=Math.atan2(dx,dz)+Math.PI;
+    if(!w.alive){w.respawn-=dt;w.g.visible=false;if(w.respawn<=0){wolfReset(w);sparks(w.x,0.6,w.z,20,0xff3a3a)}return}
+    if(w.burn>0){w.burn-=dt;if(w.fire)w.fire.forEach((m,i)=>{m.position.y=0.45+Math.abs(Math.sin(t*9+i))*0.5;m.scale.setScalar(0.7+Math.random()*0.6)});const dx=w.x-ME_ENT.x,dz=w.z-ME_ENT.z,d=Math.hypot(dx,dz)||1;w.x0=w.x;w.z0=w.z;w.x+=dx/d*8*dt;w.z+=dz/d*8*dt;ringClamp(w,0.5);w.g.rotation.y=Math.atan2(dx,dz)+Math.PI;
       if(w.burn<=0){if(w.fire)w.fire.forEach(m=>w.g.remove(m));w.fire=null;killWolf(w,true)}w.g.position.set(w.x,floorY(w.x,w.z),w.z);return}
     let vx=0,vz=0;const c=carrier();const tgt=(G.between>0||G.over)?null:wolfTarget(w);
     const chase=tgt&&(c===tgt||!w.big||Math.hypot(w.x,w.z)<8);
-    if(chase){const dx=tgt.x-w.x,dz=tgt.z-w.z,d=Math.hypot(dx,dz)||1;const sp=(c===tgt?w.speed*1.08:w.speed);if(d>1.1){vx=dx/d*sp;vz=dz/d*sp}
-      w.bite-=dt;if(d<1.3&&w.bite<=0){w.bite=w.big?1.5:1.0;hurt(tgt,w.big?2:1);w.lunge=0.25;SFX.snarl()}}
-    else{const R=w.big?1.6:(f.st==='dropped'?4.5:7.4);w.orbit+=dt*(w.big?0.35:0.5)*w.dir;const tx=gx+Math.cos(w.orbit)*R,tz=gz+Math.sin(w.orbit)*R;const dx=tx-w.x,dz=tz-w.z,d=Math.hypot(dx,dz)||1;const sp=Math.min(w.speed*0.55,d*2.2);vx=dx/d*sp;vz=dz/d*sp}
-    w.x+=vx*dt;w.z+=vz*dt;const rr=Math.hypot(w.x,w.z);if(rr>FIELD-1){w.x*=(FIELD-1)/rr;w.z*=(FIELD-1)/rr}
+    w.awake=Math.max(0,w.awake-dt);
+    if(chase){if(w.kind==='gate'&&w.awake<=0)SFX.snarl();w.awake=2.5;const [ax,az]=via(w.x,w.z,tgt.x,tgt.z);const dx=ax-w.x,dz=az-w.z,d=Math.hypot(dx,dz)||1;const dd=Math.hypot(tgt.x-w.x,tgt.z-w.z);const sp=(c===tgt?w.speed*1.06:w.speed);if(dd>1.1){vx=dx/d*sp;vz=dz/d*sp}
+      w.bite-=dt;if(dd<1.3&&w.bite<=0){w.bite=w.big?1.5:1.0;hurt(tgt,w.big?2:1);w.lunge=0.25;SFX.snarl()}}
+    else if(w.kind==='gate'){/* back to the post, then wait there, breathing */const dx=w.post.x-w.x,dz=w.post.z-w.z,d=Math.hypot(dx,dz)||1;if(d>0.4){const [ax,az]=via(w.x,w.z,w.post.x,w.post.z);const ex=ax-w.x,ez=az-w.z,ed=Math.hypot(ex,ez)||1;const sp=Math.min(w.speed*0.6,d*2);vx=ex/ed*sp;vz=ez/ed*sp}else{w.g.rotation.y=Math.atan2(-w.post.x,-w.post.z)+Math.PI+Math.sin(t*0.6+w.orbit)*0.3}}
+    else{const R=w.big?1.6:(f.st==='dropped'?4.5:7.4);w.orbit+=dt*(w.big?0.35:0.5)*w.dir;const tx=gx+Math.cos(w.orbit)*R,tz=gz+Math.sin(w.orbit)*R;const far=Math.hypot(w.x-gx,w.z-gz)>R+3;const [ax,az]=far?via(w.x,w.z,gx,gz):[tx,tz];const dx=ax-w.x,dz=az-w.z,d=Math.hypot(dx,dz)||1;const sp=far?w.speed*0.8:Math.min(w.speed*0.55,d*2.2);vx=dx/d*sp;vz=dz/d*sp}
+    w.x0=w.x;w.z0=w.z;w.x+=vx*dt;w.z+=vz*dt;const rr=Math.hypot(w.x,w.z);if(rr>FIELD-1){w.x*=(FIELD-1)/rr;w.z*=(FIELD-1)/rr}ringClamp(w,0.5);
     const mv=Math.hypot(vx,vz);if(mv>0.05)w.g.rotation.y=Math.atan2(-vx,-vz)+Math.PI;
     w.lunge=Math.max(0,w.lunge-dt);
     w.ph+=dt*(2+mv*2.2);const k=Math.min(1,mv/3);
@@ -455,7 +493,7 @@ function wolfTick(t,dt){const f=G.flag;const gx=f.st==='dropped'?f.x:0,gz=f.st==
       w.g.position.y=floorY(w.x,w.z)+Math.abs(Math.sin(w.ph))*0.12*k;w.tail.rotation.x=-0.6+Math.sin(t*4)*0.15;w.tail.rotation.y=Math.sin(t*3.1)*0.25;w.head.rotation.x=(w.lunge>0?-0.5:0)+(c?0.1:0);w.neck.rotation.x=1.15+(w.lunge>0?-0.4:0)}
     else{const s1=Math.sin(w.ph*0.7);w.legs[0].up.rotation.x=s1*0.5*k;w.legs[1].up.rotation.x=-s1*0.5*k;w.legs.forEach((l,i)=>{l.lo.rotation.x=Math.max(0,(i?-s1:s1))*0.6*k});w.arms[0].up.rotation.x=-0.4-s1*0.4*k;w.arms[1].up.rotation.x=-0.4+s1*0.4*k;w.torso.rotation.x=0.3+(w.lunge>0?0.5:0)+Math.sin(t*1.7)*0.04;w.head.rotation.x=w.lunge>0?-0.6:Math.sin(t*0.9)*0.1;w.g.position.y=floorY(w.x,w.z)+Math.abs(Math.sin(w.ph*0.7))*0.08*k}
     w.g.position.x=w.x;w.g.position.z=w.z})}
-function killWolf(w,fire){if(!w.alive)return;w.alive=false;w.respawn=w.big?30:14;w.hp=0;SFX.howl(0.9);sparks(w.x,0.8,w.z,60,fire?0xff8a2a:0xff6a3a);say(w.big?'The big one goes down.':'A wolf goes down.')}
+function killWolf(w,fire){if(!w.alive)return;w.alive=false;w.respawn=w.big?30:(w.kind==='gate'?22:14);w.hp=0;SFX.howl(0.9);sparks(w.x,0.8,w.z,60,fire?0xff8a2a:0xff6a3a);dropHeart(w.x,w.z);if(w.big)dropHeart(w.x+1,w.z);say(w.big?'The big one goes down.':(w.kind==='gate'?'A gate wolf goes down.':'A wolf goes down.'),'it dropped a heart')}
 function hitWolf(w,n){if(!w.alive)return;w.hp-=n;w.lunge=0.15;sparks(w.x,0.8,w.z,12,0xff3a3a);if(w.hp<=0)killWolf(w,false);else SFX.knock()}
 function burnWolf(w){if(!w.alive||w.burn>0)return;w.burn=1.5;w.fire=[];for(let i=0;i<6;i++){w.fire.push(mesh(new THREE.SphereGeometry((0.12+Math.random()*0.1)*(w.big?1.8:1),6,5),glow(i%2?0xffa030:0xff4a1a,0.95),(Math.random()-0.5)*0.5,0.5+Math.random()*0.6,(Math.random()-0.5)*0.8,w.g))}SFX.howl(0.7)}
 
@@ -493,8 +531,8 @@ function runnerTick(dt){const c=carrier();ENT.forEach(e=>{if(!e.bot)return;
   let aim=null,ad=e.carry?2.2:4.2;G.wolves.forEach(w=>{if(!w.alive||w.burn>0)return;const d=Math.hypot(w.x-e.x,w.z-e.z);if(d<ad){ad=d;aim=w}});if(c&&c.team.id!==e.team.id&&c!==e){const d=Math.hypot(c.x-e.x,c.z-e.z);if(d<4.2){aim=c;ad=d}}
   if(aim&&e.swcd<=0&&e.stun<=0&&goal!=='wait'){e.swcd=1.1;e.swing=0.3;e.face=Math.atan2(-(aim.x-e.x),-(aim.z-e.z));flameCone(e)}
   if(e.stun>0){e.av.g.position.set(e.x,e.y,e.z);return}
-  e.zig+=dt*1.7;const dx=tx-e.x,dz=tz-e.z,L=Math.hypot(dx,dz)||1;const sp=goal==='home'?BOT_SP*1.05:BOT_SP;const zz=goal==='hunt'||goal==='home'?0.15:0.3;const sx=-dz/L*Math.sin(e.zig)*zz,sz=dx/L*Math.sin(e.zig)*zz;
-  if(L>(goal==='escort'?0.8:0.5)){const vx=(dx/L+sx)*sp,vz=(dz/L+sz)*sp;e.x+=vx*dt;e.z+=vz*dt;if(!aim)e.face=Math.atan2(-vx,-vz);e.ph+=dt*8;const sw=Math.sin(e.ph)*0.75;e.av.legL.rotation.x=sw;e.av.legR.rotation.x=-sw;e.av.armL.rotation.x=-sw*0.8;e.av.armR.rotation.x=e.swing>0?-1.5:sw*0.8}
+  e.zig+=dt*1.7;const [vx0,vz0]=via(e.x,e.z,tx,tz);const dx=vx0-e.x,dz=vz0-e.z,L=Math.hypot(dx,dz)||1;const sp=goal==='home'?BOT_SP*1.05:BOT_SP;const zz=goal==='hunt'||goal==='home'?0.15:0.3;const sx=-dz/L*Math.sin(e.zig)*zz,sz=dx/L*Math.sin(e.zig)*zz;
+  e.x0=e.x;e.z0=e.z;if(L>(goal==='escort'?0.8:0.5)){const vx=(dx/L+sx)*sp,vz=(dz/L+sz)*sp;e.x+=vx*dt;e.z+=vz*dt;if(!aim)e.face=Math.atan2(-vx,-vz);e.ph+=dt*8;const sw=Math.sin(e.ph)*0.75;e.av.legL.rotation.x=sw;e.av.legR.rotation.x=-sw;e.av.armL.rotation.x=-sw*0.8;e.av.armR.rotation.x=e.swing>0?-1.5:sw*0.8}
   else{e.av.legL.rotation.x=e.av.legR.rotation.x=0;e.av.armL.rotation.x=0;e.av.armR.rotation.x=e.swing>0?-1.5:0}
   clampField(e);e.y=floorY(e.x,e.z);touchFlag(e);e.av.g.position.set(e.x,e.y,e.z);e.av.g.rotation.y=e.face})}
 
@@ -503,18 +541,18 @@ function say(a,b){line(a,b||'')}
 function paintHearts(){const el=$('#hearts');if(!el||!ME_ENT)return;let s='';for(let i=0;i<HEARTS;i++)s+=i<ME_ENT.hearts?'\u2665 ':'\u2661 ';el.textContent=s.trim()}
 function paintScore(){const el=$('#score');if(!el)return;el.innerHTML='';TEAMS.forEach(t=>{const d=document.createElement('span');d.className='sc'+(YOU.team&&YOU.team.t.id===t.id?' me':'');d.style.background='#'+new THREE.Color(t.hex).getHexString();d.style.color=t.id==='frost'?'#0a0d1f':'#fff';d.textContent=t.name+' '+G.score[t.id];el.appendChild(d)})}
 function paintClock(){const v=Math.max(0,Math.ceil(G.t));const m=Math.floor(v/60),s=v%60;$('#who').textContent='Round '+G.round+' \u00b7 '+m+':'+(s<10?'0':'')+s}
-function startRound(){G.round++;G.t=ROUND_S;G.between=3.2;setFlagHome();ENT.forEach(e=>{e.carry=false;respawn(e)});
-  G.wolves.forEach(w=>{w.alive=true;w.hp=w.big?8:3;w.g.visible=true;w.burn=0;if(w.fire){w.fire.forEach(m=>w.g.remove(m));w.fire=null}const a=Math.random()*6.28;w.x=w.big?0:Math.cos(a)*7.4;w.z=w.big?0:Math.sin(a)*7.4});
-  card('Round '+G.round+'.',G.round===1?'The flag is on the dais. Bring it home.':leaderWords(),2600);paintClock();paintScore();paintHearts();SFX.stab()}
+function startRound(){G.round++;G.t=ROUND_S;G.between=2.4;setFlagHome();clearHearts();ENT.forEach(e=>{e.carry=false;respawn(e)});
+  G.wolves.forEach(wolfReset);
+  card('Round '+G.round+'.',G.round===1?'Through your gate, past the pack, take the flag, bring it home.':leaderWords(),2000);paintClock();paintScore();paintHearts();SFX.stab()}
 function leaderWords(){const best=Math.max(...TEAMS.map(t=>G.score[t.id]));const who=TEAMS.filter(t=>G.score[t.id]===best);return best===0?'No one has a round yet.':(who.length===1?who[0].name+' leads.':'It is level.')}
 function score(e){if(G.between>0||G.over)return;const team=e.team;e.carry=false;G.score[team.id]++;sparks(e.x,1.5,e.z,140,team.hex);SFX.score();
   G.flag.st='held';G.flag.by=null;G.flag.g.position.set(baseOf(team).x,3.4,baseOf(team).z);G.flag.g.rotation.set(0,0,0);G.flag.g.scale.setScalar(1);
   const mine=YOU.team&&team.id===YOU.team.t.id;say(mine?'Round to '+team.name+'. That was yours.':team.name+' took the round.');
   if(e===ME_ENT)sendAct({k:'score',team:team.id});endRound(team)}
-function endRound(winner){G.between=3.6;paintScore();
+function endRound(winner){G.between=2.8;paintScore();
   if(winner&&G.score[winner.id]>=WIN_ROUNDS){setTimeout(()=>endMatch(winner),1500);return}
   if(G.round>=MAX_ROUNDS){const best=Math.max(...TEAMS.map(t=>G.score[t.id]));const who=TEAMS.filter(t=>G.score[t.id]===best);setTimeout(()=>endMatch(best>0&&who.length===1?who[0]:null),1500);return}
-  card(winner?winner.name+' takes round '+G.round+'.':'Time. Nobody brought it home.','',2200);setTimeout(startRound,2600)}
+  card(winner?winner.name+' takes round '+G.round+'.':'Time. Nobody brought it home.','',1800);setTimeout(startRound,2000)}
 function endMatch(winner){if(G.over)return;G.over=true;G.winner=winner;G.between=99;SFX.stopMusic();
   const mine=winner&&YOU.team&&winner.id===YOU.team.t.id;
   const f=$('#flash');f.style.display='flex';f.style.background=winner?'#'+new THREE.Color(winner.hex).getHexString():'#000';$('#flashword').textContent=winner?winner.name.toUpperCase():'DRAW';$('#flashword').style.color=winner?'#0a0d1f':'#fff';$('#flash p').textContent=winner?'takes the match':'nobody took it';
@@ -546,7 +584,9 @@ function startGame(){if(MODE==='game')return;MODE='game';
   buildField();
   ME_ENT=makeRunner(AV,c.t,MYNAME.h,false);armWeapon(AV,WEAPON);paintArms();YOU.x=ME_ENT.x;YOU.z=ME_ENT.z;YOU.y=0;YOU.face=ME_ENT.face;YOU.yaw=ME_ENT.face+Math.PI;YOU.pitch=0.22;
   CIRCLES.forEach(cc=>cc.seats.forEach(s=>{if(s===AV)return;makeRunner(s,cc.t,s.name,true);armWeapon(s,'flamethrower');scene.add(s.g)}));
-  for(let i=0;i<PACK;i++)makeWolf(false,i);makeWolf(true,0);
+  for(let i=0;i<PACK;i++)makeWolf('pack',i);makeWolf('big',0);
+  GATES.forEach((g,gi)=>{const px=-Math.sin(g.a),pz=Math.cos(g.a);[-1,1].forEach((k,ki)=>{makeWolf('gate',gi*2+ki,{x:Math.cos(g.a)*GATE_R+px*k*GATE_SIDE,z:Math.sin(g.a)*GATE_R+pz*k*GATE_SIDE})})});
+  RUNNING=true;$('#run').classList.add('on');$('#radar').style.display='block';
   $('#hud').classList.add('game');$('#score').style.display='flex';$('#hearts').style.display='block';$('#leave').style.display='';$('#next').style.display='none';$('#swing').textContent=WEAPONS[WEAPON].key;
   G.on=true;G.round=0;startRound();music('game');joinMatch()}
 function gameTick(dt){if(!G.on)return;
@@ -555,7 +595,7 @@ function gameTick(dt){if(!G.on)return;
   if(ME_ENT.dead>0){ME_ENT.dead-=dt;if(ME_ENT.dead<=0)respawn(ME_ENT)}
   else{ME_ENT.x=YOU.x;ME_ENT.z=YOU.z;ME_ENT.face=YOU.face;clampField(ME_ENT);YOU.x=ME_ENT.x;YOU.z=ME_ENT.z;ME_ENT.y=YOU.y;touchFlag(ME_ENT)}
   if(SWING>0)AV.armR.rotation.x=WEAPON==='sword'?-1.7+Math.sin(SWING*10)*1.1:-1.35;
-  runnerTick(dt);wolfTick(T,dt);runnerFxTick(dt);flagTick(T,dt);friendGameTick(dt);
+  runnerTick(dt);wolfTick(T,dt);runnerFxTick(dt);flagTick(T,dt);friendGameTick(dt);radarTick();
   if(SHAKE>0){SHAKE-=dt;camera.position.x+=(Math.random()-0.5)*0.2;camera.position.y+=(Math.random()-0.5)*0.2}
   sendGamePos()}
 
@@ -564,19 +604,30 @@ let RUNNING=false;
 function fieldWalk(dt){YOU.yaw-=lookDX*0.0042;YOU.pitch=Math.max(-0.6,Math.min(0.9,YOU.pitch+lookDY*0.003));lookDX=lookDY=0;
   if(ME_ENT&&(ME_ENT.dead>0||ME_ENT.stun>0)){AV.g.position.set(YOU.x,YOU.y,YOU.z);camTo();return}
   let ix=mvX+((keys.d||0)-(keys.a||0)),iz=mvZ+((keys.s||0)-(keys.w||0));const L=Math.hypot(ix,iz);if(L>1){ix/=L;iz/=L}
-  const run=keys.shift||RUNNING;const sp=(run?RUN:WALK)*(ME_ENT&&ME_ENT.carry?0.94:1);const fx=-Math.sin(YOU.yaw),fz=-Math.cos(YOU.yaw),sx=Math.cos(YOU.yaw),sz=-Math.sin(YOU.yaw);
+  const run=keys.shift?!RUNNING:RUNNING;const sp=(run?RUN:WALK)*(ME_ENT&&ME_ENT.carry?0.92:1);const fx=-Math.sin(YOU.yaw),fz=-Math.cos(YOU.yaw),sx=Math.cos(YOU.yaw),sz=-Math.sin(YOU.yaw);
   const wx=(fx*(-iz)+sx*ix)*sp,wz=(fz*(-iz)+sz*ix)*sp;if(L>0.01)YOU.face=Math.atan2(-wx,-wz);
-  YOU.x+=wx*dt;YOU.z+=wz*dt;const fy=floorY(YOU.x,YOU.z);YOU.vy-=14*dt;YOU.y+=YOU.vy*dt;if(YOU.y<=fy){YOU.y=fy;YOU.vy=0;YOU.grounded=true}
+  YOU.x0=YOU.x;YOU.z0=YOU.z;YOU.x+=wx*dt;YOU.z+=wz*dt;ringClamp(YOU);const fy=floorY(YOU.x,YOU.z);YOU.vy-=14*dt;YOU.y+=YOU.vy*dt;if(YOU.y<=fy){YOU.y=fy;YOU.vy=0;YOU.grounded=true}
   AV.g.position.set(YOU.x,YOU.y,YOU.z);AV.g.rotation.y=YOU.face;
   const walk=Math.min(1,L);AV.ph=(AV.ph||0)+dt*(1.2+walk*(run?10:8));const sw=Math.sin(AV.ph)*0.75*walk;AV.legL.rotation.x=sw;AV.legR.rotation.x=-sw;AV.armL.rotation.x=-sw*0.8;if(SWING<=0)AV.armR.rotation.x=sw*0.8;
   camTo()}
-function camTo(){const cd=5.8,cx=YOU.x+Math.sin(YOU.yaw)*cd*Math.cos(YOU.pitch),cz=YOU.z+Math.cos(YOU.yaw)*cd*Math.cos(YOU.pitch),cy=YOU.y+1.7+Math.sin(YOU.pitch)*cd;camera.position.set(cx,Math.max(floorY(cx,cz)+0.7,cy),cz);camera.lookAt(YOU.x,YOU.y+1.3,YOU.z)}
+function camTo(){const cd=6.4,cx=YOU.x+Math.sin(YOU.yaw)*cd*Math.cos(YOU.pitch),cz=YOU.z+Math.cos(YOU.yaw)*cd*Math.cos(YOU.pitch),cy=YOU.y+1.7+Math.sin(YOU.pitch)*cd;camera.position.set(cx,Math.max(floorY(cx,cz)+0.7,cy),cz);camera.lookAt(YOU.x,YOU.y+1.3,YOU.z)}
 let tapAt0=null;renderer.domElement.addEventListener('pointerdown',e=>{tapAt0=[e.clientX,e.clientY,performance.now()]});
 renderer.domElement.addEventListener('pointerup',e=>{if(!tapAt0)return;const d=Math.hypot(e.clientX-tapAt0[0],e.clientY-tapAt0[1]),dtm=performance.now()-tapAt0[2];tapAt0=null;if(MODE==='game'&&d<9&&dtm<260)swing()});
 addEventListener('keydown',e=>{if(MODE!=='game')return;if(e.key==='f'||e.key==='F'||e.key==='e'||e.key==='E')swing();if(e.key==='1')setWeapon('flamethrower');if(e.key==='2')setWeapon('sword');if(e.key==='q'||e.key==='Q')setWeapon(WEAPON==='sword'?'flamethrower':'sword')});
 $('#swing').addEventListener('pointerdown',e=>{e.preventDefault();swing()});
 $('#run').addEventListener('pointerdown',e=>{e.preventDefault();RUNNING=!RUNNING;$('#run').classList.toggle('on',RUNNING)});
 $('#again').addEventListener('click',e=>{e.preventDefault();location.reload()});
+
+/* ---------- THE RADAR: the field from above in the corner, the hedge and its gates, the bases, the flag, everyone, every wolf ---------- */
+const RAD={c:null,g:null};
+function radarTick(){const c=RAD.c||(RAD.c=$('#radar'));if(!c||!ME_ENT)return;const g=RAD.g||(RAD.g=c.getContext('2d'));const W=c.width,cx=W/2,k=(W/2-3)/FIELD;g.clearRect(0,0,W,W);
+  g.fillStyle='rgba(10,14,32,.72)';g.beginPath();g.arc(cx,cx,FIELD*k,0,6.283);g.fill();g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=1;g.stroke();
+  g.strokeStyle='rgba(120,200,120,.75)';g.lineWidth=2;for(let i=0;i<4;i++){const a0=GATES[i].a+GAPA;let a1=GATES[(i+1)%4].a-GAPA;while(a1<a0)a1+=6.283;g.beginPath();g.arc(cx,cx,HR*k,a0,a1);g.stroke()}
+  TEAMS.forEach(t=>{g.fillStyle='#'+new THREE.Color(t.hex).getHexString();const b=baseOf(t);g.beginPath();g.arc(cx+b.x*k,cx+b.z*k,3.2,0,6.283);g.fill()});
+  g.fillStyle='rgba(255,60,60,.95)';G.wolves.forEach(w=>{if(!w.alive)return;g.beginPath();g.arc(cx+w.x*k,cx+w.z*k,w.big?2.4:1.5,0,6.283);g.fill()});
+  ENT.forEach(e=>{if(e===ME_ENT||e.dead>0)return;g.fillStyle='#'+new THREE.Color(e.team.hex).getHexString();g.beginPath();g.arc(cx+e.x*k,cx+e.z*k,2.4,0,6.283);g.fill()});
+  const f=G.flag;if(f.st!=='held'){const p=0.5+0.5*Math.sin(T*6);g.fillStyle='rgba(255,208,102,'+(0.6+0.4*p)+')';g.beginPath();g.arc(cx+f.x*k,cx+f.z*k,3+p*1.5,0,6.283);g.fill();if(f.st==='carried'&&f.by){g.strokeStyle='#ffd066';g.lineWidth=1.5;g.beginPath();g.arc(cx+f.x*k,cx+f.z*k,5,0,6.283);g.stroke()}}
+  const me=ME_ENT;g.fillStyle='#fff';g.beginPath();g.arc(cx+me.x*k,cx+me.z*k,2.8,0,6.283);g.fill();g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();g.moveTo(cx+me.x*k,cx+me.z*k);g.lineTo(cx+(me.x-Math.sin(me.face)*4)*k,cx+(me.z-Math.cos(me.face)*4)*k);g.stroke()}
 
 /* ---------- the music: lobby.mp3 in the waiting room, game.mp3 in the match if it exists, else the lobby track stays ---------- */
 const MUSIC={el:null,name:null};
@@ -597,6 +648,8 @@ addEventListener('pointerdown',()=>{if(MUSIC.el&&MUSIC.el.paused&&!G.over){const
   SFX.bite=()=>{const c=a();if(!c)return;const t=c.currentTime;SFX.tone(90,t,0.25,'sawtooth',0.25);SFX.noise(t,0.12,0.2,300)};
   SFX.snarl=()=>{const c=a();if(!c)return;const t=c.currentTime;const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(70,t);o.frequency.linearRampToValueAtTime(52,t+0.4);g.gain.setValueAtTime(0.06,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.45);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.5)};
   SFX.howl=(v)=>{const c=a();if(!c)return;const t=c.currentTime;const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(520,t+0.9);o.frequency.setValueAtTime(520,t+1.5);o.frequency.exponentialRampToValueAtTime(260,t+2.4);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.14*(v||1),t+0.4);g.gain.exponentialRampToValueAtTime(0.0001,t+2.5);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+2.6)};
+  SFX.horn=(hex)=>{const c=a();if(!c)return;const t=c.currentTime;[196,261,392].forEach((f,i)=>{SFX.tone(f,t+i*0.12,0.7,'sawtooth',0.12);SFX.tone(f*1.005,t+i*0.12,0.7,'square',0.04)});SFX.noise(t,0.3,0.08,500)};
+  SFX.bell=()=>{const c=a();if(!c)return;const t=c.currentTime;SFX.tone(1046,t,1.4,'sine',0.14);SFX.tone(1568,t+0.02,1.1,'sine',0.06);SFX.tone(2093,t+0.04,0.8,'triangle',0.03)};
   SFX.take=()=>{const c=a();if(!c)return;const t=c.currentTime;[523,784,1046].forEach((f,i)=>SFX.tone(f,t+i*0.07,0.4,'triangle',0.14))};
   SFX.score=()=>{const c=a();if(!c)return;const t=c.currentTime;[392,523,659,784,1046].forEach((f,i)=>{SFX.tone(f,t+i*0.09,0.9,'sawtooth',0.08);SFX.tone(f*2,t+i*0.09,0.5,'triangle',0.05)});SFX.noise(t+0.45,0.6,0.15,900)};
   SFX.win=()=>{const c=a();if(!c)return;const t=c.currentTime;[261,329,392,523,659,784,1046].forEach((f,i)=>{SFX.tone(f,t+i*0.11,1.6,'sawtooth',0.09);SFX.tone(f*1.5,t+0.6+i*0.11,1.2,'triangle',0.05)});SFX.noise(t+0.8,1.2,0.2,700)};
@@ -639,7 +692,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(0.05,(now-las
   sparkTick(dt);friendTick(dt);renderer.render(scene,camera)}
 requestAnimationFrame(frame);
 $('#walkin').addEventListener('click',()=>{SFX.unlock();$('#gate').style.display='none';started=true;setTimeout(SFX.chip,300);music('lobby')});
-window.__flag={CIRCLES,YOU,CLOCK,join,leave,fillBots,BOTS,drop,seatOf,TEAMS,G,ENT:()=>ENT,me:()=>ME_ENT,startGame,startRound,endRound,score,swing,swingAt,flameCone,strike,hurt,die,respawn,MATCH,mode:()=>MODE,flag:()=>G.flag,wolves:()=>G.wolves,touchFlag,takeFlag,dropFlag,carrier,gameTick,fieldWalk,setWeapon,weapon:()=>WEAPON,burnWolf,floorY,sim:(secs,step)=>{step=step||0.05;for(let s=0;s<secs;s+=step){T+=step;fieldWalk(step);gameTick(step);sparkTick(step)}},cam:()=>camera.position.toArray(),music:()=>MUSIC};
+window.__flag={CIRCLES,YOU,CLOCK,join,leave,fillBots,BOTS,drop,seatOf,TEAMS,G,ENT:()=>ENT,me:()=>ME_ENT,startGame,startRound,endRound,score,swing,swingAt,flameCone,strike,hurt,die,respawn,MATCH,mode:()=>MODE,flag:()=>G.flag,wolves:()=>G.wolves,touchFlag,takeFlag,dropFlag,carrier,gameTick,fieldWalk,setWeapon,weapon:()=>WEAPON,burnWolf,floorY,via,inGap,ringClamp,GATES,HR,hearts:()=>HEARTD,dropHeart,radarTick,running:()=>RUNNING,sim:(secs,step)=>{step=step||0.05;for(let s=0;s<secs;s+=step){T+=step;fieldWalk(step);gameTick(step);sparkTick(step)}},cam:()=>camera.position.toArray(),music:()=>MUSIC};
 </script>
 </body>
 </html>
