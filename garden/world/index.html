@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.24">
+<meta name="world-build" content="6.25">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -89,6 +89,28 @@ canvas{display:block;touch-action:none;cursor:default}
 #vlnList .vsongs{display:flex;flex-direction:column;gap:4px}#vlnList .vsong{display:flex;align-items:center;gap:8px;text-align:left;background:rgba(255,255,255,.04);border:0;border-radius:8px;padding:6px 8px;color:inherit;font:inherit;cursor:pointer}#vlnList .vsong.done{background:rgba(201,162,39,.14)}
 #vlnList .vsong em{font-style:normal;width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(201,162,39,.28);font-size:11px}#vlnList .vsong span{display:flex;flex-direction:column;min-width:0}#vlnList .vsong b{font-size:13px}#vlnList .vsong small{font-size:10px;opacity:.55}#vlnList .vsong i{margin-left:auto;font-style:normal;font-size:11px;color:var(--gold);white-space:nowrap}
 #vlnList .vbows{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}#vlnList .vbow{background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:8px;padding:8px;color:inherit;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}#vlnList .vbow b{font-size:12px}#vlnList .vbow small{font-size:10px;opacity:.6}#vlnList .vbow.on{border-color:var(--gold)}#vlnList .vbow.owned{opacity:.75;cursor:default}
+#drmHud{display:none;align-items:center;gap:10px;padding:6px 8px;font-size:12px}#drmHud.on{display:flex}#drmHud b{font-size:13px}#drmHud .lays{display:flex;gap:3px;margin-left:auto}#drmHud .lays i{width:14px;height:5px;border-radius:3px;background:rgba(233,226,207,.2)}#drmHud .lays i.on{background:var(--gold)}#drmHud .lays i.cap{opacity:.25}
+#drmList{display:none;max-height:min(62vh,460px);overflow:auto;padding:8px;gap:10px;flex-direction:column}#drmList.on{display:flex}
+#drmList .vhead{display:flex;align-items:center;gap:10px}#drmList .vhead b{font-size:15px}#drmList .vhead .btn{margin-left:auto}
+#drmList .vpack{border:1px solid rgba(233,226,207,.14);border-radius:10px;padding:8px}#drmList .vph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}#drmList .vph b{font-size:13px;letter-spacing:.02em}#drmList .vph .btn{margin-left:auto}
+#drmList .vsongs{display:flex;flex-direction:column;gap:4px}#drmList .vsong{display:flex;align-items:center;gap:8px;text-align:left;background:rgba(255,255,255,.04);border:0;border-radius:8px;padding:6px 8px;color:inherit;font:inherit;cursor:pointer}#drmList .vsong.done{background:rgba(201,162,39,.14)}
+#drmList .vsong em{font-style:normal;width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(201,162,39,.28);font-size:11px}#drmList .vsong span{display:flex;flex-direction:column;min-width:0}#drmList .vsong b{font-size:13px}#drmList .vsong small{font-size:10px;opacity:.55}#drmList .vsong i{margin-left:auto;font-style:normal;font-size:11px;color:var(--gold);white-space:nowrap}
+#drmList .vbows{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}#drmList .vbow{background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:8px;padding:8px;color:inherit;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}#drmList .vbow b{font-size:12px}#drmList .vbow small{font-size:10px;opacity:.6}#drmList .vbow.on{border-color:var(--gold)}#drmList .vbow.owned{opacity:.75;cursor:default}
+#drmList .vbow .sub{opacity:.42;font-size:9px;letter-spacing:.02em;line-height:1.35}
+#drmList .vsong.shut{opacity:.4;cursor:default}
+#drmBar{display:none;flex-direction:column;gap:3px;padding:6px 8px 8px}#drmBar.on{display:flex}
+#drmBar.bad{background:rgba(141,43,43,.35);border-radius:8px}
+#drmBar .drow{display:flex;align-items:center;gap:8px}
+#drmBar .drow>span{width:62px;flex:none;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.45;text-align:right;white-space:nowrap;overflow:hidden}
+#drmBar .drow.mine>span{opacity:.95;color:var(--gold)}
+#drmBar .dsteps{display:flex;gap:2px;flex:1}
+#drmBar .dsteps i{flex:1;height:12px;border-radius:3px;background:rgba(233,226,207,.07)}
+#drmBar .dsteps i.beat{background:rgba(233,226,207,.12)}
+#drmBar .dsteps i.on{background:rgba(233,226,207,.42)}
+#drmBar .drow.mine .dsteps i.on{background:rgba(201,162,39,.5)}
+#drmBar .dsteps i.cue{background:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.9)}
+#drmBar .dsteps i.now{outline:2px solid rgba(246,243,235,.85);outline-offset:1px}
+#inPad .pad.held{background:linear-gradient(rgba(201,162,39,.6),rgba(140,110,20,.5))}
 #pnKeys{position:relative;height:min(34vh,200px);touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;overflow:hidden;background:#0d0c0a}
 .pnk{position:absolute;top:0;box-sizing:border-box;cursor:pointer}
 .pnk.w{height:100%;background:linear-gradient(#fbf8f0,#e7e0cf);border:1px solid #8f8774;border-radius:0 0 5px 5px;z-index:1}
@@ -271,7 +293,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 <div id="pianoBuy" class="sheet"><div class="panel small"><h2>The piano<span>.</span></h2><p>A grand for the music room. Sit at it and play: every key, sustain, and sheets that light the notes.</p>
 <div style="display:flex;gap:10px;margin-top:12px"><button class="btn fin" data-fin="black" style="flex:1">Black lacquer<small>5,000 gardencoin</small></button><button class="btn fin" data-fin="gold" style="flex:1;border-color:var(--gold);color:var(--gold)">Gold<small>10,000 gardencoin</small></button></div>
 <div class="sfoot" style="margin-top:12px"><button class="btn" id="pbClose">Not now.</button></div></div></div>
-<div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="inPad"></div><div id="vlnHud"></div><div id="vlnList"></div></div>
+<div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="drmBar"></div><div id="inPad"></div><div id="vlnHud"></div><div id="vlnList"></div><div id="drmHud"></div><div id="drmList"></div></div>
 <div id="paintUI"><div id="ptBar"><button class="btn" id="ptClose">Leave it</button><span id="ptSwatch"></span><button class="btn" id="ptFill">Fill</button><button class="btn" id="ptStyle">Oil style</button><button class="btn" id="ptLesson">Lessons</button><button class="btn" id="ptUndo">Undo</button><span class="micro" id="ptChip"></span><button class="btn on" id="ptSave">Save it</button></div>
 <div id="ptBrief"></div><div id="ptLes"></div><div id="ptWrap"><canvas id="ptCan"></canvas></div>
 <div id="ptStyles"><button class="btn" data-s="realism">Realism</button><button class="btn" data-s="impressionist">Impressionist</button><button class="btn" data-s="allaprima">Alla prima</button><button class="btn" data-s="varnish">Varnish only</button></div>
@@ -1732,7 +1754,7 @@ const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
 let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
 const FIRST_GC=1000,SECOND_GC=1000,REARM_S=3600,CHEST_TOYS=['chainsaw','bubbles','kite'],CHEST_GC=1000,AXE_DC=0,STATUES_TO_WAKE=12;let CHOPS=3,HOUSE_TIERS=[4,7,10],REGROW_S=600,GROW_S=600,SAPLING_GC=0,PATCH47=false,PATCH50=false,PATCH51=false,PATCH52=false,PATCH53=false,PATCH55=false,PATCH60=false,RINGS_OPEN=null,WOOD_CAPS=null,PACK_GC=1000,PACKL=null,PACKG=null;   /* the chest 1000 gardencoin every plain open (patch 54), the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
-const TOOLS={piano_black:{n:'Black grand',dc:3333.34,slot:0,hidden:true,line:'A grand for the music room.'},piano_gold:{n:'Gold grand',dc:6666.67,slot:0,hidden:true,line:'A grand for the music room, in gold.'},mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},harp:{n:'Harp',dc:4666.67,slot:0,hidden:true,line:'A gold harp for the music room.'},guitar:{n:'Electric guitar',dc:5333.34,slot:0,hidden:true,line:'An electric guitar and its amp for the music room.'},violin:{n:'Gold violin',dc:6666.67,slot:0,hidden:true,line:'A gold violin for the music room.'},violin_fiddle:{n:'The fiddle road',dc:1333.34,slot:0,hidden:true,line:'Ten fiddle tunes for the violin.'},violin_themes:{n:'The great themes',dc:4000,slot:0,hidden:true,line:'Ten famous melodies for the violin.'},violin_bow_silver:{n:'Silver mounted bow',dc:1000,slot:0,hidden:true,line:'A better bow.'},violin_bow_pern:{n:'Pernambuco bow',dc:2666.67,slot:0,hidden:true,line:'A warm bow.'},violin_bow_gold:{n:'Gold Tourte bow',dc:6666.67,slot:0,hidden:true,line:'The best bow in the house.'},drums:{n:'Drums',dc:6666.67,slot:0,hidden:true,line:'A gold drum kit for the music room.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree. One stroke takes a wolf.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down. Catches the leprechaun.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. Tap to turn it on, tap to turn it off. Wolves catch and run, trees burn to embers, and it catches the leprechaun.'}};
+const TOOLS={piano_black:{n:'Black grand',dc:3333.34,slot:0,hidden:true,line:'A grand for the music room.'},piano_gold:{n:'Gold grand',dc:6666.67,slot:0,hidden:true,line:'A grand for the music room, in gold.'},mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},harp:{n:'Harp',dc:4666.67,slot:0,hidden:true,line:'A gold harp for the music room.'},guitar:{n:'Electric guitar',dc:5333.34,slot:0,hidden:true,line:'An electric guitar and its amp for the music room.'},violin:{n:'Gold violin',dc:6666.67,slot:0,hidden:true,line:'A gold violin for the music room.'},violin_fiddle:{n:'The fiddle road',dc:1333.34,slot:0,hidden:true,line:'Ten fiddle tunes for the violin.'},violin_themes:{n:'The great themes',dc:4000,slot:0,hidden:true,line:'Ten famous melodies for the violin.'},violin_bow_silver:{n:'Silver mounted bow',dc:1000,slot:0,hidden:true,line:'A better bow.'},violin_bow_pern:{n:'Pernambuco bow',dc:2666.67,slot:0,hidden:true,line:'A warm bow.'},violin_bow_gold:{n:'Gold Tourte bow',dc:6666.67,slot:0,hidden:true,line:'The best bow in the house.'},drums:{n:'Drums',dc:6666.67,slot:0,hidden:true,line:'A gold drum kit for the music room.'},drums_machine:{n:'The machine',dc:2666.67,slot:0,hidden:true,line:'A drum box for the music room.'},drums_boom:{n:'The boom bap kit',dc:4000,slot:0,hidden:true,line:'A dusty, swung kit for the music room.'},drums_jazz:{n:'The jazz kit',dc:5333.34,slot:0,hidden:true,line:'Brushes and a ride for the music room.'},drums_hands:{n:'The hands',dc:5333.34,slot:0,hidden:true,line:'Hand drums for the music room.'},drums_stadium:{n:'The stadium kit',dc:8000,slot:0,hidden:true,line:'A big rock kit for the music room.'},drum_sticks_hickory:{n:'Hickory sticks',dc:2000,slot:0,hidden:true,line:'Better sticks.'},drum_sticks_maple:{n:'Maple sticks',dc:5333.34,slot:0,hidden:true,line:'Warmer sticks.'},drum_sticks_gold:{n:'Gold tipped sticks',dc:13333.34,slot:0,hidden:true,line:'The best sticks in the house.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree. One stroke takes a wolf.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down. Catches the leprechaun.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. Tap to turn it on, tap to turn it off. Wolves catch and run, trees burn to embers, and it catches the leprechaun.'}};
 let PATCH61=false,PATCH62=false,RAIDS=[];   /* 4.18 · the wolves, the sword, the flamethrower */
 const PACKS={pack_basic:{n:'The Gardener'},pack_ivory:{n:'The Ivory'},pack_sun:{n:'The Golden Sun'},pack_cyber:{n:'The Cyber Sprout'},pack_starlight:{n:'The Starlight'},pack_neon:{n:'The Neon Tulip'}};
 const packImg=k=>BASE+'garden-pack-'+k.slice(5)+'.webp';
@@ -3130,7 +3152,61 @@ const DRUM_PADS=[{k:'kick',n:'Kick',key:'a'},{k:'snare',n:'Snare',key:'s'},{k:'h
 const DRUM_SND=(()=>{let OUT=null;function out(){const a=SND.ac();if(!a)return null;if(!OUT){OUT=a.createGain();OUT.gain.value=0.95;OUT.connect(SND.bus()||a.destination)}return a}
   function noise(a,t,dur,type,f,q,vel,decay){const s=a.createBufferSource();s.buffer=SND.noiseBuf();if(!s.buffer)return;const fl=a.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=a.createGain();g.gain.setValueAtTime(vel,t);g.gain.exponentialRampToValueAtTime(0.0001,t+decay);s.connect(fl);fl.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur)}
   function tone(a,t,f0,f1,dur,vel,type){const o=a.createOscillator();o.type=type||'sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*0.6);const g=a.createGain();g.gain.setValueAtTime(vel,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(OUT);o.start(t);o.stop(t+dur+0.05)}
-  function hit(k,vel){const a=out();if(!a)return;vel=Math.max(0.2,Math.min(1,vel==null?0.8:vel));const t=a.currentTime;
+  function clap(a,t,vel){for(let i=0;i<4;i++)noise(a,t+i*0.011,0.09,'bandpass',1500+i*90,1.6,vel*(i===3?0.9:0.5),i===3?0.16:0.03)}
+  function metal(a,t,dur,vel,f,q,dec){noise(a,t,dur,'bandpass',f,q,vel,dec)}
+  function hit(k,vel,when){const a=out();if(!a)return;vel=Math.max(0.2,Math.min(1,vel==null?0.8:vel));
+    const t=a.currentTime+(when>0?when:0);const V=(typeof dKit==='function')?dKit().v:'rock';
+    if(V==='machine'){
+      if(k==='kick'){tone(a,t,120,34,0.8,vel*1.15);noise(a,t,0.02,'highpass',3000,0.7,vel*0.25,0.015)}
+      else if(k==='snare'){clap(a,t,vel*0.9)}
+      else if(k==='hat'){noise(a,t,0.05,'highpass',9000,1.4,vel*0.42,0.03)}
+      else if(k==='ohat'){noise(a,t,0.42,'highpass',8200,1.2,vel*0.4,0.3)}
+      else if(k==='tom1'){tone(a,t,300,120,0.4,vel*0.8,'triangle')}
+      else if(k==='tom2'){tone(a,t,160,70,0.6,vel*0.9,'triangle')}
+      else if(k==='crash'){metal(a,t,1.4,vel*0.7,5600,0.4,1.1)}
+      else if(k==='ride'){tone(a,t,540,540,0.35,vel*0.5,'square');tone(a,t,800,800,0.3,vel*0.35,'square')}
+      return}
+    if(V==='boom'){
+      if(k==='kick'){tone(a,t,92,38,0.5,vel*1.2);noise(a,t,0.03,'lowpass',900,0.7,vel*0.35,0.03)}
+      else if(k==='snare'){tone(a,t,420,300,0.09,vel*0.5,'triangle');noise(a,t,0.18,'bandpass',1900,1.1,vel*0.85,0.12)}
+      else if(k==='hat'){noise(a,t,0.06,'bandpass',6200,1.3,vel*0.4,0.04)}
+      else if(k==='ohat'){noise(a,t,0.34,'bandpass',5800,1.0,vel*0.4,0.26)}
+      else if(k==='tom1'){tone(a,t,210,120,0.4,vel*0.85)}
+      else if(k==='tom2'){tone(a,t,60,45,0.9,vel*1.1)}
+      else if(k==='crash'){metal(a,t,1.2,vel*0.6,4200,0.4,0.95)}
+      else if(k==='ride'){metal(a,t,0.7,vel*0.4,6400,2.2,0.5)}
+      return}
+    if(V==='jazz'){
+      if(k==='kick'){tone(a,t,120,48,0.3,vel*0.85)}
+      else if(k==='snare'){noise(a,t,0.34,'bandpass',3400,0.35,vel*0.6,0.28);tone(a,t,240,200,0.1,vel*0.2,'triangle')}
+      else if(k==='hat'){noise(a,t,0.09,'highpass',6800,0.9,vel*0.4,0.06)}
+      else if(k==='ohat'){noise(a,t,0.4,'highpass',6000,0.8,vel*0.4,0.3)}
+      else if(k==='tom1'){tone(a,t,230,160,0.45,vel*0.75)}
+      else if(k==='tom2'){tone(a,t,125,85,0.6,vel*0.85)}
+      else if(k==='crash'){metal(a,t,1.5,vel*0.55,4800,0.35,1.2)}
+      else if(k==='ride'){metal(a,t,1.1,vel*0.4,8200,3.2,0.8);tone(a,t,2600,2500,0.6,vel*0.16,'square')}
+      return}
+    if(V==='hands'){
+      if(k==='kick'){tone(a,t,95,58,0.5,vel*1.05)}
+      else if(k==='snare'){tone(a,t,320,240,0.14,vel*0.5,'triangle');noise(a,t,0.12,'bandpass',3200,1.2,vel*0.6,0.09)}
+      else if(k==='hat'){tone(a,t,270,250,0.22,vel*0.6,'triangle')}
+      else if(k==='ohat'){tone(a,t,210,190,0.5,vel*0.65,'triangle')}
+      else if(k==='tom1'){tone(a,t,430,380,0.3,vel*0.6,'triangle');noise(a,t,0.05,'bandpass',2400,1.4,vel*0.3,0.04)}
+      else if(k==='tom2'){tone(a,t,72,52,1.1,vel*1.15)}
+      else if(k==='crash'){tone(a,t,900,880,0.7,vel*0.35,'square');metal(a,t,0.5,vel*0.2,7000,2,0.4)}
+      else if(k==='ride'){noise(a,t,0.16,'highpass',5200,0.9,vel*0.35,0.12)}
+      return}
+    if(V==='stadium'){
+      if(k==='kick'){tone(a,t,170,44,0.5,vel*1.2);noise(a,t,0.05,'lowpass',500,0.7,vel*0.4,0.04)}
+      else if(k==='snare'){tone(a,t,200,155,0.16,vel*0.5,'triangle');noise(a,t,0.3,'bandpass',2400,0.45,vel*0.95,0.2);
+        noise(a,t+0.02,0.22,'bandpass',1800,0.3,vel*0.5,0.2);noise(a,t+0.05,0.18,'highpass',900,0.4,vel*0.35,0.16)}
+      else if(k==='hat'){noise(a,t,0.08,'highpass',7400,1.1,vel*0.5,0.05)}
+      else if(k==='ohat'){noise(a,t,0.55,'highpass',6600,1.0,vel*0.5,0.4)}
+      else if(k==='tom1'){tone(a,t,250,140,0.55,vel*1);noise(a,t,0.1,'bandpass',1200,0.6,vel*0.2,0.08)}
+      else if(k==='tom2'){tone(a,t,120,72,0.75,vel*1.1)}
+      else if(k==='crash'){metal(a,t,2.2,vel*0.85,5000,0.35,1.9);metal(a,t,1.6,vel*0.35,9500,0.8,1.3)}
+      else if(k==='ride'){metal(a,t,1,vel*0.45,7600,2.4,0.7);tone(a,t,3100,3000,0.5,vel*0.12,'square')}
+      return}
     if(k==='kick'){tone(a,t,150,42,0.42,vel*1.1);noise(a,t,0.05,'lowpass',400,0.7,vel*0.4,0.04)}
     else if(k==='snare'){tone(a,t,190,150,0.16,vel*0.55,'triangle');noise(a,t,0.3,'bandpass',2600,0.5,vel*0.9,0.2)}
     else if(k==='hat'){noise(a,t,0.08,'highpass',7000,1.1,vel*0.5,0.05)}
@@ -3224,9 +3300,10 @@ function instPlay(k){const A=INST_AT[k],g=INST.G[k];if(!A||!g||g.stand||INST.on)
   if(k==='guitar'&&g.body){g.body.position.set(0.12,0.98,A.seat+0.3);g.body.rotation.set(0.25,Math.PI,-1.15)}
   if(k==='violin'&&g.body){g.body.position.set(0.2,1.45,A.seat+0.22);g.body.rotation.set(0.9,Math.PI+0.5,-0.4);g.bow.position.set(-0.1,1.4,A.seat+0.3);g.bow.rotation.set(0.3,-0.6,-0.5)}
   instPaint();SND.buy(3);
-  toast(COARSE?{harp:'Sweep across the strings, or pluck one. Key changes the scale.',guitar:'Tap a chord to strum it. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. Higher up the row is louder.',drums:'Eight pads. Hit them.'}[k]:{harp:'Sweep or pluck. Keys A to L and the row above play the strings; Z and X move the octave.',guitar:'Tap a chord or press 1 to 8. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. A S D F and the rows above are the strings.',drums:'A S D F G H J K are the pads.'}[k])}
+  toast(COARSE?{harp:'Sweep across the strings, or pluck one. Key changes the scale.',guitar:'Tap a chord to strum it. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. Higher up the row is louder.',drums:'Eight pads. Hit them.'}[k]:{harp:'Sweep or pluck. Keys A to L and the row above play the strings; Z and X move the octave.',guitar:'Tap a chord or press 1 to 8. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. A S D F and the rows above are the strings.',drums:'A S D F G H J K are the pads.'}[k]);
+  if(k==='drums'){drmMidiChip();drmListPaint(true)}}
 function instStop(){const k=INST.on;if(!k)return;for(const p in IN_PTR)instRelease(p);for(const key in IN_KDOWN)delete IN_KDOWN[key];INST.on='';const A=INST_AT[k],g=INST.G[k];if(SAMP[k])SAMP[k].allOff(true);IN_HELD.length=0;
-  vlnStop();$('#vlnList').classList.remove('on');document.body.classList.remove('seated');$('#instUI').classList.remove('on');if(g&&g.rest){g.body.position.copy(g.rest.p);g.body.rotation.copy(g.rest.r)}if(g&&g.bowRest){g.bow.position.copy(g.bowRest.p);g.bow.rotation.copy(g.bowRest.r)}
+  vlnStop();drmStop();$('#vlnList').classList.remove('on');$('#drmList').classList.remove('on');document.body.classList.remove('seated');$('#instUI').classList.remove('on');if(g&&g.rest){g.body.position.copy(g.rest.p);g.body.rotation.copy(g.rest.r)}if(g&&g.bowRest){g.bow.position.copy(g.bowRest.p);g.bow.rotation.copy(g.bowRest.r)}
   const [bx,,bz]=instLocal(k,0.4,0,A.seat+0.9);you.x=bx;you.z=bz;you.yaw=A.ry+Math.PI;you.pitch=-0.34;camDist=2.2;hideAct()}
 function instPose(t){const k=INST.on,A=INST_AT[k];if(!A)return;AV.g.rotation.y=INST.face;const beat=performance.now()-IN_HAND<200;
   if(A.sit){AV.g.position.y-=0.42;AV.legL.rotation.x=-1.5;AV.legR.rotation.x=-1.5}
@@ -3263,14 +3340,20 @@ function instPaint(){const k=INST.on,wrap=$('#inPad');if(!wrap||!k)return;let h=
     else{h='<div class="grid6">'+GTR_STR.map((s,r)=>'<div class="grow">'+Array.from({length:13},(_,f)=>'<div class="cell'+(f===0?' open':'')+'" data-m="'+(s+f)+'"><span>'+(f===0?'o':f)+'</span></div>').join('')+'</div>').join('')+'</div>'}}
   else if(k==='violin'){bar.innerHTML='<button class="btn" id="inLess">Lessons</button><span class="micro">G &#183; D &#183; A &#183; E</span>';
     $('#inLess').onclick=()=>{const l=$('#vlnList');if(l.classList.contains('on'))l.classList.remove('on');else vlnListPaint(true)};h='<div class="grid6 v4">'+VLN_STR.map((s,r)=>'<div class="grow">'+Array.from({length:8},(_,f)=>'<div class="cell'+(f===0?' open':'')+'" data-m="'+(s+f)+'" data-hold="1"><span>'+(f===0?['E','A','D','G'][r]:pName(s+f).replace(/-?\d+$/,''))+'</span></div>').join('')+'</div>').join('')+'</div>'}
-  else if(k==='drums'){bar.innerHTML='';h='<div class="pads c4">'+DRUM_PADS.map(p=>'<div class="pad drum" data-pad="'+p.k+'"><b>'+p.n+'</b><small>'+p.key.toUpperCase()+'</small></div>').join('')+'</div>'}
-  wrap.className='k-'+k;wrap.innerHTML=h;wrap.dataset.k=k;if(k==='violin'){vlnLight();vlnHud()}}
+  else if(k==='drums'){bar.innerHTML='<button class="btn" id="inLess">Lessons</button><span class="micro">'+dKit().n+'</span>';
+    $('#inLess').onclick=()=>{const l=$('#drmList');if(l.classList.contains('on'))l.classList.remove('on');else drmListPaint(true)};
+    h='<div class="pads c4">'+dPads().map(p=>'<div class="pad drum" data-pad="'+p.k+'"><b>'+p.n+'</b><small>'+p.key.toUpperCase()+'</small></div>').join('')+'</div>'}
+  wrap.className='k-'+k;wrap.innerHTML=h;wrap.dataset.k=k;if(k==='violin'){vlnLight();vlnHud()}
+  if(k==='drums'){drmPaintBar();drmHud()}drmMidiChip()}
 function inAt(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const t=el.closest?el.closest('.hs,.pad,.cell'):null;if(!t)return null;const r=t.getBoundingClientRect();const f=Math.max(0,Math.min(1,(y-r.top)/Math.max(1,r.height)));return {el:t,vel:0.4+0.6*f,pad:t.dataset.pad,ch:t.dataset.ch,m:t.dataset.m!=null?+t.dataset.m:null,hold:!!t.dataset.hold}}
 function inDown(el){if(!el||el===document.body)return;el.classList.add('down');setTimeout(()=>el.classList.remove('down'),160)}
-function instHit(h,ptr){const k=INST.on;if(!k||!h)return;if(k==='drums'){DRUM_SND.hit(h.pad,h.vel);instFlash(k,0,h.pad);instCast(k,0,h.vel,true,h.pad);inDown(h.el);return}
+function instHit(h,ptr){const k=INST.on;if(!k||!h)return;if(k==='drums'){DRUM_SND.hit(h.pad,h.vel);instFlash(k,0,h.pad);instCast(k,0,h.vel,true,h.pad);
+    if(dHoldPad()===h.pad){drmHold(h.pad,true);IN_PTR[ptr]={pad:h.pad,el:h.el};h.el.classList.add('down');return}
+    inDown(h.el);drmHit(h.pad);return}
   if(k==='guitar'&&h.ch!=null){const notes=CHORDS[+h.ch][1];const a=SND.ac();notes.forEach((m,i)=>setTimeout(()=>{SAMP.guitar.noteOn(m,h.vel*(0.85+i*0.03));instCast(k,m,h.vel,true);instFlash(k,m)},i*28));inDown(h.el);return}
   if(h.m==null)return;SAMP[k].noteOn(h.m,h.vel*(1+vlnTone()),h.hold);instCast(k,h.m,h.vel,true);instFlash(k,h.m);if(k==='violin')vlnHit(h.m);if(h.hold){IN_PTR[ptr]={m:h.m,el:h.el};h.el.classList.add('down')}else inDown(h.el)}
-function instRelease(ptr){const p=IN_PTR[ptr];if(!p)return;delete IN_PTR[ptr];const k=INST.on;if(k&&SAMP[k]){SAMP[k].noteOff(p.m,false);instCast(k,p.m,0,false)}if(p.el)p.el.classList.remove('down')}
+function instRelease(ptr){const p=IN_PTR[ptr];if(!p)return;delete IN_PTR[ptr];const k=INST.on;
+  if(p.pad){drmHold(p.pad,false);if(p.el)p.el.classList.remove('down');return}if(k&&SAMP[k]){SAMP[k].noteOff(p.m,false);instCast(k,p.m,0,false)}if(p.el)p.el.classList.remove('down')}
 function instBind(){const wrap=$('#inPad');if(!wrap||wrap.bound)return;wrap.bound=true;const LAST={};
   const down=e=>{const h=inAt(e.clientX,e.clientY);if(!h)return;e.preventDefault();LAST[e.pointerId]=h.el;instHit(h,e.pointerId);try{wrap.setPointerCapture(e.pointerId)}catch(x){}};
   const move=e=>{if(LAST[e.pointerId]==null)return;const h=inAt(e.clientX,e.clientY);if(!h||h.el===LAST[e.pointerId])return;if(INST.on==='harp'||(INST.on==='guitar'&&INST.mode==='strings')||INST.on==='violin'){instRelease(e.pointerId);LAST[e.pointerId]=h.el;instHit(h,e.pointerId)}};
@@ -3280,7 +3363,11 @@ function instBind(){const wrap=$('#inPad');if(!wrap||wrap.bound)return;wrap.boun
 /* the computer keys: the harp and violin rows like the piano's, numbers for the chords, a s d f g h j k for the pads */
 const IN_KDOWN={};
 function instKey(e,down){const k=INST.on;if(!k)return false;const key=e.key.toLowerCase();if(key==='escape'&&down){instStop();return true}
-  if(k==='drums'){const p=DRUM_PADS.find(d=>d.key===key);if(!p)return true;if(down&&!e.repeat){const el=document.querySelector('#inPad [data-pad="'+p.k+'"]');instHit({pad:p.k,vel:0.85,el:el||document.body})}e.preventDefault();return true}
+  if(k==='drums'){const p=DRUM_PADS.find(d=>d.key===key);if(!p)return true;
+    const el=document.querySelector('#inPad [data-pad="'+p.k+'"]');
+    if(dHoldPad()===p.k){if(down){if(!IN_KDOWN[key]){IN_KDOWN[key]=1;drmHold(p.k,true);DRUM_SND.hit(p.k,0.85);instFlash(k,0,p.k);instCast(k,0,0.85,true,p.k)}}
+      else if(IN_KDOWN[key]){delete IN_KDOWN[key];drmHold(p.k,false)}e.preventDefault();return true}
+    if(down&&!e.repeat)instHit({pad:p.k,vel:0.85,el:el||document.body});e.preventDefault();return true}
   if(k==='guitar'&&INST.mode==='chords'){const i=+key-1;if(!(i>=0&&i<8))return true;if(down&&!e.repeat){const el=document.querySelector('#inPad [data-ch="'+i+'"]');instHit({ch:i,vel:0.85,el:el||document.body})}e.preventDefault();return true}
   if(k==='harp'){if(down&&!e.repeat&&(key==='z'||key==='x')){IN_LO=Math.max(0,Math.min(2,IN_LO+(key==='z'?-1:1)));return true}const HK={a:0,s:1,d:2,f:3,g:4,h:5,j:6,k:7,l:8,';':9,"'":10};if(!(key in HK))return true;const ns=harpNotes();const i=IN_LO*7+HK[key];if(i>=ns.length)return true;
     if(down&&!e.repeat){const el=document.querySelector('#inPad [data-m="'+ns[i]+'"]');instHit({m:ns[i],vel:0.8,el:el||document.body})}e.preventDefault();return true}
@@ -3504,6 +3591,208 @@ function vlnListPaint(open){const l=$('#vlnList');if(!l)return;const bx=vBowIx()
  $$('#vlnList [data-bow]').forEach(b=>b.onclick=()=>{const i=+b.dataset.bow;const B=VBOWS[i];vlnBuy(B.k,B.price,B.n,()=>vlnListPaint(true))})}
 function vlnBar(){const b=$('#inLess');if(b)b.classList.toggle('on',!!VS)}
 
+/* 6.25 THE DRUMS: the kits, the limb ladder, the lineage and the MIDI door.
+   A screen cannot give you four limbs, so the kit hands them to you one at a time and plays the rest itself.
+   Ten lessons, one per groove family, in the order they happened: you own one more voice at every step.
+   Levels 1 to 3 wait for you (the groove runs between your hits and stops at the next one). From 4 the
+   clock runs and the band does not wait. The sticks you buy widen the window, lift the ceiling on the
+   band and multiply what you earn. XP goes into the same music pool as the piano and the violin. */
+const DKITS=[
+ {k:'',n:'The house kit',sub:'gold shells, chrome hoops \u00B7 comes with the drums',price:0,v:'rock',
+  pads:['Kick','Snare','Hi hat','Open hat','Tom','Floor tom','Crash','Ride']},
+ {k:'drums_machine',n:'The machine',sub:'the drum box \u00B7 sine kick, clap, cowbell',price:4000,v:'machine',
+  pads:['Kick','Clap','Hat','Open','Tom','Low tom','Crash','Cowbell']},
+ {k:'drums_boom',n:'The boom bap',sub:'dusty, filtered, swung \u00B7 the break',price:6000,v:'boom',
+  pads:['Kick','Rim','Hat','Open','Tom','Sub','Crash','Ride']},
+ {k:'drums_jazz',n:'The jazz kit',sub:'brushes and a ride \u00B7 the swing lives on the cymbal',price:8000,v:'jazz',
+  pads:['Kick','Brush','Hat','Open','Tom','Floor','Crash','Ride']},
+ {k:'drums_hands',n:'The hands',sub:'conga, djembe, tabla, taiko \u00B7 no sticks at all',price:8000,v:'hands',
+  pads:['Bass','Slap','Tone','Open','High','Low','Bell','Shaker']},
+ {k:'drums_stadium',n:'The stadium',sub:'gated snare, double kick, long washes',price:12000,v:'stadium',
+  pads:['Kick','Snare','Hat','Open','Tom','Floor tom','Crash','Ride']}];
+const DSTICKS=[{k:'',n:'Practice sticks',price:0,win:1,lay:3,mult:1},
+ {k:'drum_sticks_hickory',n:'Hickory sticks',price:3000,win:1.4,lay:4,mult:1.15},
+ {k:'drum_sticks_maple',n:'Maple sticks',price:8000,win:1.8,lay:5,mult:1.35},
+ {k:'drum_sticks_gold',n:'Gold tipped sticks',price:20000,win:2.2,lay:5,mult:2}];
+let DKI=0;try{DKI=+(localStorage.getItem('deeds_kit')||0)||0}catch(e){DKI=0}
+function dOwnsKit(i){const K=DKITS[i];return !!K&&(!K.k||!!(S.tools&&S.tools[K.k]))}
+function dKitIx(){return dOwnsKit(DKI)?DKI:0}
+function dKit(){return DKITS[dKitIx()]}
+function dSetKit(i){if(!dOwnsKit(i))return;DKI=i;try{localStorage.setItem('deeds_kit',String(i))}catch(e){}
+ if(INST.on==='drums')instPaint();toast(DKITS[i].n+' is on the riser.')}
+function dPads(){const K=dKit();return DRUM_PADS.map((p,i)=>({k:p.k,key:p.key,n:K.pads[i]||p.n}))}
+function dStickIx(){for(let i=DSTICKS.length-1;i>0;i--)if(S.tools&&S.tools[DSTICKS[i].k])return i;return 0}
+function dStick(){return DSTICKS[dStickIx()]}
+/* ---------- the lineage: ten groove families, in the order they happened ----------
+   pat: sixteen sixteenths to the bar. x = a hit, o = an accent or an open one, . = nothing.
+   yours = the voices you hold. Everything else is played for you, in time, from the first bar. */
+const DL=(name,era,who,bpm,lvl,xp,yours,pat,ch,opt)=>Object.assign(
+ {name,era,who,bpm,lvl,xp,yours,pat,ch:vch(ch||'A/4')},opt||{});
+const DLESSONS=[
+ DL('The second line','New Orleans, 1900s','the parade bands, and Baby Dodds who carried the street beat onto records',92,1,120,
+  ['kick'],{kick:'x..x..x...x.x...',snare:'..x..x..x..x..x.',ride:'x...x...x...x...'},'F/4 F/4 Bb/4 C/4'),
+ DL('The swing ride','the big bands, 1930s','Chick Webb, Jo Jones and Gene Krupa, who moved time onto the cymbal',132,2,140,
+  ['ride'],{ride:'x...xx..x...xx..',hat:'....x.......x...',kick:'x.......x.......'},'G/4 G/4 C/4 D/4',{hold:'ride'}),
+ DL('The backbeat','Memphis and Detroit, 1960s','Al Jackson Jr and Benny Benjamin, who put the clap on two and four',104,3,160,
+  ['snare'],{snare:'....x.......x...',kick:'x.....x.x.......',hat:'x.x.x.x.x.x.x.x.'},'C/4 C/4 F/4 G/4'),
+ DL('The break','the funk, 1969','Clyde Stubblefield and Jabo Starks, whose bars are still being sampled',96,4,180,
+  ['kick','snare'],{kick:'x.......x.x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.'},'Em/4 Em/4 Am/4 Em/4'),
+ DL('Four on the floor','the rock kit, 1970s','John Bonham and Charlie Watts, the whole bar in two hands and a foot',120,5,200,
+  ['kick','snare'],{kick:'x...x...x...x...',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.'},'A/4 A/4 D/4 E/4'),
+ DL('The disco hat','Philadelphia, 1977','Earl Young, who opened the hat on the off beat and started the dance floor',122,6,220,
+  ['hat','ohat'],{hat:'x.x.x.x.x.x.x.x.',ohat:'..x...x...x...x.',kick:'x...x...x...x...',snare:'....x.......x...'},'Dm/4 Dm/4 Gm/4 A7/4'),
+ DL('The one drop','Kingston, 1973','Carlton Barrett, who left the first beat empty and let the bass hold it',78,7,240,
+  ['hat','snare'],{hat:'x.x.x.x.x.x.x.x.',snare:'........x.......',kick:'........x.......',ride:'............x...'},'Am/4 Am/4 G/4 Am/4'),
+ DL('The gallop','the punk clubs, 1977','Tommy Ramone, four counted off and no room to think',168,8,280,
+  ['kick','snare','hat'],{kick:'x...x...x...x...',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.'},'E/4 E/4 A/4 B7/4',{ghost:'hat'}),
+ DL('The boom bap','the samplers, 1988','the break diggers, who swung the grid and hit the snare late on purpose',88,9,320,
+  ['kick','snare','tom1'],{kick:'x.....x..x......',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',tom1:'..............x.'},'Cm/4 Cm/4 Fm/4 G7/4',
+  {swing:0.16,fill:{kick:'x.......x.......',snare:'....x.x.....x...',tom1:'..........x.x.x.',tom2:'............x..x'}}),
+ DL('The house','Chicago, 1985','the box and the players who programmed it, the kick under everything',126,10,400,
+  ['kick','snare','hat','ohat'],{kick:'x...x...x...x...',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',ohat:'......x.......x.'},'Fm/4 Fm/4 Db/4 Eb/4')];
+let DX={};try{DX=JSON.parse(localStorage.getItem('deeds_drums')||'{}')||{}}catch(e){DX={}}
+function dxSave(){try{localStorage.setItem('deeds_drums',JSON.stringify(DX))}catch(e){}}
+const dKey=i=>'d:'+i;
+function dPasses(i){return (DX[dKey(i)]||0)|0}
+function dCleared(i){return dPasses(i)>=2||!!PX.done[dKey(i)]}
+function dStars(i){return (DX[dKey(i)+'s']||0)|0}
+function dOpen(i){return i<3||dCleared(i-1)}
+/* ---------- the lesson ---------- */
+let DS=null,D_T=null,D_HOLD={};
+const D_BARS=8;
+function dStepMs(){return 60000/DS.s.bpm/4}
+function dPatOf(p){const s=DS.s;if(s.fill&&DS.bar===D_BARS-1&&s.fill[p]!=null)return s.fill[p];return s.pat[p]||'................'}
+function dCharAt(p,st){const r=dPatOf(p);const c=r.charAt(st);return c===''?'.':c}
+function dRows(){const s=DS?DS.s:null;if(!s)return [];const seen=[];DRUM_PADS.forEach(p=>{
+ if(s.pat[p.k]!=null||(s.fill&&s.fill[p.k]!=null)||s.yours.indexOf(p.k)>=0)seen.push(p.k)});return seen}
+function dMine(st){if(!DS)return [];return DS.s.yours.filter(p=>dCharAt(p,st)!=='.'&&p!==DS.s.hold)}
+function dSwing(st){const s=DS.s;const sw=(s.swing||0)*dStepMs();return (st%2===1)?sw:0}
+function drmChord(){if(!DS)return;const c=DS.s.ch[DS.chAt%DS.s.ch.length];const notes=VCH[c.c]||VCH.A;
+ VB.chord(notes,c.b*60/DS.s.bpm,Math.min(DS.lay,dStick().lay));DS.chAt++}
+function drmStart(i){drmStop();const s=DLESSONS[i];if(!s)return;
+ if(!dOpen(i)){toast('Clear the one before it first.');return}
+ DS={i,s,lvl:s.lvl,step:0,bar:0,streak:0,lay:0,slips:0,need:[],owed:null,waiting:false,chAt:0};
+ D_HOLD={};VB.set('band');$('#drmList').classList.remove('on');
+ toast(s.name+' \u00B7 '+(s.hold?'hold the pad and it keeps time for you.':s.lvl<=3?'the kit waits for you. Hit the lit pad.':s.lvl<=7?'in tempo now. The band will not wait.':'no lights. Play it.'));
+ drmHud();drmTick()}
+function drmStop(){if(D_T){clearTimeout(D_T);D_T=null}VB.stop();DS=null;D_HOLD={};drmPaintBar();drmHud()}
+function drmGood(){if(!DS)return;DS.streak++;const cap=dStick().lay,marks=[4,9,15,22,30];let lay=0;
+ marks.forEach(x=>{if(DS.streak>=x)lay++});DS.lay=Math.min(cap,Math.max(DS.lay,lay));drmHud()}
+function drmSlip(){if(!DS)return;DS.streak=0;if(DS.lay>0)DS.lay--;
+ const b=$('#drmBar');if(b){b.classList.add('bad');setTimeout(()=>{const q=$('#drmBar');if(q)q.classList.remove('bad')},200)}
+ if(DS.lvl>=4){DS.slips++;const cap=8+DS.lvl*2;if(DS.slips>cap){SND.nope();toast('From the top of it.');const i=DS.i;drmStop();setTimeout(()=>drmStart(i),400);return}}
+ drmHud()}
+function drmTick(){if(!DS)return;const st=DS.step;
+ for(const p in DS.s.pat){if(DS.s.yours.indexOf(p)>=0&&p!==DS.s.hold)continue;const c=dCharAt(p,st);if(c==='.')continue;
+  DRUM_SND.hit(p,c==='o'?1:0.7,dSwing(st)/1000)}
+ if(DS.s.ghost&&dCharAt(DS.s.ghost,st)!=='.'&&DS.s.yours.indexOf(DS.s.ghost)>=0)DRUM_SND.hit(DS.s.ghost,0.5,dSwing(st)/1000);
+ if(DS.s.hold&&dCharAt(DS.s.hold,st)!=='.'){if(D_HOLD[DS.s.hold]){DRUM_SND.hit(DS.s.hold,0.85,dSwing(st)/1000);drmGood()}else if(DS.lvl>=2)drmSlip()}
+ if(!DS)return;
+ DS.need=dMine(st);if(DS.s.ghost)DS.need=DS.need.filter(p=>p!==DS.s.ghost);
+ if(st===0)drmChord();
+ drmPaintBar();
+ if(DS.lvl<=3&&DS.need.length){DS.waiting=true;drmHud();return}
+ DS.waiting=false;
+ D_T=setTimeout(drmAdvance,dStepMs());}
+function drmAdvance(){if(!DS)return;
+ if(DS.owed&&Date.now()>DS.owed.until){const k=DS.owed.pads.length;DS.owed=null;for(let q=0;q<k;q++){drmSlip();if(!DS)return}}
+ if(!DS)return;
+ if(DS.need&&DS.need.length)DS.owed={pads:DS.need.slice(),until:Date.now()+dStepMs()*0.45*dStick().win};
+ DS.step++;if(DS.step>=16){DS.step=0;DS.bar++;if(DS.bar>=D_BARS){drmDone();return}}
+ drmTick()}
+function drmHit(pad){if(!DS)return false;
+ const j=DS.need?DS.need.indexOf(pad):-1;
+ if(j>=0){DS.need.splice(j,1);drmGood();drmPaintBar();
+  if(DS.waiting&&!DS.need.length){DS.waiting=false;drmHud();if(D_T)clearTimeout(D_T);D_T=setTimeout(drmAdvance,dStepMs())}
+  return true}
+ if(DS.owed&&Date.now()<=DS.owed.until){const q=DS.owed.pads.indexOf(pad);
+  if(q>=0){DS.owed.pads.splice(q,1);drmGood();return true}}
+ if(DS.lvl>=4)drmSlip();
+ return true}
+function drmHold(pad,on){if(on)D_HOLD[pad]=1;else delete D_HOLD[pad];
+ const el=document.querySelector('#inPad [data-pad="'+pad+'"]');if(el)el.classList.toggle('held',!!on)}
+function dHoldPad(){return DS&&DS.s.hold?DS.s.hold:''}
+function drmDone(){if(!DS)return;const {i,s,slips}=DS;const key=dKey(i);const was=dPasses(i);
+ DX[key]=was+1;const st=slips===0?3:slips<=4?2:1;if(st>dStars(i))DX[key+'s']=st;dxSave();
+ const first=!PX.done[key];const cleared=DX[key]>=2;
+ const xp=Math.round((first&&cleared?s.xp:Math.max(20,s.xp/8))*dStick().mult);
+ PX.xp=(PX.xp|0)+xp;if(cleared)PX.done[key]=1;pxSave();pxPaint();if(typeof floatXp==='function')floatXp(xp);
+ SND.buy(cleared?9:4);VB.stop();if(D_T){clearTimeout(D_T);D_T=null}
+ toast(cleared?(s.name+'. Cleared. +'+xp+' XP \u00B7 '+'\u2605'.repeat(st)):(s.name+'. Once more to clear it. +'+xp+' XP'));
+ DS=null;drmHud();drmPaintBar();
+ setTimeout(()=>{if(INST.on==='drums')drmListPaint(true)},900)}
+/* ---------- the bar you read: sixteen steps, your voices in gold ---------- */
+function drmPaintBar(){const b=$('#drmBar');if(!b)return;
+ if(!DS){b.classList.remove('on');b.innerHTML='';return}
+ const rows=dRows(),names=dPads(),lit=DS.lvl<=4?2:DS.lvl<=7?1:0;let h='';
+ rows.forEach(p=>{const nm=(names.find(x=>x.k===p)||{n:p}).n;const mine=DS.s.yours.indexOf(p)>=0;
+  h+='<div class="drow'+(mine?' mine':'')+'"><span>'+nm+'</span><div class="dsteps">';
+  for(let st=0;st<16;st++){const c=dCharAt(p,st);const on=c!=='.';
+   const ahead=(st-DS.step+16)%16;const near=mine&&on&&lit&&ahead<=lit;
+   h+='<i class="'+(on?'on':'')+(st===DS.step?' now':'')+(near?' cue':'')+(st%4===0?' beat':'')+'"></i>'}
+  h+='</div></div>'});
+ b.innerHTML=h;b.classList.add('on')}
+function drmHud(){const h=$('#drmHud');if(!h)return;if(!DS){h.classList.remove('on');h.innerHTML='';return}
+ h.classList.add('on');const cap=dStick().lay;
+ h.innerHTML='<b>'+DS.s.name+'</b><span class="micro">bar '+(DS.bar+1)+' of '+D_BARS+' \u00B7 streak '+DS.streak+'</span>'+
+  '<span class="lays">'+Array.from({length:5},(_,i)=>'<i class="'+(i<DS.lay?'on':'')+(i>=cap?' cap':'')+'"></i>').join('')+'</span>'+
+  '<button class="btn" id="drmQuit">Stop</button>';
+ $('#drmQuit').onclick=()=>{drmStop();drmListPaint(true)}}
+/* ---------- the shelf ---------- */
+function drmBuy(kind,price,name,after){if(visitGuard('buy '+name.toLowerCase()))return;
+ const done=()=>{S.tools=S.tools||{};S.tools[kind]=1;save();renderHud();SND.buy(10);toast(name+' is yours.');if(after)after()};
+ if(LIVE){if(BUSY)return;BUSY=true;RPC('drum_buy',{p_kind:kind}).then(r=>{BUSY=false;
+   if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(price);
+    else toast(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 81 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
+   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+ if(reach()<price){showShort(price);return}S.gc-=price;ledger(name,-price,'the Keeper');done()}
+function drmListPaint(open){const l=$('#drmList');if(!l)return;const sx=dStickIx(),ki=dKitIx();
+ let h='<div class="vhead"><b>The lineage</b><span class="micro">\u2605 '+(PX.xp|0).toLocaleString()+' XP \u00B7 '+pxRank()+'</span><button class="btn" id="drmClose">Close</button></div>';
+ h+='<div class="vpack"><div class="vph"><b>Ten grooves, in order</b><span class="micro">one more limb at every step \u00B7 the kit plays the rest</span></div><div class="vsongs">'+
+  DLESSONS.map((s,i)=>{const cl=dCleared(i),pa=dPasses(i),stq=dStars(i),op=dOpen(i);
+   return '<button class="vsong'+(cl?' done':'')+(op?'':' shut')+'"'+(op?' data-i="'+i+'"':'')+'><em>'+s.lvl+'</em><span><b>'+s.name+'</b><small>'+s.era+' \u00B7 you play '+s.yours.map(p=>(dPads().find(x=>x.k===p)||{n:p}).n.toLowerCase()).join(' and ')+'</small></span><i>'+(cl?'\u2605'.repeat(stq||1):op?(pa?'once':''):'locked')+'</i></button>'}).join('')+'</div></div>';
+ h+='<div class="vpack"><div class="vph"><b>The kit shelf</b><span class="micro">every kit is built in code, so it loads with the room</span></div><div class="vbows">'+
+  DKITS.map((K,i)=>{const own=dOwnsKit(i);return '<button class="vbow'+(i===ki?' on':'')+(own?' owned':'')+'" data-kit="'+i+'"><b>'+K.n+'</b><small>'+(own?(i===ki?'on the riser':'tap to set up'):K.price.toLocaleString()+' gc')+'</small><small class="sub">'+K.sub+'</small></button>'}).join('')+'</div></div>';
+ h+='<div class="vpack"><div class="vph"><b>The stick shelf</b><span class="micro">better sticks widen the window, lift the ceiling on the band and double what you earn</span></div><div class="vbows">'+
+  DSTICKS.map((B,i)=>'<button class="vbow'+(i===sx?' on':'')+(i<=sx?' owned':'')+'"'+(i<=sx?'':' data-stick="'+i+'"')+'><b>'+B.n+'</b><small>'+(i<=sx?(i===sx?'in your hands':'owned'):B.price.toLocaleString()+' gc')+'</small></button>').join('')+'</div></div>';
+ if(DMIDI.ok())h+='<div class="vpack"><div class="vph"><b>A real kit</b><span class="micro">pair a bluetooth or usb kit, keyboard or guitar in your system settings first, then let the room listen</span><button class="btn gold" id="drmMidi">'+(DMIDI.on()?'Listening':'Connect')+'</button></div></div>';
+ else h+='<div class="vpack"><div class="vph"><b>A real kit</b><span class="micro">this browser will not take a bluetooth kit. Chrome on a laptop or an Android phone will. Safari and the iPhone do not allow it.</span></div></div>';
+ l.innerHTML=h;l.classList.toggle('on',open!==false);
+ $('#drmClose').onclick=()=>l.classList.remove('on');
+ $$('#drmList .vsong[data-i]').forEach(b=>b.onclick=()=>drmStart(+b.dataset.i));
+ $$('#drmList [data-kit]').forEach(b=>b.onclick=()=>{const i=+b.dataset.kit;const K=DKITS[i];
+  if(dOwnsKit(i)){dSetKit(i);drmListPaint(true);return}drmBuy(K.k,K.price,K.n,()=>{dSetKit(i);drmListPaint(true)})});
+ $$('#drmList [data-stick]').forEach(b=>b.onclick=()=>{const i=+b.dataset.stick;const B=DSTICKS[i];drmBuy(B.k,B.price,B.n,()=>drmListPaint(true))});
+ const mb=$('#drmMidi');if(mb)mb.onclick=()=>DMIDI.start()}
+/* ---------- the MIDI door: one layer for every instrument in the room ----------
+   Chrome on a laptop or an Android phone speaks to a bluetooth or usb kit. Safari and the iPhone do not
+   implement it at all. Notes that come in are played, scored and broadcast on exactly the same path as
+   your thumbs, so a friend with a real kit and a friend with a phone can play together. */
+const DMIDI=(()=>{let acc=null,live=false;
+ const GM={35:'kick',36:'kick',37:'snare',38:'snare',39:'snare',40:'snare',41:'tom2',43:'tom2',45:'tom2',
+  47:'tom1',48:'tom1',50:'tom1',42:'hat',44:'hat',46:'ohat',49:'crash',52:'crash',55:'crash',57:'crash',
+  51:'ride',53:'ride',56:'ride',59:'ride'};
+ function note(m,v,down,chn){
+  if(typeof SEATED!=='undefined'&&SEATED){pianoKeyDown(m,down);return}
+  const k=INST.on;if(!k)return;
+  if(k==='drums'||chn===9){const p=GM[m]||'snare';if(!down)return;
+   DRUM_SND.hit(p,Math.max(0.35,v));instFlash('drums',0,p);instCast('drums',0,v,true,p);drmHit(p);return}
+  const s=SAMP[k];if(!s)return;if(!s.ready())s.load();
+  if(down){s.noteOn(m,v,k==='violin');instCast(k,m,v,true);instFlash(k,m);if(k==='violin')vlnHit(m)}
+  else{s.noteOff(m,false);instCast(k,m,0,false)}}
+ function msg(e){const d=e.data;if(!d||d.length<2)return;const c=d[0]&0xF0,chn=d[0]&0x0F,m=d[1],v=d.length>2?d[2]:0;
+  if(c===0x90&&v>0)note(m,Math.max(0.2,v/127),true,chn);else if(c===0x80||(c===0x90&&v===0))note(m,0,false,chn)}
+ return {ok(){try{return !!(navigator&&navigator.requestMIDIAccess)}catch(e){return false}},
+  on(){return live},
+  start(){if(!this.ok()){toast('This browser will not take a bluetooth kit. Chrome on a laptop or an Android phone will.');return}
+   navigator.requestMIDIAccess().then(a=>{acc=a;live=true;
+    const bind=()=>{let n=0;a.inputs.forEach(i=>{i.onmidimessage=msg;n++});return n};
+    const n=bind();a.onstatechange=bind;
+    toast(n?(n===1?'One instrument is listening.':n+' instruments are listening.'):'Nothing found. Pair it in your system settings first, then connect again.');
+    if(INST.on==='drums')drmListPaint(true);drmMidiChip()}).catch(()=>toast('MIDI was refused.'))}}})();
+function drmMidiChip(){const bar=$('#inBar2');if(!bar||!DMIDI.ok())return;let b=$('#inMidi');
+ if(!b){b=document.createElement('button');b.className='btn';b.id='inMidi';bar.appendChild(b);b.onclick=()=>DMIDI.start()}
+ b.textContent=DMIDI.on()?'MIDI on':'MIDI';b.style.borderColor=DMIDI.on()?'var(--gold)':'';b.style.color=DMIDI.on()?'var(--gold)':''}
 function vlnTone(){return INST.on==='violin'?vBow().tone:0}
 function paintHotbar(){const on=hasPack();['sword','flamethrower'].forEach(k=>{$('#'+k).style.display=(on||!owns(k)||!inHand(k))?'none':''});['rocket','launcher','chainsaw','bubbles','kite'].forEach(k=>{$('#'+k).style.display=(on||(owns(k)&&!inHand(k)))?'none':''});
  $('#packSlot').style.display=on?'':'none';if(!on)$('#packFan').classList.remove('on');paintBar()}
@@ -5182,7 +5471,7 @@ function portalTick(t,dt){const k=ph==='night'?1.35:1;PORTAL_RING.material.color
   PORTAL_MOTES.forEach(p=>{p.y+=p.v*dt*(PORTAL_GOING?6:1);if(p.y>2.8)p.y=0;p.a+=dt*0.8;p.m.position.set(Math.cos(p.a)*p.r,p.y,Math.sin(p.a)*p.r);p.m.material.opacity=0.85*Math.min(1,(2.8-p.y)/0.6)})}
 function portalGo(dest){if(PORTAL_GOING)return;PORTAL_GOING=true;SND.tier();toast(dest==='flag'?'The circle takes you to the flag.':dest==='chess'?'The board takes you to the study.':'The circle takes you.');const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:#07060a;opacity:0;transition:opacity .9s;z-index:80;pointer-events:none';document.body.appendChild(v);requestAnimationFrame(()=>{v.style.opacity='1'});
   setTimeout(()=>{const p=dest==='flag'?'flag':dest==='chess'?'chess':'club';location.href=(/(^|\.)deeds\.fun$/.test(location.hostname)?'/garden/'+p+'/':'../'+p+'/')},1000)}
-window.__walk={INST,INST_AT,SAMP,DRUM_SND,placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
