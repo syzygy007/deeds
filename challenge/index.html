@@ -1,49 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Someone sent you the Forty.</title>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DEEDS.">
 <meta property="og:title" content="Someone sent you the Forty.">
-<meta property="og:description" content="Forty acts of kindness. Sent anonymously, person to person.">
+<meta property="og:description" content="Forty good deeds in a year. Sent anonymously, person to person.">
 <meta property="og:url" content="https://deeds.fun/challenge/">
 <meta property="og:image" content="https://deeds.fun/challenge-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Forty circles, one filled in forest green. The Forty Challenge.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Someone sent you the Forty.">
-<meta name="twitter:description" content="Forty acts of kindness. Sent anonymously, person to person.">
+<meta name="twitter:description" content="Forty good deeds in a year. Sent anonymously, person to person.">
 <meta name="twitter:image" content="https://deeds.fun/challenge-og.jpg">
-<link rel="apple-touch-icon" href="/icon-180.png">
 <style>
-  body{margin:0;background:#F6F3EB;color:#15130E;font-family:Helvetica,Arial,sans-serif;
-       min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-  .card{max-width:480px;text-align:left;}
-  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;opacity:.55;}
-  h1{font-size:clamp(1.9rem,7vw,2.6rem);font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:14px 0 12px;}
-  h1 span{color:#1F4B3A;}
-  p{font-size:1rem;line-height:1.6;opacity:.75;margin:0 0 28px;}
-  a.btn{display:inline-block;background:#1F4B3A;color:#F6F3EB;text-decoration:none;
-        font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:15px 26px;}
+:root{
+  --forest:#1F4B3A; --paper:#FAF7F0; --card:#FFFFFF; --panel:#F1ECE0;
+  --ivory:#F6F3EB; --ink:#15130E; --gold:#A8853C; --sage:#6E7A70;
+  --mute:rgba(21,19,14,.62); --line:rgba(21,19,14,.12);
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+.micro{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+
+/* ---------- act one : the night ---------- */
+#hero{position:relative;min-height:auto;padding-bottom:34px;display:flex;flex-direction:column;overflow:hidden;background:var(--paper)}
+#stars{display:none}
+.bar{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--line);max-width:1180px;margin:0 auto;width:100%}
+.joinbtn{background:none;border:1px solid rgba(31,75,58,.45);border-radius:5px;color:var(--forest);
+  font-family:var(--sans);font-size:14px;font-weight:600;padding:10px 15px;cursor:pointer}
+.joinbtn span{font-size:12px;margin-left:4px}
+.word{font-family:var(--sans);font-weight:800;font-size:19px;letter-spacing:-.01em}
+.word{color:var(--ink)}
+.word i{font-style:normal;color:var(--forest)}
+.bar .micro{color:var(--forest)}
+.hgrid{position:relative;z-index:3;margin-top:auto;width:100%}
+.hcopy{padding:26px 22px 0;max-width:760px;width:100%;margin:0 auto}
+.hwall{display:none}
+.eyebrow{color:var(--forest);margin:0 0 16px}
+h1{font-family:var(--serif);font-weight:700;margin:0;
+  font-size:clamp(2.8rem,13.4vw,5.2rem);line-height:.96;letter-spacing:-.02em}
+h1 span{display:block}
+h1 em{font-style:normal;color:var(--forest)}
+h1 .em{font-family:var(--serif);font-style:italic;color:var(--forest)}
+.kicker{margin:16px 0 0;font-size:13.5px;color:var(--mute)}
+.hbtns{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.hbtns .cta{width:auto;min-width:180px;margin-top:26px}
+.hbtns .cue{width:auto;margin-top:26px;padding:0;text-align:left;font-size:14.5px;font-weight:600}
+.env{position:relative;width:100%;max-width:300px;margin:4px 0 26px;cursor:pointer}
+.seal{position:absolute;left:50%;top:73%;width:26%;transform:translate(-50%,-50%);
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));pointer-events:none}
+.hbtns .cue{margin-top:14px}
+.env svg{width:100%;height:auto;display:block;overflow:hidden}
+.note-card{transform:translateY(58px);opacity:0;transition:transform 1s cubic-bezier(.33,0,.15,1) .3s,opacity .5s ease .3s}
+.env.open .note-card{transform:translateY(0);opacity:1}
+.strip{margin-top:34px}
+.striplab{color:var(--forest);margin-bottom:10px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:420px}
+.thumbs img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.thumbs img:first-child{object-position:72% 50%}
+.thumbs img:nth-child(2){object-position:60% 50%}
+.plain{font-family:var(--serif);font-size:clamp(1.05rem,4.3vw,1.4rem);line-height:1.42;
+  margin:22px 0 0;max-width:34ch;color:var(--mute);font-family:var(--sans);font-size:16.5px;line-height:1.65}
+.plain b{font-weight:700;color:var(--ink)}
+.cta{display:block;width:100%;text-align:center;border:0;border-radius:6px;
+  padding:16px 20px;font-size:16px;font-weight:700;letter-spacing:.01em;
+  background:var(--forest);color:var(--ivory);margin-top:26px}
+.cta.ghost{background:transparent;color:var(--forest);box-shadow:inset 0 0 0 1.5px rgba(31,75,58,.4);margin-top:10px}
+.cue{display:block;width:100%;background:none;border:0;color:var(--forest);font-size:12.5px;
+  letter-spacing:.06em;padding:18px 0 0;text-align:center;text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- act two : the proof ---------- */
+.band{padding:34px 0 12px}
+h2{font-family:var(--serif);font-weight:700;margin:0 0 8px;
+  font-size:clamp(2.2rem,9vw,3.4rem);line-height:1.02;letter-spacing:-.02em}
+.sub{font-size:15px;line-height:1.55;color:var(--mute);margin:0 0 30px;max-width:34ch}
+.card{background:var(--card);border-radius:10px;overflow:hidden;margin:0 0 16px;
+  border:1px solid var(--line);box-shadow:0 2px 10px rgba(21,19,14,.05)}
+.chead{display:flex;align-items:center;gap:10px;padding:14px 16px 12px}
+.mark{width:32px;height:32px;border-radius:50%;flex:0 0 32px;
+  background:radial-gradient(circle at 34% 30%,#3E6B57,#1B4436);
+  box-shadow:0 0 0 1.5px rgba(160,176,164,.45)}
+.mark.b{background:radial-gradient(circle at 34% 30%,#6E7F5E,#3A4A34)}
+.mark.g{background:radial-gradient(circle at 34% 30%,#C9A85E,#8A6E30);box-shadow:0 0 0 1.5px rgba(190,154,78,.75)}
+.hand em{font-style:normal;color:var(--gold);font-size:12px;margin-left:2px}
+.hand{font-size:14px;font-weight:700;letter-spacing:.01em}
+.when{font-size:12px;color:var(--mute);margin-top:1px}
+.slot{position:relative;padding-bottom:72%;background:
+  repeating-linear-gradient(135deg,rgba(246,243,235,.05) 0 2px,rgba(246,243,235,0) 2px 9px),#14382C}
+.slot b{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  color:var(--sage);font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+.ctext{padding:0 16px 14px;font-size:16px;line-height:1.5;color:var(--ink)}
+.cfoot{display:flex;align-items:center;gap:22px;padding:12px 16px 15px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--mute)}
+.cfoot span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.redeed{display:block;padding:11px 16px;border-top:1px solid rgba(168,133,60,.32);background:rgba(168,133,60,.06);
+  color:var(--gold);font-size:10.5px;letter-spacing:.16em;font-weight:700;text-transform:uppercase}
+.note{font-family:var(--serif);font-size:clamp(1.05rem,4.4vw,1.35rem);line-height:1.5;color:var(--mute);
+  margin:6px 0 0;padding-left:16px;border-left:2px solid var(--forest);max-width:30ch}
+
+/* ---------- act three : do one ---------- */
+#do{background:var(--panel);color:var(--ink);margin-top:64px;padding:66px 0 84px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#do h2{color:var(--ink)}
+#do .sub{color:var(--mute)}
+.acts{border-top:1px solid rgba(21,19,14,.16)}
+.act{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid rgba(21,19,14,.16);padding:19px 2px;font-size:16.5px;color:var(--ink);line-height:1.35}
+.act .ring{width:19px;height:19px;flex:0 0 19px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--forest)}
+.act[aria-pressed="true"] .ring{background:var(--forest)}
+.act .free{margin-left:auto;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.made{margin-top:26px;background:var(--forest);color:var(--ivory);border-radius:10px;overflow:hidden;
+  opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.made.on{opacity:1;transform:none}
+.made .ctext{color:#EDE8DC}
+.door{margin-top:18px;padding:22px 18px;background:#EFEADD;border-radius:10px;display:none}
+.door.on{display:block}
+.door p{margin:0 0 14px;font-size:14px;line-height:1.5;color:#4A5148}
+.field{display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--forest);padding-bottom:8px}
+.field input{flex:1;border:0;background:none;font-size:17px;font-family:var(--serif);color:var(--ink);outline:none;padding:6px 0}
+.send{background:var(--forest);color:var(--ivory);border:0;border-radius:5px;padding:11px 16px;font-size:13px;font-weight:700}
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 22px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(250,247,240,0) 0%,rgba(250,247,240,.92) 36%,rgba(250,247,240,.99) 100%);
+  transform:translateY(120%);transition:transform .28s ease;pointer-events:none}
+#dock.on{transform:none;pointer-events:auto}
+#dock .cta{margin:0 auto;max-width:620px}
+#veil{position:fixed;inset:0;background:rgba(10,17,13,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+#veil.on{display:flex}
+#sheet{background:var(--ivory);color:#15130E;width:min(440px,100%);font-family:var(--sans);
+  border-top:3px solid var(--forest);border-radius:3px;padding:26px 26px 24px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#sheet .smark{color:#15130E;font-size:1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+#sheet .smark i{font-style:normal;color:var(--forest)}
+#sheet h2{font-family:var(--serif);font-weight:700;letter-spacing:-.02em;font-size:1.7rem;line-height:1.04;margin:0}
+#sheet h2 i{font-style:normal;color:var(--gold)}
+#sheet .sub{margin:8px 0 0;font-weight:700;font-size:.66rem;letter-spacing:.18em;color:var(--forest);text-transform:uppercase}
+#sheet .expl{margin-top:14px;font-size:.9rem;line-height:1.55;color:rgba(21,19,14,.78)}
+#sheet .field{margin-top:20px;display:block;border:0;padding:0}
+#sheet .field label{display:block;font-size:.6rem;letter-spacing:.2em;font-weight:700;color:rgba(21,19,14,.55);text-transform:uppercase;margin-bottom:6px}
+#sheet .field input{width:100%;border:0;border-bottom:1px solid rgba(21,19,14,.32);background:transparent;
+  font-family:var(--sans);font-size:1.15rem;padding:8px 2px 10px;border-radius:0;color:var(--ink)}
+#sheet .field input:focus{outline:none;border-bottom-color:var(--forest)}
+#sheet .fhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+#sheet .fhead label{margin-bottom:6px}
+.swap{appearance:none;border:0;background:none;font-family:var(--sans);font-size:.6rem;letter-spacing:.16em;font-weight:700;
+  color:var(--forest);text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+#sheet .field input::placeholder{color:rgba(21,19,14,.32)}
+#code{font-size:1.9rem;letter-spacing:.42em;text-align:center;font-weight:700}
+.sbtn{margin-top:20px;width:100%;appearance:none;border:0;cursor:pointer;font-family:var(--sans);
+  font-weight:700;font-size:.9rem;padding:15px 20px;border-radius:3px;background:var(--forest);color:var(--ivory)}
+.sbtn[disabled]{opacity:.55;cursor:default}
+.sbtn.ghost{background:transparent;color:rgba(21,19,14,.72);padding:12px 20px;margin-top:8px}
+.err{margin-top:14px;font-size:.84rem;line-height:1.5;color:#7A2E1F;display:none}
+.err.on{display:block}
+.jview{display:none}
+.jview.on{display:block}
+.sentto{margin-top:14px;font-size:.9rem;color:rgba(21,19,14,.78);line-height:1.5}
+.sentto b{color:#15130E}
+#doneName{color:var(--forest)}
+.joinlink{background:none;border:0;color:var(--forest);font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:6px 0}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);background:var(--ink);color:var(--ivory);
+  padding:13px 18px;border-radius:6px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s;z-index:40;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- act four : the forty ---------- */
+.forty{padding:70px 0 0}
+.rings{display:grid;grid-template-columns:repeat(10,1fr);gap:9px;max-width:420px;margin:26px 0 24px}
+.rings i{display:block;padding-bottom:100%;border-radius:50%;box-shadow:inset 0 0 0 1.4px rgba(31,75,58,.35)}
+.rings i.on{background:var(--forest);box-shadow:none}
+.ringnote{font-size:13px;color:var(--mute);margin:0 0 22px}
+.spec{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-top:1px solid var(--line);font-size:14px}
+.spec b{font-weight:400;color:var(--mute)}
+.close{padding:84px 0 90px;text-align:center;background:var(--forest);color:var(--ivory);margin-top:80px}
+.close .cta{background:var(--ivory);color:var(--ink)}
+.close .cta.ghost{background:transparent;color:var(--ivory);box-shadow:inset 0 0 0 1.5px rgba(246,243,235,.45)}
+.close h2{max-width:14ch;margin:0 auto 26px}
+.close .cta{max-width:420px;margin-left:auto;margin-right:auto}
+.foot{padding:0 0 40px;text-align:center;color:rgba(246,243,235,.6)}
+@media (min-width:900px){
+  .wrap{max-width:1000px}
+  h1{font-size:6.4rem}
+  .hcopy{padding-bottom:9svh}
+  .cta{display:inline-block;width:auto;min-width:250px;margin-right:10px}
+  .cta.ghost{margin-top:26px}
+  #hero{min-height:92svh;padding-bottom:0}
+  .strip{display:none}
+  .bar{padding:22px 26px}
+  .hgrid{max-width:1180px;margin:auto auto 0;display:grid;grid-template-columns:1.02fr .98fr;
+    gap:52px;align-items:end;padding:0 26px}
+  .hcopy{padding:0 0 46px;max-width:none;margin:0}
+  .hcopy .plain{max-width:38ch}
+  .hwall{display:block;max-height:80svh;overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,0) 100%);
+            mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,0) 100%)}
+  .hwall .card{margin-bottom:16px}
+  .hwall .card img{max-height:42svh;object-fit:cover;width:100%}
+  .hcopy .plain{max-width:30ch}
+  #proof .cards .card:first-child{display:none}
+  #proof{padding-top:10px}
+  .cue{text-align:left}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .note{max-width:36ch}
+  .card{margin:0}
+  .note{margin-top:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-  <div class="card">
-    <span class="label">The Forty Challenge</span>
-    <h1>Someone sent you this, anonymously<span>.</span></h1>
-    <p>Forty acts of kindness. Any order, any speed, no audience. They will never know if you accept. That is the point.</p>
-    <a class="btn" id="go" href="/">Open the Challenge.</a>
+
+<section id="hero">
+  
+  <div class="bar">
+    <div class="word">DEEDS<i>.</i></div>
+    <button class="joinbtn" data-join>Join Deeds <span>&#8599;</span></button>
   </div>
+  <div class="hgrid">
+  <div class="hcopy">
+    <div class="micro eyebrow">You are invited</div>
+    <div class="env" id="env" role="img" aria-label="An opening envelope holding a card that reads The Forty, 40">
+      <svg viewBox="0 0 300 212" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 74 L150 6 L288 74 Z" fill="#2A251D"/>
+        <g class="note-card">
+          <rect x="46" y="14" width="208" height="150" rx="3" fill="#FAF7F0" stroke="rgba(21,19,14,.16)"/>
+          <text x="150" y="52" text-anchor="middle" font-family="Helvetica,Arial" font-size="9"
+                letter-spacing="3.4" font-weight="700" fill="#1F4B3A">THE FORTY</text>
+          <text x="150" y="112" text-anchor="middle" font-family="Georgia,serif" font-size="56" fill="#1F4B3A">40</text>
+          <line x1="114" y1="130" x2="186" y2="130" stroke="#A8853C" stroke-width="1"/>
+        </g>
+        <path d="M12 74 L12 202 Q12 206 16 206 L284 206 Q288 206 288 202 L288 74 L150 168 Z" fill="#17140F"/>
+        <path d="M12 202 L118 128 L182 128 L288 202 Z" fill="#1E1A14" opacity=".85"/>
+      </svg>
+      <img class="seal" src="/note-seal.webp" alt="">
+    </div>
+    <h1><span id="who">Someone</span><span class="em">sent you the Forty<em>.</em></span></h1>
+    <p class="plain"><b>40 good deeds in one year.</b><br>
+      Small things for the people around you.<br>
+      They never find out whether you said yes.</p>
+    <div class="hbtns">
+      <button class="cta" data-join>Accept the Forty <span>&#8599;</span></button>
+      <button class="cue" data-jump="do">See easy ways to start</button>
+    </div>
+    <p class="kicker">Your year starts the day you accept. Your pace. No audience.</p>
+    <div class="strip">
+      <div class="micro striplab">What the Forty looks like</div>
+      <div class="thumbs">
+        <img loading="lazy" src="/wel-coffee.jpg" alt="Coffee for a mom">
+        <img loading="lazy" src="/wel-food.jpg" alt="Food drive donations">
+        <img loading="lazy" src="/wel-books.jpg" alt="Wrapped books">
+        <img loading="lazy" src="/wel-beach.jpg" alt="A clean beach at sunset">
+      </div>
+    </div>
+  </div>
+  <div class="hwall" aria-hidden="true">
+    <article class="card">
+      <div class="chead"><div class="mark b"></div>
+        <div><div class="hand">HarborLight077</div><div class="when">2 hours ago</div></div></div>
+      <p class="ctext">Coffee for the world&rsquo;s best mom.</p>
+      <img loading="lazy" src="/wel-coffee.jpg" alt="">
+      <div class="cfoot"><span>&#10022; 22 inspired</span><span>3 comments</span></div>
+    </article>
+    <article class="card">
+      <div class="chead"><div class="mark g"></div>
+        <div><div class="hand">Ridgeline Supply Co. <em>&#10003;</em></div><div class="when">Today &middot; Verified company</div></div></div>
+      <p class="ctext">Produce donations for the food drive today.</p>
+      <img loading="lazy" src="/wel-food.jpg" alt="">
+    </article>
+  </div>
+  </div>
+</section>
+
+<section id="proof" class="band">
+  <div class="wrap">
+    <div class="micro eyebrow">Four of the forty</div>
+    <div class="cards">
+      <article class="card">
+        <div class="chead"><div class="mark b"></div>
+          <div><div class="hand">HarborLight077</div><div class="when">2 hours ago</div></div></div>
+        <p class="ctext">Coffee for the world&rsquo;s best mom.</p>
+        <img loading="lazy" src="/wel-coffee.jpg" alt="A coffee cup with MOM written on it">
+        <div class="cfoot"><span>&#10022; 22 inspired</span><span>3 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark g"></div>
+          <div><div class="hand">Ridgeline Supply Co. <em>&#10003;</em></div><div class="when">Today &middot; Verified company</div></div></div>
+        <p class="ctext">Produce donations for the food drive today.</p>
+        <img loading="lazy" src="/wel-food.jpg" alt="Paper bags of produce at a food drive">
+        <div class="cfoot"><span>&#10022; 88 inspired</span><span>14 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark b"></div>
+          <div><div class="hand">PaperCrane441</div><div class="when">Sunday</div></div></div>
+        <p class="ctext">Books to help a friend through a hard time.</p>
+        <img loading="lazy" src="/wel-books.jpg" alt="Books wrapped in cream paper with a for you tag">
+        <div class="cfoot"><span>&#10022; 33 inspired</span><span>5 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark"></div>
+          <div><div class="hand">LowTideRun228</div><div class="when">Yesterday</div></div></div>
+        <p class="ctext">The beauty of the beach after cleaning it up with my family.</p>
+        <img loading="lazy" src="/wel-beach.jpg" alt="An empty beach at sunset">
+        <div class="redeed">Redeeded 9 times</div>
+        <div class="cfoot"><span>&#10022; 41 inspired</span><span>6 comments</span></div>
+      </article>
+    <h2 style="margin-top:44px">Small things.<br>Someone&rsquo;s whole day.</h2>
+    <p class="note">Nine people saw the beach one and went and did the same thing. That is the only score here.</p>
+  </div>
+</section>
+
+<section id="do">
+  <div class="wrap">
+    <h2>Start with one.</h2>
+    <p class="sub">Number one of forty can be this small. None of these cost anything.</p>
+    <div class="acts">
+      <button class="act" aria-pressed="false" data-act="Brought the neighbor&rsquo;s bins in before they got home.">
+        <span class="ring"></span>Bring a neighbor&rsquo;s bins in.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Told someone exactly what I appreciate about them. Out loud.">
+        <span class="ring"></span>Tell someone what you appreciate about them.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Picked up ten pieces of trash that were not mine.">
+        <span class="ring"></span>Pick up ten pieces of trash.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Called someone who could use the company.">
+        <span class="ring"></span>Call someone who could use the company.<span class="free">Free</span></button>
+    </div>
+
+    <div class="made" id="made">
+      <div class="chead"><div class="mark"></div>
+        <div><div class="hand" id="mhand">Your handle</div><div class="when">Just now</div></div></div>
+      <p class="ctext" id="mtext"></p>
+      <div class="cfoot"><span>&#10022; 0 inspired</span><span style="margin-left:auto">
+        <button class="send" id="logit">Log it.</button></span></div>
+    </div>
+
+
+  </div>
+</section>
+
+<section class="forty">
+  <div class="wrap">
+    <div class="micro eyebrow">What you are accepting</div>
+    <h2>Forty deeds.<br>One year.</h2>
+    <p class="sub" style="margin-top:18px">That is one every nine days. Nobody is counting for you and there is no clock on the wall. Miss a week and nothing happens except a week with less good in it.</p>
+    <div class="rings" id="rings"></div>
+    <p class="ringnote">The first one lights up the day you log it.</p>
+    <div class="spec"><span>Starts</span><b>The day you accept</b></div>
+    <div class="spec"><span>Order</span><b>Any</b></div>
+    <div class="spec"><span>Pace</span><b>About one every nine days</b></div>
+    <button class="cta ghost" style="margin-top:26px" data-jump="do">Start with one.</button>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <h2>Take the first one.</h2>
+    <button class="cta" data-join>Try the Forty.</button>
+    <button class="cta ghost" data-jump="do">Or just do one.</button>
+    <div class="micro foot" style="margin-top:40px">DEEDS. &middot; deeds.fun</div>
+  </div>
+</section>
+
+<div id="veil" role="dialog" aria-modal="true" aria-labelledby="jTitle">
+  <div id="sheet">
+    <div class="smark">DEEDS<i>.</i></div>
+    <div class="jview on" id="jsEmail">
+      <h2 id="jTitle">Join DEEDS<i>.</i></h2>
+      <p class="sub" id="jSub">One text &middot; One code &middot; No password</p>
+      <p class="expl" id="jExpl">DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in.</p>
+      <div class="field">
+        <div class="fhead"><label for="email" id="jLab">Your phone</label><button class="swap" id="btnSwap" type="button">Use email instead</button></div>
+        <input id="email" type="tel" inputmode="tel" autocomplete="tel" autocapitalize="off" spellcheck="false" placeholder="(310) 555 0123">
+      </div>
+      <div class="err" id="errEmail"></div>
+      <button class="sbtn" id="btnSend" type="button">Send the Code.</button>
+      <button class="sbtn ghost" id="btnClose1" type="button">Back.</button>
+    </div>
+    <div class="jview" id="jsCode">
+      <h2 id="codeTitle">Check your texts<i>.</i></h2>
+      <p class="sentto">A six digit code is on its way to <b id="sentAddr"></b>. Enter it here. Only the newest code works.</p>
+      <div class="field"><label for="code">Your code</label>
+        <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*"></div>
+      <div class="err" id="errCode"></div>
+      <button class="sbtn" id="btnVerify" type="button">Verify.</button>
+      <button class="sbtn ghost" id="btnAgain" type="button">Send Again.</button>
+    </div>
+    <div class="jview" id="jsDone">
+      <h2 id="doneTitle">You&rsquo;re in<i>.</i></h2>
+      <p class="expl" id="doneCopy">Your profile is ready. From here on you are <b id="doneName"></b>, and that is all anyone will ever know.</p>
+      <button class="sbtn" id="btnEnter" type="button">Enter DEEDS.</button>
+    </div>
+    <div class="jview" id="jsDead">
+      <h2>The door stuck<i>.</i></h2>
+      <p class="expl">The sign in service could not load from here. Open DEEDS and join from inside, the same one code door is there too.</p>
+      <button class="sbtn" id="btnDead" type="button">Open DEEDS.</button>
+      <button class="sbtn ghost" id="btnClose2" type="button">Back.</button>
+    </div>
+  </div>
+</div>
+
+<div id="dock"><button class="cta" data-join>Try the Forty.</button></div>
+<div id="toast"></div>
+
 <script>
-  (function(){
-    var c = new URLSearchParams(location.search).get('c');
-    var dest = '/' + (c ? '?c=' + encodeURIComponent(c) : '?c=');
-    document.getElementById('go').setAttribute('href', dest);
-    location.replace(dest);
-  })();
+(function(){
+  var slow=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* who sent it: /challenge/?c=handle */
+  var q=new URLSearchParams(location.search);
+  var raw=(q.get('c')||'').replace(/[^A-Za-z0-9]/g,'');
+  var FROM=(raw.length>=3&&raw.length<=24)?raw:'';
+  if(FROM){
+    document.getElementById('who').textContent=FROM;
+    document.title=FROM+' sent you the Forty.';
+  }
+  var env=document.getElementById('env');
+  if(slow){env.classList.add('open');}
+  else{setTimeout(function(){env.classList.add('open')},450);
+    env.addEventListener('click',function(){env.classList.remove('open');setTimeout(function(){env.classList.add('open')},120);});}
+
+  var R=document.getElementById('rings'),h='';
+  for(var i=0;i<40;i++)h+='<i'+(i===0?' class="on"':'')+'></i>';R.innerHTML=h;
+
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+    clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on')},2600);}
+
+  document.querySelectorAll('[data-jump]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var el=document.getElementById(b.getAttribute('data-jump'));
+      el.scrollIntoView({behavior:slow?'auto':'smooth',block:'start'});
+    });
+  });
+
+  var dock=document.getElementById('dock');
+  if('IntersectionObserver' in window){
+    var seen={hero:true,do:false};
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){seen[e.target.id==='hero'?'hero':'do']=e.isIntersecting});
+      dock.classList.toggle('on',!seen.hero&&!seen.do);
+    },{threshold:.12}).observe(document.getElementById('hero'));
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){seen['do']=e.isIntersecting});
+      dock.classList.toggle('on',!seen.hero&&!seen['do']);
+    },{threshold:.06}).observe(document.getElementById('do'));
+  }
+
+  var made=document.getElementById('made'),mt=document.getElementById('mtext');
+  document.querySelectorAll('.act').forEach(function(a){
+    a.addEventListener('click',function(){
+      document.querySelectorAll('.act').forEach(function(o){o.setAttribute('aria-pressed','false')});
+      a.setAttribute('aria-pressed','true');
+      mt.textContent=a.getAttribute('data-act');
+      made.classList.add('on');
+    });
+  });
+  document.getElementById('logit').addEventListener('click',function(){
+    if(!mt.textContent){toast('Pick one first.');return;}
+    try{sessionStorage.setItem('deeds_pending', mt.textContent);}catch(e){}
+    openJoin();
+  });
+
+  /* ---------- the join door (same one code door as the app) ---------- */
+  var SB_URL="https://helqqdygwaihrliglbvw.supabase.co",
+      SB_KEY="sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA",
+      _sb=null,sbLoad=null;
+  function loadSB(){
+    if(sbLoad)return sbLoad;
+    sbLoad=new Promise(function(res){
+      if(window.supabase)return res(true);
+      var x=document.createElement('script');
+      x.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      x.onload=function(){res(!!window.supabase)};x.onerror=function(){res(false)};
+      document.head.appendChild(x);setTimeout(function(){res(!!window.supabase)},9000);
+    });return sbLoad;
+  }
+  function sbc(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SB_URL,SB_KEY);return _sb;}
+  function tmo(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},ms)})]);}
+  function passed(){try{sessionStorage.setItem('deeds_welcomed','1');}catch(e){}}
+  function intoApp(){passed();location.href='/'+location.search;}
+  var veil=document.getElementById('veil'),VIEWS=['jsEmail','jsCode','jsDone','jsDead'];
+  function show(v){VIEWS.forEach(function(x){document.getElementById(x).classList.toggle('on',x===v)});
+    var f=v==='jsEmail'?'email':v==='jsCode'?'code':null;
+    if(f)setTimeout(function(){document.getElementById(f).focus()},60);}
+  function err(id,m){var e=document.getElementById(id);e.textContent=m||'';e.classList.toggle('on',!!m);}
+  function openJoin(){
+    veil.classList.add('on');err('errEmail');err('errCode');
+    var door='phone';try{if(localStorage.getItem('deeds_door')==='email')door='email';}catch(e){}
+    setMode(door);show('jsEmail');
+    loadSB().then(function(ok){if(!ok)return;var cl=sbc();if(!cl)return;
+      cl.auth.getSession().then(function(r){
+        if(r&&r.data&&r.data.session){
+          document.getElementById('doneTitle').innerHTML='You are already in<i>.</i>';
+          document.getElementById('doneCopy').innerHTML='This device is signed in. Walk through.';
+          show('jsDone');
+        }}).catch(function(){});});
+  }
+  function closeJoin(){veil.classList.remove('on');}
+  document.querySelectorAll('[data-join]').forEach(function(b){b.addEventListener('click',openJoin)});
+  document.getElementById('btnClose1').addEventListener('click',closeJoin);
+  document.getElementById('btnClose2').addEventListener('click',closeJoin);
+  veil.addEventListener('click',function(e){if(e.target===veil)closeJoin()});
+  addEventListener('keydown',function(e){if(e.key==='Escape')closeJoin()});
+  document.getElementById('btnDead').addEventListener('click',intoApp);
+  document.getElementById('btnEnter').addEventListener('click',intoApp);
+
+  var EMAIL='',PHONE='',MODE='phone';
+  function normPhone(v){v=String(v||'').trim();var plus=v.charAt(0)==='+',d=v.replace(/\D/g,'');
+    if(plus)return(d.length>=8&&d.length<=15)?'+'+d:'';
+    if(d.length===10)return '+1'+d;
+    if(d.length===11&&d.charAt(0)==='1')return '+'+d;return '';}
+  function pretty(p){var m=/^\+1(\d{3})(\d{3})(\d{4})$/.exec(p||'');return m?'('+m[1]+') '+m[2]+' '+m[3]:(p||'');}
+  function setMode(m){
+    MODE=m==='email'?'email':'phone';var ph=MODE==='phone',i=document.getElementById('email');
+    i.value='';i.setAttribute('type',ph?'tel':'email');i.setAttribute('inputmode',ph?'tel':'email');
+    i.setAttribute('autocomplete',ph?'tel':'email');i.placeholder=ph?'(310) 555 0123':'';
+    document.getElementById('jLab').textContent=ph?'Your phone':'Your email';
+    document.getElementById('btnSwap').textContent=ph?'Use email instead':'Use my phone instead';
+    document.getElementById('jSub').innerHTML=ph?'One text &middot; One code &middot; No password':'One email &middot; One code &middot; No password';
+    document.getElementById('jExpl').textContent=ph
+      ?'DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in.'
+      :'DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.';
+    try{localStorage.setItem('deeds_door',MODE);}catch(e){}
+  }
+  document.getElementById('btnSwap').addEventListener('click',function(){setMode(MODE==='phone'?'email':'phone');document.getElementById('email').focus();});
+  document.getElementById('email').addEventListener('input',function(){if(MODE==='phone'&&/@/.test(this.value)){var k=this.value;setMode('email');this.value=k;}});
+  function sendCode(again){
+    var box=again?'errCode':'errEmail';err(box);
+    if(!again){
+      var raw=(document.getElementById('email').value||'').trim();
+      if(MODE==='phone'){PHONE=normPhone(raw);EMAIL='';
+        if(!PHONE){err('errEmail','A full number with area code. Outside the US, start with +.');return;}
+      }else{EMAIL=raw;PHONE='';
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){err('errEmail','That does not look like an email address.');return;}}
+    }
+    var b=again?document.getElementById('btnAgain'):document.getElementById('btnSend'),was=b.textContent;
+    b.disabled=true;b.textContent='Sending...';
+    loadSB().then(function(ok){
+      if(!ok){show('jsDead');return Promise.reject('dead');}
+      return tmo(sbc().auth.signInWithOtp(MODE==='phone'
+        ?{phone:PHONE,options:{shouldCreateUser:true}}
+        :{email:EMAIL,options:{shouldCreateUser:true}}),15000);
+    }).then(function(r){
+      if(r&&r.error){var m=(r.error.message||'').trim();
+        err(box,m?'The code did not send. '+m:'The code did not send. The service gave no reason. Try again in a minute.');return;}
+      document.getElementById('sentAddr').textContent=MODE==='phone'?pretty(PHONE):EMAIL;
+      document.getElementById('codeTitle').innerHTML=MODE==='phone'?'Check your texts<i>.</i>':'Check your email<i>.</i>';
+      document.getElementById('code').value='';show('jsCode');
+    }).catch(function(e){
+      if(e==='dead')return;
+      err(box,e&&e.message==='timeout'
+        ?'The code service did not answer in fifteen seconds. Try again in a minute.'
+        :'The code did not send. Check the connection and try again.');
+    }).finally(function(){b.disabled=false;b.textContent=was;});
+  }
+  document.getElementById('btnSend').addEventListener('click',function(){sendCode(false)});
+  document.getElementById('btnAgain').addEventListener('click',function(){sendCode(true)});
+  document.getElementById('email').addEventListener('keydown',function(e){if(e.key==='Enter')sendCode(false)});
+  function fetchHandle(uid,tries){
+    if(tries<=0)return Promise.resolve('');
+    return sbc().from('profiles').select('handle').eq('id',uid).maybeSingle().then(function(r){
+      if(r&&r.data&&r.data.handle)return r.data.handle;
+      return new Promise(function(res){setTimeout(res,900)}).then(function(){return fetchHandle(uid,tries-1)});
+    }).catch(function(){return ''});
+  }
+  function verify(){
+    err('errCode');
+    var code=(document.getElementById('code').value||'').replace(/\D/g,'');
+    if(code.length!==6){err('errCode','The code is six digits.');return;}
+    var b=document.getElementById('btnVerify');b.disabled=true;b.textContent='Verifying...';
+    tmo(sbc().auth.verifyOtp(MODE==='phone'
+      ?{phone:PHONE,token:code,type:'sms'}
+      :{email:EMAIL,token:code,type:'email'}),15000)
+    .then(function(r){
+      if(r&&r.error){err('errCode','That code did not work. Codes expire, and only the newest one counts. Send Again for a fresh one.');return;}
+      var uid=r&&r.data&&r.data.user?r.data.user.id:'';
+      show('jsDone');
+      document.getElementById('doneName').textContent='your made name';
+      if(uid)fetchHandle(uid,5).then(function(h){if(h)document.getElementById('doneName').textContent=h;});
+    }).catch(function(){err('errCode','Verification did not answer. Try once more.');})
+    .finally(function(){b.disabled=false;b.textContent='Verify.';});
+  }
+  document.getElementById('btnVerify').addEventListener('click',verify);
+  document.getElementById('code').addEventListener('keydown',function(e){if(e.key==='Enter')verify()});
+})();
 </script>
 </body>
 </html>
