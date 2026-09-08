@@ -1,235 +1,346 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DEEDS. The Art of Doing Good</title>
-<meta name="theme-color" content="#0E1A14">
-<meta property="og:title" content="The Art of Doing Good.">
-<meta property="og:description" content="Not for recognition.">
-<meta property="og:image" content="https://deeds.fun/deeds-og.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/icon-180.png">
-<link rel="preload" as="image" href="/nebula.webp">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DEEDS. See good. Do good. Pass it on.</title>
 <style>
 :root{
-  --ink:#0E1A14; --ivory:#F6F3EB; --sage:#A0B0A4; --gold:#C9A659; --forest:#1F4B3A;
-  --pad: clamp(22px, 6vw, 84px);
+  --forest:#1F4B3A; --paper:#FAF7F0; --card:#FFFFFF; --panel:#F1ECE0;
+  --ivory:#F6F3EB; --ink:#15130E; --gold:#A8853C; --sage:#6E7A70;
+  --mute:rgba(21,19,14,.62); --line:rgba(21,19,14,.12);
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  background:var(--ink); color:var(--ivory);
-  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+.micro{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
 
-/* ---------- act one: the sky ---------- */
-#hero{position:relative; height:100svh; min-height:620px; overflow:hidden}
-.layer{position:absolute; left:-7%; top:-7%; width:114%; height:114%; will-change:transform}
-.layer img{width:100%; height:100%; object-fit:cover; object-position:50% 50%; display:block}
-#stars{position:absolute; inset:0; width:100%; height:100%}
-#skyvid{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  object-position:50% 50%; opacity:0; transition:opacity 1.4s ease}
-#skyvid.on{opacity:1}
-.scrim{position:absolute; inset:0; pointer-events:none;
-  background:
-    linear-gradient(180deg, rgba(14,26,20,.50) 0%, rgba(14,26,20,0) 22%),
-    linear-gradient(0deg,   rgba(14,26,20,.70) 0%, rgba(14,26,20,.10) 52%);
-}
-@media (min-width:1024px){
-  .scrim{background:
-    linear-gradient(90deg, rgba(14,26,20,.80) 0%, rgba(14,26,20,.46) 38%, rgba(14,26,20,0) 64%),
-    linear-gradient(180deg, rgba(14,26,20,.42) 0%, rgba(14,26,20,0) 26%),
-    linear-gradient(0deg, rgba(14,26,20,.34) 0%, rgba(14,26,20,0) 26%);}
-}
+/* ---------- act one : the night ---------- */
+#hero{position:relative;min-height:auto;padding-bottom:34px;display:flex;flex-direction:column;overflow:hidden;background:var(--paper)}
+#stars{display:none}
+.bar{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--line);max-width:1180px;margin:0 auto;width:100%}
+.joinbtn{background:none;border:1px solid rgba(31,75,58,.45);border-radius:5px;color:var(--forest);
+  font-family:var(--sans);font-size:14px;font-weight:600;padding:10px 15px;cursor:pointer}
+.joinbtn span{font-size:12px;margin-left:4px}
+.word{font-family:var(--sans);font-weight:800;font-size:19px;letter-spacing:-.01em}
+.word{color:var(--ink)}
+.word i{font-style:normal;color:var(--forest)}
+.bar .micro{color:var(--forest)}
+.hgrid{position:relative;z-index:3;margin-top:auto;width:100%}
+.hcopy{padding:26px 22px 0;max-width:760px;width:100%;margin:0 auto}
+.hwall{display:none}
+.eyebrow{color:var(--forest);margin:0 0 16px}
+h1{font-family:var(--serif);font-weight:700;margin:0;
+  font-size:clamp(2.8rem,13.4vw,5.2rem);line-height:.96;letter-spacing:-.02em}
+h1 span{display:block}
+h1 em{font-style:normal;color:var(--forest)}
+h1 .em{font-family:var(--serif);font-style:italic;color:var(--forest)}
+.kicker{margin:16px 0 0;font-size:13.5px;color:var(--mute)}
+.hbtns{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.hbtns .cta{width:auto;min-width:180px;margin-top:26px}
+.hbtns .cue{width:auto;margin-top:26px;padding:0;text-align:left;font-size:14.5px;font-weight:600}
+.strip{margin-top:34px}
+.striplab{color:var(--forest);margin-bottom:10px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:420px}
+.thumbs img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.thumbs img:first-child{object-position:72% 50%}
+.thumbs img:nth-child(2){object-position:60% 50%}
+.plain{font-family:var(--serif);font-size:clamp(1.05rem,4.3vw,1.4rem);line-height:1.42;
+  margin:22px 0 0;max-width:34ch;color:var(--mute);font-family:var(--sans);font-size:16.5px;line-height:1.65}
+.plain b{font-weight:700;color:var(--ink)}
+.cta{display:block;width:100%;text-align:center;border:0;border-radius:6px;
+  padding:16px 20px;font-size:16px;font-weight:700;letter-spacing:.01em;
+  background:var(--forest);color:var(--ivory);margin-top:26px}
+.cta.ghost{background:transparent;color:var(--forest);box-shadow:inset 0 0 0 1.5px rgba(31,75,58,.4);margin-top:10px}
+.cue{display:block;width:100%;background:none;border:0;color:var(--forest);font-size:12.5px;
+  letter-spacing:.06em;padding:18px 0 0;text-align:center;text-decoration:underline;text-underline-offset:4px}
 
-.copy{position:absolute; inset:0; display:flex; flex-direction:column;
-  padding:calc(var(--pad) + env(safe-area-inset-top)) var(--pad)
-          calc(var(--pad) + env(safe-area-inset-bottom));
-  will-change:transform}
-.mark{font-weight:700; font-size:clamp(1.05rem,4.2vw,1.35rem); letter-spacing:-.028em}
-.mark i{font-style:normal; color:var(--sage)}
-.body{margin-top:auto; max-width:min(640px, 92%)}
-.eyebrow{font-size:.62rem; letter-spacing:.24em; font-weight:700; color:var(--sage);
-  text-transform:uppercase; margin-bottom:clamp(14px,3.4vw,22px)}
-h1{font-weight:700; letter-spacing:-.037em; line-height:.92;
-  font-size:clamp(2.75rem, 12.4vw, 4.6rem)}
-h1 i{font-style:normal; color:var(--gold)}
-.deck{margin-top:clamp(16px,3.6vw,22px); max-width:34ch; line-height:1.5;
-  font-size:clamp(.92rem,3.7vw,1.02rem); color:rgba(246,243,235,.78)}
-.deck q{quotes:"\201C" "\201D"; font-style:italic; color:var(--ivory)}
+/* ---------- act two : the proof ---------- */
+.band{padding:34px 0 12px}
+h2{font-family:var(--serif);font-weight:700;margin:0 0 8px;
+  font-size:clamp(2.2rem,9vw,3.4rem);line-height:1.02;letter-spacing:-.02em}
+.sub{font-size:15px;line-height:1.55;color:var(--mute);margin:0 0 30px;max-width:34ch}
+.card{background:var(--card);border-radius:10px;overflow:hidden;margin:0 0 16px;
+  border:1px solid var(--line);box-shadow:0 2px 10px rgba(21,19,14,.05)}
+.chead{display:flex;align-items:center;gap:10px;padding:14px 16px 12px}
+.mark{width:32px;height:32px;border-radius:50%;flex:0 0 32px;
+  background:radial-gradient(circle at 34% 30%,#3E6B57,#1B4436);
+  box-shadow:0 0 0 1.5px rgba(160,176,164,.45)}
+.mark.b{background:radial-gradient(circle at 34% 30%,#6E7F5E,#3A4A34)}
+.mark.g{background:radial-gradient(circle at 34% 30%,#C9A85E,#8A6E30);box-shadow:0 0 0 1.5px rgba(190,154,78,.75)}
+.hand em{font-style:normal;color:var(--gold);font-size:12px;margin-left:2px}
+.hand{font-size:14px;font-weight:700;letter-spacing:.01em}
+.when{font-size:12px;color:var(--mute);margin-top:1px}
+.slot{position:relative;padding-bottom:72%;background:
+  repeating-linear-gradient(135deg,rgba(246,243,235,.05) 0 2px,rgba(246,243,235,0) 2px 9px),#14382C}
+.slot b{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  color:var(--sage);font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+.ctext{padding:0 16px 14px;font-size:16px;line-height:1.5;color:var(--ink)}
+.cfoot{display:flex;align-items:center;gap:22px;padding:12px 16px 15px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--mute)}
+.cfoot span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.redeed{display:block;padding:11px 16px;border-top:1px solid rgba(168,133,60,.32);background:rgba(168,133,60,.06);
+  color:var(--gold);font-size:10.5px;letter-spacing:.16em;font-weight:700;text-transform:uppercase}
+.note{font-family:var(--serif);font-size:clamp(1.05rem,4.4vw,1.35rem);line-height:1.5;color:var(--mute);
+  margin:6px 0 0;padding-left:16px;border-left:2px solid var(--forest);max-width:30ch}
 
-.spec{margin-top:clamp(26px,6vw,40px); display:grid; grid-template-columns:1fr 1fr;
-  border-top:1px solid rgba(246,243,235,.20)}
-.spec div{padding:11px 0 10px; border-bottom:1px solid rgba(246,243,235,.20);
-  font-size:.6rem; letter-spacing:.2em; font-weight:700; color:rgba(246,243,235,.72)}
-.spec div:nth-child(odd){border-right:1px solid rgba(246,243,235,.20); padding-right:12px}
-.spec div:nth-child(even){padding-left:14px}
-
-.cta{margin-top:clamp(26px,6vw,38px); display:flex; gap:12px}
-@media (max-width:1023px){.cta{flex-direction:column; align-items:stretch}.btn{text-align:center}}
-.btn{appearance:none; border:0; cursor:pointer; font:inherit; font-weight:700;
-  font-size:.86rem; letter-spacing:-.01em; padding:15px 24px; border-radius:2px;
-  background:var(--ivory); color:var(--ink); text-decoration:none; display:inline-block;
-  transition:transform .18s ease, background .18s ease, color .18s ease}
-.btn.ghost{background:transparent; color:var(--ivory); box-shadow:inset 0 0 0 1px rgba(246,243,235,.42)}
-.btn:hover{transform:translateY(-1px)}
-.btn.ghost:hover{background:rgba(246,243,235,.10)}
-.btn:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
-
-@media (min-width:1024px){
-  .body{max-width:600px; margin-bottom:6px}
-  h1{font-size:clamp(4rem, 5.6vw, 7.4rem)}
-  .spec{grid-template-columns:repeat(4,1fr)}
-  .spec div{border-right:1px solid rgba(246,243,235,.20); padding:12px 16px 11px 0}
-  .spec div+div{padding-left:16px}
-  .spec div:nth-child(even){padding-left:16px}
-  .spec div:last-child{border-right:0}
-}
-
-.herofoot{margin-top:clamp(24px,6vw,38px); display:flex; justify-content:space-between;
-  align-items:baseline; font-size:.58rem; letter-spacing:.2em; font-weight:700;
-  color:rgba(246,243,235,.52)}
-.herofoot b{font-weight:700; color:rgba(246,243,235,.72)}
-
-.cue{position:absolute; left:50%; transform:translateX(-50%);
-  bottom:calc(14px + env(safe-area-inset-bottom));
-  display:flex; flex-direction:column; align-items:center; gap:5px;
-  text-decoration:none; color:rgba(246,243,235,.62); z-index:3}
-.cue span{font-size:.56rem; letter-spacing:.26em; font-weight:700}
-.cue svg{animation:bob 2.6s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
-
-/* ---------- act two: the note ---------- */
-#note{background:var(--ink); padding:clamp(56px,10vw,120px) var(--pad) clamp(64px,10vw,120px);
-  display:flex; flex-direction:column; align-items:center}
-.notelabel{font-size:.62rem; letter-spacing:.26em; font-weight:700; color:var(--sage);
-  text-transform:uppercase; margin-bottom:clamp(26px,5vw,44px); text-align:center}
-.paper{width:min(400px, 94vw); filter:drop-shadow(0 26px 50px rgba(0,0,0,.55)); display:block}
-@media (min-width:1024px){.paper{width:620px; transform:rotate(-.55deg)}}
-.notecta{margin-top:clamp(36px,7vw,60px); display:flex; gap:12px; width:min(620px,92vw)}
-@media (max-width:1023px){.notecta{flex-direction:column}}
-.notecta .btn{flex:1; text-align:center}
-.noteline{margin-top:clamp(20px,4vw,28px); font-size:.58rem; letter-spacing:.2em;
-  font-weight:700; color:rgba(246,243,235,.45); text-align:center}
-
-/* ---------- the join sheet ---------- */
-#veil{position:fixed; inset:0; background:rgba(10,17,13,.72); backdrop-filter:blur(3px);
-  display:none; align-items:center; justify-content:center; padding:20px; z-index:20}
+/* ---------- act three : do one ---------- */
+#do{background:var(--panel);color:var(--ink);margin-top:64px;padding:66px 0 84px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#do h2{color:var(--ink)}
+#do .sub{color:var(--mute)}
+.acts{border-top:1px solid rgba(21,19,14,.16)}
+.act{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid rgba(21,19,14,.16);padding:19px 2px;font-size:16.5px;color:var(--ink);line-height:1.35}
+.act .ring{width:19px;height:19px;flex:0 0 19px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--forest)}
+.act[aria-pressed="true"] .ring{background:var(--forest)}
+.act .free{margin-left:auto;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.made{margin-top:26px;background:var(--forest);color:var(--ivory);border-radius:10px;overflow:hidden;
+  opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.made.on{opacity:1;transform:none}
+.made .ctext{color:#EDE8DC}
+.door{margin-top:18px;padding:22px 18px;background:#EFEADD;border-radius:10px;display:none}
+.door.on{display:block}
+.door p{margin:0 0 14px;font-size:14px;line-height:1.5;color:#4A5148}
+.field{display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--forest);padding-bottom:8px}
+.field input{flex:1;border:0;background:none;font-size:17px;font-family:var(--serif);color:var(--ink);outline:none;padding:6px 0}
+.send{background:var(--forest);color:var(--ivory);border:0;border-radius:5px;padding:11px 16px;font-size:13px;font-weight:700}
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:12px 22px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(250,247,240,0) 0%,rgba(250,247,240,.92) 36%,rgba(250,247,240,.99) 100%);
+  transform:translateY(120%);transition:transform .28s ease;pointer-events:none}
+#dock.on{transform:none;pointer-events:auto}
+#dock .cta{margin:0 auto;max-width:620px}
+#veil{position:fixed;inset:0;background:rgba(10,17,13,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
 #veil.on{display:flex}
-#sheet{background:var(--ivory); color:#15130E; width:min(440px, 100%);
-  border-top:3px solid var(--forest); border-radius:2px; padding:26px 26px 24px;
-  box-shadow:0 30px 70px rgba(0,0,0,.5)}
-#sheet .mark{color:#15130E; font-size:1rem; margin-bottom:18px}
-#sheet .mark i{color:var(--forest)}
-#sheet h2{font-weight:700; letter-spacing:-.03em; font-size:1.7rem; line-height:1.04}
-#sheet h2 i{font-style:normal; color:var(--forest)}
-.sub{margin-top:8px; font-weight:700; font-size:.66rem; letter-spacing:.18em;
-  color:var(--forest); text-transform:uppercase}
-.expl{margin-top:14px; font-size:.9rem; line-height:1.55; color:rgba(21,19,14,.78)}
-.field{margin-top:20px}
-.field label{display:block; font-size:.6rem; letter-spacing:.2em; font-weight:700;
-  color:rgba(21,19,14,.55); text-transform:uppercase; margin-bottom:6px}
-.field input{width:100%; border:0; border-bottom:1px solid rgba(21,19,14,.32);
-  background:transparent; font:inherit; font-size:1.15rem; padding:8px 2px 10px; border-radius:0}
-.field input:focus{outline:none; border-bottom-color:var(--forest)}
-.fhead{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
-.fhead label{margin-bottom:6px}
-.swap{appearance:none; border:0; background:none; font:inherit; font-size:.6rem; letter-spacing:.16em; font-weight:700;
-  color:var(--forest); text-transform:uppercase; cursor:pointer; padding:0; text-decoration:underline; text-underline-offset:3px}
-.field input::placeholder{color:rgba(21,19,14,.32)}
-#code{font-size:1.9rem; letter-spacing:.42em; text-align:center; font-weight:700}
-.sbtn{margin-top:20px; width:100%; appearance:none; border:0; cursor:pointer; font:inherit;
-  font-weight:700; font-size:.9rem; padding:15px 20px; border-radius:2px;
-  background:var(--forest); color:var(--ivory)}
-.sbtn[disabled]{opacity:.55; cursor:default}
-.sbtn.ghost{background:transparent; color:rgba(21,19,14,.72); padding:12px 20px; margin-top:8px}
-.err{margin-top:14px; font-size:.84rem; line-height:1.5; color:#7A2E1F; display:none}
+#sheet{background:var(--ivory);color:#15130E;width:min(440px,100%);font-family:var(--sans);
+  border-top:3px solid var(--forest);border-radius:3px;padding:26px 26px 24px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#sheet .smark{color:#15130E;font-size:1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+#sheet .smark i{font-style:normal;color:var(--forest)}
+#sheet h2{font-family:var(--serif);font-weight:700;letter-spacing:-.02em;font-size:1.7rem;line-height:1.04;margin:0}
+#sheet h2 i{font-style:normal;color:var(--gold)}
+#sheet .sub{margin:8px 0 0;font-weight:700;font-size:.66rem;letter-spacing:.18em;color:var(--forest);text-transform:uppercase}
+#sheet .expl{margin-top:14px;font-size:.9rem;line-height:1.55;color:rgba(21,19,14,.78)}
+#sheet .field{margin-top:20px;display:block;border:0;padding:0}
+#sheet .field label{display:block;font-size:.6rem;letter-spacing:.2em;font-weight:700;color:rgba(21,19,14,.55);text-transform:uppercase;margin-bottom:6px}
+#sheet .field input{width:100%;border:0;border-bottom:1px solid rgba(21,19,14,.32);background:transparent;
+  font-family:var(--sans);font-size:1.15rem;padding:8px 2px 10px;border-radius:0;color:var(--ink)}
+#sheet .field input:focus{outline:none;border-bottom-color:var(--forest)}
+#sheet .fhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+#sheet .fhead label{margin-bottom:6px}
+.swap{appearance:none;border:0;background:none;font-family:var(--sans);font-size:.6rem;letter-spacing:.16em;font-weight:700;
+  color:var(--forest);text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+#sheet .field input::placeholder{color:rgba(21,19,14,.32)}
+#code{font-size:1.9rem;letter-spacing:.42em;text-align:center;font-weight:700}
+.sbtn{margin-top:20px;width:100%;appearance:none;border:0;cursor:pointer;font-family:var(--sans);
+  font-weight:700;font-size:.9rem;padding:15px 20px;border-radius:3px;background:var(--forest);color:var(--ivory)}
+.sbtn[disabled]{opacity:.55;cursor:default}
+.sbtn.ghost{background:transparent;color:rgba(21,19,14,.72);padding:12px 20px;margin-top:8px}
+.err{margin-top:14px;font-size:.84rem;line-height:1.5;color:#7A2E1F;display:none}
 .err.on{display:block}
 .jview{display:none}
 .jview.on{display:block}
-.sentto{margin-top:14px; font-size:.9rem; color:rgba(21,19,14,.78); line-height:1.5}
+.sentto{margin-top:14px;font-size:.9rem;color:rgba(21,19,14,.78);line-height:1.5}
 .sentto b{color:#15130E}
 #doneName{color:var(--forest)}
+.joinlink{background:none;border:0;color:var(--forest);font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:6px 0}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);background:var(--ink);color:var(--ivory);
+  padding:13px 18px;border-radius:6px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s;z-index:40;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
 
-@media (prefers-reduced-motion:reduce){ .layer,.copy{transform:none !important} .cue svg{animation:none} html{scroll-behavior:auto} }
+/* ---------- act four : the forty ---------- */
+.forty{padding:70px 0 0}
+.rings{display:grid;grid-template-columns:repeat(10,1fr);gap:9px;max-width:420px;margin:26px 0 24px}
+.rings i{display:block;padding-bottom:100%;border-radius:50%;box-shadow:inset 0 0 0 1.4px rgba(31,75,58,.35)}
+.rings i.on{background:var(--forest);box-shadow:none}
+.ringnote{font-size:13px;color:var(--mute);margin:0 0 22px}
+.spec{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-top:1px solid var(--line);font-size:14px}
+.spec b{font-weight:400;color:var(--mute)}
+.close{padding:84px 0 90px;text-align:center;background:var(--forest);color:var(--ivory);margin-top:80px}
+.close .cta{background:var(--ivory);color:var(--ink)}
+.close .cta.ghost{background:transparent;color:var(--ivory);box-shadow:inset 0 0 0 1.5px rgba(246,243,235,.45)}
+.close h2{max-width:14ch;margin:0 auto 26px}
+.close .cta{max-width:420px;margin-left:auto;margin-right:auto}
+.foot{padding:0 0 40px;text-align:center;color:rgba(246,243,235,.6)}
+@media (min-width:900px){
+  .wrap{max-width:1000px}
+  h1{font-size:6.4rem}
+  .hcopy{padding-bottom:9svh}
+  .cta{display:inline-block;width:auto;min-width:250px;margin-right:10px}
+  .cta.ghost{margin-top:26px}
+  #hero{min-height:92svh;padding-bottom:0}
+  .strip{display:none}
+  .bar{padding:22px 26px}
+  .hgrid{max-width:1180px;margin:auto auto 0;display:grid;grid-template-columns:1.02fr .98fr;
+    gap:52px;align-items:end;padding:0 26px}
+  .hcopy{padding:0 0 46px;max-width:none;margin:0}
+  .hcopy .plain{max-width:38ch}
+  .hwall{display:block;max-height:80svh;overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,0) 100%);
+            mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,0) 100%)}
+  .hwall .card{margin-bottom:16px}
+  .hwall .card img{max-height:42svh;object-fit:cover;width:100%}
+  .hcopy .plain{max-width:30ch}
+  #proof .cards .card:first-child{display:none}
+  #proof{padding-top:10px}
+  .cue{text-align:left}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .note{max-width:36ch}
+  .card{margin:0}
+  .note{margin-top:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 
 <section id="hero">
-  <div class="layer" id="lSky">
-    <picture>
-      <source media="(min-width:1024px)" srcset="/nebula-wide.webp">
-      <img src="/nebula.webp" alt="" fetchpriority="high">
-    </picture>
-    <video id="skyvid" muted loop playsinline preload="auto" aria-hidden="true"></video>
-    <canvas id="stars"></canvas>
+  
+  <div class="bar">
+    <div class="word">DEEDS<i>.</i></div>
+    <button class="joinbtn" data-join>Join Deeds <span>&#8599;</span></button>
   </div>
-  <div class="layer" id="lMoon">
-    <picture>
-      <source media="(min-width:1024px)" srcset="/moon-wide.webp">
-      <img src="/moon.webp" alt="">
-    </picture>
-  </div>
-  <div class="layer" id="lFol">
-    <picture>
-      <source media="(min-width:1024px)" srcset="/foliage-wide.webp">
-      <img src="/foliage.webp" alt="">
-    </picture>
-  </div>
-  <div class="scrim"></div>
-
-  <div class="copy" id="lCopy">
-    <div class="mark">DEEDS<i>.</i></div>
-    <div class="body">
-      <div class="eyebrow" id="eyebrow">Anonymous · Person to person</div>
-      <h1 id="head">The Art of Doing Good<i>.</i></h1>
-      <p class="deck" id="deck">Not for recognition. Not for followers. Simply because good deeds deserve to be seen.</p>
-      <div class="spec">
-        <div>SEE IT</div><div>DO IT</div><div>PASS IT</div><div>WATCH IT MOVE</div>
-      </div>
-      <div class="cta">
-        <button class="btn" id="ctaMain" type="button">Join DEEDS.</button>
-        <a class="btn ghost" id="ctaAlt" href="/">Explore.</a>
-      </div>
-      <div class="herofoot">
-        <b>deeds.fun</b>
-        <span id="foot">SIGNED BY NO ONE</span>
+  <div class="hgrid">
+  <div class="hcopy">
+    <div class="micro eyebrow">See good. Do good. Pass it on.</div>
+    <h1><span>A little good.</span><span class="em">Forty times over<em>.</em></span></h1>
+    <p class="plain">Try <b>40 good deeds your first year.</b><br>
+      Small things for the people around you.<br>
+      A little more good in your everyday.</p>
+    <div class="hbtns">
+      <button class="cta" data-join>Try the Forty <span>&#8599;</span></button>
+      <button class="cue" data-jump="do">Start with an idea</button>
+    </div>
+    <p class="kicker">Your year. Your pace. Every little thing counts.</p>
+    <div class="strip">
+      <div class="micro striplab">Today on DEEDS</div>
+      <div class="thumbs">
+        <img loading="lazy" src="/wel-coffee.jpg" alt="Coffee for a mom">
+        <img loading="lazy" src="/wel-food.jpg" alt="Food drive donations">
+        <img loading="lazy" src="/wel-books.jpg" alt="Wrapped books">
+        <img loading="lazy" src="/wel-beach.jpg" alt="A clean beach at sunset">
       </div>
     </div>
   </div>
-
-  <a class="cue" href="#note" aria-label="Read the note">
-    <span>THE NOTE</span>
-    <svg width="16" height="9" viewBox="0 0 16 9" fill="none" aria-hidden="true">
-      <path d="M1 1l7 6 7-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-  </a>
+  <div class="hwall" aria-hidden="true">
+    <article class="card">
+      <div class="chead"><div class="mark b"></div>
+        <div><div class="hand">HarborLight077</div><div class="when">2 hours ago</div></div></div>
+      <p class="ctext">Coffee for the world&rsquo;s best mom.</p>
+      <img loading="lazy" src="/wel-coffee.jpg" alt="">
+      <div class="cfoot"><span>&#10022; 22 inspired</span><span>3 comments</span></div>
+    </article>
+    <article class="card">
+      <div class="chead"><div class="mark g"></div>
+        <div><div class="hand">Ridgeline Supply Co. <em>&#10003;</em></div><div class="when">Today &middot; Verified company</div></div></div>
+      <p class="ctext">Produce donations for the food drive today.</p>
+      <img loading="lazy" src="/wel-food.jpg" alt="">
+    </article>
+  </div>
+  </div>
 </section>
 
-<section id="note">
-  <div class="notelabel">A note, before you come in</div>
-  <picture>
-    <source media="(min-width:1024px)" srcset="/note.webp">
-    <img class="paper" src="/note-m.webp" alt="A typewritten note explaining DEEDS: an anonymous record of good deeds, and Matthew 5:16." loading="lazy">
-  </picture>
-  <div class="notecta">
-    <button class="btn" id="ctaJoin2" type="button">Join DEEDS.</button>
-    <a class="btn ghost" href="/" id="ctaAlt2">Explore.</a>
+<section id="proof" class="band">
+  <div class="wrap">
+    <div class="micro eyebrow">The whole post</div>
+    <div class="cards">
+      <article class="card">
+        <div class="chead"><div class="mark b"></div>
+          <div><div class="hand">HarborLight077</div><div class="when">2 hours ago</div></div></div>
+        <p class="ctext">Coffee for the world&rsquo;s best mom.</p>
+        <img loading="lazy" src="/wel-coffee.jpg" alt="A coffee cup with MOM written on it">
+        <div class="cfoot"><span>&#10022; 22 inspired</span><span>3 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark g"></div>
+          <div><div class="hand">Ridgeline Supply Co. <em>&#10003;</em></div><div class="when">Today &middot; Verified company</div></div></div>
+        <p class="ctext">Produce donations for the food drive today.</p>
+        <img loading="lazy" src="/wel-food.jpg" alt="Paper bags of produce at a food drive">
+        <div class="cfoot"><span>&#10022; 88 inspired</span><span>14 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark b"></div>
+          <div><div class="hand">PaperCrane441</div><div class="when">Sunday</div></div></div>
+        <p class="ctext">Books to help a friend through a hard time.</p>
+        <img loading="lazy" src="/wel-books.jpg" alt="Books wrapped in cream paper with a for you tag">
+        <div class="cfoot"><span>&#10022; 33 inspired</span><span>5 comments</span></div>
+      </article>
+      <article class="card">
+        <div class="chead"><div class="mark"></div>
+          <div><div class="hand">LowTideRun228</div><div class="when">Yesterday</div></div></div>
+        <p class="ctext">The beauty of the beach after cleaning it up with my family.</p>
+        <img loading="lazy" src="/wel-beach.jpg" alt="An empty beach at sunset">
+        <div class="redeed">Redeeded 9 times</div>
+        <div class="cfoot"><span>&#10022; 41 inspired</span><span>6 comments</span></div>
+      </article>
+    <h2 style="margin-top:44px">Small things.<br>Someone&rsquo;s whole day.</h2>
+    <p class="note">Nine people saw the beach one and went and did the same thing. That is the only score here.</p>
   </div>
-  <div class="noteline">ANONYMOUS · PERSON TO PERSON · DEEDS.FUN</div>
+</section>
+
+<section id="do">
+  <div class="wrap">
+    <h2>Do one right now.</h2>
+    <p class="sub">Pick one. None of these cost anything. Log it and the door opens right after.</p>
+    <div class="acts">
+      <button class="act" aria-pressed="false" data-act="Brought the neighbor&rsquo;s bins in before they got home.">
+        <span class="ring"></span>Bring a neighbor&rsquo;s bins in.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Told someone exactly what I appreciate about them. Out loud.">
+        <span class="ring"></span>Tell someone what you appreciate about them.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Picked up ten pieces of trash that were not mine.">
+        <span class="ring"></span>Pick up ten pieces of trash.<span class="free">Free</span></button>
+      <button class="act" aria-pressed="false" data-act="Called someone who could use the company.">
+        <span class="ring"></span>Call someone who could use the company.<span class="free">Free</span></button>
+    </div>
+
+    <div class="made" id="made">
+      <div class="chead"><div class="mark"></div>
+        <div><div class="hand" id="mhand">Your handle</div><div class="when">Just now</div></div></div>
+      <p class="ctext" id="mtext"></p>
+      <div class="cfoot"><span>&#10022; 0 inspired</span><span style="margin-left:auto">
+        <button class="send" id="logit">Log it.</button></span></div>
+    </div>
+
+
+  </div>
+</section>
+
+<section class="forty">
+  <div class="wrap">
+    <div class="micro eyebrow">What we suggest</div>
+    <h2>Forty deeds in your<br>first year.</h2>
+    <p class="sub" style="margin-top:18px">That is one every nine days. Nobody is counting for you and there is no clock on the wall. It is just the number that seems to change people.</p>
+    <div class="rings" id="rings"></div>
+    <p class="ringnote">The first one lights up the day you log it.</p>
+    <div class="spec"><span>Starts</span><b>The day you log your first</b></div>
+    <div class="spec"><span>Order</span><b>Any</b></div>
+    <div class="spec"><span>Pace</span><b>About one every nine days</b></div>
+    <button class="cta ghost" style="margin-top:26px" data-jump="do">Start with one.</button>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <h2>A little good starts here.</h2>
+    <button class="cta" data-join>Try the Forty.</button>
+    <button class="cta ghost" data-jump="do">Or just do one.</button>
+    <div class="micro foot" style="margin-top:40px">DEEDS. &middot; deeds.fun</div>
+  </div>
 </section>
 
 <div id="veil" role="dialog" aria-modal="true" aria-labelledby="jTitle">
   <div id="sheet">
-    <div class="mark">DEEDS<i>.</i></div>
-
+    <div class="smark">DEEDS<i>.</i></div>
     <div class="jview on" id="jsEmail">
       <h2 id="jTitle">Join DEEDS<i>.</i></h2>
-      <div class="sub" id="jSub">One text · One code · No password</div>
+      <p class="sub" id="jSub">One text &middot; One code &middot; No password</p>
       <p class="expl" id="jExpl">DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in.</p>
       <div class="field">
         <div class="fhead"><label for="email" id="jLab">Your phone</label><button class="swap" id="btnSwap" type="button">Use email instead</button></div>
@@ -239,25 +350,20 @@ h1 i{font-style:normal; color:var(--gold)}
       <button class="sbtn" id="btnSend" type="button">Send the Code.</button>
       <button class="sbtn ghost" id="btnClose1" type="button">Back.</button>
     </div>
-
     <div class="jview" id="jsCode">
       <h2 id="codeTitle">Check your texts<i>.</i></h2>
       <p class="sentto">A six digit code is on its way to <b id="sentAddr"></b>. Enter it here. Only the newest code works.</p>
-      <div class="field">
-        <label for="code">Your code</label>
-        <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*">
-      </div>
+      <div class="field"><label for="code">Your code</label>
+        <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*"></div>
       <div class="err" id="errCode"></div>
       <button class="sbtn" id="btnVerify" type="button">Verify.</button>
       <button class="sbtn ghost" id="btnAgain" type="button">Send Again.</button>
     </div>
-
     <div class="jview" id="jsDone">
-      <h2 id="doneTitle">You're in<i>.</i></h2>
+      <h2 id="doneTitle">You&rsquo;re in<i>.</i></h2>
       <p class="expl" id="doneCopy">Your profile is ready. From here on you are <b id="doneName"></b>, and that is all anyone will ever know.</p>
       <button class="sbtn" id="btnEnter" type="button">Enter DEEDS.</button>
     </div>
-
     <div class="jview" id="jsDead">
       <h2>The door stuck<i>.</i></h2>
       <p class="expl">The sign in service could not load from here. Open DEEDS and join from inside, the same one code door is there too.</p>
@@ -267,314 +373,176 @@ h1 i{font-style:normal; color:var(--gold)}
   </div>
 </div>
 
+<div id="dock"><button class="cta" data-join>Try the Forty.</button></div>
+<div id="toast"></div>
+
 <script>
 (function(){
-  "use strict";
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var wide = function(){ return window.innerWidth >= 1024; };
+  var slow=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-  /* ---------- arrival personalisation (c = invite, k = deed, a = the act) ---------- */
-  var q = new URLSearchParams(location.search);
-  function handle(v){ v = (v||"").replace(/[^A-Za-z0-9]/g,""); return (v.length>=3 && v.length<=24) ? v : ""; }
-  var c = handle(q.get("c")), k = handle(q.get("k")), act = (q.get("a")||"").slice(0,120);
-  var who = c || k;
-  if (who){
-    var eb = document.getElementById("eyebrow"),
-        hd = document.getElementById("head"),
-        dk = document.getElementById("deck");
-    eb.textContent = "An invitation · from " + who;
-    if (act){
-      hd.innerHTML = 'Someone thought of you<i>.</i>';
-      dk.innerHTML = 'They logged a deed and put your name on it. <q>' + act.replace(/[<>&]/g,"") + '</q>';
-    } else if (k){
-      hd.innerHTML = who + ' sent you the Forty<i>.</i>';
-      dk.textContent = "Forty acts of kindness. No clock. No order. No audience.";
-    } else {
-      hd.innerHTML = who + ' invited you<i>.</i>';
-      dk.textContent = "No deed attached. No clock. Just the door, held open.";
-    }
+  var R=document.getElementById('rings'),h='';
+  for(var i=0;i<40;i++)h+='<i'+(i===0?' class="on"':'')+'></i>';R.innerHTML=h;
+
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');
+    clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on')},2600);}
+
+  document.querySelectorAll('[data-jump]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var el=document.getElementById(b.getAttribute('data-jump'));
+      el.scrollIntoView({behavior:slow?'auto':'smooth',block:'start'});
+    });
+  });
+
+  var dock=document.getElementById('dock');
+  if('IntersectionObserver' in window){
+    var seen={hero:true,do:false};
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){seen[e.target.id==='hero'?'hero':'do']=e.isIntersecting});
+      dock.classList.toggle('on',!seen.hero&&!seen.do);
+    },{threshold:.12}).observe(document.getElementById('hero'));
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){seen['do']=e.isIntersecting});
+      dock.classList.toggle('on',!seen.hero&&!seen['do']);
+    },{threshold:.06}).observe(document.getElementById('do'));
   }
 
-  function passed(){ try { sessionStorage.setItem("deeds_welcomed","1"); } catch(e){} }
-  function intoApp(){ passed(); location.href = "/" + location.search; }
-  ["ctaAlt","ctaAlt2"].forEach(function(id){
-    document.getElementById(id).addEventListener("click", passed);
+  var made=document.getElementById('made'),mt=document.getElementById('mtext');
+  document.querySelectorAll('.act').forEach(function(a){
+    a.addEventListener('click',function(){
+      document.querySelectorAll('.act').forEach(function(o){o.setAttribute('aria-pressed','false')});
+      a.setAttribute('aria-pressed','true');
+      mt.textContent=a.getAttribute('data-act');
+      made.classList.add('on');
+    });
   });
-  if (wide()) document.getElementById("foot").textContent = "SIGNED BY NO ONE";
-  window.addEventListener("resize", function(){
-    document.getElementById("foot").textContent = "SIGNED BY NO ONE";
+  document.getElementById('logit').addEventListener('click',function(){
+    if(!mt.textContent){toast('Pick one first.');return;}
+    try{sessionStorage.setItem('deeds_pending', mt.textContent);}catch(e){}
+    openJoin();
   });
 
-  /* ---------- the join sheet ---------- */
-  var SB_URL = "https://helqqdygwaihrliglbvw.supabase.co";
-  var SB_KEY = "sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA";
-  var _sb = null, sbLoad = null;
+  /* ---------- the join door (same one code door as the app) ---------- */
+  var SB_URL="https://helqqdygwaihrliglbvw.supabase.co",
+      SB_KEY="sb_publishable_CHuCkjbmFzvDIAgrbwoyhA_R-8T-DHA",
+      _sb=null,sbLoad=null;
   function loadSB(){
-    if (sbLoad) return sbLoad;
-    sbLoad = new Promise(function(res){
-      if (window.supabase) return res(true);
-      var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-      s.onload = function(){ res(!!window.supabase); };
-      s.onerror = function(){ res(false); };
-      document.head.appendChild(s);
-      setTimeout(function(){ res(!!window.supabase); }, 9000);
-    });
-    return sbLoad;
+    if(sbLoad)return sbLoad;
+    sbLoad=new Promise(function(res){
+      if(window.supabase)return res(true);
+      var x=document.createElement('script');
+      x.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      x.onload=function(){res(!!window.supabase)};x.onerror=function(){res(false)};
+      document.head.appendChild(x);setTimeout(function(){res(!!window.supabase)},9000);
+    });return sbLoad;
   }
-  function sb(){
-    if (!_sb && window.supabase) _sb = window.supabase.createClient(SB_URL, SB_KEY);
-    return _sb;
-  }
-  function timeout(p, ms){
-    return Promise.race([p, new Promise(function(_,rej){ setTimeout(function(){ rej(new Error("timeout")); }, ms); })]);
-  }
-
-  var veil = document.getElementById("veil");
-  var views = ["jsEmail","jsCode","jsDone","jsDead"];
-  function show(v){
-    views.forEach(function(x){ document.getElementById(x).classList.toggle("on", x===v); });
-    var f = v==="jsEmail" ? "email" : v==="jsCode" ? "code" : null;
-    if (f) setTimeout(function(){ document.getElementById(f).focus(); }, 60);
-  }
-  function err(id, msg){
-    var e = document.getElementById(id);
-    e.textContent = msg || ""; e.classList.toggle("on", !!msg);
-  }
+  function sbc(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SB_URL,SB_KEY);return _sb;}
+  function tmo(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},ms)})]);}
+  function passed(){try{sessionStorage.setItem('deeds_welcomed','1');}catch(e){}}
+  function intoApp(){passed();location.href='/'+location.search;}
+  var veil=document.getElementById('veil'),VIEWS=['jsEmail','jsCode','jsDone','jsDead'];
+  function show(v){VIEWS.forEach(function(x){document.getElementById(x).classList.toggle('on',x===v)});
+    var f=v==='jsEmail'?'email':v==='jsCode'?'code':null;
+    if(f)setTimeout(function(){document.getElementById(f).focus()},60);}
+  function err(id,m){var e=document.getElementById(id);e.textContent=m||'';e.classList.toggle('on',!!m);}
   function openJoin(){
-    veil.classList.add("on");
-    err("errEmail"); err("errCode");
-    var door = "phone"; try { if (localStorage.getItem("deeds_door") === "email") door = "email"; } catch(e){}
-    setMode(door);
-    show("jsEmail");
-    loadSB().then(function(ok){
-      if (!ok) return;
-      var cl = sb(); if (!cl) return;
+    veil.classList.add('on');err('errEmail');err('errCode');
+    var door='phone';try{if(localStorage.getItem('deeds_door')==='email')door='email';}catch(e){}
+    setMode(door);show('jsEmail');
+    loadSB().then(function(ok){if(!ok)return;var cl=sbc();if(!cl)return;
       cl.auth.getSession().then(function(r){
-        if (r && r.data && r.data.session){
-          document.getElementById("doneTitle").innerHTML = "You're already in<i>.</i>";
-          document.getElementById("doneCopy").innerHTML = "This device is signed in. Walk through.";
-          show("jsDone");
-        }
-      }).catch(function(){});
-    });
+        if(r&&r.data&&r.data.session){
+          document.getElementById('doneTitle').innerHTML='You are already in<i>.</i>';
+          document.getElementById('doneCopy').innerHTML='This device is signed in. Walk through.';
+          show('jsDone');
+        }}).catch(function(){});});
   }
-  function closeJoin(){ veil.classList.remove("on"); }
-  document.getElementById("ctaMain").addEventListener("click", openJoin);
-  document.getElementById("ctaJoin2").addEventListener("click", openJoin);
-  document.getElementById("btnClose1").addEventListener("click", closeJoin);
-  document.getElementById("btnClose2").addEventListener("click", closeJoin);
-  veil.addEventListener("click", function(e){ if (e.target === veil) closeJoin(); });
-  window.addEventListener("keydown", function(e){ if (e.key === "Escape") closeJoin(); });
-  document.getElementById("btnDead").addEventListener("click", intoApp);
+  function closeJoin(){veil.classList.remove('on');}
+  document.querySelectorAll('[data-join]').forEach(function(b){b.addEventListener('click',openJoin)});
+  document.getElementById('btnClose1').addEventListener('click',closeJoin);
+  document.getElementById('btnClose2').addEventListener('click',closeJoin);
+  veil.addEventListener('click',function(e){if(e.target===veil)closeJoin()});
+  addEventListener('keydown',function(e){if(e.key==='Escape')closeJoin()});
+  document.getElementById('btnDead').addEventListener('click',intoApp);
+  document.getElementById('btnEnter').addEventListener('click',intoApp);
 
-  var EMAIL = "", PHONE = "", MODE = "phone";
-  /* phone first: a US number gets +1, anything starting with + is taken as typed */
-  function normPhone(s){
-    s = String(s||"").trim(); var plus = s.charAt(0) === "+"; var d = s.replace(/\D/g,"");
-    if (plus) return (d.length >= 8 && d.length <= 15) ? "+" + d : "";
-    if (d.length === 10) return "+1" + d;
-    if (d.length === 11 && d.charAt(0) === "1") return "+" + d;
-    return "";
-  }
-  function prettyPhone(p){ var m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(p||""); return m ? "(" + m[1] + ") " + m[2] + " " + m[3] : (p||""); }
+  var EMAIL='',PHONE='',MODE='phone';
+  function normPhone(v){v=String(v||'').trim();var plus=v.charAt(0)==='+',d=v.replace(/\D/g,'');
+    if(plus)return(d.length>=8&&d.length<=15)?'+'+d:'';
+    if(d.length===10)return '+1'+d;
+    if(d.length===11&&d.charAt(0)==='1')return '+'+d;return '';}
+  function pretty(p){var m=/^\+1(\d{3})(\d{3})(\d{4})$/.exec(p||'');return m?'('+m[1]+') '+m[2]+' '+m[3]:(p||'');}
   function setMode(m){
-    MODE = m === "email" ? "email" : "phone"; var ph = MODE === "phone";
-    var i = document.getElementById("email"); i.value = "";
-    i.setAttribute("type", ph ? "tel" : "email"); i.setAttribute("inputmode", ph ? "tel" : "email"); i.setAttribute("autocomplete", ph ? "tel" : "email");
-    i.placeholder = ph ? "(310) 555 0123" : "";
-    document.getElementById("jLab").textContent = ph ? "Your phone" : "Your email";
-    document.getElementById("btnSwap").textContent = ph ? "Use email instead" : "Use my phone instead";
-    document.getElementById("jSub").textContent = ph ? "One text \u00B7 One code \u00B7 No password" : "One email \u00B7 One code \u00B7 No password";
-    document.getElementById("jExpl").textContent = ph
-      ? "DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in."
-      : "DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.";
-    try { localStorage.setItem("deeds_door", MODE); } catch(e){}
+    MODE=m==='email'?'email':'phone';var ph=MODE==='phone',i=document.getElementById('email');
+    i.value='';i.setAttribute('type',ph?'tel':'email');i.setAttribute('inputmode',ph?'tel':'email');
+    i.setAttribute('autocomplete',ph?'tel':'email');i.placeholder=ph?'(310) 555 0123':'';
+    document.getElementById('jLab').textContent=ph?'Your phone':'Your email';
+    document.getElementById('btnSwap').textContent=ph?'Use email instead':'Use my phone instead';
+    document.getElementById('jSub').innerHTML=ph?'One text &middot; One code &middot; No password':'One email &middot; One code &middot; No password';
+    document.getElementById('jExpl').textContent=ph
+      ?'DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your phone receives your code and nothing else. If you already have a profile, the same door signs you in.'
+      :'DEEDS is anonymous. You get a made name, and it is the only thing anyone ever sees. Your email receives your code and nothing you do not ask for. If you already have a profile, the same door signs you in.';
+    try{localStorage.setItem('deeds_door',MODE);}catch(e){}
   }
-  document.getElementById("btnSwap").addEventListener("click", function(){ setMode(MODE === "phone" ? "email" : "phone"); document.getElementById("email").focus(); });
-  document.getElementById("email").addEventListener("input", function(){ if (MODE === "phone" && /@/.test(this.value)) { var keep = this.value; setMode("email"); this.value = keep; } });
+  document.getElementById('btnSwap').addEventListener('click',function(){setMode(MODE==='phone'?'email':'phone');document.getElementById('email').focus();});
+  document.getElementById('email').addEventListener('input',function(){if(MODE==='phone'&&/@/.test(this.value)){var k=this.value;setMode('email');this.value=k;}});
   function sendCode(again){
-    var box = again ? "errCode" : "errEmail";
-    err(box);
-    if (!again){
-      var raw = (document.getElementById("email").value || "").trim();
-      if (MODE === "phone"){
-        PHONE = normPhone(raw); EMAIL = "";
-        if (!PHONE){ err("errEmail", "A full number with area code. Outside the US, start with +."); return; }
-      } else {
-        EMAIL = raw; PHONE = "";
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){ err("errEmail", "That does not look like an email address."); return; }
-      }
+    var box=again?'errCode':'errEmail';err(box);
+    if(!again){
+      var raw=(document.getElementById('email').value||'').trim();
+      if(MODE==='phone'){PHONE=normPhone(raw);EMAIL='';
+        if(!PHONE){err('errEmail','A full number with area code. Outside the US, start with +.');return;}
+      }else{EMAIL=raw;PHONE='';
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(EMAIL)){err('errEmail','That does not look like an email address.');return;}}
     }
-    var b = again ? document.getElementById("btnAgain") : document.getElementById("btnSend");
-    b.disabled = true; var was = b.textContent; b.textContent = "Sending\u2026";
+    var b=again?document.getElementById('btnAgain'):document.getElementById('btnSend'),was=b.textContent;
+    b.disabled=true;b.textContent='Sending...';
     loadSB().then(function(ok){
-      if (!ok){ show("jsDead"); return Promise.reject("dead"); }
-      return timeout(sb().auth.signInWithOtp(MODE === "phone"
-        ? { phone: PHONE, options: { shouldCreateUser: true } }
-        : { email: EMAIL, options: { shouldCreateUser: true } }), 15000);
+      if(!ok){show('jsDead');return Promise.reject('dead');}
+      return tmo(sbc().auth.signInWithOtp(MODE==='phone'
+        ?{phone:PHONE,options:{shouldCreateUser:true}}
+        :{email:EMAIL,options:{shouldCreateUser:true}}),15000);
     }).then(function(r){
-      if (r && r.error){
-        var m = (r.error.message || "").trim();
-        err(box, m ? "The code did not send. " + m : "The code did not send. The service gave no reason. Try again in a minute.");
-        return;
-      }
-      document.getElementById("sentAddr").textContent = MODE === "phone" ? prettyPhone(PHONE) : EMAIL;
-      document.getElementById("codeTitle").innerHTML = MODE === "phone" ? "Check your texts<i>.</i>" : "Check your email<i>.</i>";
-      document.getElementById("code").value = "";
-      show("jsCode");
+      if(r&&r.error){var m=(r.error.message||'').trim();
+        err(box,m?'The code did not send. '+m:'The code did not send. The service gave no reason. Try again in a minute.');return;}
+      document.getElementById('sentAddr').textContent=MODE==='phone'?pretty(PHONE):EMAIL;
+      document.getElementById('codeTitle').innerHTML=MODE==='phone'?'Check your texts<i>.</i>':'Check your email<i>.</i>';
+      document.getElementById('code').value='';show('jsCode');
     }).catch(function(e){
-      if (e === "dead") return;
-      err(box, e && e.message === "timeout"
-        ? "The code service did not answer in fifteen seconds. Try again in a minute."
-        : "The code did not send. Check the connection and try again.");
-    }).finally(function(){ b.disabled = false; b.textContent = was; });
+      if(e==='dead')return;
+      err(box,e&&e.message==='timeout'
+        ?'The code service did not answer in fifteen seconds. Try again in a minute.'
+        :'The code did not send. Check the connection and try again.');
+    }).finally(function(){b.disabled=false;b.textContent=was;});
   }
-  document.getElementById("btnSend").addEventListener("click", function(){ sendCode(false); });
-  document.getElementById("btnAgain").addEventListener("click", function(){ sendCode(true); });
-  document.getElementById("email").addEventListener("keydown", function(e){ if (e.key==="Enter") sendCode(false); });
-
-  function fetchHandle(uid, tries){
-    if (tries <= 0) return Promise.resolve("");
-    return sb().from("profiles").select("handle").eq("id", uid).maybeSingle().then(function(r){
-      if (r && r.data && r.data.handle) return r.data.handle;
-      return new Promise(function(res){ setTimeout(res, 900); }).then(function(){ return fetchHandle(uid, tries-1); });
-    }).catch(function(){ return ""; });
+  document.getElementById('btnSend').addEventListener('click',function(){sendCode(false)});
+  document.getElementById('btnAgain').addEventListener('click',function(){sendCode(true)});
+  document.getElementById('email').addEventListener('keydown',function(e){if(e.key==='Enter')sendCode(false)});
+  function fetchHandle(uid,tries){
+    if(tries<=0)return Promise.resolve('');
+    return sbc().from('profiles').select('handle').eq('id',uid).maybeSingle().then(function(r){
+      if(r&&r.data&&r.data.handle)return r.data.handle;
+      return new Promise(function(res){setTimeout(res,900)}).then(function(){return fetchHandle(uid,tries-1)});
+    }).catch(function(){return ''});
   }
   function verify(){
-    err("errCode");
-    var code = (document.getElementById("code").value || "").replace(/\D/g,"");
-    if (code.length !== 6){ err("errCode", "The code is six digits."); return; }
-    var b = document.getElementById("btnVerify");
-    b.disabled = true; b.textContent = "Verifying\u2026";
-    timeout(sb().auth.verifyOtp(MODE === "phone"
-      ? { phone: PHONE, token: code, type: "sms" }
-      : { email: EMAIL, token: code, type: "email" }), 15000)
+    err('errCode');
+    var code=(document.getElementById('code').value||'').replace(/\D/g,'');
+    if(code.length!==6){err('errCode','The code is six digits.');return;}
+    var b=document.getElementById('btnVerify');b.disabled=true;b.textContent='Verifying...';
+    tmo(sbc().auth.verifyOtp(MODE==='phone'
+      ?{phone:PHONE,token:code,type:'sms'}
+      :{email:EMAIL,token:code,type:'email'}),15000)
     .then(function(r){
-      if (r && r.error){
-        err("errCode", "That code did not work. Codes expire, and only the newest one counts. Send Again for a fresh one.");
-        return;
-      }
-      var uid = r && r.data && r.data.user ? r.data.user.id : "";
-      show("jsDone");
-      document.getElementById("doneName").textContent = "your made name";
-      if (uid) fetchHandle(uid, 5).then(function(h){
-        if (h) document.getElementById("doneName").textContent = h;
-      });
-    }).catch(function(){
-      err("errCode", "Verification did not answer. Try once more.");
-    }).finally(function(){ b.disabled = false; b.textContent = "Verify."; });
+      if(r&&r.error){err('errCode','That code did not work. Codes expire, and only the newest one counts. Send Again for a fresh one.');return;}
+      var uid=r&&r.data&&r.data.user?r.data.user.id:'';
+      show('jsDone');
+      document.getElementById('doneName').textContent='your made name';
+      if(uid)fetchHandle(uid,5).then(function(h){if(h)document.getElementById('doneName').textContent=h;});
+    }).catch(function(){err('errCode','Verification did not answer. Try once more.');})
+    .finally(function(){b.disabled=false;b.textContent='Verify.';});
   }
-  document.getElementById("btnVerify").addEventListener("click", verify);
-  document.getElementById("code").addEventListener("keydown", function(e){ if (e.key==="Enter") verify(); });
-  document.getElementById("btnEnter").addEventListener("click", intoApp);
-
-  /* ---------- star field ---------- */
-  var cv = document.getElementById("stars"), ctx = cv.getContext("2d"), stars = [], dpr = 1;
-  var VIDON = false, vid = document.getElementById("skyvid");
-  if (!reduce){
-    vid.src = wide() ? "/sky-wide.mp4" : "/sky.mp4";
-    vid.addEventListener("playing", function(){
-      VIDON = true;
-      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
-      vid.classList.add("on");
-    });
-    vid.addEventListener("error", function(){ VIDON = false; vid.classList.remove("on"); });
-    var kick = function(){ var p = vid.play(); if (p && p.catch) p.catch(function(){}); };
-    kick();
-    document.getElementById("hero").addEventListener("touchend", kick, {passive:true});
-  }
-  function rng(seed){ return function(){ seed = (seed*1664525 + 1013904223) >>> 0; return seed/4294967296; }; }
-  function seedStars(){
-    var box = cv.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    cv.width = Math.max(1, Math.round(box.width*dpr));
-    cv.height = Math.max(1, Math.round(box.height*dpr));
-    var r = rng(20260825), n = Math.min(430, Math.round(box.width*box.height/9200));
-    var big = wide() ? 1.25 : 1;
-    stars = [];
-    for (var i=0;i<n;i++){
-      var y = Math.pow(r(), 1.45);
-      if (y > 0.70 && r() > 0.22) continue;
-      var sharp = r() < 0.38;
-      stars.push({
-        x: r()*box.width, y: y*box.height,
-        r: (0.75 + r()*1.5) * big,
-        p: r()*Math.PI*2,
-        s: sharp ? (0.0016 + r()*0.0013) : (0.00075 + r()*0.00085),
-        k: sharp ? (4.6 + r()*2.4) : (2.2 + r()*1.1),
-        f: r() < 0.10,
-        a: 0.38 + r()*0.62
-      });
-    }
-  }
-  function paint(t){
-    var w = cv.width, h = cv.height;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.clearRect(0,0,w,h);
-    for (var i=0;i<stars.length;i++){
-      var s = stars[i];
-      var v = reduce ? 0.55 : Math.pow(0.5 + 0.5*Math.sin(s.p + t*s.s), s.k);
-      var al = Math.min(1, (0.05 + 0.95*v) * s.a);
-      var rr = s.r * (0.70 + 0.85*v);
-      var gr = rr * (3.4 + 3.6*v);
-      var g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, gr);
-      g.addColorStop(0, "rgba(246,243,235," + (al*0.92).toFixed(3) + ")");
-      g.addColorStop(0.34, "rgba(225,214,178," + (al*0.24).toFixed(3) + ")");
-      g.addColorStop(1, "rgba(225,214,178,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(s.x, s.y, gr, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = "rgba(250,247,240," + al.toFixed(3) + ")";
-      ctx.beginPath(); ctx.arc(s.x, s.y, rr, 0, 6.2832); ctx.fill();
-      if (s.f && v > 0.30){
-        var L = rr * (5 + 11*v);
-        ctx.strokeStyle = "rgba(238,226,190," + (al*0.5).toFixed(3) + ")";
-        ctx.lineWidth = Math.max(0.5, rr*0.34);
-        ctx.beginPath();
-        ctx.moveTo(s.x-L, s.y); ctx.lineTo(s.x+L, s.y);
-        ctx.moveTo(s.x, s.y-L); ctx.lineTo(s.x, s.y+L);
-        ctx.stroke();
-      }
-    }
-  }
-
-  /* ---------- motion: pointer plus ambient drift, no device sensors; scroll owns touch ---------- */
-  var L = {
-    sky:  {el: document.getElementById("lSky"),  d: 5},
-    moon: {el: document.getElementById("lMoon"), d: 8},
-    fol:  {el: document.getElementById("lFol"),  d: 22},
-    copy: {el: document.getElementById("lCopy"), d: 2}
-  };
-  var tx=0, ty=0, cx=0, cy=0;
-  function clamp(v){ return v < -1 ? -1 : v > 1 ? 1 : v; }
-  window.addEventListener("mousemove", function(e){
-    tx = clamp((e.clientX/window.innerWidth  - 0.5) * 2);
-    ty = clamp((e.clientY/window.innerHeight - 0.5) * 2);
-  }, {passive:true});
-  /* tilt and its motion permission prompt removed (4.1.1): the sky moves by pointer and ambient drift alone */
-
-  var last = 0;
-  function frame(t){
-    cx += (tx - cx) * 0.075;
-    cy += (ty - cy) * 0.075;
-    var ax = Math.sin(t/9700)*0.56 + Math.sin(t/23100)*0.44;
-    var ay = Math.sin(t/13300)*0.58 + Math.cos(t/31700)*0.42;
-    var w = wide(), mul = w ? 1.6 : 1, aw = w ? 0.62 : 0.34;
-    if (!reduce){
-      for (var kk in L){
-        var d = L[kk].d * mul;
-        L[kk].el.style.transform =
-          "translate3d(" + (-(cx + ax*aw)*d).toFixed(2) + "px," +
-                           (-(cy + ay*aw)*d*0.62).toFixed(2) + "px,0)";
-      }
-    }
-    if (t - last > 24 && !VIDON){ paint(t); last = t; }
-    requestAnimationFrame(frame);
-  }
-  var rt;
-  window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(seedStars, 160); });
-  seedStars();
-  if (reduce){ paint(0); } else { requestAnimationFrame(frame); }
+  document.getElementById('btnVerify').addEventListener('click',verify);
+  document.getElementById('code').addEventListener('keydown',function(e){if(e.key==='Enter')verify()});
 })();
 </script>
 </body>
