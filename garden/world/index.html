@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.22">
+<meta name="world-build" content="6.23">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -53,6 +53,24 @@ canvas{display:block;touch-action:none;cursor:default}
 #ptStyles{display:none;gap:6px;flex-wrap:wrap;margin-top:8px}
 #ptStyles.on{display:flex}
 #ptSwatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(246,243,235,.5);display:inline-block}
+/* 6.23 the lessons */
+#ptBrief{display:none;border:1px solid rgba(246,243,235,.22);border-radius:10px;padding:12px;margin-bottom:8px;max-height:34vh;overflow:auto}
+#ptBrief.on{display:block}
+#ptBrief b{font-size:17px;display:block;margin:4px 0 4px}
+#ptBrief p{margin:0 0 8px;opacity:.85;line-height:1.55;font-size:13px}
+#ptBrief .aim{font-size:12px;color:var(--gold);opacity:.9}
+#ptBrief .lnk{margin-top:8px;font-size:11px;padding:5px 9px}
+#ptLes{display:none;flex-direction:column;margin-bottom:8px}
+#ptLes.on{display:flex}
+#ptLes .btn{font-size:12px;padding:6px 9px;min-width:64px}
+#ptLes .btn.on{border-color:var(--gold);color:var(--gold)}
+#painters{align-items:flex-start}
+#painters .panel{max-height:86vh;overflow:auto}
+.pa{border-bottom:1px solid rgba(21,19,14,.14);padding:9px 0}
+.pa .pah{display:flex;justify-content:space-between;align-items:baseline;gap:8px;cursor:pointer}
+.pa .pah small{opacity:.55;font-size:11px}
+.pa p{display:none;margin:7px 0 2px;line-height:1.6;font-size:13px;opacity:.85}
+.pa.on p{display:block}
 /* 6.21 the instruments' panel */
 #instUI{position:fixed;left:0;right:0;bottom:0;z-index:26;display:none;flex-direction:column;background:linear-gradient(180deg,rgba(21,19,14,0),rgba(21,19,14,.94) 22%);padding:22px 10px max(10px,env(safe-area-inset-bottom));pointer-events:auto;color:var(--ivory)}#instUI.on{display:flex}
 #inBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}#inBar b{letter-spacing:.06em;font-size:13px}#inBar2{display:flex;gap:6px;align-items:center}#inChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
@@ -244,13 +262,16 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 <div style="display:flex;gap:10px;margin-top:12px"><button class="btn fin" data-fin="black" style="flex:1">Black lacquer<small>5,000 gardencoin</small></button><button class="btn fin" data-fin="gold" style="flex:1;border-color:var(--gold);color:var(--gold)">Gold<small>10,000 gardencoin</small></button></div>
 <div class="sfoot" style="margin-top:12px"><button class="btn" id="pbClose">Not now.</button></div></div></div>
 <div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="inPad"></div></div>
-<div id="paintUI"><div id="ptBar"><button class="btn" id="ptClose">Leave it</button><span id="ptSwatch"></span><button class="btn" id="ptFill">Fill</button><button class="btn" id="ptStyle">Oil style</button><button class="btn" id="ptUndo">Undo</button><span class="micro" id="ptChip"></span><button class="btn on" id="ptSave">Save it</button></div>
-<div id="ptWrap"><canvas id="ptCan"></canvas></div>
+<div id="paintUI"><div id="ptBar"><button class="btn" id="ptClose">Leave it</button><span id="ptSwatch"></span><button class="btn" id="ptFill">Fill</button><button class="btn" id="ptStyle">Oil style</button><button class="btn" id="ptLesson">Lessons</button><button class="btn" id="ptUndo">Undo</button><span class="micro" id="ptChip"></span><button class="btn on" id="ptSave">Save it</button></div>
+<div id="ptBrief"></div><div id="ptLes"></div><div id="ptWrap"><canvas id="ptCan"></canvas></div>
 <div id="ptStyles"><button class="btn" data-s="realism">Realism</button><button class="btn" data-s="impressionist">Impressionist</button><button class="btn" data-s="allaprima">Alla prima</button><button class="btn" data-s="varnish">Varnish only</button></div>
 <div id="ptTools"><span id="ptCols"></span><input type="range" id="ptSize" min="6" max="90" value="26"></div></div>
 <div id="artBuy" class="sheet"><div class="panel small"><h2>Commission an artist<span>.</span></h2><p id="abSub">A finished oil, framed in gold, hung while you wait.</p>
 <div id="abGrid" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
 <div class="sfoot" style="margin-top:12px"><button class="btn" id="abClose">Not now.</button></div></div></div>
+<div id="painters" class="sheet"><div class="panel"><div class="shead"><div><div class="micro">THE PAINTERS</div><h2>What each one changed<span>.</span></h2></div></div>
+<div id="paGrid"></div>
+<div class="sfoot" style="margin-top:12px"><button class="btn" id="paClose">Close</button></div></div></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SHOP</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
   <div class="tabs" id="stTabs"></div>
@@ -2676,7 +2697,7 @@ const ART_SLOTS=[
  {n:12,x:8.83,y:ART_UF+2.6,z:1.80,ry:-Math.PI/2,w:1.2,h:1.5,fl:1,room:'the study'}];
 const ART_WORKS={orchard:{n:'The Orchard After Rain',r:1.53},bellflower:{n:'Moonlit Bellflower Bay',r:1.60},
  glasshouse:{n:'Supper at the Glasshouse',r:1.50},cedar:{n:'The Last Cedar of Valemont',r:0.66},mechanical:{n:'The Mechanical Garden',r:1.63}};
-let ARTX={slots:{},easels:[],filled:0,total:12,points:0,master:false,canvas_gc:750,commission_gc:10000};
+let ARTX={slots:{},easels:[],lessons:{},filled:0,total:12,points:0,master:false,scholar:false,lessons_done:0,lessons_of:18,canvas_gc:750,commission_gc:10000};
 let ART_SYNC='',ARTG={},ART_SIG={},ART_ON=0,ART_TEX={};
 const artSlot=n=>ART_SLOTS.filter(a=>a.n===n)[0];
 const artHas=n=>ARTX.slots[n]||null;
@@ -2684,7 +2705,8 @@ const artEasel=n=>ARTX.easels.indexOf(n)>=0;
 function artSync(force){if(!sb||!LIVE)return;const key=(VISIT?VISIT.owner:'me');if(ART_SYNC===key&&!force)return;ART_SYNC=key;
  Promise.resolve(sb.rpc('garden_art_state',VISIT?{p_owner:VISIT.owner}:{})).then(r=>{if(r.error){ART_SYNC='';return}const d=r.data||{};
   const m={};(d.slots||[]).forEach(s=>{m[+s.slot]=s});
-  ARTX={slots:m,easels:(d.easels||[]).map(Number),filled:+d.filled||0,total:+d.total||12,points:+d.points||0,
+  const ls={};(d.lessons||[]).forEach(l=>{ls[l.lesson]={lesson:l.lesson,star:!!l.star}});
+  ARTX={slots:m,easels:(d.easels||[]).map(Number),lessons:ls,lessons_done:+d.lessons_done||0,lessons_of:+d.lessons_of||18,scholar:!!d.scholar,filled:+d.filled||0,total:+d.total||12,points:+d.points||0,
    master:!!d.master,canvas_gc:+d.canvas_gc||750,commission_gc:+d.commission_gc||10000};
   if(INSIDE)placeArt()},()=>{ART_SYNC=''})}
 function artLinen(){const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');
@@ -2729,7 +2751,7 @@ function placeArt(){ART_SLOTS.forEach(A=>{const sig=artSigOf(A.n);if(ART_SIG[A.n
  ART_SIG[A.n]=sig;const g=artBuild(A);ARTG[A.n]=g;INTERIOR.scene.add(g)})}
 function artNear(){if(!INSIDE)return null;const fl=you.feet>ART_SW?1:0;let best=null,bd=2.7;
  ART_SLOTS.forEach(A=>{if(A.fl!==fl)return;const d=Math.hypot(you.x-A.x,you.z-A.z);if(d<bd){bd=d;best=A}});return best}
-function artWords(){return ARTX.filled+' of '+ARTX.total+' hung \u00B7 '+ARTX.points.toLocaleString()+' art points'}
+function artWords(){return ARTX.filled+' of '+ARTX.total+' hung \u00B7 '+lesDoneCount()+' of '+ARTX.lessons_of+' lessons \u00B7 '+ARTX.points.toLocaleString()+' art points'}
 function artAct(){const A=artNear();if(!A)return false;placeArt();
  const at=[A.x,A.y+A.h/2+0.5,A.z],rec=artHas(A.n);
  if(rec&&rec.kind==='commissioned'){showAct((ART_WORKS[rec.art]||{n:'A commissioned oil'}).n+'.',null,null,null,VISIT?'commissioned by '+VISIT.handle:'you commissioned it \u00B7 '+artWords(),null,at);return true}
@@ -2751,15 +2773,16 @@ function artStart(n){if(visitGuard('paint in this house'))return;
   if(ARTX.easels.indexOf(n)<0)ARTX.easels.push(n);SND.buy(6);openPainter(n)},e=>{BUSY=false;toast('The painter said: '+String(e&&e.message||e||'nothing'))})}
 /* ---------- the easel ---------- */
 const PT_COLS=['#F4EEDF','#E8C87A','#C8892F','#8E4B22','#6B2D1E','#93341F','#C1452F','#7C5B8F','#2E4A72','#4E7FA8','#2E5B3A','#6E8F45','#B7B09C','#4A4038','#241C15','#0F0C09'];
-const PT={n:0,col:'#2E5B3A',size:26,on:false,down:false,lx:0,ly:0,undo:[],style:'realism'};
+const PT={n:0,col:'#2E5B3A',size:26,on:false,down:false,lx:0,ly:0,undo:[],style:'realism',lesson:'',practice:false,strokes:0,cols:[],fillFirst:false,undos:0,wet:0,bigOpen:false,ground:null,t0:0,secs:function(){return (Date.now()-(this.t0||Date.now()))/1000}};
 let ptCan=null,ptG=null;
 function ptEl(id){return document.getElementById(id)}
 function openPainter(n){const A=artSlot(n);if(!A)return;PT.n=n;PT.undo=[];
+ PT.strokes=0;PT.cols=[];PT.fillFirst=false;PT.undos=0;PT.wet=0;PT.bigOpen=false;PT.ground=null;PT.t0=Date.now();
  const c=ptEl('ptCan');ptCan=c;const W=880,H=Math.round(W*A.h/A.w);c.width=W;c.height=H;
  ptG=c.getContext('2d');const rec=artHas(n);
  if(rec&&rec.img&&rec.kind==='painted'){const im=new Image();im.onload=()=>{ptG.drawImage(im,0,0,W,H)};im.src=rec.img}
  else{ptG.fillStyle='#EFE6D2';ptG.fillRect(0,0,W,H)}
- ptChipSet();ptCols();ptSwatch();ptEl('ptStyles').classList.remove('on');
+ ptChipSet();ptCols();ptSwatch();ptEl('ptStyles').classList.remove('on');ptEl('ptLes').classList.remove('on');lesShow();
  ART_ON=1;hideAct();document.getElementById('paintUI').classList.add('on')}
 function closePainter(){ART_ON=0;document.getElementById('paintUI').classList.remove('on');ptEl('ptStyles').classList.remove('on');updateAct()}
 function ptChipSet(m){ptEl('ptChip').textContent=m||('canvas '+PT.n+' \u00B7 '+(artSlot(PT.n)||{room:''}).room)}
@@ -2768,12 +2791,16 @@ function ptCols(){const w=ptEl('ptCols');if(w.childNodes.length)return;
  PT_COLS.forEach(c=>{const b=document.createElement('button');b.className='ptc'+(c===PT.col?' on':'');b.style.background=c;b.dataset.c=c;
   b.onclick=()=>{PT.col=c;ptSwatch();Array.prototype.forEach.call(w.children,e=>e.classList.toggle('on',e.dataset.c===c))};w.appendChild(b)})}
 function ptPush(){try{PT.undo.push(ptCan.toDataURL('image/png'));if(PT.undo.length>4)PT.undo.shift()}catch(e){}}
-function ptUndo(){const d=PT.undo.pop();if(!d){toast('Nothing to undo.');return}const im=new Image();
+function ptUndo(){const d=PT.undo.pop();if(!d){toast('Nothing to undo.');return}PT.undos++;const im=new Image();
  im.onload=()=>{ptG.clearRect(0,0,ptCan.width,ptCan.height);ptG.drawImage(im,0,0)};im.src=d}
 function ptShade(hex,amt){const h=hex.replace('#','');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
  const f=v=>Math.max(0,Math.min(255,Math.round(v+amt)));return 'rgb('+f(r)+','+f(g)+','+f(b)+')'}
 function ptPos(e){const r=ptCan.getBoundingClientRect();return {x:(e.clientX-r.left)*(ptCan.width/r.width),y:(e.clientY-r.top)*(ptCan.height/r.height)}}
 function ptStroke(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,len=Math.hypot(dx,dy)||1;const nx=-dy/len,ny=dx/len;
+ PT.strokes++;if(PT.cols.indexOf(PT.col)<0)PT.cols.push(PT.col);
+ if(PT.strokes<=10&&PT.size>=40)PT.bigOpen=true;
+ try{const g0=PT.ground||[239,230,210];const q=ptG.getImageData(Math.max(0,Math.min(ptCan.width-1,x0|0)),Math.max(0,Math.min(ptCan.height-1,y0|0)),1,1).data;
+  if(Math.abs(q[0]-g0[0])+Math.abs(q[1]-g0[1])+Math.abs(q[2]-g0[2])>34)PT.wet++}catch(e){}
  const S=PT.size,bristles=Math.max(5,Math.round(S/3));ptG.lineCap='round';
  for(let i=0;i<bristles;i++){const t=(i/(bristles-1)-0.5)*S;const jt=(Math.random()-0.5)*S*0.12;
   ptG.strokeStyle=ptShade(PT.col,(Math.random()-0.42)*46);ptG.globalAlpha=0.55+Math.random()*0.4;ptG.lineWidth=Math.max(1.4,S/bristles*1.5);
@@ -2782,7 +2809,9 @@ function ptStroke(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,len=Math.hypot(dx,dy)||1;
  ptG.beginPath();ptG.moveTo(x0+nx*S*0.34-1,y0+ny*S*0.34-1);ptG.lineTo(x1+nx*S*0.34-1,y1+ny*S*0.34-1);ptG.stroke();
  ptG.strokeStyle=ptShade(PT.col,-46);ptG.beginPath();ptG.moveTo(x0-nx*S*0.36+1,y0-ny*S*0.36+1);ptG.lineTo(x1-nx*S*0.36+1,y1-ny*S*0.36+1);ptG.stroke();
  ptG.globalAlpha=1}
-function ptFill(){ptPush();ptG.globalAlpha=1;ptG.fillStyle=PT.col;ptG.fillRect(0,0,ptCan.width,ptCan.height);
+function ptRGB(hex){const h=hex.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function ptFill(){ptPush();if(!PT.strokes&&!PT.ground)PT.fillFirst=true;PT.ground=ptRGB(PT.col);if(PT.cols.indexOf(PT.col)<0)PT.cols.push(PT.col);
+ ptG.globalAlpha=1;ptG.fillStyle=PT.col;ptG.fillRect(0,0,ptCan.width,ptCan.height);
  const W=ptCan.width,H=ptCan.height;for(let i=0;i<Math.round(W*H/900);i++){const x=Math.random()*W,y=Math.random()*H;
   ptG.fillStyle=ptShade(PT.col,(Math.random()-0.5)*30);ptG.globalAlpha=0.35;ptG.fillRect(x,y,6+Math.random()*10,3+Math.random()*4)}
  ptG.globalAlpha=1;ptChipSet('the ground is laid')}
@@ -2815,13 +2844,13 @@ function ptData(){let q=0.72,d='';for(let k=0;k<6;k++){d=ptCan.toDataURL('image/
 function ptSave(){if(!LIVE){toast('Sign in on deeds.fun to hang it.');return}if(BUSY)return;
  const d=ptData();if(!d||d.length<400){toast('There is nothing on the canvas yet.');return}
  if(d.length>255000){toast('That is a heavy canvas. Try a simpler pass.');return}
- BUSY=true;ptChipSet('hanging it');
+ const ST=ptStats();BUSY=true;ptChipSet('hanging it');
  RPC('paint_save',{p_slot:PT.n,p_img:d,p_title:null}).then(r=>{BUSY=false;
   if(r.error){ptChipSet();toast('The painter said: '+String(r.error.message||'nothing'));return}
   const q=r.data||{};ARTX.easels=ARTX.easels.filter(x=>x!==PT.n);
   ARTX.slots[PT.n]={slot:PT.n,kind:'painted',img:d,art:null,title:null,made_at:new Date().toISOString()};
   ARTX.filled=+q.filled||ARTX.filled;ARTX.points=+q.points||ARTX.points;ARTX.master=!!q.master;
-  SND.buy(9);closePainter();placeArt();
+  SND.buy(9);closePainter();placeArt();lesFinish(ST);
   if(q.master){setTimeout(()=>SND.tier(),500);setTimeout(()=>toast('Every canvas in the house is filled. You are a master.'),700)}
   else toast('It hangs in '+(artSlot(PT.n)||{room:'the house'}).room+'. '+artWords()+'.')},
   e=>{BUSY=false;ptChipSet();toast('The painter said: '+String(e&&e.message||e||'nothing'))})}
@@ -2832,9 +2861,134 @@ function ptBind(){const c=ptEl('ptCan');if(!c)return;
  ptEl('ptSize').addEventListener('input',e=>{PT.size=+e.target.value});
  ptEl('ptFill').onclick=ptFill;ptEl('ptUndo').onclick=ptUndo;ptEl('ptClose').onclick=closePainter;ptEl('ptSave').onclick=ptSave;
  ptEl('ptStyle').onclick=()=>ptEl('ptStyles').classList.toggle('on');
+ ptEl('ptLesson').onclick=()=>{const w=ptEl('ptLes');if(w.classList.contains('on'))w.classList.remove('on');else lesOpen()};
+ const pc=document.getElementById('paClose');if(pc)pc.onclick=()=>document.getElementById('painters').classList.remove('on');
  Array.prototype.forEach.call(document.querySelectorAll('#ptStyles .btn'),b=>{b.onclick=()=>ptArtify(b.dataset.s)});
  const ab=document.getElementById('abClose');if(ab)ab.onclick=()=>document.getElementById('artBuy').classList.remove('on')}
 setTimeout(ptBind,0);
+/* ======================================================================
+   6.23 · THE LESSONS (patch 72). Three ladders of six. Each lesson is a short brief with one aim.
+   Cover a tenth of the canvas and it passes for 250 art points; hit the aim as well and it takes a
+   gold star and another 100. Nothing fails. Every lesson names the painter it came from, and the
+   painters' shelf keeps them all, with what each one actually changed.
+   ====================================================================== */
+const ARTISTS={
+ titian:{n:'Titian',y:'about 1488 to 1576',w:'Worked on a toned ground instead of white, so the middle value was already there and he only had to paint the lights and the darks. He also built colour in thin layers over that ground, which is why his reds still glow.'},
+ rembrandt:{n:'Rembrandt van Rijn',y:'1606 to 1669',w:'Made value do the work of drawing. He would let two thirds of a face fall into shadow and put the whole weight of the picture into a narrow band of light, so you read the form without an outline anywhere.'},
+ caravaggio:{n:'Caravaggio',y:'1571 to 1610',w:'Took the even studio light away and lit his figures from one hard source in a dark room. Form gets carved by the edge between light and shadow. Every lesson about a single light source starts with him.'},
+ velazquez:{n:'Diego Velazquez',y:'1599 to 1660',w:'Painted what the eye actually catches rather than what the mind knows is there: a hand is a few loaded strokes, sharp only where you are looking. Close up it is paint, at ten feet it is a person.'},
+ leonardo:{n:'Leonardo da Vinci',y:'1452 to 1519',w:'Named the two things that make distance: air turns far hills pale and blue, and edges lose their hardness as they recede. He also softened the transitions between tones until no line was left, which is sfumato.'},
+ vermeer:{n:'Johannes Vermeer',y:'1632 to 1675',w:'Built quiet rooms around one window and one point of interest, then let everything else stay lower in contrast. His light is soft and directional, and his highlights sit as small round beads of thick paint.'},
+ turner:{n:'J M W Turner',y:'1775 to 1851',w:'Let weather and light dissolve the subject. Late in his life the boats and cliffs became almost nothing and the storm became everything, which opened the door every later painter walked through.'},
+ constable:{n:'John Constable',y:'1776 to 1837',w:'Painted the sky from life over and over, in oils, outdoors, dated by the hour. He argued the sky is the main organ of a landscape, and that flecks of pure white on green make a field look wet and alive.'},
+ monet:{n:'Claude Monet',y:'1840 to 1926',w:'Painted the light rather than the thing it fell on, and painted the same haystack, cathedral and pond at different hours to prove the subject was never really the subject.'},
+ pissarro:{n:'Camille Pissarro',y:'1830 to 1903',w:'Broken colour: instead of mixing a green on the palette he laid small strokes of blue and yellow side by side and let the eye do the mixing, which keeps the surface alive rather than flat.'},
+ morisot:{n:'Berthe Morisot',y:'1841 to 1895',w:'Pushed the loose, open stroke further than almost anyone around her, leaving bare canvas showing as part of the picture, and treated shadows as colour rather than as an absence of it.'},
+ sisley:{n:'Alfred Sisley',y:'1839 to 1899',w:'Stayed with pure landscape and short, patient strokes. His snow and water are built from many small marks of slightly different colour, never one flat wash.'},
+ renoir:{n:'Pierre Auguste Renoir',y:'1841 to 1919',w:'Warm light, cool shadow, and colour bounced back into the shadows from everything around. Skin in his pictures is never brown, it is pink, green, lilac and gold sitting next to each other.'},
+ sargent:{n:'John Singer Sargent',y:'1856 to 1925',w:'The master of getting it right in one go: he mixed the exact value and colour on the palette and laid it down once. When it was right he stopped, which is why the strokes stay readable as strokes.'},
+ zorn:{n:'Anders Zorn',y:'1860 to 1920',w:'Famous for painting a great deal with very little: white, yellow ochre, red and black. A tight palette forces you to work with value and temperature instead of reaching for another tube.'},
+ sorolla:{n:'Joaquin Sorolla',y:'1863 to 1923',w:'Painted enormous canvases outdoors on the beach in the glare, with a big brush and violent, confident strokes. Sunlight on wet skin and cloth is his whole subject.'},
+ manet:{n:'Edouard Manet',y:'1832 to 1883',w:'Cut out the careful middle tones and put light shapes straight against dark ones, flattening the form. It looked crude to his critics and it started modern painting.'},
+ hals:{n:'Frans Hals',y:'about 1582 to 1666',w:'Painted wet into wet, at speed, letting each stroke stay visible. A collar is a few slashes of grey and white, and the liveliness of the person comes out of the liveliness of the hand.'},
+ whistler:{n:'James McNeill Whistler',y:'1834 to 1903',w:'Treated a painting as an arrangement of tones first and a subject second, which is why he called them nocturnes and harmonies. He argued knowing when to stop is the whole art.'}};
+const LESSONS={
+ realism:[
+  {t:'Lay the ground.',b:'Before anything else, fill the whole canvas with one mid colour. A raw white canvas has no middle value, so every stroke after it looks wrong. Paint the lights and darks onto the ground and let the ground itself be everything in between.',aim:'Fill the canvas with one colour before you start painting.',a:'titian'},
+  {t:'Three values.',b:'Pick one colour. Put down a light version, a dark version, and leave the ground showing as the middle. Squint at it: if you can see three clear steps from dark to light, the form will read even with no drawing under it.',aim:'Three clearly different lights and darks on the canvas.',a:'rembrandt'},
+  {t:'Where the light comes from.',b:'Choose one side for the sun and hold to it. Lit faces get your colour lightened, turned faces get it darkened. One source, hard shadows, and the shape carves itself out of the dark.',aim:'One side of the canvas clearly lighter than the other.',a:'caravaggio'},
+  {t:'Real darks.',b:'Beginners paint everything in the middle. Go all the way down in the shadows and all the way up in one or two highlights, and keep the rest between. Range is what makes a picture look lit rather than flat.',aim:'A true dark and a true light, far apart.',a:'velazquez'},
+  {t:'Distance goes cool.',b:'Air is not clear. The far hills go pale, blue and low in contrast, the near ground stays warm and sharp. Paint the top of your picture cooler than the bottom and depth appears without a single line of perspective.',aim:'The far part of the canvas cooler than the near part.',a:'leonardo'},
+  {t:'One place to look.',b:'Put your strongest contrast and brightest light in one small area and keep everything else quieter. A picture with two focal points has none. Decide where the eye lands before you paint.',aim:'The brightest paint gathered in one small area.',a:'vermeer'}],
+ impressionist:[
+  {t:'Paint the light, not the thing.',b:'You are not painting a tree, you are painting the light coming off it at this hour. Cover the canvas quickly with the colours you actually see and stop naming the objects.',aim:'Most of the canvas covered.',a:'monet'},
+  {t:'Broken colour.',b:'Do not mix the green on the palette. Lay a blue stroke and a yellow stroke next to each other and let the eye mix them. The surface stays alive because it never settles into one flat colour.',aim:'Five or more different colours used.',a:'pissarro'},
+  {t:'Shadows have colour.',b:'A shadow is not the object with black added, it is the same thing lit by the sky instead of the sun, so it goes blue, violet, green. Ban grey and black from your shadows for one painting.',aim:'The dark parts coloured, not grey.',a:'morisot'},
+  {t:'Many small strokes.',b:'Build the picture from a lot of short marks rather than a few long ones. Vary each one slightly in colour. Water and snow are the classic test, because neither is ever one colour.',aim:'Sixty strokes or more.',a:'sisley'},
+  {t:'Warm light, cool shadow.',b:'Sunlight is warm, so everything it touches goes yellow and pink, and everything it misses goes toward blue. Keep that split consistent everywhere and the whole canvas reads as one moment of daylight.',aim:'The lights warmer than the darks.',a:'renoir'},
+  {t:'The sky is the subject.',b:'Give the sky most of the canvas and paint it as moving weather, not a flat blue lid. Whatever is beneath it takes its light from it, so paint the sky first and let the ground answer.',aim:'The canvas nearly all covered.',a:'constable'}],
+ allaprima:[
+  {t:'One sitting.',b:'Wet into wet, start to finish, no coming back tomorrow. Work fast, keep the whole canvas moving at the same pace, and accept what the first attempt gives you.',aim:'Finished inside six minutes.',a:'sargent'},
+  {t:'Four colours.',b:'Take white, a yellow, a red and a black, and paint the whole thing with those. A short palette forces you to solve pictures with value and temperature instead of reaching for another tube.',aim:'Four colours or fewer.',a:'zorn'},
+  {t:'Big brush first.',b:'Start with the largest brush you can bear and block the big shapes in. Detail is what you do last, if there is time. Most weak paintings were fussy from the first stroke.',aim:'Open with big strokes.',a:'sorolla'},
+  {t:'Light shape against dark shape.',b:'Cut out the careful gradient between them. Put a light mass straight up against a dark mass and let the edge do the work. It flattens the form and it makes the picture read from across the room.',aim:'Strong contrast with few strokes.',a:'manet'},
+  {t:'Wet into wet.',b:'Paint over paint while it is still soft, so the strokes drag colour into each other. Do not wait, do not tidy. The mixing happens on the canvas rather than on the palette.',aim:'Most strokes laid over paint, not bare ground.',a:'hals'},
+  {t:'Know when to stop.',b:'The hardest lesson. Get it down, then leave it alone. Every extra stroke past the point where it worked takes something away, and undoing is not the same as never having done it.',aim:'Finished without undoing anything.',a:'whistler'}]};
+const LAD=[['realism','Realism'],['impressionist','Impressionist'],['allaprima','Alla prima']];
+const lesKey=(s,i)=>s+':'+(i+1);
+const lesRec=k=>ARTX.lessons&&ARTX.lessons[k]?ARTX.lessons[k]:null;
+const lesOf=k=>{const p=String(k).split(':');return (LESSONS[p[0]]||[])[(+p[1]||1)-1]};
+function lesDoneCount(){return Object.keys(ARTX.lessons||{}).length}
+/* ---------- what the canvas says ---------- */
+function ptStats(){const W=ptCan.width,H=ptCan.height,g=ptG;const sw=Math.min(160,W),sh=Math.round(sw*H/W);
+ const c=document.createElement('canvas');c.width=sw;c.height=sh;const x=c.getContext('2d');x.drawImage(ptCan,0,0,sw,sh);
+ const d=x.getImageData(0,0,sw,sh).data;const N=sw*sh;
+ const base=PT.ground||[239,230,210];let cov=0,lum=[],hues={},warmL=0,warmN=0,coolL=0,coolN=0;
+ let lsum=0,rsum=0,ln=0,rn=0,tw=0,tn=0,bw=0,bn=0,mx=0,mn=255;const bright=[];const band={};let darkSat=0,darkN=0;
+ for(let i=0;i<N;i++){const p=i*4,r=d[p],gg=d[p+1],b=d[p+2];
+  const L=0.299*r+0.587*gg+0.114*b;const mxc=Math.max(r,gg,b),mnc=Math.min(r,gg,b);const sat=mxc?(mxc-mnc)/mxc:0;
+  if(Math.abs(r-base[0])+Math.abs(gg-base[1])+Math.abs(b-base[2])>34)cov++;
+  band[Math.floor(L/32)]=(band[Math.floor(L/32)]||0)+1;
+  if(sat>0.14){const h=Math.round(rgbHue(r,gg,b)/30);hues[h]=(hues[h]||0)+1}
+  const warm=(r-b);const xx=i%sw,yy=Math.floor(i/sw);
+  if(xx<sw/2){lsum+=L;ln++}else{rsum+=L;rn++}
+  if(yy<sh/2){tw+=warm;tn++}else{bw+=warm;bn++}
+  if(L>mx)mx=L;if(L<mn)mn=L;
+  if(L>170){warmL+=warm;warmN++}if(L<95){coolL+=warm;coolN++;darkSat+=sat;darkN++}
+  if(L>200)bright.push([xx,yy])}
+ const bands=Object.keys(band).filter(k=>band[k]>N*0.04).length;
+ let cluster=1;if(bright.length>12){let sx=0,sy=0;bright.forEach(p=>{sx+=p[0];sy+=p[1]});sx/=bright.length;sy/=bright.length;
+  let near=0;bright.forEach(p=>{if(Math.hypot(p[0]-sx,p[1]-sy)<sw*0.22)near++});cluster=near/bright.length}
+ return {cov:cov/N,bands:bands,hues:Object.keys(hues).length,contrast:mx-mn,
+  side:Math.abs(lsum/(ln||1)-rsum/(rn||1)),topCool:(bw/(bn||1))-(tw/(tn||1)),
+  warmSplit:(warmN?warmL/warmN:0)-(coolN?coolL/coolN:0),darkSat:darkN?darkSat/darkN:0,cluster:cluster}}
+function rgbHue(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;if(!d)return 0;
+ let h;if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;return h<0?h+360:h}
+function lesStar(k,st){const p=String(k).split(':'),s=p[0],i=+p[1];
+ if(s==='realism')return i===1?PT.fillFirst:i===2?st.bands>=3:i===3?st.side>12:i===4?st.contrast>150:i===5?st.topCool>10:st.cluster>0.55;
+ if(s==='impressionist')return i===1?st.cov>0.6:i===2?st.hues>=5:i===3?st.darkSat>0.22:i===4?PT.strokes>=60:i===5?st.warmSplit>14:st.cov>0.9;
+ return i===1?(PT.secs()<360):i===2?PT.cols.length<=4:i===3?PT.bigOpen:i===4?(st.contrast>130&&PT.strokes<=40):i===5?(PT.strokes>10&&PT.wet/PT.strokes>0.7):(PT.undos===0)}
+/* ---------- the lesson panel ---------- */
+function lesOpen(){const w=ptEl('ptLes');if(!w)return;w.innerHTML='';
+ LAD.forEach(([s,nm])=>{const h=document.createElement('div');h.className='micro';h.style.cssText='opacity:.6;margin:6px 0 4px';
+  h.textContent=nm+' \u00B7 '+LESSONS[s].filter((l,i)=>lesRec(lesKey(s,i))).length+' of 6';w.appendChild(h);
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;flex-wrap:wrap';
+  LESSONS[s].forEach((l,i)=>{const k=lesKey(s,i),r=lesRec(k);const b=document.createElement('button');b.className='btn'+(PT.lesson===k?' on':'');
+   b.innerHTML=(i+1)+(r?(r.star?' \u2605':' \u2713'):'')+'<small>'+l.t.replace(/\.$/,'')+'</small>';
+   b.onclick=()=>{PT.lesson=k;PT.practice=false;lesShow();ptEl('ptLes').classList.remove('on')};row.appendChild(b)});
+  w.appendChild(row)});
+ const f=document.createElement('div');f.style.cssText='display:flex;gap:6px;margin-top:10px';
+ const free=document.createElement('button');free.className='btn'+(PT.lesson?'':' on');free.textContent='Just paint';
+ free.onclick=()=>{PT.lesson='';PT.practice=false;lesShow();lesOpen()};f.appendChild(free);
+ const pr=document.createElement('button');pr.className='btn'+(PT.practice?' on':'');pr.textContent='Practise, no points';
+ pr.onclick=()=>{PT.practice=!PT.practice;lesOpen()};f.appendChild(pr);
+ const pa=document.createElement('button');pa.className='btn';pa.textContent='The painters';pa.onclick=openPainters;f.appendChild(pa);
+ w.appendChild(f);w.classList.add('on')}
+function lesShow(){const c=ptEl('ptBrief');if(!c)return;const L=lesOf(PT.lesson);
+ if(!PT.lesson||!L){c.classList.remove('on');c.innerHTML='';return}
+ const k=PT.lesson,r=lesRec(k),A=ARTISTS[L.a];
+ c.innerHTML='<div class="micro" style="opacity:.6">'+(LAD.filter(x=>x[0]===k.split(':')[0])[0]||['',''])[1]+' \u00B7 lesson '+k.split(':')[1]+(r?(r.star?' \u00B7 passed with a star':' \u00B7 passed'):'')+'</div>'+
+  '<b>'+L.t+'</b><p>'+L.b+'</p><div class="aim">Gold star: '+L.aim+'</div>'+
+  '<button class="btn lnk" id="ptWho">'+A.n+' taught this</button>';
+ c.classList.add('on');const w=document.getElementById('ptWho');if(w)w.onclick=()=>openPainters(L.a)}
+function lesFinish(st){if(!PT.lesson||PT.practice||!LIVE)return;
+ const star=!!lesStar(PT.lesson,st),L=lesOf(PT.lesson);
+ RPC('lesson_done',{p_lesson:PT.lesson,p_star:star}).then(r=>{if(r.error)return;const d=r.data||{};
+  ARTX.lessons=ARTX.lessons||{};ARTX.lessons[PT.lesson]={lesson:PT.lesson,star:star||!!(lesRec(PT.lesson)||{}).star};
+  if(d.earned){ARTX.points+=d.earned;floatArt(d.earned)}
+  if(d.scholar){setTimeout(()=>SND.tier(),600);setTimeout(()=>toast('Eighteen lessons. You have studied the whole shelf.'),820)}
+  else if(d.first)setTimeout(()=>toast(star?('Passed with a star. '+L.aim.replace(/\.$/,'')+'. '+(250+100)+' art points.'):'Lesson passed. 250 art points. The star is still there for next time.'),820)
+  else if(d.new_star)setTimeout(()=>toast('Gold star. 100 more art points.'),820)},()=>{})}
+function floatArt(n){const w=document.getElementById('floats');if(!w)return;const e=document.createElement('div');
+ e.className='fl';e.textContent='\u2605 +'+n;w.appendChild(e);setTimeout(()=>{try{w.removeChild(e)}catch(x){}},1600)}
+/* ---------- the painters' shelf ---------- */
+function openPainters(who){const g=document.getElementById('paGrid');if(!g)return;g.innerHTML='';
+ const studied={};Object.keys(ARTX.lessons||{}).forEach(k=>{const L=lesOf(k);if(L)studied[L.a]=1});
+ Object.keys(ARTISTS).forEach(id=>{const A=ARTISTS[id];const row=document.createElement('div');row.className='pa'+(who===id?' on':'');
+  row.innerHTML='<div class="pah"><span>'+A.n+(studied[id]?' \u2713':'')+'</span><small>'+A.y+'</small></div><p>'+A.w+'</p>';
+  row.querySelector('.pah').onclick=()=>row.classList.toggle('on');g.appendChild(row)});
+ document.getElementById('painters').classList.add('on')}
+
 /* ---------- the commission ---------- */
 let AB_SLOT=0;
 function openCommission(n){if(visitGuard('commission a painting'))return;AB_SLOT=n;
