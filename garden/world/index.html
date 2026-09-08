@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.21">
+<meta name="world-build" content="6.22">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -38,6 +38,21 @@ canvas{display:block;touch-action:none;cursor:default}
 #pianoUI.on{display:flex}
 #pnBar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 #pnChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
+/* 6.22 the paintings: the easel panel */
+#paintUI{position:fixed;inset:0;z-index:28;display:none;flex-direction:column;background:rgba(17,15,11,.93);padding:10px 10px max(10px,env(safe-area-inset-bottom));pointer-events:auto;color:var(--ivory)}
+#paintUI.on{display:flex}
+#ptBar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#ptChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
+#ptWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#ptCan{max-width:100%;max-height:100%;background:#efe6d2;border:10px solid #D4B04A;border-radius:2px;touch-action:none;cursor:crosshair}
+#ptTools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#ptCols{display:flex;gap:5px;flex-wrap:wrap}
+.ptc{width:26px;height:26px;border-radius:50%;border:2px solid rgba(246,243,235,.35);padding:0;cursor:pointer}
+.ptc.on{border-color:var(--gold);transform:scale(1.12)}
+#ptSize{width:130px}
+#ptStyles{display:none;gap:6px;flex-wrap:wrap;margin-top:8px}
+#ptStyles.on{display:flex}
+#ptSwatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(246,243,235,.5);display:inline-block}
 /* 6.21 the instruments' panel */
 #instUI{position:fixed;left:0;right:0;bottom:0;z-index:26;display:none;flex-direction:column;background:linear-gradient(180deg,rgba(21,19,14,0),rgba(21,19,14,.94) 22%);padding:22px 10px max(10px,env(safe-area-inset-bottom));pointer-events:auto;color:var(--ivory)}#instUI.on{display:flex}
 #inBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}#inBar b{letter-spacing:.06em;font-size:13px}#inBar2{display:flex;gap:6px;align-items:center}#inChip{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;margin-left:auto}
@@ -229,6 +244,13 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 <div style="display:flex;gap:10px;margin-top:12px"><button class="btn fin" data-fin="black" style="flex:1">Black lacquer<small>5,000 gardencoin</small></button><button class="btn fin" data-fin="gold" style="flex:1;border-color:var(--gold);color:var(--gold)">Gold<small>10,000 gardencoin</small></button></div>
 <div class="sfoot" style="margin-top:12px"><button class="btn" id="pbClose">Not now.</button></div></div></div>
 <div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="inPad"></div></div>
+<div id="paintUI"><div id="ptBar"><button class="btn" id="ptClose">Leave it</button><span id="ptSwatch"></span><button class="btn" id="ptFill">Fill</button><button class="btn" id="ptStyle">Oil style</button><button class="btn" id="ptUndo">Undo</button><span class="micro" id="ptChip"></span><button class="btn on" id="ptSave">Save it</button></div>
+<div id="ptWrap"><canvas id="ptCan"></canvas></div>
+<div id="ptStyles"><button class="btn" data-s="realism">Realism</button><button class="btn" data-s="impressionist">Impressionist</button><button class="btn" data-s="allaprima">Alla prima</button><button class="btn" data-s="varnish">Varnish only</button></div>
+<div id="ptTools"><span id="ptCols"></span><input type="range" id="ptSize" min="6" max="90" value="26"></div></div>
+<div id="artBuy" class="sheet"><div class="panel small"><h2>Commission an artist<span>.</span></h2><p id="abSub">A finished oil, framed in gold, hung while you wait.</p>
+<div id="abGrid" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
+<div class="sfoot" style="margin-top:12px"><button class="btn" id="abClose">Not now.</button></div></div></div>
 <div id="store" class="sheet"><div class="panel">
   <div class="shead"><div><div class="micro" id="stLabel">THE SHOP</div><h2 id="stTitle">Seeds<span>.</span></h2></div><div class="sbal micro" id="stBal"></div></div>
   <div class="tabs" id="stTabs"></div>
@@ -527,7 +549,8 @@ function lamp(x,z,h,fl,lv,part){at(fl,lv,3);const y=(fl?UF:GF)+h;cyl('brass',x,y
 function sconce(x,y,z,ry,fl,lv){at(fl,lv,3);const c=Math.cos(ry),s=Math.sin(ry);box('brass',x+0.06*s,y,z+0.06*c,0.08,0.26,0.06,ry);sph('lamp',x+0.16*s,y+0.14,z+0.16*c,0.07);SPOTS.push({fl,lv,x:x+0.3*s,y:y+0.2,z:z+0.3*c,kind:'sconce'})}
 function lantern(x,y,z,fl,lv,until){at(fl,lv,until==null?3:until);cyl('brass',x,y+0.35,z,0.012,0.7);box('brass',x,y-0.1,z,0.32,0.46,0.32);box('lamp',x,y-0.1,z,0.22,0.34,0.22);SPOTS.push({fl,lv,until:until==null?3:until,x,y:y-0.2,z,kind:'lantern'})}
 function rug(x,z,w,d,tex,fl,lv,ry){at(fl,lv,3);const m=new THREE.MeshStandardMaterial({map:tex,roughness:1});const g=new THREE.PlaneGeometry(w,d);const r=mesh(g,m,x,(fl?UF:GF)+0.012,z,0,-Math.PI/2);if(ry)r.rotation.z=ry;r.castShadow=false}
-function painting(x,y,z,ry,w,h,i,fl,lv,gilt){at(fl,lv,3);const c=Math.cos(ry),s=Math.sin(ry);const fw=gilt?0.09:0.05;const F=(lx,ly,sx,sy)=>box(gilt?'gilt':'walnut',x+lx*c+0.03*s,y+ly,z-lx*s+0.03*c,sx,sy,0.06,ry);
+function painting(){}   /* 6.22: the old fixed paintings are gone; the twelve slots hang from the ART module */
+function paintingOff(x,y,z,ry,w,h,i,fl,lv,gilt){at(fl,lv,3);const c=Math.cos(ry),s=Math.sin(ry);const fw=gilt?0.09:0.05;const F=(lx,ly,sx,sy)=>box(gilt?'gilt':'walnut',x+lx*c+0.03*s,y+ly,z-lx*s+0.03*c,sx,sy,0.06,ry);
  F(-(w/2+fw/2),0,fw,h+fw*2);F(w/2+fw/2,0,fw,h+fw*2);F(0,h/2+fw/2,w,fw);F(0,-(h/2+fw/2),w,fw);
  const m=new THREE.MeshStandardMaterial({map:paintingTex(i),roughness:.85});const g=new THREE.PlaneGeometry(w,h);const p=mesh(g,m,x+0.005*s,y,z+0.005*c,ry);p.castShadow=false;p.userData.painting=i}
 function piano(x,z,ry,fl,grand){const c=Math.cos(ry),s=Math.sin(ry),y=fl?UF:GF;const L=(lx,ly,lz,sx,sy,sz,p,lry)=>box(p,x+lx*c+lz*s,y+ly,z-lx*s+lz*c,sx,sy,sz,ry+(lry||0));
@@ -2610,7 +2633,7 @@ function songLight(){$$('#pnKeys .pnk').forEach(k=>{k.classList.remove('now','ne
    back wall. His paintings (frame and plaque baked in, transparent round the frame) load from garden/world/<name>.webp only in the house;
    a painted stand-in shows until the picture arrives (and in the chat preview, where his art never loads). Each gets a picture lamp */
 const MOZART_SHEETS=4;   /* sheets played through (any four of the five) that hang Mozart */
-const PORTRAITS={beethoven:{x:4.5,y:3.3,z:-4.92,w:2.2,h:3.3},mozart:{x:7.5,y:3.3,z:-4.92,w:2.2,h:3.3}};const PORTG={};
+const PORTRAITS={beethoven:{x:3.17,y:3.3,z:-1.9,w:2.2,h:3.3,ry:Math.PI/2},mozart:{x:3.17,y:3.3,z:1.6,w:2.2,h:3.3,ry:Math.PI/2}};const PORTG={};   /* 6.22: off the back wall, they covered the window at x 4.5; they face the piano now */
 function standInTex(name){const c=document.createElement('canvas');c.width=512;c.height=768;const g=c.getContext('2d');
   const bg=g.createRadialGradient(256,330,40,256,330,560);bg.addColorStop(0,'#4a2f1c');bg.addColorStop(0.6,'#221510');bg.addColorStop(1,'#0e0908');g.fillStyle=bg;g.fillRect(0,0,512,768);
   g.strokeStyle='#d9b24c';g.lineWidth=26;g.strokeRect(13,13,486,742);g.lineWidth=4;g.strokeRect(46,46,420,676);
@@ -2626,9 +2649,214 @@ function buildPortrait(name){const A=PORTRAITS[name];const g=new THREE.Group();c
   const shade=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.15,0.13,12),gilt);shade.position.set(0,A.h/2+0.31,0.32);g.add(shade);
   const L=new THREE.PointLight(0xffd88a,0.9,4.4,2);L.position.set(0,A.h/2+0.22,0.34);g.add(L);
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({color:0xffe2a0,transparent:true,opacity:0.32,depthWrite:false}));gl.position.set(0,A.h/2+0.24,0.36);gl.scale.set(0.5,0.5,1);g.add(gl);
-  g.position.set(A.x,A.y,A.z);g.userData.lamp=L;g.userData.pic=pic;return g}
+  g.position.set(A.x,A.y,A.z);if(A.ry)g.rotation.y=A.ry;g.userData.lamp=L;g.userData.pic=pic;return g}
 function placePortraits(){const won=VISIT?((OWNER_PX&&OWNER_PX.masters)||{}):PX.masters;Object.keys(PORTRAITS).forEach(name=>{const on=!!won[name];if(!PORTG[name]){if(!on)return;PORTG[name]=buildPortrait(name);INTERIOR.scene.add(PORTG[name])}PORTG[name].visible=on})}
 const placeMozart=placePortraits;
+
+/* ======================================================================
+   6.22 · THE PAINTINGS (patch 71). Twelve empty canvases hang on walls proved clear of every window,
+   doorway, bookcase, hearth breast, bed canopy and the stair. Pay for a canvas and the easel opens:
+   a fat oil brush that lays paint over paint, a Fill for the ground colour, and an oil style pass that
+   turns what you painted into a picture. Save and it hangs in your house for anyone who visits.
+   Or pay the artist and a finished oil arrives, framed in gold. Twelve filled makes you a master.
+   ====================================================================== */
+const ART_UF=INTERIOR.H.UF,ART_SW=INTERIOR.H.SWITCH;
+const ART_SLOTS=[
+ {n:1,x:-15.78,y:3.30,z:0.75,ry:Math.PI/2,w:1.7,h:1.2,fl:0,room:'the great room'},
+ {n:2,x:-14.60,y:3.00,z:-3.29,ry:0,w:1.6,h:1.2,fl:0,room:'the great room'},
+ {n:3,x:-8.83,y:3.00,z:-2.60,ry:Math.PI/2,w:1.6,h:1.2,fl:0,room:'the library'},
+ {n:4,x:-0.90,y:3.20,z:-4.93,ry:0,w:2.0,h:1.4,fl:0,room:'the hall'},
+ {n:5,x:-2.83,y:3.00,z:-3.60,ry:Math.PI/2,w:1.4,h:1.8,fl:0,room:'the hall'},
+ {n:6,x:8.83,y:3.10,z:-3.00,ry:-Math.PI/2,w:1.6,h:1.2,fl:0,room:'the music room'},
+ {n:7,x:16.03,y:3.00,z:-1.28,ry:-Math.PI/2,w:1.6,h:1.2,fl:0,room:'the dining room'},
+ {n:8,x:-8.83,y:ART_UF+2.5,z:1.80,ry:Math.PI/2,w:1.4,h:1.1,fl:1,room:'the bedroom'},
+ {n:9,x:-2.83,y:ART_UF+2.5,z:-3.50,ry:Math.PI/2,w:1.2,h:1.0,fl:1,room:'the gallery'},
+ {n:10,x:-2.83,y:ART_UF+2.5,z:-1.00,ry:Math.PI/2,w:1.2,h:1.0,fl:1,room:'the gallery'},
+ {n:11,x:-0.60,y:ART_UF+2.5,z:-4.93,ry:0,w:1.4,h:1.0,fl:1,room:'the gallery'},
+ {n:12,x:8.83,y:ART_UF+2.6,z:1.80,ry:-Math.PI/2,w:1.2,h:1.5,fl:1,room:'the study'}];
+const ART_WORKS={orchard:{n:'The Orchard After Rain',r:1.53},bellflower:{n:'Moonlit Bellflower Bay',r:1.60},
+ glasshouse:{n:'Supper at the Glasshouse',r:1.50},cedar:{n:'The Last Cedar of Valemont',r:0.66},mechanical:{n:'The Mechanical Garden',r:1.63}};
+let ARTX={slots:{},easels:[],filled:0,total:12,points:0,master:false,canvas_gc:750,commission_gc:10000};
+let ART_SYNC='',ARTG={},ART_SIG={},ART_ON=0,ART_TEX={};
+const artSlot=n=>ART_SLOTS.filter(a=>a.n===n)[0];
+const artHas=n=>ARTX.slots[n]||null;
+const artEasel=n=>ARTX.easels.indexOf(n)>=0;
+function artSync(force){if(!sb||!LIVE)return;const key=(VISIT?VISIT.owner:'me');if(ART_SYNC===key&&!force)return;ART_SYNC=key;
+ Promise.resolve(sb.rpc('garden_art_state',VISIT?{p_owner:VISIT.owner}:{})).then(r=>{if(r.error){ART_SYNC='';return}const d=r.data||{};
+  const m={};(d.slots||[]).forEach(s=>{m[+s.slot]=s});
+  ARTX={slots:m,easels:(d.easels||[]).map(Number),filled:+d.filled||0,total:+d.total||12,points:+d.points||0,
+   master:!!d.master,canvas_gc:+d.canvas_gc||750,commission_gc:+d.commission_gc||10000};
+  if(INSIDE)placeArt()},()=>{ART_SYNC=''})}
+function artLinen(){const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');
+ g.fillStyle='#EDE3CC';g.fillRect(0,0,256,256);g.strokeStyle='rgba(140,120,90,.16)';g.lineWidth=1;
+ for(let i=0;i<256;i+=4){g.beginPath();g.moveTo(i,0);g.lineTo(i,256);g.stroke();g.beginPath();g.moveTo(0,i);g.lineTo(256,i);g.stroke()}
+ g.fillStyle='rgba(90,70,40,.10)';g.fillRect(0,0,256,10);g.fillRect(0,246,256,10);
+ return new THREE.CanvasTexture(c)}
+let ART_LINEN=null;
+function artFrameBars(A,gilt){const g=new THREE.Group();const fw=gilt?0.09:0.06;
+ const M=new THREE.MeshStandardMaterial({color:gilt?0xD4B04A:0x5A3A20,roughness:gilt?0.35:0.6,metalness:gilt?0.7:0});
+ const bar=(x,y,sx,sy)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,0.07),M);m.position.set(x,y,0.02);m.castShadow=false;g.add(m)};
+ bar(-(A.w/2+fw/2),0,fw,A.h+fw*2);bar(A.w/2+fw/2,0,fw,A.h+fw*2);bar(0,A.h/2+fw/2,A.w+fw*2,fw);bar(0,-(A.h/2+fw/2),A.w+fw*2,fw);
+ return g}
+function artLamp(A,g){const gilt=new THREE.MeshStandardMaterial({color:0xE0B84A,metalness:0.9,roughness:0.3});
+ const arm=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,0.26),gilt);arm.position.set(0,A.h/2+0.3,0.12);g.add(arm);
+ const shade=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.13,0.11,12),gilt);shade.position.set(0,A.h/2+0.26,0.27);g.add(shade);
+ const L=new THREE.PointLight(0xffd88a,0.75,3.8,2);L.position.set(0,A.h/2+0.18,0.3);g.add(L);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({color:0xffe2a0,transparent:true,opacity:0.28,depthWrite:false}));
+ sp.position.set(0,A.h/2+0.2,0.32);sp.scale.set(0.42,0.42,1);g.add(sp)}
+function artPic(A,mat,w,h){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);p.position.set(0,0,0.05);p.castShadow=false;p.receiveShadow=true;return p}
+function artBuild(A){const rec=artHas(A.n),g=new THREE.Group();
+ if(rec&&rec.kind==='commissioned'){const r=(ART_WORKS[rec.art]||{r:1.5}).r;
+  let w=A.w*1.34,h=w/r;const maxh=A.h*1.55;if(h>maxh){h=maxh;w=h*r}
+  const mat=new THREE.MeshStandardMaterial({color:0x2a1d10,roughness:0.85,transparent:true,alphaTest:0.02});
+  g.add(artPic(A,mat,w,h));
+  const key='art-'+rec.art;
+  if(ART_TEX[key]){mat.map=ART_TEX[key];mat.needsUpdate=true}
+  else loadImg('world/'+key+'.webp',img=>{const t=new THREE.Texture(img);t.needsUpdate=true;dress(t);ART_TEX[key]=t;mat.map=t;mat.needsUpdate=true});
+  artLamp({w:w,h:h},g)}
+ else if(rec&&rec.img){const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.82});
+  g.add(artFrameBars(A,true));g.add(artPic(A,mat,A.w,A.h));
+  const im=new Image();im.onload=()=>{const t=new THREE.Texture(im);t.needsUpdate=true;dress(t);mat.map=t;mat.needsUpdate=true};im.src=rec.img;
+  artLamp(A,g)}
+ else{ART_LINEN=ART_LINEN||artLinen();
+  const mat=new THREE.MeshStandardMaterial({map:ART_LINEN,roughness:0.95});
+  g.add(artFrameBars(A,false));g.add(artPic(A,mat,A.w,A.h))}
+ g.position.set(A.x,A.y,A.z);g.rotation.y=A.ry;return g}
+function artSigOf(n){const r=artHas(n);if(!r)return artEasel(n)?'easel':'empty';
+ return r.kind==='commissioned'?('c:'+r.art):('p:'+String(r.made_at||'').slice(0,24))}
+function placeArt(){ART_SLOTS.forEach(A=>{const sig=artSigOf(A.n);if(ART_SIG[A.n]===sig&&ARTG[A.n])return;
+ if(ARTG[A.n]){INTERIOR.scene.remove(ARTG[A.n]);ARTG[A.n]=null}
+ ART_SIG[A.n]=sig;const g=artBuild(A);ARTG[A.n]=g;INTERIOR.scene.add(g)})}
+function artNear(){if(!INSIDE)return null;const fl=you.feet>ART_SW?1:0;let best=null,bd=2.7;
+ ART_SLOTS.forEach(A=>{if(A.fl!==fl)return;const d=Math.hypot(you.x-A.x,you.z-A.z);if(d<bd){bd=d;best=A}});return best}
+function artWords(){return ARTX.filled+' of '+ARTX.total+' hung \u00B7 '+ARTX.points.toLocaleString()+' art points'}
+function artAct(){const A=artNear();if(!A)return false;placeArt();
+ const at=[A.x,A.y+A.h/2+0.5,A.z],rec=artHas(A.n);
+ if(rec&&rec.kind==='commissioned'){showAct((ART_WORKS[rec.art]||{n:'A commissioned oil'}).n+'.',null,null,null,VISIT?'commissioned by '+VISIT.handle:'you commissioned it \u00B7 '+artWords(),null,at);return true}
+ if(rec){showAct(rec.title?rec.title+'.':'An oil, painted by you.',null,null,null,VISIT?'painted by '+VISIT.handle:artWords(),
+  VISIT?null:[{l:'Paint it again \u00B7 '+ARTX.canvas_gc.toLocaleString()+'.',f:()=>artStart(A.n)}],at);return true}
+ if(VISIT){showAct('An empty canvas.',null,null,null,'waiting for '+VISIT.handle,null,at);return true}
+ if(artEasel(A.n)){showAct('Take up the brushes.','artpaint',A.n,null,'the canvas is paid for \u00B7 '+artWords(),
+  [{l:'Commission an artist \u00B7 '+ARTX.commission_gc.toLocaleString()+'.',f:()=>openCommission(A.n)}],at);return true}
+ showAct('Paint this canvas \u00B7 '+ARTX.canvas_gc.toLocaleString()+' gardencoin.','artpaint',A.n,null,artWords(),
+  [{l:'Commission an artist \u00B7 '+ARTX.commission_gc.toLocaleString()+'.',f:()=>openCommission(A.n)}],at);return true}
+function artStart(n){if(visitGuard('paint in this house'))return;
+ if(!LIVE){SND.knock();toast('Sign in on deeds.fun to paint.');return}
+ if(artEasel(n)){openPainter(n);return}
+ if(BUSY)return;BUSY=true;
+ RPC('paint_start',{p_slot:n}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');
+   if(/not_enough/.test(m)){SND.knock();toast('A canvas is '+ARTX.canvas_gc.toLocaleString()+' gardencoin. Sell flowers or log a deed.');return}
+   toast('The painter said: '+(m||'nothing'));return}
+  const d=r.data||{};if(d.pay&&typeof d.pay.balance==='number'){S.gc=d.pay.balance;save();renderHud()}
+  if(ARTX.easels.indexOf(n)<0)ARTX.easels.push(n);SND.buy(6);openPainter(n)},e=>{BUSY=false;toast('The painter said: '+String(e&&e.message||e||'nothing'))})}
+/* ---------- the easel ---------- */
+const PT_COLS=['#F4EEDF','#E8C87A','#C8892F','#8E4B22','#6B2D1E','#93341F','#C1452F','#7C5B8F','#2E4A72','#4E7FA8','#2E5B3A','#6E8F45','#B7B09C','#4A4038','#241C15','#0F0C09'];
+const PT={n:0,col:'#2E5B3A',size:26,on:false,down:false,lx:0,ly:0,undo:[],style:'realism'};
+let ptCan=null,ptG=null;
+function ptEl(id){return document.getElementById(id)}
+function openPainter(n){const A=artSlot(n);if(!A)return;PT.n=n;PT.undo=[];
+ const c=ptEl('ptCan');ptCan=c;const W=880,H=Math.round(W*A.h/A.w);c.width=W;c.height=H;
+ ptG=c.getContext('2d');const rec=artHas(n);
+ if(rec&&rec.img&&rec.kind==='painted'){const im=new Image();im.onload=()=>{ptG.drawImage(im,0,0,W,H)};im.src=rec.img}
+ else{ptG.fillStyle='#EFE6D2';ptG.fillRect(0,0,W,H)}
+ ptChipSet();ptCols();ptSwatch();ptEl('ptStyles').classList.remove('on');
+ ART_ON=1;hideAct();document.getElementById('paintUI').classList.add('on')}
+function closePainter(){ART_ON=0;document.getElementById('paintUI').classList.remove('on');ptEl('ptStyles').classList.remove('on');updateAct()}
+function ptChipSet(m){ptEl('ptChip').textContent=m||('canvas '+PT.n+' \u00B7 '+(artSlot(PT.n)||{room:''}).room)}
+function ptSwatch(){ptEl('ptSwatch').style.background=PT.col}
+function ptCols(){const w=ptEl('ptCols');if(w.childNodes.length)return;
+ PT_COLS.forEach(c=>{const b=document.createElement('button');b.className='ptc'+(c===PT.col?' on':'');b.style.background=c;b.dataset.c=c;
+  b.onclick=()=>{PT.col=c;ptSwatch();Array.prototype.forEach.call(w.children,e=>e.classList.toggle('on',e.dataset.c===c))};w.appendChild(b)})}
+function ptPush(){try{PT.undo.push(ptCan.toDataURL('image/png'));if(PT.undo.length>4)PT.undo.shift()}catch(e){}}
+function ptUndo(){const d=PT.undo.pop();if(!d){toast('Nothing to undo.');return}const im=new Image();
+ im.onload=()=>{ptG.clearRect(0,0,ptCan.width,ptCan.height);ptG.drawImage(im,0,0)};im.src=d}
+function ptShade(hex,amt){const h=hex.replace('#','');const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+ const f=v=>Math.max(0,Math.min(255,Math.round(v+amt)));return 'rgb('+f(r)+','+f(g)+','+f(b)+')'}
+function ptPos(e){const r=ptCan.getBoundingClientRect();return {x:(e.clientX-r.left)*(ptCan.width/r.width),y:(e.clientY-r.top)*(ptCan.height/r.height)}}
+function ptStroke(x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,len=Math.hypot(dx,dy)||1;const nx=-dy/len,ny=dx/len;
+ const S=PT.size,bristles=Math.max(5,Math.round(S/3));ptG.lineCap='round';
+ for(let i=0;i<bristles;i++){const t=(i/(bristles-1)-0.5)*S;const jt=(Math.random()-0.5)*S*0.12;
+  ptG.strokeStyle=ptShade(PT.col,(Math.random()-0.42)*46);ptG.globalAlpha=0.55+Math.random()*0.4;ptG.lineWidth=Math.max(1.4,S/bristles*1.5);
+  ptG.beginPath();ptG.moveTo(x0+nx*(t+jt),y0+ny*(t+jt));ptG.lineTo(x1+nx*t,y1+ny*t);ptG.stroke()}
+ ptG.globalAlpha=0.5;ptG.strokeStyle=ptShade(PT.col,54);ptG.lineWidth=Math.max(1,S*0.14);
+ ptG.beginPath();ptG.moveTo(x0+nx*S*0.34-1,y0+ny*S*0.34-1);ptG.lineTo(x1+nx*S*0.34-1,y1+ny*S*0.34-1);ptG.stroke();
+ ptG.strokeStyle=ptShade(PT.col,-46);ptG.beginPath();ptG.moveTo(x0-nx*S*0.36+1,y0-ny*S*0.36+1);ptG.lineTo(x1-nx*S*0.36+1,y1-ny*S*0.36+1);ptG.stroke();
+ ptG.globalAlpha=1}
+function ptFill(){ptPush();ptG.globalAlpha=1;ptG.fillStyle=PT.col;ptG.fillRect(0,0,ptCan.width,ptCan.height);
+ const W=ptCan.width,H=ptCan.height;for(let i=0;i<Math.round(W*H/900);i++){const x=Math.random()*W,y=Math.random()*H;
+  ptG.fillStyle=ptShade(PT.col,(Math.random()-0.5)*30);ptG.globalAlpha=0.35;ptG.fillRect(x,y,6+Math.random()*10,3+Math.random()*4)}
+ ptG.globalAlpha=1;ptChipSet('the ground is laid')}
+function ptWeave(){const W=ptCan.width,H=ptCan.height;ptG.globalAlpha=0.10;ptG.strokeStyle='#6b5a3e';ptG.lineWidth=1;
+ for(let i=0;i<W;i+=3){ptG.beginPath();ptG.moveTo(i,0);ptG.lineTo(i,H);ptG.stroke()}
+ for(let j=0;j<H;j+=3){ptG.beginPath();ptG.moveTo(0,j);ptG.lineTo(W,j);ptG.stroke()}ptG.globalAlpha=1}
+function ptDabs(size,jit,alpha){const W=ptCan.width,H=ptCan.height;const src=ptG.getImageData(0,0,W,H).data;
+ const step=Math.max(4,Math.round(size*0.62));
+ for(let y=0;y<H;y+=step)for(let x=0;x<W;x+=step){
+  const sx=Math.min(W-1,Math.max(0,x+Math.round((Math.random()-0.5)*jit)));
+  const sy=Math.min(H-1,Math.max(0,y+Math.round((Math.random()-0.5)*jit)));
+  const i=(sy*W+sx)*4;ptG.fillStyle='rgb('+src[i]+','+src[i+1]+','+src[i+2]+')';ptG.globalAlpha=alpha;
+  ptG.save();ptG.translate(x+step/2,y+step/2);ptG.rotate((Math.random()-0.5)*1.1);
+  ptG.fillRect(-size*0.62,-size*0.26,size*1.24,size*0.52);ptG.restore()}
+ ptG.globalAlpha=1}
+function ptVarnish(){const W=ptCan.width,H=ptCan.height;
+ const gl=ptG.createLinearGradient(0,0,0,H);gl.addColorStop(0,'rgba(255,226,160,.16)');gl.addColorStop(1,'rgba(120,80,30,.14)');
+ ptG.fillStyle=gl;ptG.globalAlpha=1;ptG.fillRect(0,0,W,H);
+ const rg=ptG.createRadialGradient(W/2,H/2,Math.min(W,H)*0.28,W/2,H/2,Math.max(W,H)*0.72);
+ rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(30,18,6,.34)');ptG.fillStyle=rg;ptG.fillRect(0,0,W,H)}
+function ptArtify(style){ptPush();PT.style=style;
+ if(style==='realism'){ptDabs(Math.max(7,PT.size*0.42),3,0.55);ptWeave();ptVarnish()}
+ else if(style==='impressionist'){ptDabs(Math.max(12,PT.size*0.85),9,0.72);ptDabs(Math.max(8,PT.size*0.5),6,0.5);ptWeave();ptVarnish()}
+ else if(style==='allaprima'){ptDabs(Math.max(18,PT.size*1.3),13,0.85);ptWeave();ptVarnish()}
+ else ptVarnish();
+ ptEl('ptStyles').classList.remove('on');ptChipSet('finished in '+(style==='allaprima'?'alla prima':style))}
+function ptData(){let q=0.72,d='';for(let k=0;k<6;k++){d=ptCan.toDataURL('image/webp',q);if(d.length<235000||d.indexOf('image/webp')<0)break;q-=0.11}
+ if(d.indexOf('image/webp')<0){q=0.66;for(let k=0;k<6;k++){d=ptCan.toDataURL('image/jpeg',q);if(d.length<235000)break;q-=0.09}}
+ return d}
+function ptSave(){if(!LIVE){toast('Sign in on deeds.fun to hang it.');return}if(BUSY)return;
+ const d=ptData();if(!d||d.length<400){toast('There is nothing on the canvas yet.');return}
+ if(d.length>255000){toast('That is a heavy canvas. Try a simpler pass.');return}
+ BUSY=true;ptChipSet('hanging it');
+ RPC('paint_save',{p_slot:PT.n,p_img:d,p_title:null}).then(r=>{BUSY=false;
+  if(r.error){ptChipSet();toast('The painter said: '+String(r.error.message||'nothing'));return}
+  const q=r.data||{};ARTX.easels=ARTX.easels.filter(x=>x!==PT.n);
+  ARTX.slots[PT.n]={slot:PT.n,kind:'painted',img:d,art:null,title:null,made_at:new Date().toISOString()};
+  ARTX.filled=+q.filled||ARTX.filled;ARTX.points=+q.points||ARTX.points;ARTX.master=!!q.master;
+  SND.buy(9);closePainter();placeArt();
+  if(q.master){setTimeout(()=>SND.tier(),500);setTimeout(()=>toast('Every canvas in the house is filled. You are a master.'),700)}
+  else toast('It hangs in '+(artSlot(PT.n)||{room:'the house'}).room+'. '+artWords()+'.')},
+  e=>{BUSY=false;ptChipSet();toast('The painter said: '+String(e&&e.message||e||'nothing'))})}
+function ptBind(){const c=ptEl('ptCan');if(!c)return;
+ c.addEventListener('pointerdown',e=>{e.preventDefault();c.setPointerCapture(e.pointerId);ptPush();const p=ptPos(e);PT.down=true;PT.lx=p.x;PT.ly=p.y;ptStroke(p.x,p.y,p.x+0.01,p.y+0.01)});
+ c.addEventListener('pointermove',e=>{if(!PT.down)return;e.preventDefault();const p=ptPos(e);ptStroke(PT.lx,PT.ly,p.x,p.y);PT.lx=p.x;PT.ly=p.y});
+ const up=()=>{PT.down=false};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);c.addEventListener('pointerleave',up);
+ ptEl('ptSize').addEventListener('input',e=>{PT.size=+e.target.value});
+ ptEl('ptFill').onclick=ptFill;ptEl('ptUndo').onclick=ptUndo;ptEl('ptClose').onclick=closePainter;ptEl('ptSave').onclick=ptSave;
+ ptEl('ptStyle').onclick=()=>ptEl('ptStyles').classList.toggle('on');
+ Array.prototype.forEach.call(document.querySelectorAll('#ptStyles .btn'),b=>{b.onclick=()=>ptArtify(b.dataset.s)});
+ const ab=document.getElementById('abClose');if(ab)ab.onclick=()=>document.getElementById('artBuy').classList.remove('on')}
+setTimeout(ptBind,0);
+/* ---------- the commission ---------- */
+let AB_SLOT=0;
+function openCommission(n){if(visitGuard('commission a painting'))return;AB_SLOT=n;
+ const g=document.getElementById('abGrid');g.innerHTML='';
+ Object.keys(ART_WORKS).forEach(k=>{const b=document.createElement('button');b.className='btn';b.style.textAlign='left';
+  b.innerHTML=ART_WORKS[k].n+'<small>'+ARTX.commission_gc.toLocaleString()+' gardencoin</small>';
+  b.onclick=()=>artCommission(k);g.appendChild(b)});
+ document.getElementById('abSub').textContent='A finished oil for canvas '+n+', '+(artSlot(n)||{room:'the house'}).room+'. Framed in gold, hung while you wait.';
+ hideAct();document.getElementById('artBuy').classList.add('on')}
+function artCommission(k){if(BUSY)return;if(!LIVE){toast('Sign in on deeds.fun to commission it.');return}BUSY=true;
+ RPC('art_commission',{p_slot:AB_SLOT,p_key:k}).then(r=>{BUSY=false;
+  if(r.error){const m=String(r.error.message||'');
+   if(/not_enough/.test(m)){SND.knock();toast('The artist wants '+ARTX.commission_gc.toLocaleString()+' gardencoin.');return}
+   toast('The artist said: '+(m||'nothing'));return}
+  const d=r.data||{};if(d.pay&&typeof d.pay.balance==='number'){S.gc=d.pay.balance;save();renderHud()}
+  ARTX.easels=ARTX.easels.filter(x=>x!==AB_SLOT);
+  ARTX.slots[AB_SLOT]={slot:AB_SLOT,kind:'commissioned',img:null,art:k,title:null,made_at:new Date().toISOString()};
+  ARTX.filled=+d.filled||ARTX.filled;ARTX.master=!!d.master;
+  document.getElementById('artBuy').classList.remove('on');SND.buy(11);placeArt();
+  if(d.master){setTimeout(()=>SND.tier(),500);setTimeout(()=>toast('Every canvas in the house is filled. You are a master.'),700)}
+  else toast(ART_WORKS[k].n+' hangs in '+(artSlot(AB_SLOT)||{room:'the house'}).room+'.');updateAct()},
+  e=>{BUSY=false;toast('The artist said: '+String(e&&e.message||e||'nothing'))})}
 
 /* 6.15 THE CHESS TABLE in the great room, by the hearth; the study is its own circle at garden/chess; the greats hang over the fire as you rank */
 const CHESS_AT={x:-14.5,z:-2.2};const CHX={known:false,owned:false,xp:0,rank:'Pawn'};let CHESSG=null,CHPORT=null,CH_SYNC='';
@@ -3471,13 +3699,13 @@ function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood fro
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();toast('Bring a bundle of wood from the oaks.');return}done(+d.wood||0,+d.stage||0,+d.delivered||1)}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
   const dl=S.wood;const wood=S.house.wood+dl;let stage=S.house.stage;while(stage<3&&wood>=HOUSE_TIERS[stage])stage++;done(wood,stage,dl)}
 /* 4.16 in through the front door: the gardener steps into the interior scene, the rooms at their levels, and the world waits outside where you left it */
-function enterHouse(){if(INSIDE)return;if(FLAME.on)flameToggle(false);if(DRIVE)mowerToggle();if(SEATED)pianoStand();if(INST.on)instStop();OUTPOS={x:you.x,z:you.z};INSIDE=true;hideAct();LOCK.kind=null;LOCK.id=-1;if(CAN)setCan(false);
+function enterHouse(){if(INSIDE)return;if(FLAME.on)flameToggle(false);if(DRIVE)mowerToggle();if(SEATED)pianoStand();if(INST.on)instStop();OUTPOS={x:you.x,z:you.z};INSIDE=true;artSync(true);placeArt();hideAct();LOCK.kind=null;LOCK.id=-1;if(CAN)setCan(false);
   scene.remove(AV.g);INTERIOR.scene.add(AV.g);const L=roomLevels();INTERIOR.setLevels(L[0],L[1]);INTERIOR.setPhase(ph);
   you.x=INTERIOR.ENTER_AT.x;you.z=INTERIOR.ENTER_AT.z;you.feet=0;you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=0;you.face=0;you.pitch=-0.34;camDist=2.2;ROOM='hall';areaNow='';camera.fov=78;camera.updateProjectionMatrix();camera.position.set(0,2.8,INTERIOR.ENTER_AT.z+1.6);camera.rotation.set(-0.34,0,0);SND.knock();
   toast(L[0]?'Your house \u00B7 '+roomsWord()+'.':'The bare shell \u00B7 bring the builder 20 bundles for downstairs.')}
 function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g);scene.add(AV.g);hideAct();LOCK.kind=null;LOCK.id=-1;
   you.x=DOORW.x;you.z=DOORW.z+2.9;you.feet=floorAtW(you.x,you.z);   /* 4.26: always out on the path, clear of the steps and the door prompt */you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
-function insideAct(){const L=roomLevels();placeToolChest();placePiano();placeChess();placeInst();if(SEATED||INST.on){hideAct();return}if(pianoAct())return;if(instAct())return;if(chessAct())return;   /* 6.21 */   /* 6.15 */   /* 6.7 */
+function insideAct(){const L=roomLevels();placeToolChest();placePiano();placeChess();placeInst();if(SEATED||INST.on){hideAct();return}if(pianoAct())return;if(instAct())return;if(chessAct())return;if(artAct())return;   /* 6.21 */   /* 6.15 */   /* 6.7 */
   if(you.feet<1&&!VISIT&&Math.hypot(you.x-CHEST_AT.x,you.z-CHEST_AT.z)<2.4){const c=chestList().length;showAct('The tool chest.','toolchest',null,null,c?plural(c,'tool')+' inside \u00B7 five in hand':'five in hand, nothing inside',null,[CHEST_AT.x,1.6,CHEST_AT.z]);return}
   if(you.feet<1&&!owns('sword')&&Math.hypot(you.x-SWORD_AT.x,you.z-SWORD_AT.z)<2.8){showAct('Take the sword.','takesword',null,null,'it hangs over the hearth',null,[SWORD_AT.x+0.4,2.6,SWORD_AT.z]);return}
   if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<2.0){showAct('Go outside.','leave',null,null,'the front door',null,[0,3.0,INTERIOR.DOOR.z+0.3]);return}
@@ -3771,7 +3999,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -4118,7 +4346,7 @@ function nameSprite(text){const c=cv(320,80),g=c.getContext('2d');const t=String
   const tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));sp.scale.set(1.6,0.4,1);sp.renderOrder=5;return sp}
 const hashId=s=>{let h=7;for(let i=0;i<(s||'').length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h};
 /* ---------- the door router: at home the door itself, in a friend's garden the same door run as the owner ---------- */
-const SPEND=['hand_set','sprinkler_buy','gardener_hire','house_lock','gardener_kill','seed_buy2','tool_buy','thing_buy2','tree_plant','gc_buy','chest_open','garden_dig','garden_clear','seed_buy','thing_buy','seed_sell'];
+const SPEND=['paint_start','paint_save','art_commission','hand_set','sprinkler_buy','gardener_hire','house_lock','gardener_kill','seed_buy2','tool_buy','thing_buy2','tree_plant','gc_buy','chest_open','garden_dig','garden_clear','seed_buy','thing_buy','seed_sell'];
 const DIRECT=['garden_burn','garden_burn2','garden_burn3','sword_take','wolf_kill','wolf_kill2','tree_gift','thing_gift','beast_kill','beast_kill2','item_sell','skeleton_eat'];   /* 4.25: gifts and guest deaths too */   /* 4.18: these doors already know whose garden they act on */
 function RPC(fn,args){args=args||{};
   if(DIRECT.indexOf(fn)>=0)return Promise.resolve(sb.rpc(fn,args)).then(r=>{if(/^garden_burn|_gift$/.test(fn)&&!r.error&&r.data&&r.data.ok!==false)announce(fn,args,r.data);return r});
