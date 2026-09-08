@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.23">
+<meta name="world-build" content="6.24">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -79,6 +79,16 @@ canvas{display:block;touch-action:none;cursor:default}
 #inPad .pads{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;gap:6px;height:100%;padding:6px;box-sizing:border-box}#inPad .pad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:10px;background:linear-gradient(#2a2620,#171512);border:1px solid rgba(255,255,255,.14);cursor:pointer}#inPad .pad b{font-size:20px;letter-spacing:.04em}#inPad .pad small{font-size:10px;opacity:.55;letter-spacing:.12em}#inPad .pad.down{background:var(--gold);color:#1a1409;box-shadow:0 0 18px rgba(201,162,39,.7)}#inPad .pad.drum{background:linear-gradient(#3a2f18,#1a1610);border-color:rgba(230,190,69,.35)}
 #inPad .grid6{display:flex;flex-direction:column;height:100%;gap:2px;padding:4px;box-sizing:border-box}#inPad .grow{display:flex;flex:1;gap:2px;position:relative}#inPad .grow:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(233,226,207,.35);pointer-events:none}#inPad .cell{flex:1;display:flex;align-items:center;justify-content:center;border-radius:4px;background:rgba(255,255,255,.04);cursor:pointer;position:relative;z-index:1}#inPad .cell.open{background:rgba(201,162,39,.16)}#inPad .cell span{font-size:10px;opacity:.55}#inPad .cell.down{background:var(--gold);color:#1a1409;box-shadow:0 0 12px rgba(201,162,39,.8)}#inPad .cell.down span{opacity:1}
 #inPad.k-violin .cell span{font-size:11px}
+#inPad .cell.now{background:var(--gold);color:#1a1409;box-shadow:0 0 16px rgba(201,162,39,.95)}#inPad .cell.now span{opacity:1}
+#inPad .cell.nxt{background:rgba(201,162,39,.3)}#inPad .cell.nxt span{opacity:.85}
+#inPad .cell.bad{background:#8d2b2b;color:#fff}
+#vlnHud{display:none;align-items:center;gap:10px;padding:6px 8px;font-size:12px}#vlnHud.on{display:flex}#vlnHud b{font-size:13px}#vlnHud .lays{display:flex;gap:3px;margin-left:auto}#vlnHud .lays i{width:14px;height:5px;border-radius:3px;background:rgba(233,226,207,.2)}#vlnHud .lays i.on{background:var(--gold)}#vlnHud .lays i.cap{opacity:.25}
+#vlnList{display:none;max-height:min(62vh,460px);overflow:auto;padding:8px;gap:10px;flex-direction:column}#vlnList.on{display:flex}
+#vlnList .vhead{display:flex;align-items:center;gap:10px}#vlnList .vhead b{font-size:15px}#vlnList .vhead .btn{margin-left:auto}
+#vlnList .vpack{border:1px solid rgba(233,226,207,.14);border-radius:10px;padding:8px}#vlnList .vph{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}#vlnList .vph b{font-size:13px;letter-spacing:.02em}#vlnList .vph .btn{margin-left:auto}
+#vlnList .vsongs{display:flex;flex-direction:column;gap:4px}#vlnList .vsong{display:flex;align-items:center;gap:8px;text-align:left;background:rgba(255,255,255,.04);border:0;border-radius:8px;padding:6px 8px;color:inherit;font:inherit;cursor:pointer}#vlnList .vsong.done{background:rgba(201,162,39,.14)}
+#vlnList .vsong em{font-style:normal;width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(201,162,39,.28);font-size:11px}#vlnList .vsong span{display:flex;flex-direction:column;min-width:0}#vlnList .vsong b{font-size:13px}#vlnList .vsong small{font-size:10px;opacity:.55}#vlnList .vsong i{margin-left:auto;font-style:normal;font-size:11px;color:var(--gold);white-space:nowrap}
+#vlnList .vbows{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px}#vlnList .vbow{background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:8px;padding:8px;color:inherit;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}#vlnList .vbow b{font-size:12px}#vlnList .vbow small{font-size:10px;opacity:.6}#vlnList .vbow.on{border-color:var(--gold)}#vlnList .vbow.owned{opacity:.75;cursor:default}
 #pnKeys{position:relative;height:min(34vh,200px);touch-action:none;user-select:none;-webkit-user-select:none;border-radius:8px;overflow:hidden;background:#0d0c0a}
 .pnk{position:absolute;top:0;box-sizing:border-box;cursor:pointer}
 .pnk.w{height:100%;background:linear-gradient(#fbf8f0,#e7e0cf);border:1px solid #8f8774;border-radius:0 0 5px 5px;z-index:1}
@@ -261,7 +271,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 <div id="pianoBuy" class="sheet"><div class="panel small"><h2>The piano<span>.</span></h2><p>A grand for the music room. Sit at it and play: every key, sustain, and sheets that light the notes.</p>
 <div style="display:flex;gap:10px;margin-top:12px"><button class="btn fin" data-fin="black" style="flex:1">Black lacquer<small>5,000 gardencoin</small></button><button class="btn fin" data-fin="gold" style="flex:1;border-color:var(--gold);color:var(--gold)">Gold<small>10,000 gardencoin</small></button></div>
 <div class="sfoot" style="margin-top:12px"><button class="btn" id="pbClose">Not now.</button></div></div></div>
-<div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="inPad"></div></div>
+<div id="instUI"><div id="inBar"><button class="btn" id="inStand">Stand up</button><b id="inTitle"></b><span id="inBar2"></span><span id="inChip"></span></div><div id="inPad"></div><div id="vlnHud"></div><div id="vlnList"></div></div>
 <div id="paintUI"><div id="ptBar"><button class="btn" id="ptClose">Leave it</button><span id="ptSwatch"></span><button class="btn" id="ptFill">Fill</button><button class="btn" id="ptStyle">Oil style</button><button class="btn" id="ptLesson">Lessons</button><button class="btn" id="ptUndo">Undo</button><span class="micro" id="ptChip"></span><button class="btn on" id="ptSave">Save it</button></div>
 <div id="ptBrief"></div><div id="ptLes"></div><div id="ptWrap"><canvas id="ptCan"></canvas></div>
 <div id="ptStyles"><button class="btn" data-s="realism">Realism</button><button class="btn" data-s="impressionist">Impressionist</button><button class="btn" data-s="allaprima">Alla prima</button><button class="btn" data-s="varnish">Varnish only</button></div>
@@ -1722,7 +1732,7 @@ const TIERS=[0,10,50,100];
 const DEED_PAY=200,START_COINS=100;
 let RATE=1.5,FISH_S=300,FISH_CAP=3,FISH_BATCH=3,FISH_WORTH=15,PATCH46=false;
 const FIRST_GC=1000,SECOND_GC=1000,REARM_S=3600,CHEST_TOYS=['chainsaw','bubbles','kite'],CHEST_GC=1000,AXE_DC=0,STATUES_TO_WAKE=12;let CHOPS=3,HOUSE_TIERS=[4,7,10],REGROW_S=600,GROW_S=600,SAPLING_GC=0,PATCH47=false,PATCH50=false,PATCH51=false,PATCH52=false,PATCH53=false,PATCH55=false,PATCH60=false,RINGS_OPEN=null,WOOD_CAPS=null,PACK_GC=1000,PACKL=null,PACKG=null;   /* the chest 1000 gardencoin every plain open (patch 54), the axe 45 gardencoin, five chops, ten minutes to grow or grow back (five watered), a sapling 300 gardencoin, 5 / 10 / 50 bundles; the server's numbers win when signed in */
-const TOOLS={piano_black:{n:'Black grand',dc:3333.34,slot:0,hidden:true,line:'A grand for the music room.'},piano_gold:{n:'Gold grand',dc:6666.67,slot:0,hidden:true,line:'A grand for the music room, in gold.'},mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},harp:{n:'Harp',dc:4666.67,slot:0,hidden:true,line:'A gold harp for the music room.'},guitar:{n:'Electric guitar',dc:5333.34,slot:0,hidden:true,line:'An electric guitar and its amp for the music room.'},violin:{n:'Gold violin',dc:6666.67,slot:0,hidden:true,line:'A gold violin for the music room.'},drums:{n:'Drums',dc:6666.67,slot:0,hidden:true,line:'A gold drum kit for the music room.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree. One stroke takes a wolf.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down. Catches the leprechaun.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. Tap to turn it on, tap to turn it off. Wolves catch and run, trees burn to embers, and it catches the leprechaun.'}};
+const TOOLS={piano_black:{n:'Black grand',dc:3333.34,slot:0,hidden:true,line:'A grand for the music room.'},piano_gold:{n:'Gold grand',dc:6666.67,slot:0,hidden:true,line:'A grand for the music room, in gold.'},mower:{n:'Gold mower',dc:3333.34,slot:0,hidden:true,line:'Parks by your house. Ride it round the whole garden.'},harp:{n:'Harp',dc:4666.67,slot:0,hidden:true,line:'A gold harp for the music room.'},guitar:{n:'Electric guitar',dc:5333.34,slot:0,hidden:true,line:'An electric guitar and its amp for the music room.'},violin:{n:'Gold violin',dc:6666.67,slot:0,hidden:true,line:'A gold violin for the music room.'},violin_fiddle:{n:'The fiddle road',dc:1333.34,slot:0,hidden:true,line:'Ten fiddle tunes for the violin.'},violin_themes:{n:'The great themes',dc:4000,slot:0,hidden:true,line:'Ten famous melodies for the violin.'},violin_bow_silver:{n:'Silver mounted bow',dc:1000,slot:0,hidden:true,line:'A better bow.'},violin_bow_pern:{n:'Pernambuco bow',dc:2666.67,slot:0,hidden:true,line:'A warm bow.'},violin_bow_gold:{n:'Gold Tourte bow',dc:6666.67,slot:0,hidden:true,line:'The best bow in the house.'},drums:{n:'Drums',dc:6666.67,slot:0,hidden:true,line:'A gold drum kit for the music room.'},rocket:{n:'Flower rocket',dc:1000,slot:3,line:'Fire it at a quadrant and every ripe bed in it is picked in one shot.'},launcher:{n:'Water launcher',dc:1000,slot:4,line:'Waters every thirsty bed on one half of the garden. Two shots and everything is watered.'},chainsaw:{n:'Chainsaw',dc:0,slot:5,hidden:true,line:'Found in the chest. One pull fells a tree. One stroke takes a wolf.'},bubbles:{n:'Bubble gun',dc:0,slot:6,hidden:true,line:'Found in the chest. Blows bubbles.'},kite:{n:'Kite',dc:0,slot:7,hidden:true,line:'Found in the chest. Fly it and watch the sky.'},sword:{n:'Sword',dc:0,slot:8,hidden:true,line:'Hangs over the hearth. Three hits and a wolf goes down. Catches the leprechaun.'},flamethrower:{n:'Flamethrower',dc:1000,slot:9,line:'Burns the ripe blooms off a bed in a friend\u2019s garden. Tap to turn it on, tap to turn it off. Wolves catch and run, trees burn to embers, and it catches the leprechaun.'}};
 let PATCH61=false,PATCH62=false,RAIDS=[];   /* 4.18 · the wolves, the sword, the flamethrower */
 const PACKS={pack_basic:{n:'The Gardener'},pack_ivory:{n:'The Ivory'},pack_sun:{n:'The Golden Sun'},pack_cyber:{n:'The Cyber Sprout'},pack_starlight:{n:'The Starlight'},pack_neon:{n:'The Neon Tulip'}};
 const packImg=k=>BASE+'garden-pack-'+k.slice(5)+'.webp';
@@ -2584,7 +2594,8 @@ function pianoSync(){if(!LIVE)return;const key=VISIT?'v:'+VISIT.owner:'me';if(PX
   RPC('piano_get',{p_owner:VISIT?VISIT.owner:null}).then(r=>{const d=r.data||{};if(r.error||!d.ok){PX_SYNC='';return}PATCH73=true;
     if(VISIT){OWNER_PX=d;placePortraits();return}
     pxMerge(d);const more=(PX.xp|0)>(+d.xp||0)||Object.keys(PX.done).some(k=>!(d.done||{})[k])||Object.keys(PX.masters).some(k=>!(d.masters||{})[k]);if(more)pxPush();placePortraits()}).catch(()=>{PX_SYNC=''})}
-function pxRank(){if(PX.masters.beethoven&&PX.masters.mozart)return 'Grand master';if(PX.master)return 'Master musician';const x=PX.xp|0;return x>=4000?'Virtuoso':x>=2500?'Player':x>=1000?'Student':x>0?'Beginner':'New at the keys'}
+function pxRank(){if(PX.masters.beethoven&&PX.masters.mozart)return 'Grand master';if(PX.master)return 'Master musician';const x=PX.xp|0;
+  return x>=20000?'Maestro':x>=12000?'Virtuoso':x>=7000?'Concertmaster':x>=3500?'Soloist':x>=1500?'Player':x>=500?'Student':'Novice'}
 function pxPaint(){const el=$('#pnXp');if(!el)return;el.textContent='\u2605 '+(PX.xp|0).toLocaleString()+' XP \u00B7 '+pxRank();el.classList.toggle('master',!!PX.master)}
 function songSteps(s){if(s._steps)return s._steps;s._steps=s.steps.map(st=>Array.isArray(st)?{r:st[0],l:st[1],n:st[0].concat(st[1]),b:st[2],h:st[3]||st[2]}:{r:st.n,l:[],n:st.n,b:st.b,h:st.b});return s._steps}
 function songSecs(s){return s.sections||[{name:s.name,a:0,b:songSteps(s).length,xp:200}]}
@@ -3215,7 +3226,7 @@ function instPlay(k){const A=INST_AT[k],g=INST.G[k];if(!A||!g||g.stand||INST.on)
   instPaint();SND.buy(3);
   toast(COARSE?{harp:'Sweep across the strings, or pluck one. Key changes the scale.',guitar:'Tap a chord to strum it. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. Higher up the row is louder.',drums:'Eight pads. Hit them.'}[k]:{harp:'Sweep or pluck. Keys A to L and the row above play the strings; Z and X move the octave.',guitar:'Tap a chord or press 1 to 8. Strings gives you every note. Crunch turns the amp up.',violin:'Hold a note and it sings. A S D F and the rows above are the strings.',drums:'A S D F G H J K are the pads.'}[k])}
 function instStop(){const k=INST.on;if(!k)return;for(const p in IN_PTR)instRelease(p);for(const key in IN_KDOWN)delete IN_KDOWN[key];INST.on='';const A=INST_AT[k],g=INST.G[k];if(SAMP[k])SAMP[k].allOff(true);IN_HELD.length=0;
-  document.body.classList.remove('seated');$('#instUI').classList.remove('on');if(g&&g.rest){g.body.position.copy(g.rest.p);g.body.rotation.copy(g.rest.r)}if(g&&g.bowRest){g.bow.position.copy(g.bowRest.p);g.bow.rotation.copy(g.bowRest.r)}
+  vlnStop();$('#vlnList').classList.remove('on');document.body.classList.remove('seated');$('#instUI').classList.remove('on');if(g&&g.rest){g.body.position.copy(g.rest.p);g.body.rotation.copy(g.rest.r)}if(g&&g.bowRest){g.bow.position.copy(g.bowRest.p);g.bow.rotation.copy(g.bowRest.r)}
   const [bx,,bz]=instLocal(k,0.4,0,A.seat+0.9);you.x=bx;you.z=bz;you.yaw=A.ry+Math.PI;you.pitch=-0.34;camDist=2.2;hideAct()}
 function instPose(t){const k=INST.on,A=INST_AT[k];if(!A)return;AV.g.rotation.y=INST.face;const beat=performance.now()-IN_HAND<200;
   if(A.sit){AV.g.position.y-=0.42;AV.legL.rotation.x=-1.5;AV.legR.rotation.x=-1.5}
@@ -3250,14 +3261,15 @@ function instPaint(){const k=INST.on,wrap=$('#inPad');if(!wrap||!k)return;let h=
     $('#inChords').onclick=()=>{INST.mode='chords';instPaint()};$('#inStrings').onclick=()=>{INST.mode='strings';instPaint()};$('#inCrunch').onclick=()=>{INST.crunch=!INST.crunch;SAMP.guitar.crunch(INST.crunch);instPaint()};
     if(INST.mode==='chords'){h='<div class="pads c4">'+CHORDS.map((c,i)=>'<div class="pad" data-ch="'+i+'"><b>'+c[0]+'</b><small>'+(i+1)+'</small></div>').join('')+'</div>'}
     else{h='<div class="grid6">'+GTR_STR.map((s,r)=>'<div class="grow">'+Array.from({length:13},(_,f)=>'<div class="cell'+(f===0?' open':'')+'" data-m="'+(s+f)+'"><span>'+(f===0?'o':f)+'</span></div>').join('')+'</div>').join('')+'</div>'}}
-  else if(k==='violin'){bar.innerHTML='<span class="micro">G &#183; D &#183; A &#183; E &#183; hold to sing</span>';h='<div class="grid6 v4">'+VLN_STR.map((s,r)=>'<div class="grow">'+Array.from({length:8},(_,f)=>'<div class="cell'+(f===0?' open':'')+'" data-m="'+(s+f)+'" data-hold="1"><span>'+(f===0?['E','A','D','G'][r]:pName(s+f).replace(/-?\d+$/,''))+'</span></div>').join('')+'</div>').join('')+'</div>'}
+  else if(k==='violin'){bar.innerHTML='<button class="btn" id="inLess">Lessons</button><span class="micro">G &#183; D &#183; A &#183; E</span>';
+    $('#inLess').onclick=()=>{const l=$('#vlnList');if(l.classList.contains('on'))l.classList.remove('on');else vlnListPaint(true)};h='<div class="grid6 v4">'+VLN_STR.map((s,r)=>'<div class="grow">'+Array.from({length:8},(_,f)=>'<div class="cell'+(f===0?' open':'')+'" data-m="'+(s+f)+'" data-hold="1"><span>'+(f===0?['E','A','D','G'][r]:pName(s+f).replace(/-?\d+$/,''))+'</span></div>').join('')+'</div>').join('')+'</div>'}
   else if(k==='drums'){bar.innerHTML='';h='<div class="pads c4">'+DRUM_PADS.map(p=>'<div class="pad drum" data-pad="'+p.k+'"><b>'+p.n+'</b><small>'+p.key.toUpperCase()+'</small></div>').join('')+'</div>'}
-  wrap.className='k-'+k;wrap.innerHTML=h;wrap.dataset.k=k}
+  wrap.className='k-'+k;wrap.innerHTML=h;wrap.dataset.k=k;if(k==='violin'){vlnLight();vlnHud()}}
 function inAt(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const t=el.closest?el.closest('.hs,.pad,.cell'):null;if(!t)return null;const r=t.getBoundingClientRect();const f=Math.max(0,Math.min(1,(y-r.top)/Math.max(1,r.height)));return {el:t,vel:0.4+0.6*f,pad:t.dataset.pad,ch:t.dataset.ch,m:t.dataset.m!=null?+t.dataset.m:null,hold:!!t.dataset.hold}}
 function inDown(el){if(!el||el===document.body)return;el.classList.add('down');setTimeout(()=>el.classList.remove('down'),160)}
 function instHit(h,ptr){const k=INST.on;if(!k||!h)return;if(k==='drums'){DRUM_SND.hit(h.pad,h.vel);instFlash(k,0,h.pad);instCast(k,0,h.vel,true,h.pad);inDown(h.el);return}
   if(k==='guitar'&&h.ch!=null){const notes=CHORDS[+h.ch][1];const a=SND.ac();notes.forEach((m,i)=>setTimeout(()=>{SAMP.guitar.noteOn(m,h.vel*(0.85+i*0.03));instCast(k,m,h.vel,true);instFlash(k,m)},i*28));inDown(h.el);return}
-  if(h.m==null)return;SAMP[k].noteOn(h.m,h.vel,h.hold);instCast(k,h.m,h.vel,true);instFlash(k,h.m);if(h.hold){IN_PTR[ptr]={m:h.m,el:h.el};h.el.classList.add('down')}else inDown(h.el)}
+  if(h.m==null)return;SAMP[k].noteOn(h.m,h.vel*(1+vlnTone()),h.hold);instCast(k,h.m,h.vel,true);instFlash(k,h.m);if(k==='violin')vlnHit(h.m);if(h.hold){IN_PTR[ptr]={m:h.m,el:h.el};h.el.classList.add('down')}else inDown(h.el)}
 function instRelease(ptr){const p=IN_PTR[ptr];if(!p)return;delete IN_PTR[ptr];const k=INST.on;if(k&&SAMP[k]){SAMP[k].noteOff(p.m,false);instCast(k,p.m,0,false)}if(p.el)p.el.classList.remove('down')}
 function instBind(){const wrap=$('#inPad');if(!wrap||wrap.bound)return;wrap.bound=true;const LAST={};
   const down=e=>{const h=inAt(e.clientX,e.clientY);if(!h)return;e.preventDefault();LAST[e.pointerId]=h.el;instHit(h,e.pointerId);try{wrap.setPointerCapture(e.pointerId)}catch(x){}};
@@ -3276,6 +3288,223 @@ function instKey(e,down){const k=INST.on;if(!k)return false;const key=e.key.toLo
     const strs=k==='violin'?[VLN_STR[3],VLN_STR[2],VLN_STR[1],VLN_STR[0]]:[GTR_STR[5],GTR_STR[4],GTR_STR[3]];let m=null;rows.forEach((row,r)=>{const f=row.indexOf(key);if(f>=0)m=strs[r]+f});if(m==null)return true;
     if(down){if(!IN_KDOWN[key]){IN_KDOWN[key]=m;const el=document.querySelector('#inPad [data-m="'+m+'"]');instHit({m,vel:0.8,el:el||document.body,hold:k==='violin'},'key:'+key)}}else{if(IN_KDOWN[key]!=null){instRelease('key:'+key);delete IN_KDOWN[key]}}e.preventDefault();return true}
   return true}
+/* ---------- 6.24 THE VIOLIN LESSONS ----------
+   Three packs of ten. Every lesson is one line of melody, one note at a time, never the real part.
+   The difficulty lives in the lane, not the piece: the first levels wait for you and glow two ahead,
+   the last ones run in tempo with nothing lit. A lesson clears when you play it through twice.
+   Under you an orchestra assembles itself: keep a clean streak and the bass, the pad, the upper voice
+   and the drum come in one at a time; slip and the top layer walks off. XP goes into the same music
+   pool as the piano (PX), so the whole room feeds one rank. The bow you buy widens the timing window,
+   deepens the tone, raises the ceiling on the layers and multiplies what you earn. */
+const VBOWS=[{k:'',n:'Student bow',price:0,win:1,lay:3,mult:1,tone:0},
+ {k:'violin_bow_silver',n:'Silver mounted bow',price:3000,win:1.35,lay:4,mult:1.15,tone:0.15},
+ {k:'violin_bow_pern',n:'Pernambuco bow',price:8000,win:1.7,lay:5,mult:1.35,tone:0.3},
+ {k:'violin_bow_gold',n:'Gold Tourte bow',price:20000,win:2.1,lay:5,mult:2,tone:0.45}];
+const vmel=s=>s.trim().split(/\s+/).map(t=>{const p=t.split('/');return {m:N(p[0]),b:p[1]?+p[1]:1}});
+const vch=s=>s.trim().split(/\s+/).map(t=>{const p=t.split('/');return {c:p[0],b:p[1]?+p[1]:2}});
+const VCH={C:[48,52,55],D:[50,54,57],E:[52,56,59],F:[53,57,60],G:[43,47,50],A:[45,49,52],B:[47,51,54],
+ Am:[45,48,52],Bm:[47,50,54],Cm:[48,51,55],Dm:[50,53,57],Em:[52,55,59],Fm:[53,56,60],Gm:[43,46,50],
+ 'F#m':[54,57,61],'C#m':[49,52,56],Bb:[46,50,53],Eb:[51,55,58],'A7':[45,49,52,55],'D7':[50,54,57,60],'E7':[52,56,59,62],'G7':[43,47,50,53],'B7':[47,51,54,57]};
+const VL=(name,by,bpm,lvl,xp,mel,ch)=>({name,by,bpm,lvl,xp,mel:vmel(mel),ch:vch(ch||'D/4')});
+const VPACKS=[
+{id:'first',n:'The first string',sub:'ten slow ones, free with the violin',kind:'',price:0,band:'strings',songs:[
+ VL('Ode to joy','Beethoven, 1824',76,1,120,
+  'F#4 F#4 G4 A4 A4 G4 F#4 E4 D4 D4 E4 F#4 F#4/1.5 E4/.5 E4/2 F#4 F#4 G4 A4 A4 G4 F#4 E4 D4 D4 E4 F#4 E4/1.5 D4/.5 D4/2',
+  'D/4 A/4 D/4 G/2 A/2 D/4 A/4 D/4 A/2 D/2'),
+ VL('Twinkle','traditional, 1761',80,1,120,
+  'D4 D4 A4 A4 B4 B4 A4/2 G4 G4 F#4 F#4 E4 E4 D4/2 A4 A4 G4 G4 F#4 F#4 E4/2 D4 D4 A4 A4 B4 B4 A4/2 G4 G4 F#4 F#4 E4 E4 D4/2',
+  'D/4 D/2 A/2 G/2 D/2 A/2 D/2 D/2 A/2 G/2 D/2 A/2 D/2 D/4 D/2 A/2 G/2 D/2 A/2 D/2'),
+ VL('Amazing grace','traditional, 1779',66,2,150,
+  'A3/1 D4/2 F#4/.5 D4/.5 F#4/2 E4/1 D4/2 B3/1 A3/3 A3/1 D4/2 F#4/.5 D4/.5 F#4/2 E4/1 A4/3 F#4/1 A4/2 A4/.5 F#4/.5 D4/2 E4/1 D4/2 B3/1 A3/3',
+  'D/6 G/3 D/3 A/3 D/6 G/3 D/3 D/6 G/3 D/3 A/3 D/3'),
+ VL('Greensleeves','traditional, c. 1580',84,3,180,
+  'E4 G4 A4/1.5 B4/.5 C5 B4 A4/1.5 F#4/.5 D4 E4 F#4/1.5 G4/.5 E4 E4/.5 D4/.5 E4/1.5 F#4/.5 D4/2 E4 G4 A4/1.5 B4/.5 C5 B4 A4/1.5 F#4/.5 D4 E4 F#4/1.5 G4/.5 E4/1.5 D4/.5 C#4 E4 D4/2',
+  'Em/3 G/3 D/3 Em/3 Em/3 G/3 D/3 Em/3 Em/3 G/3 D/3 Em/3 A/3 Em/3'),
+ VL('Air on the G string','Bach, c. 1731 · the tune drawn out',56,3,200,
+  'D5/4 C#5/2 B4/1 A4/1 B4/2 A4/1 G4/1 F#4/3 G4/1 A4/2 B4/1 A4/1 G4/2 F#4/2 E4/4 F#4/2 G4/1 A4/1 B4/4 A4/2 G4/2 F#4/4',
+  'D/4 A/4 Bm/4 F#m/4 G/4 D/4 G/4 A/4 D/4 A/4 D/4 G/4 A/4 D/4'),
+ VL('Danny boy','Londonderry Air, traditional',60,4,220,
+  'A3/.5 B3/.5 D4/1.5 E4/.5 F#4/2 A4/1 B4/1 A4/1 F#4/1 D4/2 E4/2 F#4/1 E4/1 D4/2 B3/1 A3/1 A3/.5 B3/.5 D4/1.5 E4/.5 F#4/2 A4/1 B4/1 A4/1 F#4/1 D4/2 E4/1 F#4/1 E4/1 D4/1 D4/4',
+  'D/4 G/2 D/2 A/4 D/4 G/2 A/2 D/4 D/4 G/2 D/2 A/4 D/4 A/2 D/2 D/4'),
+ VL('Canon in D','Pachelbel, c. 1700 · the descant',72,5,240,
+  'F#5/2 E5/2 D5/2 C#5/2 B4/2 A4/2 B4/2 C#5/2 D5/2 C#5/2 B4/2 A4/2 G4/2 F#4/2 G4/2 E4/2 D4 F#4 A4 G4 F#4 D4 F#4 E4 D4 B3 D4 A4 G4 B4 A4 G4',
+  'D/2 A/2 Bm/2 F#m/2 G/2 D/2 G/2 A/2 D/2 A/2 Bm/2 F#m/2 G/2 D/2 G/2 A/2 D/2 A/2 Bm/2 F#m/2 G/2 D/2 G/2 A/2'),
+ VL('Ave Maria','Schubert, 1825 · the opening line',60,6,260,
+  'A4/1.5 A4/.5 A4/1 B4/1 C#5/2 C#5/1 B4/1 A4/2 F#4/2 A4/1.5 G4/.5 F#4/1 E4/1 D4/4 A4/1.5 A4/.5 B4/1 C#5/1 D5/2 C#5/1 B4/1 A4/2 F#4/2 E4/2 D4/4',
+  'D/4 A/4 D/4 Bm/4 G/4 A/4 D/4 D/4 A/4 D/4 G/4 A/4 D/4'),
+ VL('The swan','Saint-Saëns, 1886 · the melody alone',58,7,280,
+  'G4/2 D5/2 C5/1 B4/1 A4/2 G4/2 F#4/1 G4/1 A4/4 B4/2 C5/2 B4/1 A4/1 G4/2 F#4/2 E4/1 F#4/1 G4/4 D5/2 C5/1 B4/1 A4/2 G4/4',
+  'G/4 D/4 G/4 C/2 D/2 G/4 Em/4 Am/4 D/4 G/4 D/4 G/4'),
+ VL('Meditation','Massenet, 1894 · the theme reduced',54,8,320,
+  'D4/1 F#4/1 A4/2 D5/3 C#5/1 B4/2 A4/2 G4/1 F#4/1 E4/2 D4/4 A4/1 B4/1 C#5/2 D5/3 E5/1 D5/2 C#5/2 B4/1 A4/1 F#4/2 D4/4',
+  'D/4 A/4 D/4 Bm/4 G/4 A/4 D/4 D/4 A/4 D/4 G/4 A/4 D/4 D/4')]},
+{id:'fiddle',n:'The fiddle road',sub:'ten with a band behind them',kind:'violin_fiddle',price:4000,band:'band',songs:[
+ VL('Shenandoah','traditional, c. 1820',66,2,160,
+  'D4/1 G4/2 A4/1 B4/2 A4/1 G4/2 E4/1 D4/4 D4/1 G4/2 B4/1 D5/2 B4/1 A4/2 G4/1 E4/2 D4/1 D4/4',
+  'G/4 C/4 G/4 D/4 G/4 C/4 G/4 D/4 G/4'),
+ VL('Scarborough fair','traditional, c. 1670',72,3,180,
+  'D4/2 D4/1 A4/2 A4/1 E5/1.5 D5/.5 C5/1 A4/2 A4/1 G4/1 E4/1 F#4/1 G4/1 A4/2 A4/1 D4/2 D4/1 A4/2 A4/1 C5/1 B4/1 A4/1 G4/1 F#4/1 E4/1 D4/3',
+  'Dm/3 Dm/3 C/3 Dm/3 Dm/3 C/3 Dm/3 Dm/3 C/3 Dm/3 Am/3 Dm/3'),
+ VL('Soldier’s joy','traditional, c. 1760',96,4,200,
+  'A4/.5 F#4/.5 D4 D4/.5 E4/.5 F#4/.5 G4/.5 A4 A4/.5 B4/.5 A4/.5 G4/.5 F#4/.5 E4/.5 D4 F#4/.5 A4/.5 D5/.5 C#5/.5 B4/.5 A4/.5 G4/.5 F#4/.5 E4 A4/.5 G4/.5 F#4/.5 E4/.5 D4/2',
+  'D/4 A/4 D/4 G/2 A/2 D/4 A/4 D/4 A/2 D/2'),
+ VL('Arkansas traveler','traditional, 1847',100,5,210,
+  'D4/.5 E4/.5 F#4 F#4/.5 G4/.5 A4 A4/.5 B4/.5 A4/.5 G4/.5 F#4/.5 E4/.5 D4/2 D4/.5 E4/.5 F#4 F#4/.5 G4/.5 A4 B4/.5 A4/.5 G4/.5 F#4/.5 E4/.5 D4/.5 D4/2',
+  'D/4 G/2 D/2 A/4 D/4 D/4 G/2 D/2 A/4 D/4'),
+ VL('Swallowtail jig','traditional Irish',108,6,230,
+  'E4/.5 B4/.5 B4/.5 A4/.5 B4/.5 C#5/.5 D5/.5 B4/.5 B4/.5 A4/.5 B4/.5 G4/.5 E4/.5 B4/.5 B4/.5 A4/.5 B4/.5 C#5/.5 D5/.5 E5/.5 C#5/.5 A4/.5 B4/.5 G4/.5 E4/1.5',
+  'Em/3 D/3 Em/3 G/3 Em/3 D/3 Em/3 Em/3'),
+ VL('Cripple creek','traditional Appalachian',112,6,230,
+  'A4/.5 A4/.5 G4/.5 E4/.5 D4/.5 E4/.5 G4/.5 E4/.5 A4/.5 A4/.5 G4/.5 E4/.5 D4/2 A4/.5 A4/.5 G4/.5 E4/.5 D4/.5 E4/.5 G4/.5 A4/.5 B4/.5 A4/.5 G4/.5 E4/.5 D4/2',
+  'A/4 D/2 A/2 A/4 E/2 A/2 A/4 D/2 A/2 E/2 A/2'),
+ VL('Drowsy Maggie','traditional Irish',120,7,250,
+  'E4/.5 B4/.5 E4/.5 D4/.5 E4/.5 B4/.5 E4/.5 D4/.5 E4/.5 B4/.5 E4/.5 D4/.5 E4/.5 G4/.5 F#4/.5 E4/.5 D4/.5 A4/.5 D4/.5 C4/.5 D4/.5 A4/.5 D4/.5 C4/.5 D4/.5 A4/.5 B4/.5 C5/.5 D5/.5 B4/.5 A4/.5 G4/.5',
+  'Em/4 Em/4 Em/4 D/4 Em/4 D/4 Em/4 D/4'),
+ VL('Devil’s dream','traditional, c. 1800',126,8,270,
+  'A4/.5 E4/.5 A4/.5 B4/.5 C#5/.5 B4/.5 A4/.5 E4/.5 A4/.5 B4/.5 C#5/.5 D5/.5 E5/.5 C#5/.5 A4/.5 E4/.5 D5/.5 C#5/.5 B4/.5 A4/.5 G4/.5 A4/.5 B4/.5 C#5/.5 D5/.5 B4/.5 A4/.5 G4/.5 A4/2',
+  'A/4 A/4 D/4 A/4 E/4 A/4 E/2 A/2'),
+ VL('Bonaparte’s retreat','traditional, c. 1815',88,9,290,
+  'A4/1.5 G4/.5 E4/1 D4/1 E4/2 G4/1 A4/1 B4/2 A4/2 A4/1.5 G4/.5 E4/1 D4/1 E4/1 G4/1 A4/2 D5/2 B4/1 A4/1 G4/1 E4/1 D4/4',
+  'A/4 D/4 A/4 E/4 A/4 D/4 A/4 E/2 A/2 A/4'),
+ VL('Mason’s apron','traditional, the last one',132,10,340,
+  'A4/.5 B4/.5 C#5/.5 A4/.5 E5/.5 A4/.5 C#5/.5 A4/.5 B4/.5 C#5/.5 D5/.5 B4/.5 E5/.5 D5/.5 C#5/.5 B4/.5 A4/.5 C#5/.5 E5/.5 C#5/.5 A4/.5 E5/.5 C#5/.5 A4/.5 B4/.5 A4/.5 G4/.5 F#4/.5 E4/.5 A4/.5 A4/1',
+  'A/4 A/4 D/4 A/4 E/4 A/4 D/2 E/2 A/4')]},
+{id:'themes',n:'The great themes',sub:'ten famous lines, reduced',kind:'violin_themes',price:12000,band:'orchestra',songs:[
+ VL('Spring','Vivaldi, 1725 · the opening',88,4,260,
+  'E5/.5 E5/.5 E5/1 E5/.5 E5/.5 E5/1 E5/.5 F#5/.5 G#5/.5 F#5/.5 E5/1 B4/.5 C#5/.5 D#5/.5 C#5/.5 B4/1 E5/.5 E5/.5 E5/1 E5/.5 E5/.5 E5/1 E5/.5 F#5/.5 G#5/.5 F#5/.5 E5/2',
+  'E/4 E/4 B/4 E/4 E/4 E/4 B/2 E/2'),
+ VL('The blue Danube','Strauss, 1866',90,4,240,
+  'D4/1 F#4/1 A4/1 A4/2 A4/2 B4/1 A4/2 A4/2 A4/1 B4/1 A4/2 A4/2 G4/1 F#4/1 D4/2 D4/2 D4/1 F#4/1 A4/1 A4/2 A4/2 B4/1 A4/2 A4/4',
+  'D/6 D/6 D/6 A/6 A/6 D/6 D/6 D/6'),
+ VL('Hungarian dance no. 5','Brahms, 1869 · the theme',96,6,280,
+  'A4/.5 B4/.5 C5/1 B4/.5 A4/.5 G#4/1 A4/.5 B4/.5 C5/1 E5/2 D5/.5 C5/.5 B4/1 A4/.5 G#4/.5 A4/1 E4/2 A4/.5 B4/.5 C5/1 B4/.5 A4/.5 G#4/1 A4/2 A4/2',
+  'Am/4 E/4 Am/4 Am/4 E/4 Am/4 E/4 Am/4'),
+ VL('Ride of the Valkyries','Wagner, 1856 · the call',88,6,280,
+  'B3/.5 E4/1.5 G4/.5 E4/1.5 B4/2 B3/.5 E4/1.5 G4/.5 E4/1.5 B4/2 B4/.5 E5/1.5 G5/.5 E5/1.5 B4/2 G4/1 E4/1 B3/2',
+  'Em/4 Em/4 Em/4 Em/4 B/4 Em/4 Em/4 Em/4'),
+ VL('Liebesfreud','Kreisler, 1905 · the waltz',104,7,300,
+  'D5/1 A4/1 B4/1 C#5/2 A4/1 D5/1 A4/1 B4/1 C#5/1 D5/1 E5/1 F#5/2 E5/1 D5/1 C#5/1 B4/1 A4/2 G4/1 F#4/1 E4/1 D4/1 A4/2 D4/1',
+  'D/3 A/3 D/3 D/3 A/3 D/3 G/3 A/3 D/3 A/3 D/3'),
+ VL('Preludio','Bach, 1720 · the opening bars',108,8,320,
+  'E5/.5 B4/.5 G#4/.5 B4/.5 E5/.5 B4/.5 G#4/.5 B4/.5 E5/.5 B4/.5 A4/.5 B4/.5 E5/.5 B4/.5 A4/.5 B4/.5 E5/.5 B4/.5 G#4/.5 B4/.5 F#5/.5 B4/.5 G#4/.5 B4/.5 E5/.5 C#5/.5 A4/.5 C#5/.5 E5/.5 B4/.5 G#4/.5 E4/.5',
+  'E/4 E/4 E/4 B/4 E/4 B/4 A/4 E/4'),
+ VL('Csárdás','Monti, 1904 · slow, then fast',72,9,360,
+  'D5/2 C5/1 B4/1 A4/2 G4/1 F#4/1 E4/4 A4/2 G4/1 F#4/1 E4/2 D4/4 D5/.5 C5/.5 B4/.5 A4/.5 G4/.5 F#4/.5 E4/.5 D4/.5 E4/.5 F#4/.5 G4/.5 A4/.5 B4/.5 C5/.5 D5/.5 E5/.5 D5/2',
+  'Dm/4 Gm/4 A/4 Dm/4 Dm/4 A/4 Dm/4 Dm/4 A/4 Dm/4'),
+ VL('Zigeunerweisen','Sarasate, 1878 · the song',68,9,380,
+  'A4/2 C5/1 B4/1 A4/2 G#4/2 A4/1 B4/1 C5/2 B4/2 A4/4 E5/2 D5/1 C5/1 B4/2 A4/2 G#4/1 A4/1 B4/2 A4/4',
+  'Am/4 E/4 Am/4 Am/4 E/4 Am/4 Am/4 E/4 Am/4 Am/4'),
+ VL('Salut d’Amour','Elgar, 1888 · the melody',76,9,380,
+  'E5/1.5 D5/.5 C#5/1 B4/1 A4/2 B4/1 C#5/1 D5/2 C#5/2 B4/1.5 A4/.5 G4/1 F#4/1 E4/2 F#4/1 G4/1 A4/2 D4/2 E5/1.5 D5/.5 C#5/1 B4/1 A4/4',
+  'D/4 A/4 D/4 G/4 A/4 D/4 Bm/4 E/4 A/4 D/4 A/4 D/4'),
+ VL('Chaconne','Bach, 1720 · the opening, the last thing in the room',60,10,450,
+  'A4/1 D5/2 D5/1 C#5/2 D5/1 E5/2 F5/1 E5/2 D5/1 C#5/2 D5/1 B4/2 C#5/1 D5/2 A4/1 B4/2 C#5/1 D5/2 A4/1 F4/2 E4/1 D4/4',
+  'Dm/3 Dm/3 A/3 Dm/3 Gm/3 Dm/3 A/3 Dm/3 Dm/3 A/3 Dm/3 Dm/3')]}];
+/* the state that lives on this device and merges up with the piano's, so one pool feeds one rank */
+let VX={};try{VX=JSON.parse(localStorage.getItem('deeds_violin')||'{}')||{}}catch(e){VX={}}
+function vxSave(){try{localStorage.setItem('deeds_violin',JSON.stringify(VX))}catch(e){}}
+const vKey=(p,i)=>'v'+p+':'+i;
+function vOwnsPack(p){const P=VPACKS[p];if(!P.kind)return true;return !!(S.tools&&S.tools[P.kind])}
+function vBowIx(){for(let i=VBOWS.length-1;i>0;i--)if(S.tools&&S.tools[VBOWS[i].k])return i;return 0}
+function vBow(){return VBOWS[vBowIx()]}
+function vPasses(p,i){return (VX[vKey(p,i)]||0)|0}
+function vClear(p,i){return vPasses(p,i)>=2||!!PX.done[vKey(p,i)]}
+function vStars(p,i){return (VX[vKey(p,i)+'s']||0)|0}
+function vPackDone(p){return VPACKS[p].songs.every((s,i)=>vClear(p,i))}
+function vRank(){const x=PX.xp|0;return x>=20000?'Maestro':x>=12000?'Virtuoso':x>=7000?'Concertmaster':x>=3500?'Soloist':x>=1500?'Player':x>=500?'Student':'Novice'}
+/* the band under you. Five layers that come in one at a time on a clean streak and leave on a slip.
+   strings: drone, bass, pad, upper voice, soft drum. band: drone, upright bass, guitar chops, banjo, stomps and claps */
+const VB=(()=>{let a=null,bus=null,g=null,voices=[],timer=null,style='strings';
+ function ac(){a=SND.ac();if(!a)return null;if(!g){g=a.createGain();g.gain.value=0.5;g.connect(SND.bus()||a.destination)}return a}
+ function tone(f,t,dur,type,vol,glide){const o=a.createOscillator(),v=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(vol,t+(glide||0.02));v.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(v);v.connect(g);o.start(t);o.stop(t+dur+0.05);voices.push(o)}
+ function noise(t,dur,vol,hi){const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+  const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type=hi?'highpass':'lowpass';f.frequency.value=hi?1800:320;
+  const v=a.createGain();v.gain.value=vol;s.connect(f);f.connect(v);v.connect(g);s.start(t);voices.push(s)}
+ const hz=m=>440*Math.pow(2,(m-69)/12);
+ return {set(st){style=st},
+  chord(notes,dur,lay){const A=ac();if(!A)return;const t=A.currentTime+0.01;const root=notes[0];
+   tone(hz(root-12),t,dur*0.95,'sine',0.12,0.08);
+   if(lay>=1)tone(hz(root),t,style==='band'?0.5:dur*0.9,style==='band'?'triangle':'sine',0.16,style==='band'?0.01:0.1);
+   if(lay>=2)notes.forEach((m,i)=>tone(hz(m+12),t+i*0.012,dur*0.85,'sawtooth',style==='band'?0.05:0.055,style==='band'?0.01:0.25));
+   if(lay>=3)notes.forEach((m,i)=>tone(hz(m+24),t+0.25+i*0.05,style==='band'?0.28:dur*0.6,'triangle',0.05,0.02));
+   if(lay>=4){noise(t,0.12,style==='band'?0.28:0.14,style==='band');if(style==='band')noise(t+dur/2,0.09,0.2,true)}},
+  stop(){voices.forEach(v=>{try{v.stop()}catch(e){}});voices=[];if(timer){clearTimeout(timer);timer=null}}}})();
+/* ---------- the lesson itself ---------- */
+let VS=null,V_T=null;
+function vlnCells(){return $$('#inPad .cell')}
+function vlnTarget(m,prev){let best=null;vlnCells().forEach(el=>{const v=+el.dataset.m;if(v!==m)return;const s=Math.floor([].indexOf.call(el.parentNode.parentNode.children,el.parentNode));
+  const d=prev==null?Math.abs(s-2):Math.abs(s-prev);if(!best||d<best.d)best={el,s,d}});return best}
+function vlnLight(){vlnCells().forEach(c=>c.classList.remove('now','nxt'));if(!VS)return;const ahead=VS.lvl<=4?2:VS.lvl<=7?1:0;
+ for(let j=0;j<=ahead;j++){const st=VS.mel[VS.k+j];if(!st)break;const t=vlnTarget(st.m,VS.lastStr);if(t){t.el.classList.add(j===0?'now':'nxt');if(j===0)VS.str=t.s}}}
+function vlnHud(){const h=$('#vlnHud');if(!h)return;if(!VS){h.classList.remove('on');h.innerHTML='';return}h.classList.add('on');
+ const lay=VS.lay,cap=vBow().lay;
+ h.innerHTML='<b>'+VS.s.name+'</b><span class="micro">'+(VS.k)+' of '+VS.mel.length+' \u00B7 streak '+VS.streak+'</span>'+
+  '<span class="lays">'+Array.from({length:5},(_,i)=>'<i class="'+(i<lay?'on':'')+(i>=cap?' cap':'')+'"></i>').join('')+'</span>'+
+  '<button class="btn" id="vlnQuit">Stop</button>';
+ $('#vlnQuit').onclick=()=>{vlnStop();vlnListPaint(true)}}
+function vlnStart(p,i){vlnStop();const s=VPACKS[p].songs[i];
+ VS={p,i,s,mel:s.mel,ch:s.ch,lvl:s.lvl,k:0,streak:0,lay:0,slips:0,lastStr:null,str:null,t0:performance.now(),chAt:0,chT:0,beat:60000/s.bpm};
+ VB.set(VPACKS[p].band);$('#vlnList').classList.remove('on');vlnLight();vlnHud();vlnBar();
+ toast(s.name+' \u00B7 '+(s.lvl<=3?'nothing can go wrong here. Play the lit note.':s.lvl<=5?'play the lit note, it waits for you.':'in tempo now. Keep up.'));
+ if(VS.lvl>=6)vlnClock()}
+function vlnStop(){if(V_T){clearTimeout(V_T);V_T=null}VB.stop();VS=null;vlnCells().forEach(c=>c.classList.remove('now','nxt'));vlnHud()}
+function vlnClock(){if(!VS)return;const st=VS.mel[VS.k];if(!st)return;const win=st.b*VS.beat*(1.15+0.35*vBow().win);
+ V_T=setTimeout(()=>{if(!VS)return;vlnMiss(true)},win)}
+function vlnChord(){if(!VS)return;const c=VS.ch[VS.chAt%VS.ch.length];const notes=VCH[c.c]||VCH.D;VB.chord(notes,c.b*VS.beat/1000,Math.min(VS.lay,vBow().lay));VS.chAt++}
+function vlnMiss(late){if(!VS)return;VS.streak=0;if(VS.lay>0)VS.lay--;if(VS.lvl>=4)VS.slips++;
+ const el=$('#inPad .cell.now');if(el){el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),220)}
+ if(VS.lvl>=4&&VS.slips>Math.max(3,Math.round(VS.mel.length*0.12))){SND.nope();toast('From the top of it.');const p=VS.p,i=VS.i;vlnStop();vlnStart(p,i);return}
+ vlnHud();if(late&&VS.lvl>=6){VS.k++;if(VS.k>=VS.mel.length){vlnDone();return}vlnLight();vlnClock()}}
+function vlnHit(m){if(!VS)return false;const st=VS.mel[VS.k];if(!st)return false;
+ if(m!==st.m){vlnMiss(false);return true}
+ if(V_T){clearTimeout(V_T);V_T=null}
+ VS.streak++;VS.lastStr=VS.str;
+ const cap=vBow().lay,marks=[4,9,15,22,30];let lay=0;marks.forEach(x=>{if(VS.streak>=x)lay++});VS.lay=Math.min(cap,Math.max(VS.lay,lay));
+ if(VS.k%4===0)vlnChord();
+ VS.k++;
+ if(VS.k>=VS.mel.length){vlnDone();return true}
+ vlnLight();vlnHud();if(VS.lvl>=6)vlnClock();return true}
+function vlnDone(){const {p,i,s,slips}=VS;const key=vKey(p,i);const was=vPasses(p,i);
+ VX[key]=was+1;const st=slips===0?3:slips<=2?2:1;if(st>vStars(p,i))VX[key+'s']=st;vxSave();
+ const first=!PX.done[key];const cleared=VX[key]>=2;
+ const xp=Math.round((first&&cleared?s.xp:Math.max(15,s.xp/8))*vBow().mult);
+ PX.xp=(PX.xp|0)+xp;if(cleared)PX.done[key]=1;pxSave();pxPaint();if(typeof floatXp==='function')floatXp(xp);
+ SND.buy(cleared?9:4);VB.stop();
+ const left=2-VX[key];
+ toast(cleared?(s.name+'. Cleared. +'+xp+' XP \u00B7 '+'\u2605'.repeat(st)):(s.name+'. Once more to clear it. +'+xp+' XP'));
+ const pp=p,ii=i;VS=null;vlnHud();vlnCells().forEach(c=>c.classList.remove('now','nxt'));
+ setTimeout(()=>{if(INST.on==='violin')vlnListPaint(true)},900)}
+/* ---------- the shelf: the packs and the bows ---------- */
+function vlnBuy(kind,price,name,after){if(visitGuard('buy '+name.toLowerCase()))return;
+ const done=()=>{S.tools=S.tools||{};S.tools[kind]=1;save();renderHud();SND.buy(10);toast(name+' is yours.');if(after)after()};
+ if(LIVE){if(BUSY)return;BUSY=true;RPC('violin_buy',{p_kind:kind}).then(r=>{BUSY=false;
+   if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(price);
+    else toast(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 80 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
+   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+ if(reach()<price){showShort(price);return}S.gc-=price;ledger(name,-price,'the Keeper');done()}
+function vlnListPaint(open){const l=$('#vlnList');if(!l)return;const bx=vBowIx();
+ let h='<div class="vhead"><b>Lessons</b><span class="micro">\u2605 '+(PX.xp|0).toLocaleString()+' XP \u00B7 '+vRank()+'</span><button class="btn" id="vlnClose">Close</button></div>';
+ VPACKS.forEach((P,p)=>{const own=vOwnsPack(p);
+  h+='<div class="vpack"><div class="vph"><b>'+P.n+'</b><span class="micro">'+P.sub+'</span>'+
+   (own?'':'<button class="btn gold" data-buy="'+p+'">'+P.price.toLocaleString()+' gc</button>')+'</div>';
+  if(own)h+='<div class="vsongs">'+P.songs.map((s,i)=>{const cl=vClear(p,i),pa=vPasses(p,i),stq=vStars(p,i);
+   return '<button class="vsong'+(cl?' done':'')+'" data-p="'+p+'" data-i="'+i+'"><em>'+s.lvl+'</em><span><b>'+s.name+'</b><small>'+s.by+'</small></span><i>'+(cl?'\u2605'.repeat(stq||1):pa?'once':'')+'</i></button>'}).join('')+'</div>';
+  h+='</div>'});
+ h+='<div class="vpack"><div class="vph"><b>The bow shelf</b><span class="micro">a better bow widens the window, warms the tone, lifts the ceiling on the band and doubles what you earn</span></div><div class="vbows">'+
+  VBOWS.map((b,i)=>'<button class="vbow'+(i===bx?' on':'')+(i<=bx?' owned':'')+'"'+(i<=bx?'':' data-bow="'+i+'"')+'><b>'+b.n+'</b><small>'+(i<=bx?(i===bx?'in your hand':'owned'):b.price.toLocaleString()+' gc')+'</small></button>').join('')+'</div></div>';
+ l.innerHTML=h;l.classList.toggle('on',open!==false);
+ $('#vlnClose').onclick=()=>l.classList.remove('on');
+ $$('#vlnList .vsong').forEach(b=>b.onclick=()=>vlnStart(+b.dataset.p,+b.dataset.i));
+ $$('#vlnList [data-buy]').forEach(b=>b.onclick=()=>{const p=+b.dataset.buy;const P=VPACKS[p];
+  if(p===2&&(vBowIx()<2||!vPackDone(1))){toast('The great themes want the fiddle road cleared and a Pernambuco bow in your hand.');return}
+  vlnBuy(P.kind,P.price,P.n,()=>vlnListPaint(true))});
+ $$('#vlnList [data-bow]').forEach(b=>b.onclick=()=>{const i=+b.dataset.bow;const B=VBOWS[i];vlnBuy(B.k,B.price,B.n,()=>vlnListPaint(true))})}
+function vlnBar(){const b=$('#inLess');if(b)b.classList.toggle('on',!!VS)}
+
+function vlnTone(){return INST.on==='violin'?vBow().tone:0}
 function paintHotbar(){const on=hasPack();['sword','flamethrower'].forEach(k=>{$('#'+k).style.display=(on||!owns(k)||!inHand(k))?'none':''});['rocket','launcher','chainsaw','bubbles','kite'].forEach(k=>{$('#'+k).style.display=(on||(owns(k)&&!inHand(k)))?'none':''});
  $('#packSlot').style.display=on?'':'none';if(!on)$('#packFan').classList.remove('on');paintBar()}
 function renderFan(){const ks=['can','rocket','launcher','chainsaw','bubbles','kite','sword','flamethrower'].filter(k=>k==='can'||(owns(k)&&inHand(k)));
