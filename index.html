@@ -1621,6 +1621,28 @@ html.dark .rchip{border-color:rgba(244,241,234,.22)}
 .dsearch{display:flex}
 @media(min-width:1080px){.dnav{position:static;transform:none;margin-left:auto;margin-right:26px;gap:0}.dnav button{padding:0 14px}.dtop-in{justify-content:flex-start}.dright{margin-left:0}}
 @media(min-width:1080px) and (max-width:1180px){.dhandle{display:none}}
+/* NAV TRIM (Sep 9): half the height, the coin only on the profile */
+.dmark{aspect-ratio:412/121;height:auto}
+.mtop{padding:8px 16px}
+.mword .dmark{width:82px;height:24px}
+@media(min-width:1080px){
+ .dtop-in{height:46px;padding:0 28px}
+ .dnav{height:46px}
+ .dnav button{font-size:14px;padding:0 12px}
+ .dnav button.on::after{height:2px;left:10px;right:10px}
+ .dword .dmark{width:100px;height:29px}
+ .dright{gap:10px}
+ .dlog{width:32px;height:32px;box-shadow:0 5px 12px rgba(31,75,58,.22)}
+ .dlog svg{width:16px;height:16px}
+ .dbell,.dnotes,.dtop-in>.modeic{width:34px;height:34px}
+ .dtop-in>.modeic{margin-left:10px}
+ .dbell svg,.dnotes svg,.dtop-in>.modeic svg{width:17px;height:17px}
+ .dsep{height:22px}
+ .dav,.dav svg{width:28px;height:28px}.dav{flex-basis:28px}
+ .dme{padding:3px 6px 3px 3px;gap:8px}
+ .dhandle{font-size:12px}
+}
+body:not(:has(#pg-profile.on)) .cbtn{display:none!important}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
