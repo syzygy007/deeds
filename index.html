@@ -127,6 +127,21 @@ input,textarea{font:inherit;color:var(--ink)}
 .xcard b{font-size:15px;font-weight:800}
 .xcard span{font-size:12px;color:var(--muted)}
 .xsec .rline{padding:0 18px 14px}
+/* the games grid: one tile a game, so the depth of the world reads at a glance */
+.xgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px}
+.xtile{border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:var(--ink);background:#FBF9F3;display:flex;flex-direction:column}
+.xt-art{height:88px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.xt-art svg{width:100%;height:100%;display:block}
+.xt-c{padding:11px 12px 13px;display:flex;flex-direction:column;gap:3px}
+.xt-c .micro{font-size:9px;letter-spacing:.16em;color:#A8A395}
+.xt-c b{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.xt-c span{font-size:11.5px;color:var(--muted);line-height:1.35}
+.xt-wide{grid-column:1 / -1}
+.xt-wide .xt-art{height:104px}
+.xmore{padding:0 18px 14px;font-size:12px;color:var(--muted)}
+.xmore a{color:var(--forest);font-weight:800;text-decoration:none}
+html.dark .xtile{background:#1B1913;color:#F4F1EA}
+html.dark .xt-c b{color:#F4F1EA}
 .xonlab{display:flex;align-items:baseline;justify-content:space-between;padding:8px 18px 4px}
 .xonlab .xlab{padding:0}
 .xoncount{font-size:10px;letter-spacing:.14em;font-weight:800;color:#4C8B4F}
@@ -1835,7 +1850,14 @@ html.dark .rchip{border-color:rgba(244,241,234,.22)}
       <div class="xsec">
         <div class="xlab">GAMES</div>
         <a class="xgate" href="garden/world/"><img src="gate.webp" alt="" onerror="this.onerror=null;this.src='garden-door.webp'"><div class="xg-copy"><div class="micro">THE GARDEN GATE</div><h2>Walk the garden<b>.</b></h2><div class="xg-sub">Your deeds, planted. Step through and look around.</div></div></a>
-        <div class="xrow"><a class="xcard" href="garden/"><b>My Garden.</b><span>Sow what your deeds earn.</span></a><a class="xcard" href="garden/world/?bloom=1"><b>In Bloom.</b><span>All forty beds, planted.</span></a></div>
+        <div class="xgrid">
+          <a class="xtile" href="garden/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#E7EEE4"/><rect x="18" y="16" width="70" height="56" fill="none" stroke="#1F4B3A" stroke-width="2"/><rect x="112" y="16" width="70" height="56" fill="none" stroke="#1F4B3A" stroke-width="2"/><circle cx="100" cy="44" r="13" fill="none" stroke="#BE9A4E" stroke-width="2"/><circle cx="100" cy="44" r="4" fill="#BE9A4E"/><circle cx="40" cy="34" r="5" fill="#C0603F"/><circle cx="66" cy="54" r="5" fill="#D08C46"/><circle cx="134" cy="54" r="5" fill="#C0603F"/><circle cx="160" cy="34" r="5" fill="#D08C46"/></svg></div><div class="xt-c"><div class="micro">THE PLOT</div><b>My Garden.</b><span>Sow what your deeds earn.</span></div></a>
+          <a class="xtile" href="garden/club/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#171226"/><circle cx="62" cy="44" r="26" fill="none" stroke="#E24A8B" stroke-width="2"/><circle cx="62" cy="44" r="6" fill="#E24A8B"/><circle cx="138" cy="44" r="26" fill="none" stroke="#7C5CFF" stroke-width="2"/><circle cx="138" cy="44" r="6" fill="#7C5CFF"/><rect x="90" y="30" width="20" height="4" fill="#BE9A4E"/><rect x="90" y="42" width="20" height="4" fill="#BE9A4E"/><rect x="90" y="54" width="20" height="4" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE CLUB</div><b>DJ Pro.</b><span>Take the decks. The whole floor jumps.</span></div></a>
+          <a class="xtile" href="garden/chess/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#F0E6D9"/><g fill="#6E2A28"><rect x="60" y="14" width="20" height="20"/><rect x="100" y="14" width="20" height="20"/><rect x="80" y="34" width="20" height="20"/><rect x="120" y="34" width="20" height="20"/><rect x="60" y="54" width="20" height="20"/><rect x="100" y="54" width="20" height="20"/></g><rect x="40" y="14" width="120" height="60" fill="none" stroke="#6E2A28" stroke-width="2"/><circle cx="150" cy="24" r="6" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE STUDY</div><b>Chess.</b><span>Play the house or a friend. Hang the greats.</span></div></a>
+          <a class="xtile" href="garden/flag/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#F7E6E1"/><rect x="66" y="16" width="4" height="58" fill="#15130E"/><path d="M70 20 L136 30 L70 44 Z" fill="#C0392B"/><circle cx="68" cy="14" r="5" fill="#BE9A4E"/><path d="M28 74 L52 74" stroke="#15130E" stroke-width="2"/><path d="M148 74 L172 74" stroke="#15130E" stroke-width="2"/></svg></div><div class="xt-c"><div class="micro">THE FIELD</div><b>Capture the Flag.</b><span>One flag, a pack of wolves, four teams.</span></div></a>
+          <a class="xtile xt-wide" href="garden/world/?in=music"><div class="xt-art"><svg viewBox="0 0 400 104" preserveAspectRatio="none"><rect width="400" height="104" fill="#12161F"/><g fill="#F4F1EA"><rect x="40" y="52" width="20" height="40"/><rect x="64" y="52" width="20" height="40"/><rect x="88" y="52" width="20" height="40"/><rect x="112" y="52" width="20" height="40"/><rect x="136" y="52" width="20" height="40"/><rect x="160" y="52" width="20" height="40"/><rect x="184" y="52" width="20" height="40"/><rect x="208" y="52" width="20" height="40"/><rect x="232" y="52" width="20" height="40"/><rect x="256" y="52" width="20" height="40"/><rect x="280" y="52" width="20" height="40"/><rect x="304" y="52" width="20" height="40"/><rect x="328" y="52" width="20" height="40"/></g><g fill="#12161F"><rect x="56" y="52" width="10" height="24"/><rect x="80" y="52" width="10" height="24"/><rect x="128" y="52" width="10" height="24"/><rect x="152" y="52" width="10" height="24"/><rect x="176" y="52" width="10" height="24"/><rect x="224" y="52" width="10" height="24"/><rect x="248" y="52" width="10" height="24"/><rect x="296" y="52" width="10" height="24"/><rect x="320" y="52" width="10" height="24"/></g><circle cx="330" cy="46" r="13" fill="#BE9A4E"/><rect x="340" y="14" width="4" height="34" fill="#BE9A4E"/><path d="M344 14 L366 20 L366 30 L344 24 Z" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE MUSIC ROOM</div><b>Instruments.</b><span>Piano, harp, guitar, violin and drums.</span></div></a>
+        </div>
+        <div class="xmore">Every one of them is a room in the same world. <a href="garden/world/?bloom=1">See it in bloom</a>.</div>
       </div>
       <div class="xsec">
         <div class="xlab">GOOD COMPANIES</div>
