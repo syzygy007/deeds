@@ -1458,6 +1458,26 @@ body.gsky-on .tab.on{color:#F4F1EA}
 .hwpaper::after{top:calc(56% + 1px);height:9px;background:linear-gradient(rgba(64,50,26,.12),rgba(64,50,26,0))}
 .hwnote{margin:2px -10px 4px;padding:2px 8px 4px;max-width:664px}
 .hwnote .hwin{min-height:24px}
+/* ---- BOARD v2 (Sep 9): the deed row after the deedable mock ---- */
+.post{padding:26px 18px 24px}
+.post .hwlab{display:none}
+.post .p-head{position:relative;align-items:center;gap:14px;margin-bottom:16px;padding-right:44px}
+.post .p-av{width:56px;height:56px;flex:0 0 56px}
+.post .p-av svg{width:100%;height:100%;display:block}
+.post .p-handle .mono{font-size:15.5px;font-weight:700}
+.post .p-handle .chip,.post .p-handle .privchip{font-size:10px;padding:4px 10px}
+.post .p-time{font-size:13px;letter-spacing:0;font-weight:600;text-transform:lowercase;margin-top:4px}
+.post .p-head .pa.more{position:absolute;right:0;top:4px;margin:0;padding:4px;color:var(--muted);background:none;border:0;cursor:pointer}
+.post .p-head .pa.more svg{width:22px;height:22px}
+.post .p-acts{gap:34px;margin-top:20px}
+.post .pa{font-size:15px;gap:9px}
+.post .pa svg{width:24px;height:24px}
+.hwpaper{border-width:14px;background-color:#FBF9F3;filter:brightness(.955) saturate(1.08)}
+.hw-plain .hwpaper{filter:none}
+.hwpaper::before,.hwpaper::after{display:none}
+.deedrow .hwnote{margin:2px -8px 2px;padding:10px 12px 16px;max-width:none}
+.hwmore{margin-top:6px}
+@media(min-width:1080px){.post{padding:30px 32px 26px}.deedrow .hwnote{padding:14px 26px 22px}.deedrow .p-acts{max-width:none}.post .p-av{width:64px;height:64px;flex:0 0 64px}}
 .hwsvg{display:block;width:100%;height:auto;overflow:visible}
 .hwsvg text{white-space:pre;user-select:text;-webkit-user-select:text;cursor:text}
 .hw-plain .hwsvg g{filter:none!important}
@@ -3308,7 +3328,8 @@ var body=isPost?(r.body||''):(r.story||r.title||'');
 var h='<article class="post'+(isPost?'':' deedrow')+'" data-lid="'+esc(r.id)+'">'+(isPost?'':'<div class="hwlab">A DEED.</div>');
 h+='<div class="p-head"><div class="p-av" data-lmember="'+esc(nm.handle)+'">'+DeedsTypes.svg(nm.type,40,{verified:nm.v})+'</div>';
 h+='<div class="p-meta"><div class="p-handle"><span class="mono" data-lmember="'+esc(nm.handle)+'">'+esc(nm.handle)+'</span>'+DeedsTypes.chip(nm.type,nm.v)+((!isPost&&r.origin_id)?'<span class="chip pk">REDEED</span>':'')+(isPost?'<span class="chip pk">POST</span>':'')+(r.is_private?'<span class="privchip">PRIVATE</span>':'')+(r.mod_status==='hold'?'<span class="privchip">IN REVIEW</span>':(r.mod_status==='removed'?'<span class="privchip">REMOVED</span>':''))+'</div>';
-h+='<div class="p-time">'+relTime(r.created_at)+'</div></div></div>';
+h+='<div class="p-time">'+relTime(r.created_at)+'</div></div>';
+h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'"'+(mine?' data-lown="1"':'')+' aria-label="More">'+MORESVG+'</button></div>';
 if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
 h+=presBodyHTML(r,body,mine,nm);
@@ -3323,7 +3344,6 @@ h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSP
 h+='<button class="pa" data-lcmt="'+esc(tk)+'">'+CMTSVG+'<span>'+(CCMT[tk]||0)+'</span></button>';
 if(!isPost&&!mine)h+='<button class="pa" data-redeed="'+esc(r.id)+'">'+REDEEDSVG+'<span>'+(r.redeed_count||0)+'</span></button>';
 h+='<button class="pa" data-lshare="'+esc(r.id)+'">'+SHARESVG+'<span>Share</span></button>';
-h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'"'+(mine?' data-lown="1"':'')+' aria-label="More">'+MORESVG+'</button>';
 h+='</div></article>';return h}
 
 /* ---- example treatment for the seeded frame posts ---- */
@@ -3371,7 +3391,7 @@ function exLiveHTML(r){var t=document.createElement('div');t.innerHTML=livePostH
 a.classList.add('expost');a.classList.add('exlive');
 var hd=a.querySelector('.p-handle');if(hd){var c=document.createElement('span');c.className='chip ex';c.textContent='EXAMPLE';hd.appendChild(c)}
 var ms=a.querySelectorAll('[data-lmember]');for(var i=0;i<ms.length;i++){ms[i].removeAttribute('data-lmember');ms[i].style.cursor='default'}
-var acts=a.querySelectorAll('.p-acts .pa');for(var j=0;j<acts.length;j++){var b=acts[j];
+var acts=a.querySelectorAll('.pa');for(var j=0;j<acts.length;j++){var b=acts[j];
 if(b.hasAttribute('data-lmore')){b.parentNode.removeChild(b);continue}
 b.removeAttribute('data-linsp');b.removeAttribute('data-lcmt');b.removeAttribute('data-redeed');b.removeAttribute('data-lshare');b.setAttribute('data-exnudge','1')}
 return a.outerHTML}
@@ -5962,17 +5982,20 @@ function presEggArtSrc(r){if(r.egg_filling==='treat')return r.egg_treat_style===
 var EGGARTLOADED={};function preloadEggArt(r){var src=(r.egg_filling==='photo'&&r.media_path&&(!r.media_status||r.media_status==='live'))?mediaURL(r.media_path):presEggArtSrc(r);if(EGGARTLOADED[src])return;EGGARTLOADED[src]=1;var i=new Image();i.src=src}
 function presPick(a){return a[Math.floor(Math.random()*a.length)]}
 /* ---- HANDWRITING: a deed posts as a note in the member's hand, real text on torn paper (Aug 30) ---- */
-var HWFONTS={
-rainbow:{fam:'HW Rainbow',size:26,lh:37},
-nothing:{fam:'HW Nothing',size:28,lh:38},
-reenie:{fam:'HW Reenie',size:26,lh:33},
-zeyada:{fam:'HW Zeyada',size:30,lh:38},
-aurore:{fam:'HW Aurore',size:27,lh:38},
-dawning:{fam:'HW Dawning',size:30,lh:38},
-apple:{fam:'HW Apple',size:22,lh:42},
-cedarville:{fam:'HW Cedarville',size:26,lh:40},
-glory:{fam:'HW Glory',size:27,lh:36},
-justme:{fam:'HW Justme',size:31,lh:36}};
+var HWBASE={
+rainbow:{fam:'HW Rainbow',size:31,lh:44},
+nothing:{fam:'HW Nothing',size:33,lh:45},
+reenie:{fam:'HW Reenie',size:31,lh:39},
+zeyada:{fam:'HW Zeyada',size:36,lh:45},
+aurore:{fam:'HW Aurore',size:32,lh:45},
+dawning:{fam:'HW Dawning',size:36,lh:45},
+apple:{fam:'HW Apple',size:26,lh:50},
+cedarville:{fam:'HW Cedarville',size:31,lh:47},
+glory:{fam:'HW Glory',size:32,lh:43},
+justme:{fam:'HW Justme',size:37,lh:43}};
+var HWFONTS={},HWSC=0;
+function hwScale(){var m=window.innerWidth>=1080?1:.86;if(m===HWSC)return false;HWSC=m;for(var k in HWBASE){var b=HWBASE[k],o={};for(var p in b)o[p]=b[p];o.size=Math.round(b.size*m);o.lh=Math.round(b.lh*m);HWFONTS[k]=o}return true}
+hwScale();
 var HWKEYS=Object.keys(HWFONTS),HWCAP=9,HWINK='#1B1712',HWOPEN={},HWREADY={},HWQ={},HWCV=null,HWRAF=0,HWRT=0;
 var HWMON=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function hwHash(s){s=String(s||'');var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -6017,11 +6040,11 @@ var pr=(.84+rnd()*.16)*op,sz=1+(rnd()-.5)*.05;
 s+='<tspan fill-opacity="'+pr.toFixed(2)+'"'+(Math.abs(sz-1)>.012?' font-size="'+(size*sz).toFixed(1)+'"':'')+' dx="'+dx.join(' ')+'" dy="'+dy.join(' ')+'" rotate="'+rot.join(' ')+'">'+esc(txt)+'</tspan>'});
 return s+'</text>'}
 /* the whole note as one svg: heading in the same hand, then the words */
-function hwSVG(o){var f=HWFONTS[o.k],rnd=hwRng(hwHash(o.id)),size=f.size,lh=f.lh,hs=Math.round(size*.86),W=Math.round(o.W);
+function hwSVG(o){var f=HWFONTS[o.k],rnd=hwRng(hwHash(o.id)),size=f.size,lh=f.lh,hs=Math.round(size*.74),W=Math.round(o.W);
 var lines=hwWrap(o.text,o.k,W-6);
 var fold=!o.open&&lines.length>HWCAP+1,shown=fold?lines.slice(0,HWCAP):lines;
-var head=!!(o.no||o.date),yH=head?Math.round(hs*.92):0,yB=head?yH+Math.round(lh*1.02):Math.round(size*.86);
-var H=yB+(shown.length-1)*lh+Math.round(size*.46);
+var head=!!(o.no||o.date),yH=head?Math.round(hs*1.0):0,yB=head?yH+Math.round(lh*1.28):Math.round(size*.86);
+var H=yB+(shown.length-1)*lh+Math.round(size*.5);
 var s='<svg class="hwsvg" xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="font-family:\''+f.fam+'\',cursive'+(f.feat?';font-feature-settings:'+f.feat.replace(/"/g,'&quot;'):'')+'"><g fill="'+HWINK+'" filter="url(#hwink)">';
 if(head){var dS=o.date||'',noS=o.no?'Deed #'+o.no:'',cx=hwCtx();function wd(t,sz){cx.font=hwFont(o.k,sz);return cx.measureText(t).width*1.08}
 if(noS&&dS){var room=W-18,need=wd(noS,hs)+wd(dS,hs);if(need>room){var h2=Math.floor(hs*room/need);if(h2>=Math.round(size*.64))hs=h2;else{dS=hwShortDate(dS);need=wd(noS,hs)+wd(dS,hs);hs=need>room?Math.max(Math.round(size*.64),Math.floor(hs*room/need)):hs}}}
@@ -6030,14 +6053,14 @@ shown.forEach(function(ln,i){if(ln.blank||!ln.w.length)return;s+=hwLine(ln.w,2,y
 s+='</g></svg>';return{svg:s,fold:fold,h:H}}
 /* width the note will get in the feed column, so a loaded hand draws in one pass with no swap */
 function hwGuessW(){var d=document.querySelector('.hwnote.hw-drawn[data-w]');if(d)return +d.getAttribute('data-w')||0;
-var fe=document.getElementById('feed');if(!fe||!fe.clientWidth)return 0;var pad=window.innerWidth>=1080?64:36;return fe.clientWidth-pad+20-48-16}
+var fe=document.getElementById('feed');if(!fe||!fe.clientWidth)return 0;var pad=window.innerWidth>=1080?64:36;return fe.clientWidth-pad-12-(window.innerWidth>=1080?52:24)}
 function hwNoteHTML(r,body,nm){var k=hwHandOf(nm),f=HWFONTS[k],no=+(r.deed_no||0)||0,dt=hwDate(r),W=hwGuessW(),d=null;
 if(HWREADY[k]&&W>=60){try{d=hwSVG({id:r.id,k:k,text:body,no:no,date:dt,W:W,open:!!HWOPEN[r.id]})}catch(e){d=null}}
 var inner=d?d.svg:('<p class="hwp" style="font:'+f.size+'px/'+f.lh+'px \''+f.fam+'\',cursive">'+(dt?'<span class="hwph">'+(no?'Deed #'+no+'  ':'')+esc(dt)+'</span>':'')+esc(body)+'</p>');
 return '<div class="hwnote hwpaper'+(d?' hw-drawn':'')+'" data-hw="'+esc(r.id)+'" data-hand="'+k+'" data-no="'+no+'" data-date="'+esc(dt)+'" data-body="'+esc(body)+'"'+(d?' data-w="'+W+'"':'')+'><div class="hwin">'+inner+'</div><button class="hwmore" type="button"'+((d&&d.fold)?'':' style="display:none"')+'>Unfold It.</button></div>'}
-function hwDrawEl(el){var W=el.clientWidth-16;if(W<60)return;if(el.classList.contains('hw-drawn')&&Math.abs(W-(+el.getAttribute('data-w')||0))<3)return;
+function hwDrawEl(el){var W=el.clientWidth-(window.innerWidth>=1080?52:24);if(W<60)return;if(el.classList.contains('hw-drawn')&&Math.abs(W-(+el.getAttribute('data-w')||0))<3)return;
 var k=el.getAttribute('data-hand');if(!HWFONTS[k])k=HWKEYS[0];el.setAttribute('data-w',W);
-hwEnsure(k,function(){if(!el.isConnected)return;var W2=el.clientWidth-16;if(W2<60)return;var id=el.getAttribute('data-hw');
+hwEnsure(k,function(){if(!el.isConnected)return;var W2=el.clientWidth-(window.innerWidth>=1080?52:24);if(W2<60)return;var id=el.getAttribute('data-hw');
 var d=hwSVG({id:id,k:k,text:el.getAttribute('data-body')||'',no:+el.getAttribute('data-no')||0,date:el.getAttribute('data-date')||'',W:W2,open:!!HWOPEN[id]});
 var box=el.querySelector('.hwin');if(box)box.innerHTML=d.svg;el.setAttribute('data-w',W2);el.classList.add('hw-drawn');
 var mb=el.querySelector('.hwmore');if(mb)mb.style.display=d.fold?'':'none'})}
@@ -6045,10 +6068,10 @@ function hwPaint(){var els=document.querySelectorAll('.hwnote');for(var i=0;i<el
 function hwSched(){if(HWRAF)return;HWRAF=requestAnimationFrame(function(){HWRAF=0;hwPaint()})}
 (function(){if(document.getElementById('hwink'))return;var d=document.createElement('div');d.id='hwwarm';d.style.cssText='position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden';d.setAttribute('aria-hidden','true');
 try{if(localStorage.getItem('deeds_hwplain')==='1')document.documentElement.classList.add('hw-plain')}catch(e){}
-d.innerHTML='<svg width="0" height="0" focusable="false"><defs><filter id="hwink" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="1.05" numOctaves="1" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation=".16" result="b"/><feComponentTransfer in="b"><feFuncA type="table" tableValues="0 .42 .96 1"/></feComponentTransfer></filter></defs></svg>';
+d.innerHTML='<svg width="0" height="0" focusable="false"><defs><filter id="hwink" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="1.05" numOctaves="1" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.05" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation=".12" result="b"/><feComponentTransfer in="b"><feFuncA type="table" tableValues="0 .42 .96 1"/></feComponentTransfer></filter></defs></svg>';
 document.body.appendChild(d);
 try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(ms[i].addedNodes&&ms[i].addedNodes.length){hwSched();return}}}).observe(document.body,{childList:true,subtree:true})}catch(e){}
-window.addEventListener('resize',function(){clearTimeout(HWRT);HWRT=setTimeout(hwPaint,180)});
+window.addEventListener('resize',function(){clearTimeout(HWRT);HWRT=setTimeout(function(){if(hwScale()){$$('.hwnote').forEach(function(n){n.classList.remove('hw-drawn')});try{hwComposerPaint()}catch(e){}}hwPaint()},180)});
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.hwmore'):null;if(!b)return;e.preventDefault();var n=b.closest('.hwnote');if(!n)return;
 HWOPEN[n.getAttribute('data-hw')]=1;n.classList.remove('hw-drawn');hwDrawEl(n)});
 var _hwGo=window.go;if(typeof _hwGo==='function')window.go=function(){var r=_hwGo.apply(this,arguments);hwSched();return r}})();
