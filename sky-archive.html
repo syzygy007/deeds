@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Night Sky. DEEDS.</title>
+<meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:#0E1A14;color:#F6F3EB;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;overflow:hidden}
+#gsky{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0E1A14;pointer-events:none}
+#gsky .gl{position:absolute;left:-7%;top:-7%;width:114%;height:114%;will-change:transform}
+#gskyMoon{top:-15%}
+#gsky .gl img,#gsky video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+#gsky video{opacity:0;transition:opacity 1.4s ease}
+#gsky video.on{opacity:1}
+#gsky canvas{position:absolute;inset:0;width:100%;height:100%}
+#gsky .gscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,26,20,.55) 0%,rgba(14,26,20,0) 24%),linear-gradient(0deg,rgba(14,26,20,.80) 0%,rgba(14,26,20,.18) 56%)}
+#gskyCopy{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:26px 22px 30px;will-change:transform}
+.micro{font-size:9.5px;letter-spacing:.24em;font-weight:800;color:#9CB7A4;text-transform:uppercase}
+h1{font-weight:800;font-size:clamp(2.6rem,11.5vw,3.6rem);letter-spacing:-.035em;line-height:.95;margin:14px 0 0}
+h1 b{color:#BE9A4E}
+p{font-size:15px;line-height:1.55;margin:16px 0 0;max-width:440px;color:rgba(246,243,235,.8)}
+a.back{display:inline-block;margin-top:22px;font-size:9.5px;letter-spacing:.24em;font-weight:800;color:rgba(246,243,235,.7);text-decoration:none;border-bottom:1px solid rgba(246,243,235,.3);padding-bottom:5px;text-transform:uppercase}
+@media(min-width:1080px){
+ #gskyMoon{top:-7%}
+ #gskyCopy{padding:44px;max-width:760px}
+ h1{font-size:clamp(3.4rem,6.4vw,5.6rem)}
+}
+@media(prefers-reduced-motion:reduce){#gsky .gl,#gskyCopy{transform:none!important}}
+</style>
+</head>
+<body>
+<div id="gsky" aria-hidden="true">
+  <div class="gl" id="gskySky"><picture><source media="(min-width:1080px)" srcset="nebula-wide.webp"><img src="nebula.webp" alt=""></picture><video id="gskyVid" muted loop playsinline preload="none" aria-hidden="true"></video><canvas id="gskyStars"></canvas></div>
+  <div class="gl" id="gskyMoon"><picture><source media="(min-width:1080px)" srcset="moon-wide.webp"><img src="moon.webp" alt=""></picture></div>
+  <div class="gl" id="gskyFol"><picture><source media="(min-width:1080px)" srcset="foliage-wide.webp"><img src="foliage.webp" alt=""></picture></div>
+  <div class="gscrim"></div>
+</div>
+<div id="gskyCopy">
+  <div class="micro">Kept &middot; The Night Sky</div>
+  <h1>Anonymous, and followed<b>.</b></h1>
+  <p>The first signed out profile. Nebula, crescent moon, treeline, the twinkling stars on a canvas and a sixteen second sky. Kept here so it does not go anywhere.</p>
+  <a class="back" href="/">Back to DEEDS</a>
+</div>
+<script>
+function $(s){return document.querySelector(s)}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+var GSKY={on:true,vid:null,vidOn:false,stars:[],ctx:null,tx:0,ty:0,cx:0,cy:0,dpr:1,last:0,rt:0,raf:0};
+function gskyRM(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+function gskyWide(){return window.innerWidth>=1080}
+function gskyClamp(v){return v<-1?-1:v>1?1:v}
+function gskyRng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+function gskyLoad(){var v=$('#gskyVid'),cv=$('#gskyStars');GSKY.vid=v;GSKY.ctx=cv?cv.getContext('2d'):null;
+if(v&&!gskyRM()){v.src=gskyWide()?'sky-wide.mp4':'sky.mp4';v.addEventListener('playing',function(){GSKY.vidOn=true;v.classList.add('on');if(GSKY.ctx&&cv){GSKY.ctx.setTransform(1,0,0,1,0,0);GSKY.ctx.clearRect(0,0,cv.width,cv.height)}});v.addEventListener('error',function(){GSKY.vidOn=false;v.classList.remove('on')})}
+window.addEventListener('mousemove',function(e){GSKY.tx=gskyClamp((e.clientX/window.innerWidth-.5)*2);GSKY.ty=gskyClamp((e.clientY/window.innerHeight-.5)*2)},{passive:true});
+window.addEventListener('resize',function(){clearTimeout(GSKY.rt);GSKY.rt=setTimeout(gskySeed,160)})}
+function gskySeed(){var cv=$('#gskyStars');if(!cv||!GSKY.ctx)return;var box=cv.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.max(1,Math.round(box.width*dpr));cv.height=Math.max(1,Math.round(box.height*dpr));GSKY.dpr=dpr;
+var r=gskyRng(20260827),n=Math.min(430,Math.round(box.width*box.height/9200)),big=gskyWide()?1.25:1,st=[];
+for(var i=0;i<n;i++){var y=Math.pow(r(),1.45);if(y>.7&&r()>.22)continue;var sharp=r()<.38;st.push({x:r(),y:y,r:(.7+r()*.85)*big,ph:r()*6.283,sp:sharp?(2.1+r()*1.1):(4.5+r()*4),k:sharp?(4.6+r()*2.4):(2.2+r()*1.1),spike:r()<.08})}
+GSKY.stars=st}
+function gskyPaint(t){var cv=$('#gskyStars'),ctx=GSKY.ctx;if(!cv||!ctx)return;var dpr=GSKY.dpr||1,W=cv.width,H=cv.height;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);
+GSKY.stars.forEach(function(s){var a=Math.pow((Math.sin(t/1000*6.283/s.sp+s.ph)+1)/2,s.k);a=.05+a*.95;var rr=s.r*dpr*(.7+a*.85),x=s.x*W,y=s.y*H;
+ctx.globalAlpha=a*.6;ctx.fillStyle='#F6F3EB';ctx.beginPath();ctx.arc(x,y,rr,0,6.283);ctx.fill();
+if(a>.6){var g=ctx.createRadialGradient(x,y,0,x,y,rr*4);g.addColorStop(0,'rgba(246,243,235,'+(a*.35).toFixed(3)+')');g.addColorStop(1,'rgba(246,243,235,0)');ctx.globalAlpha=1;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,rr*4,0,6.283);ctx.fill()}
+if(s.spike&&a>.75){ctx.globalAlpha=(a-.75)*2;ctx.strokeStyle='#F6F3EB';ctx.lineWidth=Math.max(1,dpr*.6);ctx.beginPath();ctx.moveTo(x-rr*5,y);ctx.lineTo(x+rr*5,y);ctx.moveTo(x,y-rr*5);ctx.lineTo(x,y+rr*5);ctx.stroke()}});
+ctx.globalAlpha=1}
+function gskyFrame(t){GSKY.cx+=(GSKY.tx-GSKY.cx)*.075;GSKY.cy+=(GSKY.ty-GSKY.cy)*.075;
+var ax=Math.sin(t/9700)*.56+Math.sin(t/23100)*.44,ay=Math.sin(t/13300)*.58+Math.cos(t/31700)*.42,w=gskyWide(),mul=w?1.6:1,aw=w?.62:.34;
+[['#gskySky',5],['#gskyMoon',8],['#gskyFol',22],['#gskyCopy',2]].forEach(function(L){var el=$(L[0]);if(!el)return;var d=L[1]*mul;el.style.transform='translate3d('+(-(GSKY.cx+ax*aw)*d).toFixed(2)+'px,'+(-(GSKY.cy+ay*aw)*d*.62).toFixed(2)+'px,0)'});
+if(!GSKY.vidOn&&t-GSKY.last>24){gskyPaint(t);GSKY.last=t}
+GSKY.raf=requestAnimationFrame(gskyFrame)}
+gskyLoad();gskySeed();
+if(GSKY.vid&&!gskyRM()){try{var p=GSKY.vid.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
+if(gskyRM())gskyPaint(0);else GSKY.raf=requestAnimationFrame(gskyFrame);
+</script>
+</body>
+</html>

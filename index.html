@@ -1288,53 +1288,51 @@ background:radial-gradient(circle,rgba(247,240,255,.34) 0,rgba(217,193,255,.30) 
 @media (max-width:520px){.efill .fs{display:none}.eggart{width:74vw}.eggart[data-cont="pinata"]{width:84vw}.econt .cl{font-size:11.5px}}
 @media (prefers-reduced-motion:reduce){.eggart .emain,.eggart:hover .emain,.eggart.tap .emain{animation:none!important}.eggin,.eggopen .eoplate,.eggopen .eomicro,.eggopen .eowords,.eggopen .tdrow,.eggopen .tdmicro{animation:none}.inkwords{transition:none}}
 /* ============ GUEST SKY + ARTIFACT SHARE (v4.14 · the welcome sky behind the signed-out profile; Artifacts and ink travel as sealed links) ============ */
-#gsky{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0E1A14;pointer-events:none}
-#gsky .gl{position:absolute;left:-7%;top:-7%;width:114%;height:114%;will-change:transform}
-#gskyMoon{top:-15%}
-#gsky .gl img,#gsky video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
-#gsky video{opacity:0;transition:opacity 1.4s ease}
-#gsky video.on{opacity:1}
-#gsky canvas{position:absolute;inset:0;width:100%;height:100%}
-#gsky .gscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,26,20,.55) 0%,rgba(14,26,20,0) 24%),linear-gradient(0deg,rgba(14,26,20,.80) 0%,rgba(14,26,20,.18) 56%)}
-#profguest .gcopy{position:relative;z-index:2;min-height:calc(100vh - 150px);min-height:calc(100svh - 150px - env(safe-area-inset-bottom));display:flex;flex-direction:column;justify-content:flex-end;color:var(--ivory);padding:26px 22px 28px;will-change:transform}
-#profguest .gcopy .micro{color:var(--sage)}
-#profguest .gcopy h1{color:var(--ivory);font-weight:800;font-size:clamp(2.6rem,11.5vw,3.6rem);letter-spacing:-.035em;line-height:.95;margin-top:14px}
-#profguest .gcopy h1 b{color:var(--gold)}
-#profguest .gcopy .gdeck{font-size:15px;line-height:1.55;margin-top:16px;max-width:440px;color:rgba(246,243,235,.8)}
-#profguest .gspec{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(246,243,235,.2)}
-#profguest .gspec div{padding:11px 0 10px;border-bottom:1px solid rgba(246,243,235,.2);font-size:9.5px;letter-spacing:.2em;font-weight:800;color:rgba(246,243,235,.72)}
-#profguest .gspec div:nth-child(odd){border-right:1px solid rgba(246,243,235,.2);padding-right:12px}
-#profguest .gspec div:nth-child(even){padding-left:14px}
-#profguest .gcopy .mbtn{background:var(--ivory);color:var(--ink);font-size:15px;padding:14px 26px}
-#profguest .gcopy .remnote{color:rgba(246,243,235,.62)}
-#profguest .gcopy .remnote a{color:rgba(246,243,235,.62);text-decoration:none;border-bottom:1px solid rgba(246,243,235,.25)}
-body.gsky-on{background:#0E1A14}
-body.gsky-on .mtop{background:rgba(14,26,20,.55);border-bottom-color:rgba(246,243,235,.14);color:var(--ivory)}
-body.gsky-on .mtop .mword,body.gsky-on .mtop .mword b,body.gsky-on .mtop button{color:var(--ivory)}
-body.gsky-on .tabs{background:rgba(14,26,20,.74);border-top-color:rgba(246,243,235,.14)}
-body.gsky-on .tab{color:rgba(246,243,235,.55)}
-body.gsky-on .tab.on{color:var(--ivory)}
+#gsky{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0B0B0B;pointer-events:none}
+#profguest{--gink:#0B0B0B;--gcream:#F4F1EA;--gem:#07854B;--gemt:#0FA35F;--gline:rgba(244,241,234,.16)}
+#pg-profile #profguest .prof{background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+#pg-profile #profguest .gcopy{position:relative;z-index:2;color:var(--gcream);padding:0 22px 34px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}
+#profguest .ghero{min-height:calc(100vh - 172px);min-height:calc(100svh - 172px - env(safe-area-inset-bottom));display:flex;flex-direction:column;justify-content:center;padding:26px 0 34px}
+#profguest .gcopy .micro{color:var(--gemt);font-size:9.5px;letter-spacing:.24em;font-weight:800}
+#profguest .gcopy h1{color:var(--gcream);font-weight:800;text-transform:uppercase;font-size:clamp(2.5rem,12vw,4.4rem);letter-spacing:-.042em;line-height:.93;margin:16px 0 0}
+#profguest .gcopy h1 b{color:var(--gem)}
+#profguest .dsig{margin-top:28px;color:var(--gcream)}
+#profguest .dsig svg{display:block;width:min(64vw,238px);height:auto;overflow:visible}
+#profguest .gcopy .mbtn{background:var(--gcream);color:#0B0B0B;font-size:15px;font-weight:800;padding:15px 30px;border:0;border-radius:999px}
+#profguest .gsub{font-size:12.5px;color:rgba(244,241,234,.6);margin-top:15px}
+#profguest .gsub a{color:rgba(244,241,234,.85);text-decoration:none;border-bottom:1px solid var(--gemt);cursor:pointer}
+#profguest .gmiss{border-top:1px solid var(--gline);padding-top:28px}
+#profguest .gmiss h2{font-weight:800;font-size:clamp(1.7rem,7vw,2.3rem);letter-spacing:-.032em;line-height:1.02;margin:14px 0 0;color:var(--gcream)}
+#profguest .gmiss h2 b{color:var(--gem)}
+#profguest .gmiss p{font-size:15px;line-height:1.6;margin:14px 0 0;max-width:460px;color:rgba(244,241,234,.76)}
+#profguest .gspec{margin-top:28px;border-top:1px solid var(--gline)}
+#profguest .gspec div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--gline);font-size:9.5px;letter-spacing:.2em;font-weight:800;color:rgba(244,241,234,.55)}
+#profguest .gspec div span{color:var(--gcream)}
+#profguest .gcopy .remnote{color:rgba(244,241,234,.5);font-size:11.5px}
+#profguest .gcopy .remnote a{color:rgba(244,241,234,.5);text-decoration:none;border-bottom:1px solid rgba(244,241,234,.22)}
+body.gsky-on{background:#0B0B0B}
+body.gsky-on .mtop{background:rgba(11,11,11,.9);border-bottom-color:rgba(244,241,234,.14);color:#F4F1EA}
+body.gsky-on .mtop .mword,body.gsky-on .mtop .mword b,body.gsky-on .mtop button{color:#F4F1EA}
+body.gsky-on .tabs{background:rgba(11,11,11,.94);border-top-color:rgba(244,241,234,.14)}
+body.gsky-on .tab{color:rgba(244,241,234,.5)}
+body.gsky-on .tab.on{color:#F4F1EA}
 @media(min-width:1080px){
- #gskyMoon{top:-7%}
  body.gsky-on .rail-r{display:none}
- #pg-profile #profguest .prof{background:none;border:0;padding:0}
- #profguest .gcopy{min-height:calc(100vh - 190px);padding:40px 44px 44px;max-width:760px}
- #profguest .gcopy h1{font-size:clamp(3.4rem,6.4vw,5.6rem)}
- #profguest .gspec{grid-template-columns:repeat(4,1fr);max-width:640px}
- #profguest .gspec div{border-right:1px solid rgba(246,243,235,.2);padding:11px 12px 10px}
- #profguest .gspec div:nth-child(odd){border-right:1px solid rgba(246,243,235,.2);padding-right:12px}
- #profguest .gspec div:nth-child(even){padding-left:12px}
- #profguest .gspec div:first-child{padding-left:0}
- #profguest .gspec div:last-child{border-right:0}
- body.gsky-on .dtop{background:rgba(14,26,20,.62);border-bottom-color:rgba(246,243,235,.14)}
- body.gsky-on .dword,body.gsky-on .dword b,body.gsky-on .dme .dhandle,body.gsky-on .dchev{color:var(--ivory)}
- body.gsky-on .dnav button{color:rgba(246,243,235,.72)}
- body.gsky-on .dnav button.on{color:var(--ivory)}
- body.gsky-on .dnav button.on::after{background:var(--gold)}
- body.gsky-on .dsep{background:rgba(246,243,235,.2)}
- body.gsky-on .dme:hover{background:rgba(246,243,235,.1)}
- body.gsky-on .dfoot{position:relative;z-index:2;color:rgba(246,243,235,.62)}
- body.gsky-on .dfoot a{color:rgba(246,243,235,.62)}
+ #pg-profile #profguest .gcopy{padding:0 44px 46px;max-width:900px}
+ #profguest .ghero{min-height:calc(100vh - 210px);padding:44px 0 48px}
+ #profguest .gcopy h1{font-size:clamp(3.6rem,7.2vw,6.2rem)}
+ #profguest .dsig svg{width:312px}
+ #profguest .gmiss h2{font-size:clamp(2.1rem,3.3vw,2.9rem)}
+ #profguest .gspec{max-width:620px}
+ body.gsky-on .dtop{background:rgba(11,11,11,.92);border-bottom-color:rgba(244,241,234,.14)}
+ body.gsky-on .dword,body.gsky-on .dword b,body.gsky-on .dme .dhandle,body.gsky-on .dchev{color:#F4F1EA}
+ body.gsky-on .dnav button{color:rgba(244,241,234,.7)}
+ body.gsky-on .dnav button.on{color:#F4F1EA}
+ body.gsky-on .dnav button.on::after{background:#07854B}
+ body.gsky-on .dsep{background:rgba(244,241,234,.2)}
+ body.gsky-on .dme:hover{background:rgba(244,241,234,.1)}
+ body.gsky-on .dfoot{position:relative;z-index:2;color:rgba(244,241,234,.5)}
+ body.gsky-on .dfoot a{color:rgba(244,241,234,.5)}
 }
 .sentflash{animation:sentflash 2.4s ease-out}
 @keyframes sentflash{0%{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(190,154,78,.16)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
@@ -1707,20 +1705,24 @@ body.gsky-on .tab.on{color:var(--ivory)}
 
     <div class="page" id="pg-profile">
       <div id="profguest" style="display:none">
-        <div id="gsky" aria-hidden="true">
-          <div class="gl" id="gskySky"><picture><source media="(min-width:1080px)" data-srcset="/nebula-wide.webp"><img data-src="/nebula.webp" alt=""></picture><video id="gskyVid" muted loop playsinline preload="none" aria-hidden="true"></video><canvas id="gskyStars"></canvas></div>
-          <div class="gl" id="gskyMoon"><picture><source media="(min-width:1080px)" data-srcset="/moon-wide.webp"><img data-src="/moon.webp" alt=""></picture></div>
-          <div class="gl" id="gskyFol"><picture><source media="(min-width:1080px)" data-srcset="/foliage-wide.webp"><img data-src="/foliage.webp" alt=""></picture></div>
-          <div class="gscrim"></div>
-        </div>
+        <div id="gsky" aria-hidden="true"></div>
         <div class="prof gcopy" id="gskyCopy">
-          <div class="micro">Profile &middot; Anonymous</div>
-          <h1>Anonymous, and followed<b>.</b></h1>
-          <p class="gdeck">One profile. A generated handle. No headshots, no real names. The community knows what you do, never who you are.</p>
-          <div class="gspec"><div>SEE IT</div><div>DO IT</div><div>PASS IT</div><div>WATCH IT MOVE</div></div>
-          <div class="mrow" style="margin-top:24px"><button class="mbtn" id="gJoin">Sign In or Join.</button></div>
-          <p class="remnote" style="margin-top:14px">Same door, one code. It takes one minute.</p>
-          <p class="remnote" style="margin-top:18px;line-height:2"><a href="/terms/">Terms</a> &middot; <a href="/privacy/">Privacy</a> &middot; <a href="/guidelines/">Guidelines</a> &middot; <a href="/copyright/">Copyright</a><br>&copy; 2026 Unilateral Good LLC</p>
+          <div class="ghero">
+            <div class="micro">Profile &middot; Anonymous</div>
+            <h1>Do anonymous good<b>.</b></h1>
+            <div class="dsig"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 412 121" class="dsvg" role="img" aria-label="deedable"> <path fill="currentColor" fill-rule="evenodd" d="M 12.984 127.292 C 5.717 117.471 25.657 91.385 49.081 80.069 C 55.270 77.079 59.571 76.975 64.143 79.705 C 65.816 80.705 67.301 81.386 67.441 81.219 C 67.582 81.052 71.882 75.401 76.997 68.660 C 94.046 46.191 98.480 40.941 101.171 40.032 C 104.483 38.914 106.962 39.542 108.347 41.853 C 109.785 44.252 108.827 45.747 96.879 59.750 C 79.883 79.670 63.476 104.383 61.416 113.163 C 60.510 117.028 62.576 116.839 70.159 112.363 C 75.634 109.131 76.978 107.690 80.003 101.812 C 88.372 85.550 102.555 74.204 113.427 75.074 C 119.093 75.527 121.603 78.699 120.574 84.103 C 119.265 90.974 104.490 102.781 93.680 105.594 C 87.575 107.183 87.038 107.718 86.742 112.497 C 86.523 116.054 86.742 116.468 89.096 116.929 C 92.054 117.510 104.852 112.257 110.800 108.023 C 113.274 106.261 115.075 103.900 115.836 101.419 C 118.594 92.436 131.644 78.411 140.234 75.199 C 149.679 71.668 156.571 75.961 154.548 84.114 C 153.511 88.292 142.399 97.415 134.456 100.611 C 130.630 102.150 126.848 103.681 126.051 104.015 C 124.324 104.738 122.718 109.935 123.845 111.153 C 125.134 112.545 132.698 109.970 140.187 105.590 C 144.026 103.346 153.121 96.249 160.398 89.821 C 175.792 76.222 178.372 74.798 185.165 76.146 C 189.970 77.100 189.974 77.098 192.322 73.087 C 203.787 53.500 208.975 45.350 213.060 40.509 C 218.860 33.636 221.519 32.208 225.288 33.943 C 229.826 36.031 228.781 39.061 219.337 51.210 C 214.573 57.339 208.207 65.967 205.191 70.382 C 195.766 84.182 186.148 105.374 188.270 107.665 C 189.851 109.372 197.580 102.961 212.252 87.771 C 223.612 76.010 231.473 73.219 237.359 78.857 C 238.381 79.836 240.576 80.746 242.238 80.879 C 247.835 81.327 247.938 83.711 242.788 93.623 C 237.922 102.988 236.178 107.894 237.673 108.014 C 240.966 108.277 263.470 82.330 270.924 69.674 C 277.900 57.831 289.739 41.389 292.049 40.338 C 296.214 38.442 301.000 40.520 301.000 44.223 C 301.000 45.182 295.938 52.287 289.750 60.012 C 277.934 74.766 271.332 84.372 272.295 85.412 C 272.611 85.753 274.361 85.032 276.184 83.810 C 278.008 82.588 281.471 80.756 283.880 79.738 C 294.260 75.352 301.222 83.451 296.487 94.405 C 295.655 96.330 295.174 98.122 295.420 98.387 C 295.665 98.651 298.217 97.774 301.091 96.437 C 305.827 94.233 306.750 93.196 310.937 85.375 C 319.305 69.743 334.427 49.752 341.916 44.420 C 346.645 41.053 351.179 41.084 353.443 44.498 C 354.299 45.789 355.000 47.575 355.000 48.467 C 355.000 52.159 344.901 64.540 321.147 89.972 C 313.005 98.689 307.316 113.618 311.413 115.518 C 314.798 117.088 333.999 108.476 334.001 105.387 C 334.003 101.926 340.563 91.523 345.741 86.769 C 357.090 76.351 367.483 73.773 372.586 80.113 C 376.950 85.534 375.284 90.956 367.284 97.373 C 361.582 101.947 352.685 105.922 347.163 106.363 C 343.049 106.692 342.044 108.013 342.014 113.136 C 341.968 120.722 358.974 116.858 376.018 105.409 C 380.970 102.082 382.311 101.599 383.524 102.702 C 385.900 104.864 385.295 106.274 380.069 110.744 C 369.859 119.478 354.556 126.370 346.775 125.738 C 342.533 125.394 337.512 121.892 335.526 117.893 L 333.955 114.729 L 326.508 119.311 C 320.035 123.293 318.294 123.887 313.209 123.848 C 307.636 123.805 307.231 123.642 304.679 120.405 C 302.372 117.479 302.000 116.099 302.000 110.476 C 302.000 104.653 301.810 104.008 300.250 104.516 C 299.288 104.829 296.184 105.714 293.353 106.482 C 289.844 107.433 286.827 109.263 283.876 112.229 C 278.689 117.441 272.863 121.096 267.727 122.359 C 264.398 123.177 263.554 123.019 260.554 121.008 C 257.753 119.132 257.057 118.973 256.608 120.108 C 255.855 122.009 253.633 121.648 251.655 119.304 C 249.440 116.679 249.560 115.009 252.458 108.107 C 255.446 100.993 254.787 101.066 248.115 108.587 C 240.403 117.279 235.826 118.783 231.455 114.062 C 229.516 111.968 229.000 110.380 229.000 106.506 L 229.000 101.602 L 219.641 110.212 C 211.409 117.786 209.862 118.789 206.796 118.544 C 203.294 118.264 200.923 116.316 199.672 112.694 C 199.107 111.059 198.489 111.198 193.908 113.982 C 187.971 117.591 186.255 117.676 182.635 114.538 C 180.403 112.604 179.996 111.463 179.975 107.075 L 179.950 101.896 L 171.841 110.041 C 160.580 121.352 156.315 122.911 151.336 117.533 C 149.246 115.277 148.867 114.118 149.318 111.372 C 149.624 109.512 149.647 107.972 149.370 107.950 C 149.092 107.927 146.308 109.796 143.183 112.103 C 130.848 121.205 121.532 122.238 116.041 115.113 C 114.562 113.193 114.278 113.279 109.000 117.227 C 97.585 125.765 86.736 127.858 81.509 122.529 C 80.148 121.142 78.778 119.177 78.464 118.162 C 77.963 116.544 77.097 116.799 71.383 120.254 C 60.169 127.034 52.248 124.189 53.324 113.766 C 53.605 111.038 54.170 107.934 54.580 106.866 C 54.990 105.799 50.147 109.540 43.819 115.178 C 25.908 131.138 18.100 134.205 12.984 127.292 Z M 32.568 113.499 C 48.471 102.119 62.439 88.503 59.975 86.782 C 55.209 83.456 35.537 97.766 26.335 111.255 C 19.102 121.859 20.288 122.286 32.568 113.499 Z M 170.627 100.400 C 181.890 89.683 185.529 85.287 184.014 84.230 C 180.857 82.026 168.313 93.138 161.670 104.021 C 156.340 112.754 158.607 111.838 170.627 100.400 Z M 227.631 92.768 C 236.915 83.338 232.935 81.123 222.496 89.910 C 217.616 94.018 210.000 104.124 210.000 106.491 C 210.000 108.427 219.472 101.055 227.631 92.768 Z M 102.646 92.699 C 113.418 85.453 116.980 79.250 107.661 83.966 C 101.481 87.093 91.695 97.336 94.661 97.573 C 95.025 97.602 98.618 95.409 102.646 92.699 Z M 266.862 107.942 C 269.647 106.291 274.080 104.395 276.713 103.730 C 280.567 102.756 282.085 101.648 284.500 98.047 C 292.266 86.468 291.414 83.272 281.974 88.575 C 276.420 91.694 267.428 100.168 263.669 105.824 C 259.592 111.959 259.826 112.114 266.862 107.942 Z M 142.129 87.528 C 147.437 83.220 148.093 81.847 144.963 81.597 C 142.742 81.419 131.000 91.290 131.000 93.336 C 131.000 95.099 136.040 92.469 142.129 87.528 Z M 356.941 94.436 C 365.358 89.488 368.935 84.131 362.858 85.574 C 360.429 86.150 349.000 95.633 349.000 97.072 C 349.000 98.654 350.758 98.070 356.941 94.436 Z"/> <circle cx="391" cy="122" r="9.5" fill="#07854B"/> </svg></div>
+            <div class="mrow" style="margin-top:30px"><button class="mbtn" id="gJoin">Sign up.</button></div>
+            <p class="gsub">One email. One code. No password. <a id="gLogin">Already a member</a></p>
+          </div>
+          <div class="gmiss">
+            <div class="micro">Our mission</div>
+            <h2>Good, with no name on it<b>.</b></h2>
+            <p>A place to share the good you do and to find your next idea. Your handle is generated. No headshots, no real names. People see the deed, never the doer.</p>
+            <p>The point is not credit. The point is that somebody sees a small thing, and goes and does it themselves.</p>
+            <div class="gspec"><div>SEE IT<span>THE WALL</span></div><div>DO IT<span>ONE SMALL THING</span></div><div>PASS IT<span>ANONYMOUSLY</span></div><div>WATCH IT MOVE<span>RE&middot;DEEDED</span></div></div>
+            <div class="mrow" style="margin-top:30px"><button class="mbtn" id="gJoin2">Sign up.</button></div>
+            <p class="remnote" style="margin-top:24px;line-height:2"><a href="/terms/">Terms</a> &middot; <a href="/privacy/">Privacy</a> &middot; <a href="/guidelines/">Guidelines</a> &middot; <a href="/copyright/">Copyright</a> &middot; <a href="/sky-archive.html">The night sky</a><br>&copy; 2026 Unilateral Good LLC</p>
+          </div>
         </div>
       </div>
       <div id="profreal">
@@ -3793,14 +3795,12 @@ var ax=Math.sin(t/9700)*.56+Math.sin(t/23100)*.44,ay=Math.sin(t/13300)*.58+Math.
 if(!GSKY.vidOn&&t-GSKY.last>24){gskyPaint(t);GSKY.last=t}
 GSKY.raf=requestAnimationFrame(gskyFrame)}
 function gskyOn(){var pg=$('#pg-profile'),g=$('#profguest');if(!pg||!g||!pg.classList.contains('on')||g.style.display!=='block')return;
-gskyLoad();document.body.classList.add('gsky-on');if(GSKY.on)return;GSKY.on=true;gskySeed();
-if(GSKY.vid&&!gskyRM()){try{var p=GSKY.vid.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
-if(gskyRM())gskyPaint(0);else if(!GSKY.raf)GSKY.raf=requestAnimationFrame(gskyFrame)}
-function gskyOff(){document.body.classList.remove('gsky-on');if(!GSKY.on)return;GSKY.on=false;if(GSKY.vid){try{GSKY.vid.pause()}catch(e){}}}
+document.body.classList.add('gsky-on');GSKY.on=true}
+function gskyOff(){document.body.classList.remove('gsky-on');GSKY.on=false}
 var _goPre=window.go;window.go=function(p){_goPre(p);if(p==='profile')gskyOn();else gskyOff()};
 renderProfile=function(){var g=$('#profguest'),rr=$('#profreal');
 if(liveOn&&!PROFILE){if(g)g.style.display='block';if(rr)rr.style.display='none';gskyOn();
-var gj=$('#gJoin');if(gj)gj.onclick=openJoin;return}
+['#gJoin','#gJoin2','#gLogin'].forEach(function(sel){var b=$(sel);if(b)b.onclick=function(e){if(e&&e.preventDefault)e.preventDefault();openJoin()}});return}
 gskyOff();if(g)g.style.display='none';if(rr)rr.style.display='block';
 baseRenderProfile();
 var so=$('#pSignout');
