@@ -679,8 +679,11 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .appsteps .n{flex:0 0 22px;height:22px;border-radius:50%;background:var(--forest);color:var(--ivory);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .shareglyph{display:inline-block;width:14px;height:14px;vertical-align:-2px}
 /* ---- scratch reveal: the daily deed on the feed, today's verse on The Word (Aug 24) ---- */
-.dd-wrap{position:relative;margin:12px 0 4px;border-radius:14px;overflow:hidden;background:var(--bone);min-height:112px}
-.dd-under{padding:20px 22px;min-height:112px;display:flex;flex-direction:column;justify-content:center}
+.dd-wrap{position:relative;margin:12px 0 4px;border-radius:16px;overflow:hidden;background:var(--bone);min-height:164px}
+.dd-peek{position:absolute;right:14px;bottom:12px;font-family:Georgia,"Times New Roman",serif;font-size:19px;color:var(--ink);background:var(--bone);padding:2px 4px 2px 10px;pointer-events:none;white-space:nowrap}
+.dd-wrap.done .dd-peek,.dd-wrap.seen .dd-peek{display:none}
+.dd-row{display:flex;justify-content:space-between;align-items:baseline}.dd-row .dd-no{color:var(--muted)}
+.dd-under{padding:20px 22px;min-height:164px;display:flex;flex-direction:column;justify-content:center}
 .dd-act{font-weight:800;font-size:19px;line-height:1.3}
 .dd-under .p-time{margin-top:8px}
 .dd-verse{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.5}
@@ -692,7 +695,7 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .dd-hint{position:absolute;left:0;right:0;bottom:11px;text-align:center;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:rgba(246,243,235,.7);pointer-events:none;transition:opacity .3s}
 .dd-wrap.touched .dd-hint,.dd-wrap.done .dd-hint{opacity:0}
 .dd-acts{display:flex;align-items:center;gap:22px;margin-top:10px;min-height:22px}
-.dd-acts .reveal{color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.dd-acts .reveal{color:var(--ink);font-size:14px;letter-spacing:0;text-transform:none;font-weight:500;text-decoration:underline;text-underline-offset:4px}
 #wdVerseCard{margin:14px 0 18px}
 #wdVerseCard .dd-wrap{margin-top:10px}
 @media(prefers-reduced-motion:reduce){.dd-wrap.done .dd-cv{transition:none}}
@@ -1547,8 +1550,8 @@ html.dark .modeic .mo-moon{display:none}
 #pg-read .wd-title{font-size:38px;letter-spacing:-.04em}
 #pg-read .wd-sub{font-size:14px;font-weight:500}
 #wdVerseCard{border-radius:20px;padding:18px 18px 16px}
-#wdVerseCard .dd-wrap{border-radius:14px;min-height:96px}
-#wdVerseCard .dd-under{min-height:96px}
+#wdVerseCard .dd-wrap{border-radius:16px;min-height:164px}
+#wdVerseCard .dd-under{min-height:164px}
 #pg-read .lib-head{margin:26px 0 12px;padding-top:22px;border-top:1px solid var(--line)}
 #pg-read .lib-head .micro{font-size:12px;letter-spacing:.2em}
 #pg-read .viewall{color:var(--muted);text-decoration:none;font-size:13px;font-family:inherit;letter-spacing:0}
@@ -3180,17 +3183,22 @@ function finish(){if(wrap.classList.contains('done'))return;wrap.classList.add('
 var seen=false;try{seen=!!(o.key&&localStorage.getItem(o.key))}catch(e){}
 if(seen){wrap.classList.add('done');wrap.classList.add('seen');if(rv)rv.style.display='none';if(o.onDone)o.onDone();return}
 var cv=document.createElement('canvas');cv.className='dd-cv';cv.setAttribute('aria-hidden','true');wrap.appendChild(cv);
-var hint=document.createElement('div');hint.className='dd-hint';hint.textContent='Scratch to reveal';wrap.appendChild(hint);
+var op=wrap.querySelector('.dd-peek');if(op)op.remove();if(o.peek){var pk=document.createElement('span');pk.className='dd-peek';pk.textContent=o.peek;wrap.insertBefore(pk,cv)}
 var ctx=cv.getContext('2d'),W=0,H=0,down=false,last=null,checkAt=0;
 function spaced(t){return String(t).toUpperCase().split('').join(' ')}
 function paint(){var dpr=Math.min(window.devicePixelRatio||1,2);var r=wrap.getBoundingClientRect();W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
 cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalCompositeOperation='source-over';
-var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1F4B3A');g.addColorStop(.55,'#245741');g.addColorStop(1,'#183C2F');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-var sh=ctx.createLinearGradient(0,0,W,0);sh.addColorStop(0,'rgba(246,243,235,0)');sh.addColorStop(.45,'rgba(246,243,235,.10)');sh.addColorStop(.55,'rgba(246,243,235,.10)');sh.addColorStop(1,'rgba(246,243,235,0)');ctx.fillStyle=sh;ctx.fillRect(0,0,W,H);
-try{var img=ctx.getImageData(0,0,cv.width,cv.height),d=img.data,s=1234567;for(var i=0;i<d.length;i+=4){s=(s*16807)%2147483647;var n=((s/2147483647)-.5)*18;d[i]+=n;d[i+1]+=n;d[i+2]+=n}ctx.putImageData(img,0,0)}catch(e){}
-ctx.fillStyle='rgba(246,243,235,.92)';ctx.font='800 13px "Helvetica Neue",Helvetica,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-ctx.fillText(spaced(o.label||'Today.'),W/2,H/2-(o.sub?4:0));
-if(o.sub){ctx.fillStyle='rgba(160,176,164,.9)';ctx.font='800 9px "Helvetica Neue",Helvetica,Arial,sans-serif';ctx.fillText(spaced(o.sub),W/2,H/2+16)}
+var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1B1B1B');g.addColorStop(.5,'#0C0C0C');g.addColorStop(1,'#151515');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+var sh=ctx.createLinearGradient(0,0,W,H);sh.addColorStop(.35,'rgba(255,255,255,0)');sh.addColorStop(.5,'rgba(255,255,255,.05)');sh.addColorStop(.65,'rgba(255,255,255,0)');ctx.fillStyle=sh;ctx.fillRect(0,0,W,H);
+try{var img=ctx.getImageData(0,0,cv.width,cv.height),d=img.data,s=1234567;for(var i=0;i<d.length;i+=4){s=(s*16807)%2147483647;var n=((s/2147483647)-.5)*22;d[i]+=n;d[i+1]+=n;d[i+2]+=n}ctx.putImageData(img,0,0)}catch(e){}
+var lines=String(o.h1||o.label||'Today.').split('|'),fs=Math.min(Math.round(W*.11),46),ff='800 {0}px "Helvetica Neue",Helvetica,Arial,sans-serif';
+ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.font=ff.replace('{0}',fs);var mw=0;lines.forEach(function(l){mw=Math.max(mw,ctx.measureText(l).width)});if(mw>W*.86){fs=Math.floor(fs*W*.86/mw);ctx.font=ff.replace('{0}',fs)}
+var base=lines.length>1?H*.44:H*.53,by=base+(lines.length-1)*fs*.98;ctx.fillStyle='#FFFFFF';lines.forEach(function(l,i){ctx.fillText(l,W/2,base+i*fs*.98)});
+var tl=lines[lines.length-1],tw=ctx.measureText(tl).width;ctx.fillStyle='#07854B';ctx.fillRect(W/2+tw/2+fs*.06,by-fs*.17,fs*.19,fs*.19);
+ctx.fillStyle='rgba(255,255,255,.62)';ctx.font='500 '+Math.max(9,Math.round(W*.028))+'px "Helvetica Neue",Helvetica,Arial,sans-serif';ctx.fillText('S C R A T C H   T O   R E V E A L',W/2,by+fs*.72);
+var pts=[[W,H*.62],[W*.9,H*.66],[W*.84,H*.74],[W*.78,H*.8],[W*.8,H*.9],[W*.76,H],[W,H]];
+ctx.save();ctx.globalCompositeOperation='destination-out';ctx.beginPath();pts.forEach(function(p,i){i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])});ctx.closePath();ctx.fill();ctx.restore();
+ctx.save();ctx.beginPath();pts.slice(0,6).forEach(function(p,i){i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])});var f=ctx.createLinearGradient(W*.76,H*.6,W,H);f.addColorStop(0,'#E9E9E9');f.addColorStop(.45,'#9C9C9C');f.addColorStop(.7,'#F2F2F2');f.addColorStop(1,'#B5B5B5');ctx.strokeStyle=f;ctx.lineWidth=Math.max(6,W*.028);ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();ctx.restore();
 ctx.globalCompositeOperation='destination-out'}
 function gone(){return !document.body.contains(cv)}
 function pos(e){var r=cv.getBoundingClientRect();var p=e.touches?e.touches[0]:e;return{x:p.clientX-r.left,y:p.clientY-r.top}}
@@ -3763,7 +3771,7 @@ return cv}
 /* ---- the daily deed: one act, everyone, every day ---- */
 function dailyCardHTML(){if(!DAILY)return'';
 var done=DAILYN===1?'1 member did it today.':DAILYN>1?DAILYN+' members did it today.':'Be the first today.';
-return '<article class="post dailycard"><div class="micro" style="color:var(--forest)">Today\u2019s Deed \u00B7 No. '+DAILY.day_no+'</div>'+
+return '<article class="post dailycard"><div class="micro dd-row" style="color:var(--forest)"><span>Today\u2019s Deed</span><span class="dd-no">No. '+DAILY.day_no+'</span></div>'+
 '<div class="dd-wrap" id="ddwrap"><div class="dd-under"><div class="dd-act">'+esc(DAILY.act)+'</div><div class="p-time">'+done+'</div></div></div>'+
 '<div class="dd-acts"><button class="pa lit" id="dailyGo" style="display:none">Do It. Log It.</button><button class="pa reveal" id="ddReveal">Reveal it.</button></div></article>'}
 function loadDaily(){if(!sb)return;
@@ -3773,7 +3781,8 @@ DAILY=r.data[0];
 sb.from('daily_counts').select('n').eq('daily_no',DAILY.day_no).maybeSingle().then(function(c){
 DAILYN=(c.data&&c.data.n)||0;renderFeed()}).catch(function(){renderFeed()})
 }).catch(function(){})}
-function wireDaily(){var w=$('#ddwrap');if(w&&typeof scratchMount==='function')scratchMount(w,{key:'dd-deed-'+ymd(new Date()),label:'Today\u2019s Deed.',sub:'No. '+(DAILY?DAILY.day_no:''),reveal:'#ddReveal',onDone:function(){var g=$('#dailyGo');if(g)g.style.display=''}});
+function tail(t){var w=String(t||'').trim().split(/\s+/);return w.slice(-2).join(' ')}
+function wireDaily(){var w=$('#ddwrap');if(w&&typeof scratchMount==='function')scratchMount(w,{key:'dd-deed-'+ymd(new Date()),h1:'A LITTLE GOOD',peek:tail(DAILY?DAILY.act:''),reveal:'#ddReveal',onDone:function(){var g=$('#dailyGo');if(g)g.style.display=''}});
 var b=$('#dailyGo');if(!b)return;b.onclick=function(){
 if(!PROFILE){openJoin();return}
 DAILYLOG=DAILY?DAILY.day_no:0;chainParentLive=null;chainLinkLive=0;chainLink=0;CAMPLOG=null;var _cp1=$('#logcamp');if(_cp1)_cp1.style.display='none';
@@ -6530,7 +6539,7 @@ J('vsRef').textContent=(String(VS.ref||'')+' \u00B7 '+String(VS.tr||'WEB')).toUp
 var hl=J('vsLine');hl.textContent=String(VS.house_line||'');hl.style.display=VS.house_line?'':'none';
 var bc=parseRef(VS.ref),rb=J('vsRead');if(bc)rb.onclick=function(){openReader(bc.b,bc.c,bc.v)};
 card.style.display='';
-if(typeof window.scratchMount==='function')window.scratchMount(J('vswrap'),{key:'dd-verse-'+vsYmd(),label:'Today\u2019s Verse.',sub:vsDay(),reveal:'#vsReveal',onDone:function(){if(bc)rb.style.display=''}});
+if(typeof window.scratchMount==='function')window.scratchMount(J('vswrap'),{key:'dd-verse-'+vsYmd(),h1:'A MOMENT|OF WISDOM',peek:(function(t){var w=String(t||'').trim().split(/\s+/);return w.slice(-2).join(' ')})(J('vsText')?J('vsText').textContent:''),reveal:'#vsReveal',onDone:function(){if(bc)rb.style.display=''}});
 else{J('vswrap').classList.add('done');if(bc)rb.style.display=''}
 }).catch(function(){})}
 function renderShelf(){var pg=J('pg-read');if(!pg)return;loadRL();loadVerse();
