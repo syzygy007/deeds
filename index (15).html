@@ -3,36 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Deedable. Someone left you an Artifact.</title>
-<meta name="description" content="Sealed until you open it. Crack it on DEEDS.">
+<title>Deedable. Someone invited you.</title>
+<meta name="description" content="Anonymous acts of kindness, person to person.">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deedable.">
-<meta property="og:url" content="https://deedable.fun/artifact.html">
-<meta property="og:title" content="Someone left you an Artifact.">
-<meta property="og:description" content="Sealed until you open it. Crack it on Deedable.">
-<meta property="og:image" content="https://deedable.fun/artifact-og.jpg">
+<meta property="og:url" content="https://deedable.fun/invite/">
+<meta property="og:title" content="Someone invited you to Deedable.">
+<meta property="og:description" content="Anonymous acts of kindness, person to person.">
+<meta property="og:image" content="https://deedable.fun/invite-og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A sealed golden egg. Someone left you something on Deedable.">
+<meta property="og:image:alt" content="An invitation to Deedable">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Someone left you an Artifact.">
-<meta name="twitter:description" content="Sealed until you open it. Crack it on Deedable.">
-<meta name="twitter:image" content="https://deedable.fun/artifact-og.jpg">
+<meta name="twitter:title" content="Someone invited you to Deedable.">
+<meta name="twitter:description" content="Anonymous acts of kindness, person to person.">
+<meta name="twitter:image" content="https://deedable.fun/invite-og.jpg">
 
 <link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/icon-180.png">
 
 <script>
 /* Crawlers never run this. They read the meta above and stop.
-   A human is moved straight into the app with the post id
-   carried across untouched, and the app opens the wall on it. */
+   A human gets moved straight into the app with the sender
+   and the kind carried across untouched. */
 (function(){
   try{
     var qs = window.location.search || '';
-    window.location.replace('/' + qs);
+    window.location.replace('/' + (qs ? qs : '?k=invite'));
   }catch(e){}
 })();
 </script>
@@ -52,16 +52,17 @@
   p{color:rgba(246,243,235,.66);font-size:15px;line-height:1.6;margin-top:18px}
   a.go{display:inline-block;margin-top:30px;background:var(--ivory);color:var(--ink);
        text-decoration:none;font-weight:800;font-size:15px;padding:15px 30px;border-radius:999px}
-  .egg{width:96px;height:auto;display:block;margin:26px auto 0}
+  .dmark{font-size:64px;font-weight:800;letter-spacing:-.02em;margin-top:26px}
+  .dmark b{color:var(--sage)}
 </style>
 </head>
 <body>
   <div class="card">
     <div class="word">DEEDS<b>.</b></div>
-    <div class="micro">AN ARTIFACT &middot; SEALED FOR YOU</div>
-    <h1>Someone left you something<b>.</b></h1>
-    <p>It stays sealed until you open it. No account needed to crack it, and you will never be told who sent it unless they say so themselves.</p>
-    <img class="egg" src="/egg-frame-sealed.webp" alt="">
+    <div class="micro">AN INVITATION &middot; PERSON TO PERSON</div>
+    <h1>Someone thought of you<b>.</b></h1>
+    <p>No deed attached. No clock. Someone inside DEEDS held the door open for you, and the name you will see is a handle, never a face.</p>
+    <div class="dmark">D<b>.</b></div>
     <a class="go" href="/">Open DEEDS.</a>
   </div>
 </body>
