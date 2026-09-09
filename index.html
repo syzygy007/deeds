@@ -1473,6 +1473,35 @@ body.gsky-on .tab.on{color:#F4F1EA}
 .handchip.on{border-color:var(--forest);box-shadow:inset 0 0 0 1px var(--forest)}
 .handchip .hs{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .handchip .hn{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* ============ DEEDABLE SKIN (Sep 9) ============ */
+:root{--ivory:#FFFFFF;--ink:#0B0B0B;--forest:#07854B;--sage:#7FA893;--bone:#F4F2ED;--muted:rgba(11,11,11,.55);--line:rgba(11,11,11,.11)}
+body{background:#FFFFFF}
+.dmark{display:block;height:auto;overflow:visible;width:100%}
+.dword .dmark{width:124px}
+.mword .dmark{width:92px}
+.th-word .dmark{width:104px}
+.lword .dmark{width:140px}
+.sword .dmark{width:86px}
+.sheet .sword,.modal .sword{display:flex;align-items:center}
+.mtop{background:rgba(255,255,255,.94)}
+.tabs{background:rgba(255,255,255,.96)}
+.tab{color:rgba(11,11,11,.42)}
+.tab.on{color:var(--ink)}
+.tab-log{background:var(--ink);color:#FFFFFF;box-shadow:0 10px 24px rgba(0,0,0,.20)}
+.dlog,.llog{background:var(--ink);color:#FFFFFF;border-color:var(--ink)}
+.mbtn,.chbtn,.logbtn,.jn-btn{background:var(--ink);color:#FFFFFF;letter-spacing:-.01em}
+.joinbtn{border-color:var(--ink);color:var(--ink)}
+.dcbtns button{border-color:rgba(11,11,11,.22);color:var(--ink)}
+.dcbtns button.pri{background:var(--ink);color:#FFFFFF;border-color:var(--ink)}
+.dcount .dn,.markcard .mn{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;letter-spacing:-.05em}
+.dcount .dn b,.markcard .mn b{color:var(--forest)}
+.lcov.iv{background:var(--bone)}
+.lcov.fo{background:#141414;border-color:#141414}
+.biblecov{background:#141414}
+.biblecov .bc-title{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;letter-spacing:-.04em}
+.biblecov .bc-title b,.biblecov .bc-line{color:#0FA35F}
+.biblecov .bc-mic{color:rgba(255,255,255,.6)}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1482,10 +1511,11 @@ body.gsky-on .tab.on{color:#F4F1EA}
 <meta name="apple-mobile-web-app-title" content="DEEDS.">
 </head>
 <body>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;left:-9999px"><symbol id="dblmark" viewBox="0 22 412 121"><path id="wordmark" fill="currentColor" fill-rule="evenodd" d="M 12.984 127.292 C 5.717 117.471 25.657 91.385 49.081 80.069 C 55.270 77.079 59.571 76.975 64.143 79.705 C 65.816 80.705 67.301 81.386 67.441 81.219 C 67.582 81.052 71.882 75.401 76.997 68.660 C 94.046 46.191 98.480 40.941 101.171 40.032 C 104.483 38.914 106.962 39.542 108.347 41.853 C 109.785 44.252 108.827 45.747 96.879 59.750 C 79.883 79.670 63.476 104.383 61.416 113.163 C 60.510 117.028 62.576 116.839 70.159 112.363 C 75.634 109.131 76.978 107.690 80.003 101.812 C 88.372 85.550 102.555 74.204 113.427 75.074 C 119.093 75.527 121.603 78.699 120.574 84.103 C 119.265 90.974 104.490 102.781 93.680 105.594 C 87.575 107.183 87.038 107.718 86.742 112.497 C 86.523 116.054 86.742 116.468 89.096 116.929 C 92.054 117.510 104.852 112.257 110.800 108.023 C 113.274 106.261 115.075 103.900 115.836 101.419 C 118.594 92.436 131.644 78.411 140.234 75.199 C 149.679 71.668 156.571 75.961 154.548 84.114 C 153.511 88.292 142.399 97.415 134.456 100.611 C 130.630 102.150 126.848 103.681 126.051 104.015 C 124.324 104.738 122.718 109.935 123.845 111.153 C 125.134 112.545 132.698 109.970 140.187 105.590 C 144.026 103.346 153.121 96.249 160.398 89.821 C 175.792 76.222 178.372 74.798 185.165 76.146 C 189.970 77.100 189.974 77.098 192.322 73.087 C 203.787 53.500 208.975 45.350 213.060 40.509 C 218.860 33.636 221.519 32.208 225.288 33.943 C 229.826 36.031 228.781 39.061 219.337 51.210 C 214.573 57.339 208.207 65.967 205.191 70.382 C 195.766 84.182 186.148 105.374 188.270 107.665 C 189.851 109.372 197.580 102.961 212.252 87.771 C 223.612 76.010 231.473 73.219 237.359 78.857 C 238.381 79.836 240.576 80.746 242.238 80.879 C 247.835 81.327 247.938 83.711 242.788 93.623 C 237.922 102.988 236.178 107.894 237.673 108.014 C 240.966 108.277 263.470 82.330 270.924 69.674 C 277.900 57.831 289.739 41.389 292.049 40.338 C 296.214 38.442 301.000 40.520 301.000 44.223 C 301.000 45.182 295.938 52.287 289.750 60.012 C 277.934 74.766 271.332 84.372 272.295 85.412 C 272.611 85.753 274.361 85.032 276.184 83.810 C 278.008 82.588 281.471 80.756 283.880 79.738 C 294.260 75.352 301.222 83.451 296.487 94.405 C 295.655 96.330 295.174 98.122 295.420 98.387 C 295.665 98.651 298.217 97.774 301.091 96.437 C 305.827 94.233 306.750 93.196 310.937 85.375 C 319.305 69.743 334.427 49.752 341.916 44.420 C 346.645 41.053 351.179 41.084 353.443 44.498 C 354.299 45.789 355.000 47.575 355.000 48.467 C 355.000 52.159 344.901 64.540 321.147 89.972 C 313.005 98.689 307.316 113.618 311.413 115.518 C 314.798 117.088 333.999 108.476 334.001 105.387 C 334.003 101.926 340.563 91.523 345.741 86.769 C 357.090 76.351 367.483 73.773 372.586 80.113 C 376.950 85.534 375.284 90.956 367.284 97.373 C 361.582 101.947 352.685 105.922 347.163 106.363 C 343.049 106.692 342.044 108.013 342.014 113.136 C 341.968 120.722 358.974 116.858 376.018 105.409 C 380.970 102.082 382.311 101.599 383.524 102.702 C 385.900 104.864 385.295 106.274 380.069 110.744 C 369.859 119.478 354.556 126.370 346.775 125.738 C 342.533 125.394 337.512 121.892 335.526 117.893 L 333.955 114.729 L 326.508 119.311 C 320.035 123.293 318.294 123.887 313.209 123.848 C 307.636 123.805 307.231 123.642 304.679 120.405 C 302.372 117.479 302.000 116.099 302.000 110.476 C 302.000 104.653 301.810 104.008 300.250 104.516 C 299.288 104.829 296.184 105.714 293.353 106.482 C 289.844 107.433 286.827 109.263 283.876 112.229 C 278.689 117.441 272.863 121.096 267.727 122.359 C 264.398 123.177 263.554 123.019 260.554 121.008 C 257.753 119.132 257.057 118.973 256.608 120.108 C 255.855 122.009 253.633 121.648 251.655 119.304 C 249.440 116.679 249.560 115.009 252.458 108.107 C 255.446 100.993 254.787 101.066 248.115 108.587 C 240.403 117.279 235.826 118.783 231.455 114.062 C 229.516 111.968 229.000 110.380 229.000 106.506 L 229.000 101.602 L 219.641 110.212 C 211.409 117.786 209.862 118.789 206.796 118.544 C 203.294 118.264 200.923 116.316 199.672 112.694 C 199.107 111.059 198.489 111.198 193.908 113.982 C 187.971 117.591 186.255 117.676 182.635 114.538 C 180.403 112.604 179.996 111.463 179.975 107.075 L 179.950 101.896 L 171.841 110.041 C 160.580 121.352 156.315 122.911 151.336 117.533 C 149.246 115.277 148.867 114.118 149.318 111.372 C 149.624 109.512 149.647 107.972 149.370 107.950 C 149.092 107.927 146.308 109.796 143.183 112.103 C 130.848 121.205 121.532 122.238 116.041 115.113 C 114.562 113.193 114.278 113.279 109.000 117.227 C 97.585 125.765 86.736 127.858 81.509 122.529 C 80.148 121.142 78.778 119.177 78.464 118.162 C 77.963 116.544 77.097 116.799 71.383 120.254 C 60.169 127.034 52.248 124.189 53.324 113.766 C 53.605 111.038 54.170 107.934 54.580 106.866 C 54.990 105.799 50.147 109.540 43.819 115.178 C 25.908 131.138 18.100 134.205 12.984 127.292 Z M 32.568 113.499 C 48.471 102.119 62.439 88.503 59.975 86.782 C 55.209 83.456 35.537 97.766 26.335 111.255 C 19.102 121.859 20.288 122.286 32.568 113.499 Z M 170.627 100.400 C 181.890 89.683 185.529 85.287 184.014 84.230 C 180.857 82.026 168.313 93.138 161.670 104.021 C 156.340 112.754 158.607 111.838 170.627 100.400 Z M 227.631 92.768 C 236.915 83.338 232.935 81.123 222.496 89.910 C 217.616 94.018 210.000 104.124 210.000 106.491 C 210.000 108.427 219.472 101.055 227.631 92.768 Z M 102.646 92.699 C 113.418 85.453 116.980 79.250 107.661 83.966 C 101.481 87.093 91.695 97.336 94.661 97.573 C 95.025 97.602 98.618 95.409 102.646 92.699 Z M 266.862 107.942 C 269.647 106.291 274.080 104.395 276.713 103.730 C 280.567 102.756 282.085 101.648 284.500 98.047 C 292.266 86.468 291.414 83.272 281.974 88.575 C 276.420 91.694 267.428 100.168 263.669 105.824 C 259.592 111.959 259.826 112.114 266.862 107.942 Z M 142.129 87.528 C 147.437 83.220 148.093 81.847 144.963 81.597 C 142.742 81.419 131.000 91.290 131.000 93.336 C 131.000 95.099 136.040 92.469 142.129 87.528 Z M 356.941 94.436 C 365.358 89.488 368.935 84.131 362.858 85.574 C 360.429 86.150 349.000 95.633 349.000 97.072 C 349.000 98.654 350.758 98.070 356.941 94.436 Z"/> <circle id="period" cx="391" cy="122" r="9.5" fill="#07854B"/></symbol></svg>
 
 <!-- THRESHOLD -->
 <div id="threshold">
-  <div class="th-word">DEEDS<b>.</b></div>
+  <div class="th-word"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <div class="th-frame"><canvas id="heroPaint" width="1760" height="1150"></canvas></div>
   <div class="th-copy">
     <div class="th-eyebrow micro">A Living Record Of Anonymous Acts</div>
@@ -1503,7 +1533,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 <!-- DESKTOP TOP BAR v4 -->
 <header class="dtop">
   <div class="dtop-in">
-    <div class="dword" data-go="feed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 412 121" role="img" aria-label="deedable"> <path fill="currentColor" fill-rule="evenodd" d="M 12.984 127.292 C 5.717 117.471 25.657 91.385 49.081 80.069 C 55.270 77.079 59.571 76.975 64.143 79.705 C 65.816 80.705 67.301 81.386 67.441 81.219 C 67.582 81.052 71.882 75.401 76.997 68.660 C 94.046 46.191 98.480 40.941 101.171 40.032 C 104.483 38.914 106.962 39.542 108.347 41.853 C 109.785 44.252 108.827 45.747 96.879 59.750 C 79.883 79.670 63.476 104.383 61.416 113.163 C 60.510 117.028 62.576 116.839 70.159 112.363 C 75.634 109.131 76.978 107.690 80.003 101.812 C 88.372 85.550 102.555 74.204 113.427 75.074 C 119.093 75.527 121.603 78.699 120.574 84.103 C 119.265 90.974 104.490 102.781 93.680 105.594 C 87.575 107.183 87.038 107.718 86.742 112.497 C 86.523 116.054 86.742 116.468 89.096 116.929 C 92.054 117.510 104.852 112.257 110.800 108.023 C 113.274 106.261 115.075 103.900 115.836 101.419 C 118.594 92.436 131.644 78.411 140.234 75.199 C 149.679 71.668 156.571 75.961 154.548 84.114 C 153.511 88.292 142.399 97.415 134.456 100.611 C 130.630 102.150 126.848 103.681 126.051 104.015 C 124.324 104.738 122.718 109.935 123.845 111.153 C 125.134 112.545 132.698 109.970 140.187 105.590 C 144.026 103.346 153.121 96.249 160.398 89.821 C 175.792 76.222 178.372 74.798 185.165 76.146 C 189.970 77.100 189.974 77.098 192.322 73.087 C 203.787 53.500 208.975 45.350 213.060 40.509 C 218.860 33.636 221.519 32.208 225.288 33.943 C 229.826 36.031 228.781 39.061 219.337 51.210 C 214.573 57.339 208.207 65.967 205.191 70.382 C 195.766 84.182 186.148 105.374 188.270 107.665 C 189.851 109.372 197.580 102.961 212.252 87.771 C 223.612 76.010 231.473 73.219 237.359 78.857 C 238.381 79.836 240.576 80.746 242.238 80.879 C 247.835 81.327 247.938 83.711 242.788 93.623 C 237.922 102.988 236.178 107.894 237.673 108.014 C 240.966 108.277 263.470 82.330 270.924 69.674 C 277.900 57.831 289.739 41.389 292.049 40.338 C 296.214 38.442 301.000 40.520 301.000 44.223 C 301.000 45.182 295.938 52.287 289.750 60.012 C 277.934 74.766 271.332 84.372 272.295 85.412 C 272.611 85.753 274.361 85.032 276.184 83.810 C 278.008 82.588 281.471 80.756 283.880 79.738 C 294.260 75.352 301.222 83.451 296.487 94.405 C 295.655 96.330 295.174 98.122 295.420 98.387 C 295.665 98.651 298.217 97.774 301.091 96.437 C 305.827 94.233 306.750 93.196 310.937 85.375 C 319.305 69.743 334.427 49.752 341.916 44.420 C 346.645 41.053 351.179 41.084 353.443 44.498 C 354.299 45.789 355.000 47.575 355.000 48.467 C 355.000 52.159 344.901 64.540 321.147 89.972 C 313.005 98.689 307.316 113.618 311.413 115.518 C 314.798 117.088 333.999 108.476 334.001 105.387 C 334.003 101.926 340.563 91.523 345.741 86.769 C 357.090 76.351 367.483 73.773 372.586 80.113 C 376.950 85.534 375.284 90.956 367.284 97.373 C 361.582 101.947 352.685 105.922 347.163 106.363 C 343.049 106.692 342.044 108.013 342.014 113.136 C 341.968 120.722 358.974 116.858 376.018 105.409 C 380.970 102.082 382.311 101.599 383.524 102.702 C 385.900 104.864 385.295 106.274 380.069 110.744 C 369.859 119.478 354.556 126.370 346.775 125.738 C 342.533 125.394 337.512 121.892 335.526 117.893 L 333.955 114.729 L 326.508 119.311 C 320.035 123.293 318.294 123.887 313.209 123.848 C 307.636 123.805 307.231 123.642 304.679 120.405 C 302.372 117.479 302.000 116.099 302.000 110.476 C 302.000 104.653 301.810 104.008 300.250 104.516 C 299.288 104.829 296.184 105.714 293.353 106.482 C 289.844 107.433 286.827 109.263 283.876 112.229 C 278.689 117.441 272.863 121.096 267.727 122.359 C 264.398 123.177 263.554 123.019 260.554 121.008 C 257.753 119.132 257.057 118.973 256.608 120.108 C 255.855 122.009 253.633 121.648 251.655 119.304 C 249.440 116.679 249.560 115.009 252.458 108.107 C 255.446 100.993 254.787 101.066 248.115 108.587 C 240.403 117.279 235.826 118.783 231.455 114.062 C 229.516 111.968 229.000 110.380 229.000 106.506 L 229.000 101.602 L 219.641 110.212 C 211.409 117.786 209.862 118.789 206.796 118.544 C 203.294 118.264 200.923 116.316 199.672 112.694 C 199.107 111.059 198.489 111.198 193.908 113.982 C 187.971 117.591 186.255 117.676 182.635 114.538 C 180.403 112.604 179.996 111.463 179.975 107.075 L 179.950 101.896 L 171.841 110.041 C 160.580 121.352 156.315 122.911 151.336 117.533 C 149.246 115.277 148.867 114.118 149.318 111.372 C 149.624 109.512 149.647 107.972 149.370 107.950 C 149.092 107.927 146.308 109.796 143.183 112.103 C 130.848 121.205 121.532 122.238 116.041 115.113 C 114.562 113.193 114.278 113.279 109.000 117.227 C 97.585 125.765 86.736 127.858 81.509 122.529 C 80.148 121.142 78.778 119.177 78.464 118.162 C 77.963 116.544 77.097 116.799 71.383 120.254 C 60.169 127.034 52.248 124.189 53.324 113.766 C 53.605 111.038 54.170 107.934 54.580 106.866 C 54.990 105.799 50.147 109.540 43.819 115.178 C 25.908 131.138 18.100 134.205 12.984 127.292 Z M 32.568 113.499 C 48.471 102.119 62.439 88.503 59.975 86.782 C 55.209 83.456 35.537 97.766 26.335 111.255 C 19.102 121.859 20.288 122.286 32.568 113.499 Z M 170.627 100.400 C 181.890 89.683 185.529 85.287 184.014 84.230 C 180.857 82.026 168.313 93.138 161.670 104.021 C 156.340 112.754 158.607 111.838 170.627 100.400 Z M 227.631 92.768 C 236.915 83.338 232.935 81.123 222.496 89.910 C 217.616 94.018 210.000 104.124 210.000 106.491 C 210.000 108.427 219.472 101.055 227.631 92.768 Z M 102.646 92.699 C 113.418 85.453 116.980 79.250 107.661 83.966 C 101.481 87.093 91.695 97.336 94.661 97.573 C 95.025 97.602 98.618 95.409 102.646 92.699 Z M 266.862 107.942 C 269.647 106.291 274.080 104.395 276.713 103.730 C 280.567 102.756 282.085 101.648 284.500 98.047 C 292.266 86.468 291.414 83.272 281.974 88.575 C 276.420 91.694 267.428 100.168 263.669 105.824 C 259.592 111.959 259.826 112.114 266.862 107.942 Z M 142.129 87.528 C 147.437 83.220 148.093 81.847 144.963 81.597 C 142.742 81.419 131.000 91.290 131.000 93.336 C 131.000 95.099 136.040 92.469 142.129 87.528 Z M 356.941 94.436 C 365.358 89.488 368.935 84.131 362.858 85.574 C 360.429 86.150 349.000 95.633 349.000 97.072 C 349.000 98.654 350.758 98.070 356.941 94.436 Z"/> <circle cx="391" cy="122" r="9.5" fill="#07854B"/> </svg></div>
+    <div class="dword" data-go="feed"><svg class="dmark"><use href="#dblmark"></use></svg></div>
     <nav class="dnav">
       <button data-go="feed" class="on">Deeds.</button>
       <button data-go="read">Read.</button>
@@ -1531,7 +1561,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 
   <!-- LEFT RAIL (desktop) -->
   <aside class="rail-l">
-    <div class="lword" data-go="feed">DEEDS<b>.</b></div>
+    <div class="lword" data-go="feed"><svg class="dmark"><use href="#dblmark"></use></svg></div>
     <nav class="lnav">
       <button data-go="feed" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Deeds.</button>
       <button data-go="read"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.4C10.2 4 7.7 3.3 4 3.3v15.5c3.7 0 6.2.7 8 2 1.8-1.3 4.3-2 8-2V3.3c-3.7 0-6.2.7-8 2.1z"/><path d="M12 5.4v15.4"/></svg>Read.</button>
@@ -1547,7 +1577,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <!-- CENTER -->
   <main class="colmain">
     <div class="mtop">
-      <div class="mword" data-go="feed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 412 121" role="img" aria-label="deedable"> <path fill="currentColor" fill-rule="evenodd" d="M 12.984 127.292 C 5.717 117.471 25.657 91.385 49.081 80.069 C 55.270 77.079 59.571 76.975 64.143 79.705 C 65.816 80.705 67.301 81.386 67.441 81.219 C 67.582 81.052 71.882 75.401 76.997 68.660 C 94.046 46.191 98.480 40.941 101.171 40.032 C 104.483 38.914 106.962 39.542 108.347 41.853 C 109.785 44.252 108.827 45.747 96.879 59.750 C 79.883 79.670 63.476 104.383 61.416 113.163 C 60.510 117.028 62.576 116.839 70.159 112.363 C 75.634 109.131 76.978 107.690 80.003 101.812 C 88.372 85.550 102.555 74.204 113.427 75.074 C 119.093 75.527 121.603 78.699 120.574 84.103 C 119.265 90.974 104.490 102.781 93.680 105.594 C 87.575 107.183 87.038 107.718 86.742 112.497 C 86.523 116.054 86.742 116.468 89.096 116.929 C 92.054 117.510 104.852 112.257 110.800 108.023 C 113.274 106.261 115.075 103.900 115.836 101.419 C 118.594 92.436 131.644 78.411 140.234 75.199 C 149.679 71.668 156.571 75.961 154.548 84.114 C 153.511 88.292 142.399 97.415 134.456 100.611 C 130.630 102.150 126.848 103.681 126.051 104.015 C 124.324 104.738 122.718 109.935 123.845 111.153 C 125.134 112.545 132.698 109.970 140.187 105.590 C 144.026 103.346 153.121 96.249 160.398 89.821 C 175.792 76.222 178.372 74.798 185.165 76.146 C 189.970 77.100 189.974 77.098 192.322 73.087 C 203.787 53.500 208.975 45.350 213.060 40.509 C 218.860 33.636 221.519 32.208 225.288 33.943 C 229.826 36.031 228.781 39.061 219.337 51.210 C 214.573 57.339 208.207 65.967 205.191 70.382 C 195.766 84.182 186.148 105.374 188.270 107.665 C 189.851 109.372 197.580 102.961 212.252 87.771 C 223.612 76.010 231.473 73.219 237.359 78.857 C 238.381 79.836 240.576 80.746 242.238 80.879 C 247.835 81.327 247.938 83.711 242.788 93.623 C 237.922 102.988 236.178 107.894 237.673 108.014 C 240.966 108.277 263.470 82.330 270.924 69.674 C 277.900 57.831 289.739 41.389 292.049 40.338 C 296.214 38.442 301.000 40.520 301.000 44.223 C 301.000 45.182 295.938 52.287 289.750 60.012 C 277.934 74.766 271.332 84.372 272.295 85.412 C 272.611 85.753 274.361 85.032 276.184 83.810 C 278.008 82.588 281.471 80.756 283.880 79.738 C 294.260 75.352 301.222 83.451 296.487 94.405 C 295.655 96.330 295.174 98.122 295.420 98.387 C 295.665 98.651 298.217 97.774 301.091 96.437 C 305.827 94.233 306.750 93.196 310.937 85.375 C 319.305 69.743 334.427 49.752 341.916 44.420 C 346.645 41.053 351.179 41.084 353.443 44.498 C 354.299 45.789 355.000 47.575 355.000 48.467 C 355.000 52.159 344.901 64.540 321.147 89.972 C 313.005 98.689 307.316 113.618 311.413 115.518 C 314.798 117.088 333.999 108.476 334.001 105.387 C 334.003 101.926 340.563 91.523 345.741 86.769 C 357.090 76.351 367.483 73.773 372.586 80.113 C 376.950 85.534 375.284 90.956 367.284 97.373 C 361.582 101.947 352.685 105.922 347.163 106.363 C 343.049 106.692 342.044 108.013 342.014 113.136 C 341.968 120.722 358.974 116.858 376.018 105.409 C 380.970 102.082 382.311 101.599 383.524 102.702 C 385.900 104.864 385.295 106.274 380.069 110.744 C 369.859 119.478 354.556 126.370 346.775 125.738 C 342.533 125.394 337.512 121.892 335.526 117.893 L 333.955 114.729 L 326.508 119.311 C 320.035 123.293 318.294 123.887 313.209 123.848 C 307.636 123.805 307.231 123.642 304.679 120.405 C 302.372 117.479 302.000 116.099 302.000 110.476 C 302.000 104.653 301.810 104.008 300.250 104.516 C 299.288 104.829 296.184 105.714 293.353 106.482 C 289.844 107.433 286.827 109.263 283.876 112.229 C 278.689 117.441 272.863 121.096 267.727 122.359 C 264.398 123.177 263.554 123.019 260.554 121.008 C 257.753 119.132 257.057 118.973 256.608 120.108 C 255.855 122.009 253.633 121.648 251.655 119.304 C 249.440 116.679 249.560 115.009 252.458 108.107 C 255.446 100.993 254.787 101.066 248.115 108.587 C 240.403 117.279 235.826 118.783 231.455 114.062 C 229.516 111.968 229.000 110.380 229.000 106.506 L 229.000 101.602 L 219.641 110.212 C 211.409 117.786 209.862 118.789 206.796 118.544 C 203.294 118.264 200.923 116.316 199.672 112.694 C 199.107 111.059 198.489 111.198 193.908 113.982 C 187.971 117.591 186.255 117.676 182.635 114.538 C 180.403 112.604 179.996 111.463 179.975 107.075 L 179.950 101.896 L 171.841 110.041 C 160.580 121.352 156.315 122.911 151.336 117.533 C 149.246 115.277 148.867 114.118 149.318 111.372 C 149.624 109.512 149.647 107.972 149.370 107.950 C 149.092 107.927 146.308 109.796 143.183 112.103 C 130.848 121.205 121.532 122.238 116.041 115.113 C 114.562 113.193 114.278 113.279 109.000 117.227 C 97.585 125.765 86.736 127.858 81.509 122.529 C 80.148 121.142 78.778 119.177 78.464 118.162 C 77.963 116.544 77.097 116.799 71.383 120.254 C 60.169 127.034 52.248 124.189 53.324 113.766 C 53.605 111.038 54.170 107.934 54.580 106.866 C 54.990 105.799 50.147 109.540 43.819 115.178 C 25.908 131.138 18.100 134.205 12.984 127.292 Z M 32.568 113.499 C 48.471 102.119 62.439 88.503 59.975 86.782 C 55.209 83.456 35.537 97.766 26.335 111.255 C 19.102 121.859 20.288 122.286 32.568 113.499 Z M 170.627 100.400 C 181.890 89.683 185.529 85.287 184.014 84.230 C 180.857 82.026 168.313 93.138 161.670 104.021 C 156.340 112.754 158.607 111.838 170.627 100.400 Z M 227.631 92.768 C 236.915 83.338 232.935 81.123 222.496 89.910 C 217.616 94.018 210.000 104.124 210.000 106.491 C 210.000 108.427 219.472 101.055 227.631 92.768 Z M 102.646 92.699 C 113.418 85.453 116.980 79.250 107.661 83.966 C 101.481 87.093 91.695 97.336 94.661 97.573 C 95.025 97.602 98.618 95.409 102.646 92.699 Z M 266.862 107.942 C 269.647 106.291 274.080 104.395 276.713 103.730 C 280.567 102.756 282.085 101.648 284.500 98.047 C 292.266 86.468 291.414 83.272 281.974 88.575 C 276.420 91.694 267.428 100.168 263.669 105.824 C 259.592 111.959 259.826 112.114 266.862 107.942 Z M 142.129 87.528 C 147.437 83.220 148.093 81.847 144.963 81.597 C 142.742 81.419 131.000 91.290 131.000 93.336 C 131.000 95.099 136.040 92.469 142.129 87.528 Z M 356.941 94.436 C 365.358 89.488 368.935 84.131 362.858 85.574 C 360.429 86.150 349.000 95.633 349.000 97.072 C 349.000 98.654 350.758 98.070 356.941 94.436 Z"/> <circle cx="391" cy="122" r="9.5" fill="#07854B"/> </svg></div>
+      <div class="mword" data-go="feed"><svg class="dmark"><use href="#dblmark"></use></svg></div>
       <div style="display:flex;align-items:center;gap:18px">
         <button class="cbtn hide" id="mCoin" aria-label="Deedcoins" title="Deedcoins."><img src="deedcoin.webp" alt=""><b id="mCoinN"></b></button>
         <button id="mNotes" class="nbtn" aria-label="Notes" title="Notes."><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7.5l9 6 9-6"/></svg><span class="ndot"></span></button>
@@ -1560,7 +1590,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
       <div class="searchwrap" id="searchwrap"><input id="searchin" type="search" placeholder="Search deeds, people, organizations." autocomplete="off"></div>
       <div id="pplres" style="display:none"></div>
       <div class="markcard" id="markcard" style="display:none"></div>
-      <div class="dcount" id="dcount" style="display:none"><div class="micro" style="color:var(--forest)">Deeds Done On DEEDS.</div><div class="dn"><span id="dcn">0</span><b>.</b></div><div class="dbar"><i id="dcbar" style="width:0"></i></div><div class="dsub" id="dcsub"></div><p class="dcall">Anonymous good, done by people who did not sign their names. Help us do more.</p><div class="dcbtns"><button id="dcInv">Invite Someone.</button><button class="pri" id="dcLog">Log a Deed.</button></div></div>
+      <div class="dcount" id="dcount" style="display:none"><div class="micro" style="color:var(--forest)">Deeds Done On Deedable.</div><div class="dn"><span id="dcn">0</span><b>.</b></div><div class="dbar"><i id="dcbar" style="width:0"></i></div><div class="dsub" id="dcsub"></div><p class="dcall">Anonymous good, done by people who did not sign their names. Help us do more.</p><div class="dcbtns"><button id="dcInv">Invite Someone.</button><button class="pri" id="dcLog">Log a Deed.</button></div></div>
       <div class="post" id="pwacard"><div class="micro" style="color:var(--forest)" id="pwamicro">The App</div>
         <p class="pwline" id="pwline">Put DEEDS. on your Home Screen.</p>
         <div style="display:flex;gap:12px;align-items:center;margin-top:9px">
@@ -1934,7 +1964,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 
 <!-- OVERLAYS -->
 <div class="sheet" id="appsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Put DEEDS. on your phone.</h3>
   <p class="remnote" style="margin-top:0">The full app. No app store.</p>
   <ol class="appsteps" id="appSteps"></ol>
@@ -1942,14 +1972,14 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <p class="remnote">Inside the app, sign in with the same email. One code, same profile.</p>
 </div>
 <div class="sheet" id="qrsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Your Tree.</h3>
   <p class="remnote" style="margin:0 0 10px">Every leaf is a piece of the link. Point a camera at it and you are followed.</p>
   <div class="qrart" id="qrart"></div>
   <div class="qrfoot"><button class="fbtn" id="qrSave" type="button">Save it.</button><button class="fbtn on" id="qrShare" type="button">Share it.</button></div>
 </div>
 <div class="sheet" id="avsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="avsName">Your Avatar.</h3>
   <div class="avstage" id="avStage"></div>
   <div class="avcounts" id="avCounts"></div>
@@ -2003,18 +2033,18 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <button id="vbClear" class="dim">Clear.</button>
 </div>
 <div class="sheet" id="picksheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="pkH">The Word.</h3>
   <div id="pkBody"></div>
 </div>
 <div class="sheet" id="fortysheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>The Forty.</h3>
   <div class="wd-sub">Forty passages that move. Skip between the peaks.</div>
   <div id="foList"></div>
 </div>
 <div class="sheet" id="findsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Search the Word.</h3>
   <div class="wd-sub">Every verse of the whole Bible.</div>
   <input class="chfield" id="fsQ" placeholder="A word or a phrase." autocomplete="off">
@@ -2022,7 +2052,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <div id="fsList"></div>
 </div>
 <div class="sheet" id="cardsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>The Card.</h3>
   <canvas id="cardcv" width="1080" height="1350"></canvas>
   <div class="logrow"><button class="lchip on" id="ccIvory">Ivory.</button><button class="lchip" id="ccForest">Forest.</button></div>
@@ -2030,7 +2060,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="memsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="mmTitle">Share as a Memory.</h3>
   <canvas id="memcv" width="1080" height="1350"></canvas>
   <div class="logrow" id="mmChips" style="margin-top:0"></div>
@@ -2038,7 +2068,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <div class="logrow" style="margin-top:12px"><button class="wbtn" id="mmShare">Share It.</button></div>
 </div>
 <div class="sheet" id="redeedsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Redeed It.</h3>
   <div class="chaintag" id="rdCount"></div>
   <p class="p-body" id="rdBody" style="margin:10px 0 4px"></p>
@@ -2047,7 +2077,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <div class="logrow" style="margin-top:12px"><button class="wbtn ghost" id="rdSend">Send It As A Challenge.</button><button class="wbtn" id="rdGo">REDEED IT.</button></div>
 </div>
 <div class="sheet" id="whysheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Not For Followers.</h3>
   <p class="p-body" style="margin:10px 0 4px">We said it. Then we built a follow button. Both are true.</p>
   <p class="chnote">You are anonymous here. A follower cannot follow your face, your name, or your life. They can only follow what you do. So the number under a handle does not measure how liked someone is. It measures how far their good reaches.</p>
@@ -2055,7 +2085,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
   <p class="chnote" style="font-weight:800">Not for recognition. Not for followers. For the next deed.</p>
 </div>
 <div class="sheet" id="notepick">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>The Study.</h3>
   <div id="nsList"></div>
   <div class="logrow" style="margin-top:12px"><input class="chfield" id="nsNew" placeholder="Name a new study." style="flex:1"><button class="wbtn" id="nsMake">Make It.</button></div>
@@ -2063,7 +2093,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="noteview">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="nvTitle">The Study.</h3>
   <div class="micro" id="nvMeta" style="margin-bottom:6px"></div>
   <div id="nvList"></div>
@@ -2072,13 +2102,13 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="versesheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>From the Studies.</h3>
   <div id="vsList"></div>
 </div>
 
 <div class="sheet" id="logsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <div class="modetog" id="modetog"><button id="modeDeed" class="on">DEED.</button><button id="modePost">POST.</button><button id="modeInv">INVITE.</button></div>
   <h3 id="composeH">Log a Deed.</h3>
   <div class="chaintag" id="logchain" style="display:none"></div>
@@ -2155,20 +2185,20 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="cmtsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="cmtcount">Comments.</h3>
   <div id="cmtlist"></div>
   <div class="cmtin"><input id="cmtin" placeholder="Add yours."><button class="chbtn" id="cmtsend">Post.</button></div>
 </div>
 
 <div class="sheet" id="altsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Activity.</h3>
   <div id="altlist"></div>
 </div>
 
 <div class="sheet" id="goodsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <div class="gc-head">
     <div>
       <div class="gc-micro" id="gcMicro">The 2027 List</div>
@@ -2197,7 +2227,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="cxsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="cxTitle">Connections.</h3>
   <p class="remnote" style="margin:-8px 0 12px" id="cxwho"></p>
   <div class="cxtabs" id="cxtabs">
@@ -2215,7 +2245,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="coinsend">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Send Deedcoins.</h3>
   <p class="remnote" style="margin:-8px 0 10px" id="csHint">Pick how many. Then who, and how it travels.</p>
   <div class="csamt"><button type="button" id="csMinus" aria-label="Less">&minus;</button><input id="csAmt" type="number" inputmode="numeric" min="1" step="1" value="50" aria-label="How many Deedcoins"><button type="button" id="csPlus" aria-label="More">+</button></div>
@@ -2225,7 +2255,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="lettersheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <div class="lt-meta"><span class="mono" id="ltWho" role="button" tabindex="0"></span><span class="micro" id="ltWhen"></span></div>
   <div class="lt-kind" id="ltKind"></div>
   <div class="lt-stage" id="ltStage">
@@ -2256,7 +2286,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="notesheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Write a Note.</h3>
   <p class="remnote" style="margin:-8px 0 14px">To <span class="mono" id="notewho"></span>. Only the two of you can read it.</p>
   <div class="modetog nkind" id="nkind"><button class="on" data-nk="sealed">SEALED.</button><button data-nk="ink">DISAPPEARING INK.</button><button data-nk="artifact">ARTIFACT.</button></div>
@@ -2278,14 +2308,14 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="ntopick">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>To Whom.</h3>
   <input class="chfield" id="ntoQ" placeholder="Find a member." autocomplete="off" style="margin-bottom:6px">
   <div id="ntoList"></div>
 </div>
 
 <div class="sheet" id="passsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Pass It On.</h3>
   <button class="sheetrowbtn" id="passchain">Continue the Chain.<small>Do the next act and log it as the next link.</small></button>
   <button class="sheetrowbtn" id="passsecond">Second It.<small>Lift the deed with your words. It stays theirs.</small></button>
@@ -2293,7 +2323,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="moresheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>This Post.</h3>
   <button class="sheetrowbtn" id="moreedit" style="display:none">Edit It.<small>Fix your words. Redeeds keep the copy they carried.</small></button>
   <button class="sheetrowbtn" id="moredelete" style="display:none">Delete It.<small>Gone from DEEDS for good.</small></button>
@@ -2303,7 +2333,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="editsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Fix It.</h3>
   <p class="remnote" style="margin:0 0 10px">Your words only. Redeeds and seconds keep the copy they carried.</p>
   <textarea class="logarea" id="edittext"></textarea>
@@ -2311,7 +2341,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="modal" id="arrive">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3 id="arriveH"></h3>
   <p id="arriveP"></p>
   <div class="dotstrip" id="arriveDots"></div>
@@ -2320,7 +2350,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="tossheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Before you go on.</h3>
   <p class="tosbody">We have published the rules of DEEDS. Nothing about how you use it changes. We need you to say you have seen them.</p>
   <p class="tosbody">You must be 18 or older to hold an account.</p>
@@ -2331,7 +2361,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 <div class="sheet" id="joinsheet" style="position:fixed">
   <button class="jn-x" id="jx" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
   <div class="sword" style="letter-spacing:.18em;color:var(--forest)">DEEDS<b style="color:var(--forest)">.</b></div>
-  <div class="jn-h1">Join DEEDS<b style="color:var(--forest)">.</b></div>
+  <div class="jn-h1">Join Deedable<b style="color:var(--forest)">.</b></div>
   <p class="jn-sub" id="jsub">One text. One code. No password.</p>
   <div class="jn-div"><svg class="jn-star" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0c.5 4.5 3 7 8 8-5 1-7.5 3.5-8 8-.5-4.5-3-7-8-8 5-1 7.5-3.5 8-8z"/></svg></div>
   <div id="jstep1">
@@ -2373,7 +2403,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="welcomesheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <div class="micro" style="color:var(--muted);margin-top:6px">Your Handle</div>
   <h3 style="margin-top:8px">Meet your DEEDS. Handle.</h3>
   <div class="mono" id="wHandle" style="font-size:24px"></div>
@@ -2384,7 +2414,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="sheet" id="orgsheet">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>Set Up an Organization.</h3>
   <p class="remnote" style="margin:0 0 12px">Organizations carry real names. DEEDS. reviews each one. The gold halo means verified.</p>
   <input class="chfield" id="orgFind" placeholder="Find your organization first." autocomplete="off">
@@ -2405,7 +2435,7 @@ body.gsky-on .tab.on{color:#F4F1EA}
 </div>
 
 <div class="modal" id="authfail">
-  <div class="sword">DEEDS<b>.</b></div>
+  <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>The code did not send.</h3>
   <p id="authfailP"></p>
   <div class="mrow" style="margin-top:16px"><button class="mbtn" id="authfailOk">Try Again.</button></div>
@@ -3959,7 +3989,7 @@ var ld=$('#logdaily');if(ld)ld.style.display='none'}})();
 var baseReport=$('#morereport').onclick,baseBlock=$('#moreblock').onclick;
 $('#morereport').onclick=function(){if(morePostLive){var m=morePostLive;morePostLive=null;closeSheets();
 if(sb&&PROFILE){sb.rpc('mod_report',{p_kind:(m._k==='post'?'post':'deed'),p_id:m.id}).then(function(){toast('Reported, quietly. The desk will look.')}).catch(function(){toast('Reported.')})}
-else toast('Join DEEDS to report.');
+else toast('Join Deedable to report.');
 return}
 baseReport&&baseReport()};
 $('#moreblock').onclick=function(){if(morePostLive){var m=morePostLive;morePostLive=null;
