@@ -659,11 +659,6 @@ body.rd-lock{overflow:hidden}body.rd-lock .scrim{z-index:160}body.rd-lock .sheet
 .vv.hl{background:rgba(160,176,164,.4)}
 .vv.sel{background:rgba(31,75,58,.16)}
 .vv.hl.sel{background:rgba(31,75,58,.24)}
-html.dark .vv.hl{background:rgba(111,154,130,.34)}
-html.dark .vv.sel{background:rgba(244,241,234,.16)}
-html.dark .vv.hl.sel{background:rgba(111,154,130,.55)}
-.rd-top>.modeic{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);flex:none}
-.rd-top>.modeic svg{width:16px;height:16px}
 .vv.fl{animation:vfl 1.5s ease 1}
 @keyframes vfl{0%{background:rgba(190,154,78,.42)}100%{background:none}}
 .rd-end{margin:28px 0 10px;display:flex;gap:10px;flex-wrap:wrap;break-inside:avoid}
@@ -1661,6 +1656,97 @@ html.dark .rchip{border-color:rgba(244,241,234,.22)}
  .dhandle{font-size:12px}
 }
 body:not(:has(#pg-profile.on)) .cbtn{display:none!important}
+/* ---- the journal ---- */
+#jnsect{display:none}
+.jn-shelf{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--bone)}
+.jn-icon{width:44px;height:58px;flex:none;border-radius:3px 8px 8px 3px;background:linear-gradient(90deg,#000 0,#000 5px,#1b1a1a 5px,#242322 60%,#161515);position:relative;box-shadow:0 6px 12px rgba(0,0,0,.45)}
+.jn-icon::after{content:"";position:absolute;top:0;bottom:0;right:8px;width:3px;background:#000}
+.jn-icon.sm{width:30px;height:40px}
+.jn-shelf .t{flex:1;min-width:0}
+.jn-shelf b{display:block;font-size:17px;letter-spacing:-.01em;color:var(--ink)}
+.jn-shelf b i{font-style:normal;color:var(--forest)}
+.jn-shelf small{display:block;color:var(--muted);font-size:13px;margin-top:3px;line-height:1.35}
+.jn-buy{flex:none;background:var(--ink);color:var(--ivory);border:0;border-radius:999px;padding:11px 16px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.jn-buy i{font-style:normal;color:var(--forest)}
+html.dark .jn-buy i{color:#7FC79E}
+.jn-coin{font-size:12px;color:var(--muted);padding:0 2px 10px}
+.jn-sheet{margin-top:12px;padding:18px;border-radius:16px;background:var(--ink);color:var(--ivory)}
+.jn-sheet b{font-size:22px;letter-spacing:-.02em;display:block}
+.jn-sheet b i{font-style:normal;color:#7FC79E}
+.jn-sheet p{font-size:13px;opacity:.7;margin:6px 0 14px;line-height:1.4}
+.jn-sheet .row{display:flex;gap:10px}
+.jn-sheet button{flex:1;border:0;border-radius:999px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+.jn-sheet .go{background:var(--ivory);color:var(--ink)}
+.jn-sheet .no{background:none;border:1.5px solid var(--ivory);color:var(--ivory)}
+.jn-owned{display:flex;align-items:center;gap:14px;padding:4px 2px 14px;cursor:pointer}
+.jn-owned small{color:var(--muted);font-size:13px}
+.jn-owned small b{display:block;color:var(--ink);font-size:15px}
+.jn-owned small b i{font-style:normal;color:var(--forest)}
+.jn-leather{position:relative;border-radius:6px 18px 18px 6px;
+  background:radial-gradient(120% 90% at 20% 0%,rgba(255,255,255,.075),transparent 55%),radial-gradient(70% 60% at 90% 100%,rgba(0,0,0,.45),transparent 60%),#141314;
+  box-shadow:0 30px 50px -20px rgba(0,0,0,.8),0 2px 0 #2a2827 inset,0 -1px 0 #000 inset;isolation:isolate}
+.jn-leather::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;filter:url(#jngrain);background:#000;opacity:.55;mix-blend-mode:screen;z-index:0}
+.jn-leather::after{content:"";position:absolute;inset:9px;border-radius:4px 14px 14px 4px;pointer-events:none;border:1px dashed rgba(230,220,200,.32);z-index:0}
+.jn-spine{position:absolute;left:0;top:0;bottom:0;width:16px;border-radius:6px 0 0 6px;background:linear-gradient(90deg,#0a0a0a,#2a2828 45%,#0e0d0d);z-index:1}
+.jn-band{position:absolute;top:0;bottom:0;width:9px;background:linear-gradient(90deg,#000,#232222,#000);z-index:5;pointer-events:none;box-shadow:0 0 6px rgba(0,0,0,.7)}
+.jn-cover{height:500px;cursor:pointer;margin-bottom:34px}
+.jn-cover .jn-band{right:44px}
+.jn-edge{position:absolute;right:16px;top:14px;bottom:14px;width:7px;border-radius:2px;background:repeating-linear-gradient(180deg,#EDE6D6 0 2px,#CDC3AB 2px 3px)}
+.jn-rtail{position:absolute;left:96px;bottom:-26px;width:14px;height:54px;background:linear-gradient(90deg,#4f1c1c,#7a2a2a 45%,#4a1818);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);z-index:1}
+.jn-deb{position:absolute;left:46px;top:78px;font-size:44px;color:#0b0b0b;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.14),0 -1px 0 rgba(0,0,0,.9)}
+.jn-deb2{position:absolute;left:48px;top:134px;font-size:20px;color:#0f0f0f;text-shadow:0 1px 0 rgba(255,255,255,.12),0 -1px 0 #000}
+.jn-mono{position:absolute;left:46px;bottom:44px;font-size:26px;color:#5b4a26;letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,220,150,.25),0 -1px 0 #000}
+.jn-hint{position:absolute;right:66px;bottom:24px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#6f6d62}
+.jn-book{padding:22px 24px 22px 18px;margin-right:26px}
+.jn-book .jn-band{right:10px}
+.jn-ribbon{position:absolute;left:86px;top:-2px;width:14px;height:64px;background:linear-gradient(90deg,#4f1c1c,#7a2a2a 45%,#4a1818);clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);z-index:6;pointer-events:none}
+.jn-tabs{position:absolute;right:-27px;top:70px;display:flex;flex-direction:column;gap:10px;z-index:7}
+.jn-tab{writing-mode:vertical-rl;text-orientation:mixed;font-size:17px;color:#7a7264;background:linear-gradient(90deg,#DCD3BE,#EFE8D6);padding:12px 5px;border-radius:0 6px 6px 0;border:1px solid #c9bfa6;border-left:0;cursor:pointer;box-shadow:2px 3px 6px rgba(0,0,0,.5);font-family:inherit;line-height:1}
+.jn-tab.on{color:#1B1B1B;background:linear-gradient(90deg,#F5F0E3,#FBF7EC);transform:translateX(3px)}
+.jn-page{position:relative;z-index:2;min-height:520px;padding:26px 22px 28px 26px;border-radius:2px 8px 8px 2px;color:#1B1B1B;
+  background:radial-gradient(140% 100% at 100% 0,rgba(255,255,255,.35),transparent 55%),linear-gradient(90deg,rgba(0,0,0,.16),transparent 18px),#F5F0E3;
+  box-shadow:0 1px 0 #fff inset,3px 3px 0 #E9E1CE,5px 5px 0 #D9D0BA,7px 7px 0 #CDC3AB,10px 12px 24px rgba(0,0,0,.5)}
+.jn-page.hide{display:none}
+.jn-pdate{font-size:17px;color:#6d6656;display:flex;justify-content:space-between;margin-bottom:12px}
+.jn-ptitle{font-size:34px;color:#1B1B1B;line-height:1.05;margin-bottom:12px}
+.jn-ptitle u{text-decoration:none;border-bottom:2px solid #1B1B1B;padding-bottom:1px}
+.jn-line{display:flex;align-items:flex-start;gap:12px;padding:6px 0;border-bottom:1px solid rgba(60,50,30,.12)}
+.jn-ring{flex:none;margin-top:9px;width:18px;height:18px;border-radius:50%;border:1.8px solid #1B1B1B;background:none;cursor:pointer;position:relative;transform:rotate(-8deg);padding:0}
+.jn-ring::after{content:"";position:absolute;left:3px;top:-3px;width:7px;height:13px;border:0 solid var(--forest);border-width:0 2.6px 2.6px 0;transform:rotate(38deg);opacity:0}
+.jn-line.done .jn-ring{border-color:var(--forest)}
+.jn-line.done .jn-ring::after{opacity:1}
+.jn-hw{font-size:26px;line-height:1.3;color:#1B1B1B;flex:1;min-width:0;outline:none;min-height:34px;transform:rotate(-.4deg);word-break:break-word;white-space:pre-wrap}
+.jn-hw:empty::before{content:attr(data-ph);color:#A9A290}
+.jn-line.done .jn-hw{color:#6d6656;text-decoration:line-through;text-decoration-thickness:1.5px}
+.jn-post{display:none;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;color:var(--forest);margin:-2px 0 6px 30px;cursor:pointer;background:none;border:0;padding:0}
+.jn-post i{font-style:normal;color:#1B1B1B}
+.jn-line.done+.jn-post{display:block}
+.jn-post.posted{color:#6d6656;cursor:default}
+.jn-n{font-size:22px;color:#6d6656;width:24px;flex:none;margin-top:4px}
+.jn-gr .jn-line{border-bottom:0;padding:4px 0}
+.jn-dayrule{font-size:17px;color:#6d6656;margin:16px 0 4px}
+.jn-grid{display:grid;grid-template-columns:1fr repeat(7,20px);gap:0 4px;color:#1B1B1B;align-items:center}
+.jn-grid .h{font-size:13px;color:#6d6656;text-align:center;padding-bottom:6px}
+.jn-grid .v{font-size:19px;line-height:1.15;padding:3px 0;border-bottom:1px solid rgba(60,50,30,.12);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;outline:none}
+.jn-grid .c{height:26px;border-bottom:1px solid rgba(60,50,30,.12);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.jn-grid .c b{width:7px;height:7px;border-radius:50%;background:#1B1B1B;opacity:0;transform:scale(1,.85) rotate(20deg)}
+.jn-grid .c.on b{opacity:.85}
+.jn-grid .focus .v{color:var(--forest)}
+.jn-note{font-size:18px;color:#6d6656;margin-top:14px;line-height:1.35}
+.jn-quad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;min-height:420px}
+.jn-q{padding:10px 8px 8px;min-width:0}
+.jn-q:nth-child(1){border-right:2px solid #1B1B1B;border-bottom:2px solid #1B1B1B}
+.jn-q:nth-child(2){border-bottom:2px solid #1B1B1B}
+.jn-q:nth-child(3){border-right:2px solid #1B1B1B}
+.jn-q h4{font-size:14px;font-weight:400;color:#6d6656;margin:0 0 4px;line-height:1.1}
+.jn-q h4 b{display:block;font-weight:400;font-size:21px;color:#1B1B1B}
+.jn-q .jn-hw{font-size:19px;min-height:26px;line-height:1.2;margin-top:2px}
+.jn-foot{display:flex;justify-content:space-between;gap:12px;padding:16px 4px 0;font-size:12px;color:var(--muted);line-height:1.5}
+.jn-foot b{color:var(--ink)}
+.jn-close{flex:none;color:var(--ink);font-weight:700;cursor:pointer;background:none;border:0;font-family:inherit;font-size:12px}
+.jn-add{font-size:20px;color:#A9A290;margin-top:12px;cursor:pointer;background:none;border:0;font-family:inherit;padding:0}
+@media(max-width:420px){.jn-page{padding:22px 16px 24px 20px}.jn-hw{font-size:24px}.jn-tab{font-size:15px}}
+
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -1964,6 +2050,10 @@ body:not(:has(#pg-profile.on)) .cbtn{display:none!important}
           </div>
         </div>
       </div>
+      <div class="sect" id="jnsect">
+        <div class="micro">The Journal</div>
+        <div id="jnbox"></div>
+      </div>
       <div class="sect" id="deskrow" style="display:none"><button class="wbtn" id="deskgo" style="width:100%">The Desk. &#183; Admin</button></div>
       <div class="sect" id="admstat" style="display:none"><div class="micro" style="color:var(--forest)">The Count &#183; Admin</div><div class="adstat" id="adgrid"></div><div class="admarks" id="admarks"></div></div>
       <div class="sect" id="advsect" style="display:none">
@@ -2169,7 +2259,6 @@ body:not(:has(#pg-profile.on)) .cbtn{display:none!important}
     <button class="rd-40" id="rdFind" aria-label="Search the Word"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="display:block"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg></button>
     <button class="rd-40" id="rd40">40</button>
     <button class="rd-tr" id="rdTr">WEB</button>
-    <button class="modeic" id="rdMode" data-modeic aria-label="Light or dark" title="Light or dark."><svg class="mo-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="mo-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button>
   </div>
   <div class="rd-prog"><i id="rdProg"></i></div>
   <div class="rd-view" id="rdView">
@@ -4391,7 +4480,7 @@ if(mm){dpay.media_path=mm.path;dpay.media_kind='photo';dpay.media_w=mm.w;dpay.me
 sb.from('deeds').insert(dpay).select().single().then(function(r){
 b.textContent='Log It.';
 if(r.error){toast('Could not log it: '+r.error.message);return}
-if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id,no:(r.data.deed_no||0)});
+if(dpay.media_path)publishMedia('deed',r.data.id);my.deeds.push({body:txt,when:chipTxt.replace('.',''),priv:logPriv,dbid:r.data.id,no:(r.data.deed_no||0)});if(window.jnOnDeed)try{window.jnOnDeed(r.data)}catch(e){}
 if(DAILYLOG){DAILYN++;DAILYLOG=0;var _ld=$('#logdaily');if(_ld)_ld.style.display='none'}
 if(chainParentLive){chainParentLive=null;chainLinkLive=0;var _lc=$('#logchain');if(_lc)_lc.style.display='none'}
 if(CAMPLOG){CAMPLOG=null;CAMPTITLE='';var _lp=$('#logcamp');if(_lp)_lp.style.display='none'}
@@ -6456,6 +6545,79 @@ cdn.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
 cdn.onload=function(){init();loadPeople()};
 cdn.onerror=function(){};
 document.head.appendChild(cdn);
+
+/* ---- THE JOURNAL (private, 200 Deedcoin) ---- */
+(function(){
+var JN={owned:null,st:'buy',tab:'todo',rows:[],fam:'',hk:'',t:{},loading:false,posting:null};
+var VIRT=['Temperance','Silence','Order','Resolution','Frugality','Industry','Sincerity','Justice','Moderation','Cleanliness','Tranquility','Chastity','Humility'];
+var QH=[['urgent, important','Do it.'],['important, not urgent','Schedule it.'],['urgent, not important','Hand it off.'],['neither','Drop it.']];
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function box(){return document.getElementById('jnbox')}
+function sect(){return document.getElementById('jnsect')}
+function grain(){if(document.getElementById('jngrain'))return;var d=document.createElement('div');d.innerHTML='<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="jngrain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 .09 0 0 0 0 .085 0 0 0 0 .08 0 0 0 .9 0"/></filter></svg>';document.body.appendChild(d.firstChild)}
+function hand(){try{var k=hwMyHand(),f=HWFONTS[k];JN.hk=k;JN.fam=f?f.fam:'';if(typeof hwEnsure==='function')hwEnsure(k,function(){})}catch(e){JN.fam=''}return JN.fam?'font-family:\''+JN.fam+'\',cursive;':''}
+function today(){var d=new Date();return HWMON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()}
+function dayStr(iso){var p=String(iso||'').split('-');if(p.length<3)return iso;return HWMON[+p[1]-1]+' '+(+p[2])}
+function ymd(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function wk(){var d=new Date(),s=new Date(d.getFullYear(),0,1);return Math.floor(((d-s)/864e5+s.getDay())/7)}
+function initials(){var h=(PROFILE&&PROFILE.handle)||'';var m=h.match(/[A-Z]/g)||[];return m.length?m.slice(0,2).join('.')+'.':(h.slice(0,2).toUpperCase()||'')}
+function bal(){return (WALLET&&+WALLET.balance)||0}
+
+function paint(){var b=box(),sc=sect();if(!b||!sc)return;if(!PROFILE||!sb){sc.style.display='none';return}
+sc.style.display='block';grain();var fs=hand();
+if(JN.owned===null){b.innerHTML='<div class="jn-coin">Opening the book\u2026</div>';return}
+if(!JN.owned){b.innerHTML='<div class="jn-coin">You have '+bal()+' Deedcoin</div><div class="jn-shelf"><div class="jn-icon"></div><div class="t"><b>The Journal<i>.</i></b><small>A black leather book that is yours alone. To dos in your hand, a gratitude list, Franklin\u2019s thirteen, and what matters.</small></div><button class="jn-buy" id="jnBuy">200 coin<i>.</i></button></div><div class="jn-sheet" id="jnSheet" style="display:none"><b>Buy the Journal<i>.</i></b><p>200 Deedcoin, once. It lives on your profile from then on, and no one else can ever read it.</p><div class="row"><button class="no" id="jnNo">Not now</button><button class="go" id="jnGo">Buy it<i>.</i></button></div></div>';
+document.getElementById('jnBuy').onclick=function(){document.getElementById('jnSheet').style.display='block'};
+document.getElementById('jnNo').onclick=function(){document.getElementById('jnSheet').style.display='none'};
+document.getElementById('jnGo').onclick=buy;return}
+if(JN.st!=='open'){b.innerHTML='<div class="jn-owned" id="jnOpen1"><div class="jn-icon sm"></div><small><b>The Journal<i>.</i></b>Tap the cover to open it.</small></div><div class="jn-leather jn-cover" id="jnCover"><div class="jn-spine"></div><div class="jn-band"></div><div class="jn-edge"></div><div class="jn-rtail"></div><div class="jn-deb" style="'+fs+'">Journal.</div><div class="jn-deb2" style="'+fs+'">Yours alone.</div><div class="jn-mono" style="'+fs+'">'+esc(initials())+'</div><div class="jn-hint">TAP TO OPEN</div></div>';
+document.getElementById('jnCover').onclick=document.getElementById('jnOpen1').onclick=function(){JN.st='open';paint();load()};return}
+b.innerHTML='<div class="jn-leather jn-book"><div class="jn-spine"></div><div class="jn-ribbon"></div><div class="jn-band"></div><div class="jn-tabs" style="'+fs+'">'+['todo|To do','grat|Gratitude','thirteen|The Thirteen','quad|What matters'].map(function(t){var p=t.split('|');return '<button class="jn-tab'+(JN.tab===p[0]?' on':'')+'" data-t="'+p[0]+'">'+p[1]+'</button>'}).join('')+'</div><div class="jn-page" id="jnPage" style="'+fs+'"></div></div><div class="jn-foot"><span><b>Private.</b> Stored under your account only. The one door out is the green line under a finished to do.</span><button class="jn-close" id="jnClose">Close it.</button></div>';
+b.querySelectorAll('.jn-tab').forEach(function(t){t.onclick=function(){JN.tab=t.getAttribute('data-t');paint()}});
+document.getElementById('jnClose').onclick=function(){JN.st='cover';paint()};
+page()}
+
+function rows(kind){return JN.rows.filter(function(r){return r.kind===kind}).sort(function(a,b){return (a.pos-b.pos)||(a.created_at<b.created_at?-1:1)})}
+function line(r,ph){return '<div class="jn-line'+(r.done?' done':'')+'" data-id="'+r.id+'"><button class="jn-ring" type="button" aria-label="Done"></button><div class="jn-hw" contenteditable="true" data-ph="'+esc(ph||'')+'">'+esc(r.text)+'</div></div><button class="jn-post'+(r.deed_id?' posted':'')+'" type="button">'+(r.deed_id?'Posted as Deed #'+(r.deed_no||''):'Post it as a deed<i>.</i>')+'</button>'}
+function page(){var p=document.getElementById('jnPage');if(!p)return;var h='';
+if(JN.tab==='todo'){var L=rows('todo');h='<div class="jn-pdate"><span>To do</span><span>'+today()+'</span></div><div class="jn-ptitle">Good I still <u>owe</u>.</div>'+L.map(function(r){return line(r,'')}).join('')+'<button class="jn-add" type="button" data-k="todo">write the next one</button>'}
+else if(JN.tab==='grat'){var G=rows('grat'),days={},order=[];G.forEach(function(r){if(!days[r.on_day]){days[r.on_day]=[];order.push(r.on_day)}days[r.on_day].push(r)});var td=ymd();if(!days[td]){days[td]=[];order.unshift(td)}order.sort().reverse();
+h='<div class="jn-pdate"><span>Gratitude</span><span>'+today()+'</span></div><div class="jn-ptitle">Thankful <u>today</u>.</div><div class="jn-gr">'+order.map(function(d){var L=days[d];return (d===td?'':'<div class="jn-dayrule">'+dayStr(d)+'</div>')+L.map(function(r,i){return '<div class="jn-line" data-id="'+r.id+'"><div class="jn-n">'+(i+1)+'.</div><div class="jn-hw" contenteditable="true">'+esc(r.text)+'</div></div>'}).join('')+(d===td?'<button class="jn-add" type="button" data-k="grat">one more</button>':'')}).join('')+'</div>'}
+else if(JN.tab==='thirteen'){var V=rows('virtue');if(!V.length)V=VIRT.map(function(v,i){return{id:'v'+i,text:v,pos:i+1,meta:{}}});var w=wk(),fi=w%13,days2=['S','M','T','W','T','F','S'];
+h='<div class="jn-pdate"><span>The Thirteen</span><span>Week '+(fi+1)+' of 13</span></div><div class="jn-ptitle">This week, <u>'+esc(V[fi]?V[fi].text:'')+'</u>.</div><div class="jn-grid"><div class="h"></div>'+days2.map(function(d){return '<div class="h">'+d+'</div>'}).join('')+V.map(function(r,i){var m=(r.meta&&r.meta.w&&r.meta.w[String(w)])||[];return '<div class="'+(i===fi?'focus':'')+'" style="display:contents" data-id="'+r.id+'"><div class="v" contenteditable="true">'+(i===fi?'\u2192 ':'')+esc(r.text)+'</div>'+days2.map(function(d,di){return '<div class="c'+(m.indexOf(di)>-1?' on':'')+'" data-d="'+di+'"><b></b></div>'}).join('')+'</div>'}).join('')+'</div><div class="jn-note">A dot for every slip. One virtue gets the week, all thirteen get watched. Four rounds a year, the way Franklin kept it. Tap a name to make it your own.</div>'}
+else{var Q=rows('quad');h='<div class="jn-pdate"><span>What matters</span><span>'+today()+'</span></div><div class="jn-quad">'+QH.map(function(q,qi){var L=Q.filter(function(r){return r.q===qi+1});return '<div class="jn-q" data-q="'+(qi+1)+'"><h4>'+q[0]+'<b>'+q[1]+'</b></h4>'+L.map(function(r){return '<div class="jn-hw" contenteditable="true" data-id="'+r.id+'">'+esc(r.text)+'</div>'}).join('')+'<div class="jn-hw" contenteditable="true" data-new="'+(qi+1)+'" data-ph="..."></div></div>'}).join('')+'</div>'}
+p.innerHTML=h;wire(p)}
+
+function wire(p){
+p.querySelectorAll('.jn-add').forEach(function(b){b.onclick=function(){add(b.getAttribute('data-k'))}});
+p.querySelectorAll('.jn-ring').forEach(function(r){r.onclick=function(){var l=r.parentElement,id=l.getAttribute('data-id'),row=byId(id);if(!row||row.deed_id)return;row.done=!row.done;l.classList.toggle('done',row.done);save(row,{done:row.done})}});
+p.querySelectorAll('.jn-post').forEach(function(b){b.onclick=function(){if(b.classList.contains('posted'))return;var l=b.previousElementSibling,row=byId(l.getAttribute('data-id'));if(!row||!row.text.trim())return;postDeed(row)}});
+p.querySelectorAll('.jn-hw[contenteditable]').forEach(function(e){var t=null;
+e.addEventListener('input',function(){clearTimeout(t);t=setTimeout(function(){commit(e)},700)});
+e.addEventListener('blur',function(){clearTimeout(t);commit(e)});
+e.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();e.blur();var k=JN.tab==='todo'?'todo':JN.tab==='grat'?'grat':null;if(k)add(k)}})});
+p.querySelectorAll('.jn-grid .v[contenteditable]').forEach(function(e){e.addEventListener('blur',function(){var id=e.parentElement.getAttribute('data-id'),row=byId(id);var txt=e.textContent.replace(/^\u2192\s*/,'').trim();if(!row||!txt||txt===row.text)return;row.text=txt;save(row,{text:txt})})});
+p.querySelectorAll('.jn-grid .c').forEach(function(c){c.onclick=function(){var id=c.parentElement.getAttribute('data-id'),row=byId(id);if(!row)return;var w=String(wk()),di=+c.getAttribute('data-d');row.meta=row.meta||{};row.meta.w=row.meta.w||{};var a=row.meta.w[w]||[];var i=a.indexOf(di);if(i>-1)a.splice(i,1);else a.push(di);row.meta.w[w]=a;c.classList.toggle('on',i<0);save(row,{meta:row.meta})}})}
+function byId(id){for(var i=0;i<JN.rows.length;i++)if(JN.rows[i].id===id)return JN.rows[i];return null}
+function commit(e){var txt=e.textContent.trim();var id=e.getAttribute('data-id')||(e.parentElement&&e.parentElement.getAttribute('data-id'));var nq=e.getAttribute('data-new');
+if(nq){if(!txt)return;e.removeAttribute('data-new');var row={id:'tmp'+Math.random(),kind:'quad',q:+nq,text:txt,done:false,pos:rows('quad').length+1,meta:{},on_day:ymd(),created_at:new Date().toISOString()};JN.rows.push(row);e.setAttribute('data-id',row.id);insert(row,function(){var q=e.parentElement;if(q&&!q.querySelector('[data-new]')){var n=document.createElement('div');n.className='jn-hw';n.setAttribute('contenteditable','true');n.setAttribute('data-new',nq);n.setAttribute('data-ph','...');q.appendChild(n);wire(q)}});return}
+var row=byId(id);if(!row)return;if(txt===row.text)return;row.text=txt;if(!txt&&!row.done&&!row.deed_id){remove(row);return}save(row,{text:txt})}
+function add(kind){var pos=rows(kind).length+1;var row={id:'tmp'+Math.random(),kind:kind,q:null,text:'',done:false,pos:pos,meta:{},on_day:ymd(),created_at:new Date().toISOString()};JN.rows.push(row);page();var els=document.querySelectorAll('#jnPage [data-id="'+row.id+'"] .jn-hw');var e=els[els.length-1];if(e)e.focus();insert(row)}
+function insert(row,cb){sb.from('journal_entries').insert({kind:row.kind,q:row.q,text:row.text,pos:row.pos,meta:row.meta,on_day:row.on_day}).select().single().then(function(r){if(r.error){toast('Could not save that.');return}var old=row.id;row.id=r.data.id;document.querySelectorAll('[data-id="'+old+'"]').forEach(function(el){el.setAttribute('data-id',row.id)});if(row.text&&row.text!==r.data.text)save(row,{text:row.text});if(cb)cb()})}
+function save(row,patch){if(/^tmp/.test(row.id)){setTimeout(function(){save(row,patch)},600);return}if(/^v\d+$/.test(row.id)){return}sb.from('journal_entries').update(patch).eq('id',row.id).then(function(r){if(r.error)toast('Could not save that.')})}
+function remove(row){JN.rows=JN.rows.filter(function(x){return x!==row});if(/^tmp/.test(row.id)){page();return}sb.from('journal_entries').delete().eq('id',row.id).then(function(){page()})}
+
+function load(){if(JN.loading)return;JN.loading=true;sb.from('journal_entries').select('*').then(function(r){JN.loading=false;if(r.error){toast('Run the journal patch on DEEDS first.');return}JN.rows=r.data||[];var V=rows('virtue');if(!V.length){VIRT.forEach(function(v,i){JN.rows.push({id:'tmp'+i,kind:'virtue',q:null,text:v,done:false,pos:i+1,meta:{},on_day:ymd(),created_at:new Date().toISOString()})});rows('virtue').forEach(function(x){insert(x)})}page()})}
+function check(){if(!sb||!PROFILE){JN.owned=null;return}sb.from('journal_owned').select('profile_id').eq('profile_id',PROFILE.id).maybeSingle().then(function(r){if(r.error){JN.owned=false;paint();return}JN.owned=!!r.data;paint()})}
+function buy(){var g=document.getElementById('jnGo');if(g)g.textContent='Buying\u2026';sb.rpc('journal_buy').then(function(r){if(r.error){var m=String(r.error.message||'');toast(/not_enough/.test(m)?'Not enough Deedcoin yet. A deed pays 200.':'Could not buy it: '+m);if(g)g.innerHTML='Buy it<i>.</i>';return}JN.owned=true;JN.st='cover';if(WALLET&&r.data&&r.data.balance!=null){WALLET.balance=+r.data.balance;if(typeof paintCoin==='function')paintCoin()}if(typeof loadWallet==='function')loadWallet();toast('The Journal is yours.');paint()})}
+
+function postDeed(row){JN.posting=row.id;try{openCompose('deed')}catch(e){return}setTimeout(function(){var ta=document.getElementById('logtext');if(ta){ta.value=row.text;ta.dispatchEvent(new Event('input'))}},80)}
+window.jnOnDeed=function(d){if(!JN.posting||!d)return;var row=byId(JN.posting);JN.posting=null;if(!row)return;row.deed_id=d.id;row.deed_no=d.deed_no||0;row.done=true;save(row,{deed_id:d.id,deed_no:row.deed_no,done:true});if(JN.st==='open')page()};
+
+var _g=window.go;window.go=function(p){var r=_g.apply(this,arguments);if(p==='profile'){if(PROFILE){if(JN.owned===null)check();else paint()}else{var s=sect();if(s)s.style.display='none'}}return r};
+document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){if(PROFILE&&(typeof curPage==='undefined'||curPage==='profile'))check()},1500)});
+window.JN=JN;JN._dbg=function(P,S,W){PROFILE=P;sb=S;WALLET=W};
+})();
 })();
 </script>
 <script>
