@@ -805,6 +805,7 @@ html.dark .vv.hl.sel{background:rgba(111,154,130,.55)}
  #profreal>*{grid-column:1/-1;min-width:0}
  #profreal>#advsect,#profreal>#modsect,#profreal>#rnsect,#profreal>#wrsect{grid-column:auto}
  #profreal>.prof{order:1}
+ #profreal>#jnsect{order:1}
  #profreal>#editpane{order:2}
  #profreal>#cxsect{order:3}
  #profreal>#deskrow{order:4}
@@ -1375,21 +1376,14 @@ body.gsky-on .tab.on{color:#F4F1EA}
 .sentflash{animation:sentflash 2.4s ease-out}
 @keyframes sentflash{0%{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(190,154,78,.16)}100%{box-shadow:inset 0 0 0 2px transparent;background:transparent}}
 @media(prefers-reduced-motion:reduce){#gsky .gl,#profguest .gcopy{transform:none!important}.sentflash{animation:none}}
-/* garden door */
+/* garden row */
 #gardsect .micro{color:var(--forest)}
-.gdoor{position:relative;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:#20361F;box-shadow:0 16px 36px rgba(21,19,14,.14)}
-.gdoor-art{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;background:#20361F}
-.gdoor-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:#FFFFFF;padding:13px 14px 13px 16px}
-.gdoor-count{font-size:10.5px;letter-spacing:.13em;font-weight:800;color:var(--ink);white-space:nowrap}
-.gdoor-enter{background:var(--forest);color:var(--ivory);font-weight:800;font-size:14px;padding:12px 22px;border-radius:999px;text-decoration:none;white-space:nowrap;text-align:center}
-.gdoor-enter:hover{opacity:.92}
-.gdoor-share{display:inline-flex;align-items:center;gap:7px;color:var(--forest);font-weight:800;font-size:13.5px;padding:6px 4px;white-space:nowrap}
-.gdoor-share svg{width:17px;height:17px}
-.gdoor-sack{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none}
-.gdoor-sack img{width:58px;height:auto;filter:drop-shadow(0 6px 12px rgba(0,0,0,.45))}
-.gdoor-seeds{background:rgba(246,243,235,.94);color:var(--forest);font-size:10px;letter-spacing:.12em;font-weight:800;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.grow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 2px;text-decoration:none;color:var(--ink)}
+.grow-l{font-size:11px;letter-spacing:.13em;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grow-dot{margin:0 8px;color:var(--forest)}
+.grow-go{flex:none;background:var(--forest);color:var(--ivory);font-weight:800;font-size:13.5px;padding:10px 18px;border-radius:999px;white-space:nowrap}
+.grow:hover .grow-go{opacity:.92}
 #profreal>#gardsect{order:1}
-@media (max-width:419px){.gdoor-share span{display:none}.gdoor-enter{padding:11px 18px;font-size:13.5px}}
 /* ===== DEEDCOINS (v4.16): the coin in the top bar, its dropdown, the send sheet, artifact notes, coins in the letter ===== */
 .cbtn{position:relative;display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;padding:0;cursor:pointer;color:var(--ink);font:inherit}
 .cbtn img{width:26px;height:26px;display:block;filter:drop-shadow(0 1px 2px rgba(21,19,14,.25))}
@@ -2043,21 +2037,16 @@ html.dark .jn-buy i{color:#7FC79E}
         <button class="chbtn prof-log" id="pLog">Log a Deed.</button>
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
       </div>
-      <div class="sect" id="gardsect">
-        <div class="micro">My Garden</div>
-        <div class="gdoor">
-          <img class="gdoor-art" src="garden-door.webp" alt="My garden" decoding="async" loading="lazy">
-          <a class="gdoor-sack" href="garden/" aria-label="Your seeds"><img src="garden-sack.webp" alt="" decoding="async" loading="lazy"><span class="gdoor-seeds" id="gdoorSeeds">SEEDS</span></a>
-          <div class="gdoor-bar">
-            <span class="gdoor-count" id="gdoorCount">0 OF 40 GROWING</span>
-            <a class="gdoor-enter" href="garden/">Enter My Garden.</a>
-            <button class="gdoor-share" id="gdoorShare" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m8 7 4-4 4 4"/><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/></svg><span>Share</span></button>
-          </div>
-        </div>
-      </div>
       <div class="sect" id="jnsect">
         <div class="micro">The Journal</div>
         <div id="jnbox"></div>
+      </div>
+      <div class="sect" id="gardsect">
+        <div class="micro">The Garden</div>
+        <a class="grow" href="garden/">
+          <span class="grow-l"><span id="gdoorCount">0 OF 40 GROWING</span><span class="grow-dot">&middot;</span><span id="gdoorSeeds">SEEDS</span></span>
+          <span class="grow-go">Enter.</span>
+        </a>
       </div>
       <div class="sect" id="deskrow" style="display:none"><button class="wbtn" id="deskgo" style="width:100%">The Desk. &#183; Admin</button></div>
       <div class="sect" id="admstat" style="display:none"><div class="micro" style="color:var(--forest)">The Count &#183; Admin</div><div class="adstat" id="adgrid"></div><div class="admarks" id="admarks"></div></div>
@@ -3128,7 +3117,6 @@ window._gdSeeds=function(){var el=$('#gdoorSeeds');if(!el)return;var s=null;try{
 var t=Math.max(0,s?(s.bank||0):4);el.textContent=t+(t===1?' SEED':' SEEDS')};
 window._gdSeeds();
 if(!window._gdPS){window._gdPS=1;window.addEventListener('pageshow',function(e){if(e.persisted&&window._gdSeeds)window._gdSeeds()})}
-var _gds=$('#gdoorShare');if(_gds)_gds.onclick=function(){var u='https://deedable.fun/garden/';if(navigator.share){navigator.share({url:u}).catch(function(){})}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(function(){toast('Copied. Post it anywhere.')},function(){toast(u)})}else{toast(u)}};
 renderProfMeta()}
 function renderProfMeta(){var t=my.type||'doer';var L=DeedsTypes.LABELS[t]||'Doer';
 var vt=$('#vType');if(vt)vt.textContent=L.slice(-1)==='.'?L:L+'.';
