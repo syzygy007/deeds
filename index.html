@@ -127,20 +127,32 @@ input,textarea{font:inherit;color:var(--ink)}
 .xcard b{font-size:15px;font-weight:800}
 .xcard span{font-size:12px;color:var(--muted)}
 .xsec .rline{padding:0 18px 14px}
-/* the games grid: one tile a game, so the depth of the world reads at a glance */
+/* the games grid: one tile a room, the room is a painted plate, the person in it is you */
 .xgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 12px}
-.xtile{border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:var(--ink);background:#FBF9F3;display:flex;flex-direction:column}
-.xt-art{height:88px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.xt-art svg{width:100%;height:100%;display:block}
-.xt-c{padding:11px 12px 13px;display:flex;flex-direction:column;gap:3px}
-.xt-c .micro{font-size:9px;letter-spacing:.16em;color:#A8A395}
-.xt-c b{font-size:15px;font-weight:800;letter-spacing:-.01em}
-.xt-c span{font-size:11.5px;color:var(--muted);line-height:1.35}
-.xt-wide{grid-column:1 / -1}
-.xt-wide .xt-art{height:104px}
+.xtile{position:relative;display:block;border-radius:18px;overflow:hidden;text-decoration:none;color:#fff;background:#0d0d0d;aspect-ratio:4/5;isolation:isolate}
+.xt-wide{grid-column:1 / -1;aspect-ratio:16/9}
+.xt-plate,.xt-occ{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat}
+.xt-occ{z-index:2;pointer-events:none}
+.xt-fig{position:absolute;z-index:1;transform:translateX(-50%);display:none;pointer-events:none}
+.xt-fig.on{display:block}
+.xt-sh{position:absolute;z-index:1;width:34%;height:6%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.42),rgba(0,0,0,0) 70%);display:none}
+.xt-fig.on+.xt-sh{display:block}
+.xtile:after{content:"";position:absolute;inset:0;z-index:3;background:linear-gradient(180deg,rgba(0,0,0,.14) 0%,rgba(0,0,0,0) 26%,rgba(0,0,0,0) 54%,rgba(0,0,0,.66) 100%);pointer-events:none}
+.xt-m{position:absolute;left:12px;top:11px;z-index:4;font-size:7.5px;letter-spacing:.24em;line-height:1.9;color:#e6ece6;font-weight:600}
+.xt-a{position:absolute;right:10px;top:10px;z-index:4;width:28px;height:28px;border-radius:50%;border:1.2px solid rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+.xt-h{position:absolute;left:12px;bottom:40px;z-index:4;font-weight:900;font-size:30px;line-height:.86;letter-spacing:-.045em;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.xt-h i{display:inline-block;width:7px;height:7px;background:#2EE38A;border-radius:50%;margin-left:1px}
+.xt-wide .xt-h{font-size:42px;bottom:42px}.xt-wide .xt-h i{width:10px;height:10px}
+.xt-r{position:absolute;left:12px;bottom:11px;z-index:4;font-size:8.5px;letter-spacing:.2em;color:#eceae3;font-weight:600}
+.xt-r b{display:block;font-weight:500;letter-spacing:.04em;color:#2EE38A;margin-top:3px;font-size:9px}
+@media(min-width:700px){.xt-h{font-size:38px}.xt-wide .xt-h{font-size:54px}.xt-m{font-size:9px}.xt-r{font-size:10px}.xt-r b{font-size:10.5px}}
+.xtile[data-room="garden"] .xt-plate,.xtile[data-room="garden"] .xt-occ{background-image:url(play/garden.jpg)}
+.xtile[data-room="club"] .xt-plate,.xtile[data-room="club"] .xt-occ{background-image:url(play/club.jpg)}
+.xtile[data-room="chess"] .xt-plate,.xtile[data-room="chess"] .xt-occ{background-image:url(play/chess.jpg)}
+.xtile[data-room="flag"] .xt-plate,.xtile[data-room="flag"] .xt-occ{background-image:url(play/flag.jpg)}
+.xtile[data-room="music"] .xt-plate,.xtile[data-room="music"] .xt-occ{background-image:url(play/music.jpg)}
 .xmore{padding:0 18px 14px;font-size:12px;color:var(--muted)}
 .xmore a{color:var(--forest);font-weight:800;text-decoration:none}
-html.dark .xtile{background:#1B1913;color:#F4F1EA}
 html.dark .xt-c b{color:#F4F1EA}
 .xonlab{display:flex;align-items:baseline;justify-content:space-between;padding:8px 18px 4px}
 .xonlab .xlab{padding:0}
@@ -1874,13 +1886,13 @@ body:not(:has(#pg-profile.on)) .cbtn{display:none!important}
         <div class="xlab">GAMES</div>
         <a class="xgate" href="garden/world/"><img src="gate.webp" alt="" onerror="this.onerror=null;this.src='garden-door.webp'"><div class="xg-copy"><div class="micro">THE GARDEN GATE</div><h2>Walk the garden<b>.</b></h2><div class="xg-sub">Your deeds, planted. Step through and look around.</div></div></a>
         <div class="xgrid">
-          <a class="xtile" href="garden/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#E7EEE4"/><rect x="18" y="16" width="70" height="56" fill="none" stroke="#1F4B3A" stroke-width="2"/><rect x="112" y="16" width="70" height="56" fill="none" stroke="#1F4B3A" stroke-width="2"/><circle cx="100" cy="44" r="13" fill="none" stroke="#BE9A4E" stroke-width="2"/><circle cx="100" cy="44" r="4" fill="#BE9A4E"/><circle cx="40" cy="34" r="5" fill="#C0603F"/><circle cx="66" cy="54" r="5" fill="#D08C46"/><circle cx="134" cy="54" r="5" fill="#C0603F"/><circle cx="160" cy="34" r="5" fill="#D08C46"/></svg></div><div class="xt-c"><div class="micro">THE PLOT</div><b>My Garden.</b><span>Sow what your deeds earn.</span></div></a>
-          <a class="xtile" href="garden/club/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#171226"/><circle cx="62" cy="44" r="26" fill="none" stroke="#E24A8B" stroke-width="2"/><circle cx="62" cy="44" r="6" fill="#E24A8B"/><circle cx="138" cy="44" r="26" fill="none" stroke="#7C5CFF" stroke-width="2"/><circle cx="138" cy="44" r="6" fill="#7C5CFF"/><rect x="90" y="30" width="20" height="4" fill="#BE9A4E"/><rect x="90" y="42" width="20" height="4" fill="#BE9A4E"/><rect x="90" y="54" width="20" height="4" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE CLUB</div><b>DJ Pro.</b><span>Take the decks. The whole floor jumps.</span></div></a>
-          <a class="xtile" href="garden/chess/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#F0E6D9"/><g fill="#6E2A28"><rect x="60" y="14" width="20" height="20"/><rect x="100" y="14" width="20" height="20"/><rect x="80" y="34" width="20" height="20"/><rect x="120" y="34" width="20" height="20"/><rect x="60" y="54" width="20" height="20"/><rect x="100" y="54" width="20" height="20"/></g><rect x="40" y="14" width="120" height="60" fill="none" stroke="#6E2A28" stroke-width="2"/><circle cx="150" cy="24" r="6" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE STUDY</div><b>Chess.</b><span>Play the house or a friend. Hang the greats.</span></div></a>
-          <a class="xtile" href="garden/flag/"><div class="xt-art"><svg viewBox="0 0 200 88" preserveAspectRatio="none"><rect width="200" height="88" fill="#F7E6E1"/><rect x="66" y="16" width="4" height="58" fill="#15130E"/><path d="M70 20 L136 30 L70 44 Z" fill="#C0392B"/><circle cx="68" cy="14" r="5" fill="#BE9A4E"/><path d="M28 74 L52 74" stroke="#15130E" stroke-width="2"/><path d="M148 74 L172 74" stroke="#15130E" stroke-width="2"/></svg></div><div class="xt-c"><div class="micro">THE FIELD</div><b>Capture the Flag.</b><span>One flag, a pack of wolves, four teams.</span></div></a>
-          <a class="xtile xt-wide" href="garden/world/?in=music"><div class="xt-art"><svg viewBox="0 0 400 104" preserveAspectRatio="none"><rect width="400" height="104" fill="#12161F"/><g fill="#F4F1EA"><rect x="40" y="52" width="20" height="40"/><rect x="64" y="52" width="20" height="40"/><rect x="88" y="52" width="20" height="40"/><rect x="112" y="52" width="20" height="40"/><rect x="136" y="52" width="20" height="40"/><rect x="160" y="52" width="20" height="40"/><rect x="184" y="52" width="20" height="40"/><rect x="208" y="52" width="20" height="40"/><rect x="232" y="52" width="20" height="40"/><rect x="256" y="52" width="20" height="40"/><rect x="280" y="52" width="20" height="40"/><rect x="304" y="52" width="20" height="40"/><rect x="328" y="52" width="20" height="40"/></g><g fill="#12161F"><rect x="56" y="52" width="10" height="24"/><rect x="80" y="52" width="10" height="24"/><rect x="128" y="52" width="10" height="24"/><rect x="152" y="52" width="10" height="24"/><rect x="176" y="52" width="10" height="24"/><rect x="224" y="52" width="10" height="24"/><rect x="248" y="52" width="10" height="24"/><rect x="296" y="52" width="10" height="24"/><rect x="320" y="52" width="10" height="24"/></g><circle cx="330" cy="46" r="13" fill="#BE9A4E"/><rect x="340" y="14" width="4" height="34" fill="#BE9A4E"/><path d="M344 14 L366 20 L366 30 L344 24 Z" fill="#BE9A4E"/></svg></div><div class="xt-c"><div class="micro">THE MUSIC ROOM</div><b>Instruments.</b><span>Piano, harp, guitar, violin and drums.</span></div></a>
+          <a class="xtile" data-room="garden" href="garden/"><div class="xt-plate"></div><img class="xt-fig" alt=""><div class="xt-sh"></div><div class="xt-occ"></div><div class="xt-m">PLANT<br>GROW<br>UNWIND</div><div class="xt-a">&#8599;</div><div class="xt-h">MY<br>GARDEN<i></i></div><div class="xt-r">THE PLOT<b>Sow what your deeds earn.</b></div></a>
+          <a class="xtile" data-room="club" href="garden/club/"><div class="xt-plate"></div><img class="xt-fig" alt=""><div class="xt-sh"></div><div class="xt-occ"></div><div class="xt-m">MIX<br>CREATE<br>FEEL</div><div class="xt-a">&#8599;</div><div class="xt-h">DJ<br>PRO<i></i></div><div class="xt-r">THE CLUB<b>Take the decks. The floor jumps.</b></div></a>
+          <a class="xtile" data-room="chess" href="garden/chess/"><div class="xt-plate"></div><img class="xt-fig" alt=""><div class="xt-sh"></div><div class="xt-occ"></div><div class="xt-m">THINK<br>PLAN<br>MOVE</div><div class="xt-a">&#8599;</div><div class="xt-h">CHESS<i></i></div><div class="xt-r">THE STUDY<b>The house, or a friend.</b></div></a>
+          <a class="xtile" data-room="flag" href="garden/flag/"><div class="xt-plate"></div><img class="xt-fig" alt=""><div class="xt-sh"></div><div class="xt-occ"></div><div class="xt-m">RUN<br>TEAM UP<br>CONQUER</div><div class="xt-a">&#8599;</div><div class="xt-h">CAPTURE<br>THE FLAG<i></i></div><div class="xt-r">THE FIELD<b>One flag. Four teams. Wolves.</b></div></a>
+          <a class="xtile xt-wide" data-room="music" href="garden/world/?in=music"><div class="xt-plate"></div><img class="xt-fig" alt=""><div class="xt-sh"></div><div class="xt-occ"></div><div class="xt-m">PLAY<br>EXPLORE<br>CREATE</div><div class="xt-a">&#8599;</div><div class="xt-h">INSTRUMENTS<i></i></div><div class="xt-r">THE MUSIC ROOM<b>Piano, harp, guitar, violin, drums.</b></div></a>
         </div>
-        <div class="xmore">Every one of them is a room in the same world. <a href="garden/world/?bloom=1">See it in bloom</a>.</div>
+        <div class="xmore">Every room is yours. That is you in each of them. <a href="garden/world/?bloom=1">See the garden in bloom</a>.</div>
       </div>
       <div class="xsec">
         <div class="xlab">GOOD COMPANIES</div>
@@ -5467,6 +5479,61 @@ rn.render(sc,cam);AVSTOP=requestAnimationFrame(frame)}
 AVFR=function(){bowAt=Date.now()};
 host.onclick=function(){if(!bowAt)bowAt=Date.now()};
 frame();setTimeout(function(){bowAt=Date.now()},520)}
+
+/* PLAY tiles: your figure drawn into each painted room, once per look, kept for the session */
+var PLAYROOMS={
+ garden:{eq:{hands:'hands.can'},ry:Math.PI-.7,arms:[[-.75,.5],[.25,-.15]],legs:[.1,-.15],cam:[0,1.3,4.6,0,1.0,0],hemi:[0xffe0b0,0x5a8a4a,1.2],dl:[[0xffb060,1.6,-3,3,-2],[0xffe8c0,.9,2,3,4]],cx:67.7,top:32.8,h:39.9,occ:75.6,sh:1},
+ club:{seat:false,ry:Math.PI-.35,arms:[[-2.4,-.2],[-1.15,-.2]],amb:[0x6a4ac0,1.1],dl:[[0xb56cff,1.4,0,3,4],[0x5f6bff,1.2,-3,4,-2],[0xff9a60,.5,3,1,2]],cam:[0,1.45,4.4,0,1.25,0],cx:49.9,top:27.1,h:64.2,occ:49.9},
+ chess:{seat:true,ry:Math.PI+.15,arms:[[-1.15,.2],[-1.0,-.25]],amb:[0xffd9b0,.9],dl:[[0xffc070,1.6,3,3,2],[0xff9a60,.7,-3,2,-1]],cam:[0,1.35,4.2,0,1.05,0],cx:26.7,top:23.5,h:37.1,occ:49.2},
+ flag:{ry:.25,arms:[[-1.1,.25],[.9,-.25]],legs:[-.85,.7],hemi:[0xcfe6ff,0x5a8a4a,1.1],dl:[[0xfff0d0,1.8,3,5,2]],cam:[0,1.3,4.6,0,1.0,0],cx:38.3,top:37.1,h:39.9,sh:1},
+ music:{seat:true,ry:-.7,arms:[[-1.3,.2],[-1.35,-.2]],amb:[0xffdcb0,.9],dl:[[0xffb070,1.8,-4,3,1],[0xffd9a0,.6,2,3,3]],cam:[0,1.4,4.4,0,1.0,0],cx:46.4,top:31.9,h:40.4,occ:68}};
+var PLAYDONE='';
+function playFigures(){
+var tiles=document.querySelectorAll('.xtile[data-room]');if(!tiles.length)return;
+lookRows(function(eq,cw){
+var key='v1|'+JSON.stringify(eq)+'|'+JSON.stringify(cw);
+if(PLAYDONE===key)return;
+var cached=null;try{cached=JSON.parse(sessionStorage.getItem('deeds_play')||'null')}catch(e){}
+if(cached&&cached.key===key){playPaint(cached.pics);PLAYDONE=key;return}
+figureLibs(function(bad){if(bad)return;
+var pics={};
+try{
+var cv=document.createElement('canvas');cv.width=560;cv.height=560;
+var rn=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});
+rn.setClearColor(0,0);rn.setSize(560,560,false);rn.outputEncoding=THREE.sRGBEncoding;rn.toneMapping=THREE.ACESFilmicToneMapping;rn.toneMappingExposure=1.05;
+Object.keys(PLAYROOMS).forEach(function(room){
+var R=PLAYROOMS[room],sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.1,100);
+var e2={};Object.keys(eq).forEach(function(k){e2[k]=eq[k]});if(R.eq)Object.keys(R.eq).forEach(function(k){e2[k]=R.eq[k]});
+var F=window.Figure.build({eq:e2,colorway:cw,face:null}),fig=F.fig,d=F.dims,k=1.75/(d.headRy-d.ground);
+var piv=new THREE.Group();piv.add(fig);fig.scale.setScalar(k);fig.rotation.y=Math.PI;fig.position.y=-d.ground*k;sc.add(piv);
+if(R.seat){F.legs.forEach(function(l){l.rotation.x=-Math.PI/2.1});fig.position.y=.5-d.hipY*k}
+piv.rotation.y=R.ry;
+if(R.arms){F.arms[0].rotation.x=R.arms[0][0];F.arms[0].rotation.z=R.arms[0][1];F.arms[1].rotation.x=R.arms[1][0];F.arms[1].rotation.z=R.arms[1][1]}
+if(R.legs){F.legs[0].rotation.x=R.legs[0];F.legs[1].rotation.x=R.legs[1]}
+if(R.hemi)sc.add(new THREE.HemisphereLight(R.hemi[0],R.hemi[1],R.hemi[2]));
+if(R.amb)sc.add(new THREE.AmbientLight(R.amb[0],R.amb[1]));
+(R.dl||[]).forEach(function(L){var l=new THREE.DirectionalLight(L[0],L[1]);l.position.set(L[2],L[3],L[4]);sc.add(l)});
+cam.position.set(R.cam[0],R.cam[1],R.cam[2]);cam.lookAt(R.cam[3],R.cam[4],R.cam[5]);
+rn.render(sc,cam);
+/* crop to the figure so the tile places its true height */
+var c2=document.createElement('canvas');c2.width=560;c2.height=560;var g=c2.getContext('2d');g.drawImage(cv,0,0);
+var im=g.getImageData(0,0,560,560).data,x0=560,y0=560,x1=0,y1=0,i,x,y;
+for(y=0;y<560;y++)for(x=0;x<560;x++){i=(y*560+x)*4+3;if(im[i]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+if(x1>x0&&y1>y0){var c3=document.createElement('canvas');c3.width=x1-x0+1;c3.height=y1-y0+1;c3.getContext('2d').drawImage(c2,x0,y0,c3.width,c3.height,0,0,c3.width,c3.height);pics[room]=c3.toDataURL('image/png')}
+try{window.Figure.dispose&&window.Figure.dispose(fig)}catch(e){}
+});
+rn.dispose();
+}catch(e){return}
+PLAYDONE=key;try{sessionStorage.setItem('deeds_play',JSON.stringify({key:key,pics:pics}))}catch(e){}
+playPaint(pics)})})}
+function playPaint(pics){
+document.querySelectorAll('.xtile[data-room]').forEach(function(t){
+var room=t.getAttribute('data-room'),R=PLAYROOMS[room],img=t.querySelector('.xt-fig'),occ=t.querySelector('.xt-occ'),sh=t.querySelector('.xt-sh');
+if(!R||!img||!pics[room])return;
+img.src=pics[room];img.style.left=R.cx+'%';img.style.top=R.top+'%';img.style.height=R.h+'%';img.className='xt-fig on';
+if(occ)occ.style.clipPath=R.occ?('inset('+R.occ+'% 0 0 0)'):'inset(100% 0 0 0)';
+if(sh){if(R.sh){sh.style.left=R.cx+'%';sh.style.top=(R.top+R.h-3)+'%'}else{sh.style.display='none'}}})}
+var _renderMeetP=renderMeet;renderMeet=function(){var r=_renderMeetP.apply(this,arguments);try{playFigures()}catch(e){}return r};
 function loadAvCounts(){
 var el=$('#avCounts');if(!el)return;
 var deeds=(window.my&&my.deeds&&my.deeds.length)||0;
