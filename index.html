@@ -1563,6 +1563,7 @@ html.dark #ivchips .achip.on,html.dark .ivbig button,html.dark #ncont button.on{
 html.dark .gdoor-bar{background:#141414}
 html.dark .dcount .dn b,html.dark .markcard .mn b{color:#0FA35F}
 html.dark .lcov.fo,html.dark .biblecov{background:#000;border-color:#000}
+html.dark .mr-card{background:var(--card);border-color:var(--line)}html.dark .ex{background:#222;color:rgba(244,241,234,.55)}html.dark .vbar{background:var(--card);box-shadow:0 18px 44px rgba(0,0,0,.6)}html.dark .vbar button{color:var(--ink)}html.dark .wdcard,html.dark .fcard,html.dark #ncoin{background:var(--card)}html.dark .chcard,html.dark .chip.ex{background:#1A1A1A}html.dark .dtop{background:rgba(11,11,11,.93);border-color:var(--line)}
 /* dark: ivory text on green or black grounds stays cream; text on cream (ink) grounds goes black */
 html.dark .th-word,html.dark .th-line,html.dark .th-ghost,html.dark .playbadge,html.dark .markcard,html.dark .fbtn.on,html.dark .xgate,html.dark .xg-copy .micro,html.dark .xg-copy h2,html.dark .xonb,html.dark .avgo,html.dark .pedit.on,html.dark .remchip.on,html.dark .lchip.on,html.dark #toast,html.dark .reelcap,html.dark .reelx,html.dark .cxtab.on,html.dark .nmsg.me,html.dark .wchip.done,html.dark .biblecov,html.dark .biblecov .bc-title,html.dark .wbtn,html.dark .ncomp:hover,html.dark .gdoor-enter,html.dark .ivpick button.on,html.dark .wt-add button,html.dark .vbar button,html.dark .pk-c button.rd,html.dark .appsteps .n,html.dark .nchips button.on,html.dark .dtypes button.on,html.dark .coinmenu .cm-row button,html.dark #invpane .sendb:hover,html.dark .ivmail .sendb,html.dark .lcov.fo .lt,html.dark .lcov.fo,html.dark .lrow .env,html.dark .thwrite:hover{color:#F4F1EA}
 html.dark .achip.on,html.dark .sendb:hover,html.dark #toast,html.dark .modetog button.on,html.dark .csquick button.on,html.dark .lrow .env.ink,html.dark .lchip.on{color:#0B0B0B}
@@ -6705,10 +6706,8 @@ fit.lines.forEach(function(L,i){ctx.fillText(L,M,y0+i*fit.size*1.44)});
 ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
 ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';
 spaced(ctx,CARD.ref,M,1216,6);
-ctx.font='800 46px "Helvetica Neue",Helvetica,Arial,sans-serif';
-var w=ctx.measureText('DEEDS').width,pw=ctx.measureText('.').width;
-ctx.fillText('DEEDS',W-M-w-pw-4,1222);
-ctx.fillStyle=ac;ctx.fillText('.',W-M-pw,1222)}
+var mk=document.getElementById('wordmark');if(mk){var sc=236/412,mx=W-M-236,my=1228-143*sc;ctx.save();ctx.translate(mx,my);ctx.scale(sc,sc);ctx.fillStyle=ink;ctx.fill(new Path2D(mk.getAttribute('d')),'evenodd');ctx.fillStyle=ac;ctx.beginPath();ctx.arc(391,122,9.5,0,Math.PI*2);ctx.fill();ctx.restore()}
+ctx.fillStyle=ac;ctx.font='800 23px "Helvetica Neue",Helvetica,Arial,sans-serif';spaced(ctx,'DEEDABLE.FUN',M,1282,7)}
 J('ccIvory').onclick=function(){CW='ivory';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
 J('ccIvory').classList.add('on');J('ccForest').classList.remove('on');drawCard()};
 J('ccForest').onclick=function(){CW='forest';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
