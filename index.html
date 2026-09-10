@@ -1746,6 +1746,7 @@ html.dark .jn-buy i{color:#7FC79E}
 .jn-add{font-size:20px;color:#A9A290;margin-top:12px;cursor:pointer;background:none;border:0;font-family:inherit;padding:0}
 @media(max-width:420px){.jn-page{padding:22px 16px 24px 20px}.jn-hw{font-size:24px}.jn-tab{font-size:15px}}
 
+.jnpriv{margin-left:8px;opacity:.55}
 </style>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-180.png">
@@ -2038,7 +2039,7 @@ html.dark .jn-buy i{color:#7FC79E}
         <button class="mghost" id="pSignout" style="margin-top:14px;display:none">Sign Out.</button>
       </div>
       <div class="sect" id="jnsect">
-        <div class="micro">The Journal</div>
+        <div class="micro">The Journal <span class="jnpriv">Private to you</span></div>
         <div id="jnbox"></div>
       </div>
       <div class="sect" id="gardsect">
@@ -3066,8 +3067,8 @@ wireFeed()}
 
 /* ============ PROFILE + STATUS ============ */
 /* the avatar portrait: the wardrobe saves a head shot, the profile shows it next to the handle (type mark becomes the badge) */
-/* which picture you want next to your handle: your avatar (the default) or the plain type mark */
-function picPref(){try{return localStorage.getItem('deeds_pic')==='mark'?'mark':'avatar'}catch(e){return 'avatar'}}
+/* which picture you want next to your handle: the type mark (the default) or your avatar, only if you set it */
+function picPref(){try{return localStorage.getItem('deeds_pic')==='avatar'?'avatar':'mark'}catch(e){return 'mark'}}
 function setPicPref(v){try{localStorage.setItem('deeds_pic',v)}catch(e){}}
 /* a member with no portrait yet (or one saved by the old blank-canvas build) gets one made
    quietly: the wardrobe page draws it and saves it the moment it loads */
