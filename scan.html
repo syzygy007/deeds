@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Card scanner. · deedable</title>
+<style>
+:root{--bg:#050505;--ink:#E8E8E6;--dim:rgba(232,232,230,.5);--faint:rgba(232,232,230,.22);--line:rgba(232,232,230,.12);--green:#3A9A5B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100%}
+body{padding:calc(env(safe-area-inset-top) + 22px) 20px 48px;max-width:430px;margin:0 auto;position:relative;overflow-x:hidden}
+.glow{position:fixed;border-radius:50%;pointer-events:none;filter:blur(60px);opacity:.55}
+.glow.a{width:260px;height:260px;left:-120px;top:-80px;background:radial-gradient(circle,rgba(58,154,91,.22),transparent 70%)}
+.glow.b{width:300px;height:300px;right:-150px;bottom:-120px;background:radial-gradient(circle,rgba(232,232,230,.07),transparent 70%)}
+header{display:flex;align-items:center;justify-content:space-between;height:28px;margin-bottom:34px}
+.mark{font-family:"Brush Script MT","Snell Roundhand",cursive;font-size:22px;color:#fff;text-decoration:none}
+.mark i,h1 i{font-style:normal;color:var(--green)}
+.back{font-size:12px;color:var(--dim);text-decoration:none}
+.spacer{width:40px}
+h1{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-bottom:8px}
+.lede{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:28px}
+.frame{aspect-ratio:4/3;border-radius:18px;background:radial-gradient(120% 90% at 12% 0%,#1E1E1E,#0C0C0C 70%);border:1px dashed var(--line);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:22px;cursor:pointer}
+.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.frame.filled{border-style:solid;border-color:rgba(232,232,230,.25)}
+.frame .corner{position:absolute;width:22px;height:22px;border:1.5px solid rgba(232,232,230,.35)}
+.frame .corner.tl{top:14px;left:14px;border-right:0;border-bottom:0}.frame .corner.tr{top:14px;right:14px;border-left:0;border-bottom:0}
+.frame .corner.bl{bottom:14px;left:14px;border-right:0;border-top:0}.frame .corner.br{bottom:14px;right:14px;border-left:0;border-top:0}
+.frame.filled .corner{display:none}
+.frame .empty{font-size:12px;color:var(--faint);letter-spacing:.02em;text-align:center;line-height:1.6}
+.frame .x{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:14px;display:none;align-items:center;justify-content:center;border:0}
+.frame.filled .x{display:flex}
+.pill{display:block;width:100%;padding:15px 20px;border-radius:999px;border:1px solid rgba(232,232,230,.35);background:transparent;color:var(--ink);font:500 14px/1 Helvetica,Arial,sans-serif;cursor:pointer;text-align:center;transition:background .2s,border-color .2s}
+.pill:hover{border-color:rgba(232,232,230,.6)}
+.pill.solid{background:var(--ink);color:#000;border-color:var(--ink)}
+.pill.solid:hover{background:#fff}
+.pill:disabled{opacity:.3;cursor:default}
+.pill + .pill{margin-top:10px}
+.hint{font-size:11.5px;color:var(--faint);text-align:center;margin-top:14px}
+.err{font-size:12.5px;color:#D46A5A;text-align:center;margin-top:12px;display:none}
+input[type=file]{display:none}
+.stack{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.card{border-radius:18px;background:radial-gradient(120% 90% at 12% 0%,#1E1E1E,#0C0C0C 70%);box-shadow:0 20px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(232,232,230,.05);padding:18px 20px 16px;position:relative}
+.card .name{font-size:12.5px;letter-spacing:.34em;text-transform:uppercase;color:rgba(232,232,230,.78);font-weight:500;line-height:1.3;margin-bottom:12px;padding-right:44px}
+.rows{border-top:1px solid var(--line);margin-bottom:14px}
+.row{display:grid;grid-template-columns:64px 1fr;align-items:center;border-bottom:1px solid var(--line);min-height:36px}
+.row label{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.row input{background:none;border:0;color:var(--ink);font:400 13px Helvetica,Arial,sans-serif;padding:8px 0;width:100%;outline:none}
+.row input:focus{color:#fff}
+.card .one{display:inline-block;padding:9px 16px;border-radius:999px;border:1px solid rgba(232,232,230,.3);background:none;color:var(--ink);font:500 12px Helvetica,Arial,sans-serif;cursor:pointer}
+.card .one:hover{border-color:rgba(232,232,230,.6)}
+.card .drop{position:absolute;top:14px;right:16px;font-size:11px;color:var(--faint);background:none;border:0;cursor:pointer}
+.card .drop:hover{color:var(--dim)}
+.count{font-size:11.5px;color:var(--faint);margin-bottom:14px}
+.hide{display:none}
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#000;font-size:13px;padding:11px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="glow a"></div><div class="glow b"></div>
+<header>
+  <a class="back" href="/card.html">Back</a>
+  <a class="mark" href="/#profile">deedable<i>.</i></a>
+  <span class="spacer"></span>
+</header>
+
+<section id="capture">
+  <h1>Card scanner<i>.</i></h1>
+  <p class="lede">Lay up to six cards on a table and take one photo. The details get read off each card.</p>
+  <div class="frame" id="frame">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <span class="empty">Tap to snap<br>Lay them flat, fill the frame</span>
+    <button class="x" id="clear">×</button>
+  </div>
+  <input type="file" id="file" accept="image/*" capture="environment">
+  <button class="pill" id="snap">Snap the cards.</button>
+  <button class="pill solid" id="read" disabled>Read the cards.</button>
+  <p class="err" id="err"></p>
+  <p class="hint">Six at a time. Sharp photo, straight on.</p>
+</section>
+
+<section id="review" class="hide">
+  <h1>Check the details<i>.</i></h1>
+  <p class="lede">Fix anything the camera got wrong. Add each one to your phone, or all at once.</p>
+  <p class="count" id="count"></p>
+  <div class="stack" id="stack"></div>
+  <button class="pill solid" id="all">Add all to phone.</button>
+  <button class="pill" id="again">Scan more.</button>
+  <p class="hint">Your phone opens the file and asks to add the contacts.</p>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='PASTE_YOUR_SUPABASE_URL';
+const SUPABASE_ANON='PASTE_YOUR_ANON_KEY';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+
+const FIELDS=[['name','Name'],['title','Title'],['company','Company'],['cell','Cell'],['office','Office'],['email','Email'],['website','Web']];
+const $=s=>document.querySelector(s);
+let shot=null, cards=[];
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+function err(t){const e=$('#err');e.textContent=t||'';e.style.display=t?'block':'none'}
+
+async function downscale(file,max=1800){
+  const img=await createImageBitmap(file);const s=Math.min(1,max/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85);
+}
+function paintFrame(){
+  const f=$('#frame');const old=f.querySelector('img');if(old)old.remove();
+  if(shot){const i=document.createElement('img');i.src=shot;f.prepend(i);f.classList.add('filled')}else f.classList.remove('filled');
+  $('#read').disabled=!shot;
+}
+$('#snap').onclick=()=>$('#file').click();
+$('#frame').onclick=e=>{if(e.target.id==='clear'){shot=null;paintFrame();return}if(!shot)$('#file').click()};
+$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;err('');shot=await downscale(f);paintFrame()};
+
+$('#read').onclick=async()=>{
+  const b=$('#read');b.textContent='Reading…';b.disabled=true;err('');
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)throw new Error('Sign in on deedable first.');
+    const r=await fetch(`${SUPABASE_URL}/functions/v1/card-read`,{method:'POST',headers:{'content-type':'application/json',apikey:SUPABASE_ANON,Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({image:shot})});
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error||'Could not read the cards.');
+    cards=(j.cards||[]).filter(c=>c&&(c.name||c.email||c.cell));
+    if(!cards.length)throw new Error('No cards found. Try a sharper photo.');
+    paintReview();
+  }catch(e){err(e.message)}
+  b.textContent='Read the cards.';b.disabled=!shot;
+};
+
+function paintReview(){
+  $('#capture').classList.add('hide');$('#review').classList.remove('hide');window.scrollTo(0,0);
+  $('#count').textContent=cards.length===1?'One card.':`${cards.length} cards.`;
+  const st=$('#stack');st.innerHTML='';
+  cards.forEach((c,i)=>{
+    const d=document.createElement('div');d.className='card';
+    d.innerHTML=`<div class="name">${esc(c.name)||'Unnamed'}</div>
+      <div class="rows">${FIELDS.map(([k,l])=>`<div class="row"><label>${l}</label><input data-i="${i}" data-k="${k}" value="${esc(c[k])}"></div>`).join('')}</div>
+      <button class="one" data-i="${i}">Add to phone.</button>
+      <button class="drop" data-i="${i}">Drop</button>`;
+    st.appendChild(d);
+  });
+}
+function esc(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+$('#stack').addEventListener('input',e=>{const t=e.target;if(t.tagName!=='INPUT')return;cards[+t.dataset.i][t.dataset.k]=t.value;if(t.dataset.k==='name')t.closest('.card').querySelector('.name').textContent=t.value||'Unnamed'});
+$('#stack').addEventListener('click',e=>{
+  const one=e.target.closest('.one');if(one){share([cards[+one.dataset.i]]);return}
+  const dr=e.target.closest('.drop');if(!dr)return;cards.splice(+dr.dataset.i,1);
+  if(!cards.length){$('#again').click();return}paintReview();
+});
+$('#all').onclick=()=>share(cards);
+$('#again').onclick=()=>{cards=[];shot=null;paintFrame();$('#review').classList.add('hide');$('#capture').classList.remove('hide');window.scrollTo(0,0)};
+
+function vcf(list){
+  return list.map(c=>{const [first,...rest]=(c.name||'').trim().split(' ');
+    return ['BEGIN:VCARD','VERSION:3.0',`N:${rest.join(' ')};${first};;;`,`FN:${c.name||''}`,c.company?`ORG:${c.company}`:'',c.title?`TITLE:${c.title}`:'',c.cell?`TEL;TYPE=CELL:${c.cell}`:'',c.office?`TEL;TYPE=WORK:${c.office}`:'',c.email?`EMAIL:${c.email}`:'',c.website?`URL:${c.website}`:'','END:VCARD'].filter(Boolean).join('\r\n')}).join('\r\n')+'\r\n';
+}
+async function share(list){
+  const name=(list.length===1?(list[0].name||'card').replace(/[^\w]+/g,'-'):'cards')+'.vcf';
+  const blob=new Blob([vcf(list)],{type:'text/vcard'});const f=new File([blob],name,{type:'text/vcard'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]})}catch{}}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+}
+paintFrame();
+</script>
+</body>
+</html>
