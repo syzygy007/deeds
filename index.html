@@ -7043,8 +7043,8 @@ fit.lines.forEach(function(L,i){ctx.fillText(L,M,y0+i*fit.size*1.44)});
 ctx.strokeStyle=ln;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(M,1136);ctx.lineTo(W-M,1136);ctx.stroke();
 ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';
 spaced(ctx,CARD.ref,M,1216,6);
-var mk=document.getElementById('wordmark');if(mk){var sc=236/412,mx=W-M-236,my=1228-143*sc;ctx.save();ctx.translate(mx,my);ctx.scale(sc,sc);ctx.fillStyle=ink;ctx.fill(new Path2D(mk.getAttribute('d')),'evenodd');ctx.fillStyle=ac;ctx.beginPath();ctx.arc(391,122,9.5,0,Math.PI*2);ctx.fill();ctx.restore()}
-ctx.fillStyle=ac;ctx.font='800 23px "Helvetica Neue",Helvetica,Arial,sans-serif';spaced(ctx,'DEEDABLE.FUN',M,1282,7)}
+/* Sep 11: no wordmark on the card, the site name sits bottom right instead */
+ctx.fillStyle=ink;ctx.font='800 29px "Helvetica Neue",Helvetica,Arial,sans-serif';var sw=0;for(var si=0;si<12;si++)sw+=ctx.measureText('DEEDABLE.FUN'[si]).width+6;sw-=6;spaced(ctx,'DEEDABLE.FUN',W-M-sw,1216,6)}
 J('ccIvory').onclick=function(){CW='ivory';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
 J('ccIvory').classList.add('on');J('ccForest').classList.remove('on');drawCard()};
 J('ccForest').onclick=function(){CW='forest';try{localStorage.setItem('deeds_cw',CW)}catch(e){}
