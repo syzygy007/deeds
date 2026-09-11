@@ -1777,6 +1777,14 @@ html.dark .jn-buy i{color:#7FC79E}
 .wl-silver .wl-mono{font-size:28px}
 .wl-mark{position:absolute;right:22px;bottom:18px;width:80px;height:24px;color:rgba(242,242,240,.85)}
 .wl-hint{text-align:center;font-size:13px;color:var(--muted);margin-top:16px}
+/* ============ PHOTO DEEDS (Sep 11) · a deed with a picture: photo, caps line, plain words. No paper. ============ */
+.deedrow .p-media{margin-top:6px;border-radius:22px}
+.dcap{margin-top:16px}
+.dcap-k{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--muted);margin-bottom:8px}
+.dcap-b{font-size:18px;line-height:1.35;font-weight:400;letter-spacing:-.01em;margin:0}
+/* the composer is DEED or POST; the invite lane opens from Invite Someone. */
+#modeInv{display:none!important}
+#logsheet.inv #modetog{display:none!important}
 </style>
 <meta name="theme-color" content="#0B0B0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3534,12 +3542,14 @@ h+='<div class="p-time">'+relTime(r.created_at)+'</div></div>';
 h+='<button class="pa more" data-lmore="'+esc(r.id)+'" data-lmh="'+esc(nm.handle)+'"'+(mine?' data-lown="1"':'')+' aria-label="More">'+MORESVG+'</button></div>';
 if(!isPost&&r.chain_no)h+='<div class="chaintag">'+CHAINSVG+'CHAIN \u00B7 LINK '+r.chain_no+'</div>';
 if(!isPost&&r.daily_no)h+='<div class="chaintag">DAILY DEED \u00B7 No. '+r.daily_no+'</div>';
-h+=presBodyHTML(r,body,mine,nm);
 var mlive=!r.media_status||r.media_status==='live';
+var photoDeed=!isPost&&!!r.media_path&&mlive;
+if(!photoDeed)h+=presBodyHTML(r,body,mine,nm);
 var eggPhoto=isPost&&r.presentation_type==='golden_egg'&&r.egg_filling==='photo';
 if(r.media_path&&mlive&&!eggPhoto){var mu=esc(mediaURL(r.media_path));
 h+='<div class="p-media" data-limg="'+mu+'"><img src="'+mu+'" alt="" loading="lazy" style="width:100%;height:auto;display:block"'+((r.media_w&&r.media_h)?' width="'+r.media_w+'" height="'+r.media_h+'"':'')+'></div>'}
 else if(r.media_path&&r.media_status==='pending'&&mine&&!eggPhoto){h+='<div class="chaintag">PHOTO IN REVIEW \u00B7 IT SHOWS WHEN IT CLEARS</div>'}
+if(photoDeed){var pno=+(r.deed_no||0)||0,pdt=hwDate(r);h+='<div class="dcap"><div class="dcap-k">'+(pno?'Deed #'+pno:'A Deed')+(pdt?' \u00B7 '+esc(pdt):'')+'</div>'+(body?'<p class="dcap-b">'+esc(body)+'</p>':'')+'</div>'}
 var tk=(isPost?'p:':'d:')+r.id;
 h+='<div class="p-acts">';
 h+='<button class="pa'+(MYINSP[tk]?' lit':'')+'" data-linsp="'+esc(tk)+'">'+INSPSVG+'<span>'+(CINSP[tk]||0)+'</span></button>';
