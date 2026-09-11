@@ -5627,7 +5627,28 @@ if(!R||!img||!pics[room])return;
 img.src=pics[room];img.style.left=R.cx+'%';img.style.top=R.top+'%';img.style.height=R.h+'%';img.className='xt-fig on';
 if(occ)occ.style.clipPath=R.occ?('inset('+R.occ+'% 0 0 0)'):'inset(100% 0 0 0)';
 if(sh){if(R.sh){sh.style.left=R.cx+'%';sh.style.top=(R.top+R.h-3)+'%'}else{sh.style.display='none'}}})}
-var _renderMeetP=renderMeet;renderMeet=function(){var r=_renderMeetP.apply(this,arguments);try{playFigures()}catch(e){}return r};
+/* the green lines: every tile stays lit, the line under it tells the truth about where you stand */
+var PLAYLINES_AT=0;
+function playLine(room,txt){var t=document.querySelector('.xtile[data-room="'+room+'"] .xt-r b');if(t&&txt)t.textContent=txt}
+function playLines(){
+if(!document.querySelector('.xtile[data-room]'))return;
+try{var n=deedCount();var sk=null;try{sk=JSON.parse(localStorage.getItem('garden'))}catch(e){}var sd=Math.max(0,(sk&&typeof sk==='object')?(sk.bank||0):4);
+if(PROFILE)playLine('garden',Math.min(n,40)+' of 40 growing \u00B7 '+sd+(sd===1?' seed':' seeds')+' in the sack.')}catch(e){}
+if(!sb||!PROFILE)return;
+var now=Date.now();if(now-PLAYLINES_AT<60000)return;PLAYLINES_AT=now;
+try{sb.rpc('chess_state').then(function(r){if(r.error||!r.data)return;var d=r.data;
+if(d.owned)playLine('chess','Sit down \u00B7 '+(d.rank||'Pawn')+' \u00B7 '+(+d.xp||0)+' xp.');
+else playLine('chess','The board is '+(+d.price||3000).toLocaleString()+' gc. A friend can invite you free.')}).catch(function(){})}catch(e){}
+var doors=['garden_state12','garden_state11','garden_state10'];
+function tryDoor(i){if(i>=doors.length)return;sb.rpc(doors[i]).then(function(r){if(r.error||!r.data){tryDoor(i+1);return}var d=r.data;
+var st=+(d.house&&d.house.stage)||0,wd=+(d.house&&d.house.wood)||0,tiers=Array.isArray(d.house_tiers)?d.house_tiers.map(Number):[4,7,10];
+var have=[],names={piano_black:'Piano',piano_gold:'Gold piano',harp:'Harp',guitar:'Guitar',violin:'Violin',drums:'Drums'};
+(d.tools||[]).forEach(function(k){if(names[k])have.push(names[k])});
+if(have.length)playLine('music',have.join(' \u00B7 ')+'. Sit down.');
+else if(st>=1)playLine('music','The house is yours. The piano waits on its plinth.');
+else playLine('music','Waits in the house \u00B7 '+wd+' of '+(tiers[0]||4)+' wood to the door.')}).catch(function(){tryDoor(i+1)})}
+tryDoor(0)}
+var _renderMeetP=renderMeet;renderMeet=function(){var r=_renderMeetP.apply(this,arguments);try{playFigures()}catch(e){}try{playLines()}catch(e){}return r};
 function loadAvCounts(){
 var el=$('#avCounts');if(!el)return;
 var deeds=(window.my&&my.deeds&&my.deeds.length)||0;
