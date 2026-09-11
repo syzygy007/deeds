@@ -36,6 +36,7 @@ h1{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-
 .pill:disabled{opacity:.3;cursor:default}
 .pill + .pill{margin-top:10px}
 .hint{font-size:11.5px;color:var(--faint);text-align:center;margin-top:14px}
+.prog{display:none;margin:18px 0 0}.prog.on{display:block}.prog .bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}.prog .fill{height:100%;width:0;background:var(--ink);transition:width .6s ease}.prog .ph{font-size:11.5px;color:var(--dim);text-align:center;margin-top:12px}
 .err{font-size:12.5px;color:#D46A5A;text-align:center;margin-top:12px;display:none}
 input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 label.pill{display:block}
@@ -77,6 +78,7 @@ label.pill{display:block}
   <input type="file" id="file" accept="image/*" capture="environment">
   <label class="pill" for="file" id="snap">Snap the cards.</label>
   <button class="pill solid" id="read" disabled>Read the cards.</button>
+  <div class="prog" id="prog"><div class="bar"><div class="fill" id="fill"></div></div><div class="ph" id="ph"></div></div>
   <p class="err" id="err"></p>
   <p class="hint">Six at a time. Sharp photo, straight on.</p>
 </section>
@@ -105,10 +107,10 @@ let shot=null, cards=[];
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
 function err(t){const e=$('#err');e.textContent=t||'';e.style.display=t?'block':'none'}
 
-async function downscale(file,max=1800){
+async function downscale(file,max=1400){
   const img=await createImageBitmap(file);const s=Math.min(1,max/Math.max(img.width,img.height));
   const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
-  c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.8);
 }
 function paintFrame(){
   const f=$('#frame');const old=f.querySelector('img');if(old)old.remove();
@@ -119,19 +121,26 @@ function paintFrame(){
 $('#frame').onclick=e=>{if(e.target.id==='clear'){shot=null;paintFrame();return}if(!shot)$('#file').click()};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;err('');shot=await downscale(f);paintFrame()};
 
+let ptimer=null;
+function progStart(){const p=$('#prog'),f=$('#fill'),ph=$('#ph');p.classList.add('on');f.style.width='0%';const t0=Date.now();
+  const phases=[[0,'Sending the photo'],[3,'Reading the cards'],[12,'Picking out the names and numbers'],[22,'Almost there']];
+  ptimer=setInterval(()=>{const s=(Date.now()-t0)/1000;const w=Math.min(92,100*(1-Math.exp(-s/12)));f.style.width=w+'%';let l=phases[0][1];for(const [at,txt] of phases)if(s>=at)l=txt;ph.textContent=l},250)}
+function progEnd(ok){clearInterval(ptimer);const f=$('#fill'),ph=$('#ph');if(ok){f.style.width='100%';ph.textContent='Done.';setTimeout(()=>$('#prog').classList.remove('on'),500)}else{$('#prog').classList.remove('on')}}
 $('#read').onclick=async()=>{
-  const b=$('#read');b.textContent='Reading…';b.disabled=true;err('');
+  const b=$('#read');b.textContent='Reading…';b.disabled=true;err('');progStart();
   try{
     if(!sb)throw new Error('Supabase lines at the top of scan.html are not filled in.');
     const {data:{session}}=await sb.auth.getSession();
     if(!session)throw new Error('Sign in on deedable first.');
-    const r=await fetch(`${SUPABASE_URL}/functions/v1/card-read`,{method:'POST',headers:{'content-type':'application/json',apikey:SUPABASE_ANON,Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({image:shot})});
+    const ac=new AbortController();const to=setTimeout(()=>ac.abort(),60000);
+    const r=await fetch(`${SUPABASE_URL}/functions/v1/card-read`,{method:'POST',signal:ac.signal,headers:{'content-type':'application/json',apikey:SUPABASE_ANON,Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({image:shot})}).catch(e=>{throw new Error(e.name==='AbortError'?'Took over a minute. Try again.':'No connection.')});
+    clearTimeout(to);
     const j=await r.json();
     if(!r.ok)throw new Error(j.error||'Could not read the cards.');
     cards=(j.cards||[]).filter(c=>c&&(c.name||c.email||c.cell));
     if(!cards.length)throw new Error('No cards found. Try a sharper photo.');
-    paintReview();
-  }catch(e){err(e.message)}
+    progEnd(true);setTimeout(paintReview,450);return;
+  }catch(e){progEnd(false);err(e.message)}
   b.textContent='Read the cards.';b.disabled=!shot;
 };
 
@@ -156,7 +165,7 @@ $('#stack').addEventListener('click',e=>{
   if(!cards.length){$('#again').click();return}paintReview();
 });
 $('#all').onclick=()=>share(cards);
-$('#again').onclick=()=>{cards=[];shot=null;paintFrame();$('#review').classList.add('hide');$('#capture').classList.remove('hide');window.scrollTo(0,0)};
+$('#again').onclick=()=>{cards=[];shot=null;paintFrame();$('#read').textContent='Read the cards.';$('#review').classList.add('hide');$('#capture').classList.remove('hide');window.scrollTo(0,0)};
 
 function vcf(list){
   return list.map(c=>{const [first,...rest]=(c.name||'').trim().split(' ');
