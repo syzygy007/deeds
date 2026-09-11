@@ -1791,6 +1791,25 @@ html.dark .jn-buy i{color:#7FC79E}
 .mtop div:has(#mNotes.newnotes) .cbtn::after,.dright:has(#dNotes.newnotes) .cbtn::after{display:block}
 .tl-row .tl-dot{width:8px;height:8px;border-radius:50%;background:var(--forest);display:none;margin-right:6px}
 #toolsheet:has(~ * #mNotes.newnotes) .tl-dot,body:has(#mNotes.newnotes) #tlNotes .tl-dot{display:block}
+/* the buy sheet preview of The Card: two slides, front then back, slide across */
+.cb-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;margin:0 -20px;padding:0 20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cb-track::-webkit-scrollbar{display:none}
+.cb-slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
+.cb-face{position:relative;width:100%;aspect-ratio:1.53;border-radius:22px;overflow:hidden;background:linear-gradient(160deg,#171717 0%,#121212 50%,#0E0E0E 100%);border:1px solid rgba(255,255,255,.08);box-shadow:0 22px 50px rgba(0,0,0,.45);color:#F2F2F0}
+.cb-face:after{content:"";position:absolute;inset:0;background:radial-gradient(80% 70% at 100% 100%,rgba(0,0,0,.3),rgba(0,0,0,0) 60%);pointer-events:none}
+.cb-front{padding:30px 28px}
+.cb-back{display:flex;align-items:center;gap:18px;padding:20px}
+.cb-name{position:relative;z-index:1;font-size:12.5px;letter-spacing:.34em;text-transform:uppercase;font-weight:400;color:rgba(240,240,238,.78)}
+.cb-mark{position:absolute;right:28px;bottom:26px;width:74px;height:22px;color:rgba(240,240,238,.92);z-index:1}
+.cb-qr{position:relative;z-index:1;height:100%;aspect-ratio:1;flex:none;background:#fff;border-radius:12px;padding:8px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.cb-qr svg{width:100%;height:100%;display:block}
+.cb-scan{position:relative;z-index:1;font-size:19px;line-height:1.08;letter-spacing:-.02em;font-weight:600;color:#F5F5F3}
+.cb-scan i{font-style:normal;color:var(--gem,#0FA35F)}
+.cb-cap{font-size:14px;line-height:1.5;color:var(--muted);margin:14px 2px 0}
+.cb-cap b{color:var(--ink);font-weight:700}
+.cb-dots{display:flex;justify-content:center;gap:7px;margin-top:12px}
+.cb-dots span{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.cb-dots span.on{background:var(--forest)}
 </style>
 <meta name="theme-color" content="#0B0B0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2563,7 +2582,12 @@ html.dark .jn-buy i{color:#7FC79E}
 <div class="sheet" id="cardbuy">
   <div class="sword"><svg class="dmark"><use href="#dblmark"></use></svg></div>
   <h3>The Card.</h3>
-  <p class="remnote" style="margin:-6px 0 16px">Your name and title on a black card, with a code that hands over your contact when someone scans it. 1,000 Deedcoin, once. It lives in your Tools.</p>
+  <div class="cb-track" id="cbTrack">
+    <div class="cb-slide"><div class="cb-face cb-front"><div class="cb-name" id="cbName">Your name</div><svg class="cb-mark"><use href="#dblmark"></use></svg></div><p class="cb-cap"><b>The front.</b> Your name on a black card. Nothing else on it.</p></div>
+    <div class="cb-slide"><div class="cb-face cb-back"><div class="cb-qr" id="cbQr"></div><div class="cb-scan">Scan to save my contact<i>.</i></div></div><p class="cb-cap"><b>The back.</b> Tap the card and it turns into a code. Anyone who scans it gets your name, title, company, cell, email and site straight into their contacts.</p></div>
+  </div>
+  <div class="cb-dots"><span class="on"></span><span></span></div>
+  <p class="remnote" style="margin:12px 0 16px">1,000 Deedcoin, once. It lives in your Tools.</p>
   <div class="tl-btns"><button class="tl-btn ghost" type="button" data-tlclose>Not now.</button><button class="tl-btn" type="button" id="cbGo">Buy it.</button></div>
 </div>
 <div class="coinmenu" id="coinmenu" role="menu" aria-label="Deedcoins">
@@ -5224,7 +5248,14 @@ var paintCoinBase=paintCoin;paintCoin=function(b){paintCoinBase(b);if($('#wallet
 $('#tlNotes').onclick=function(){closeSheets();openNotesPage()};
 $('#tlWallet').onclick=openWallet;
 $('#tlJournal').onclick=function(){closeSheets();go('profile');setTimeout(function(){var j=$('#jnsect');if(j)j.scrollIntoView({behavior:'smooth',block:'start'})},150)};
-$('#tlCard').onclick=function(){cardOwned().then(function(own){if(own){location.href='/card.html';return}sheet('#cardbuy')})};
+$('#tlCard').onclick=function(){cardOwned().then(function(own){if(own){location.href='/card.html';return}var nm=$('#cbName');if(nm)nm.textContent=(PROFILE&&(PROFILE.display_name||PROFILE.handle))||'Your name';cbSample();var tk=$('#cbTrack');if(tk)tk.scrollLeft=0;sheet('#cardbuy')})};
+/* a sample code for the preview: random modules with the three finder squares, so it looks like a code but reads as nothing */
+function cbSample(){var el=$('#cbQr');if(!el||el.firstChild)return;var N=29,s=7;function rnd(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff}
+var q='<svg viewBox="0 0 '+N+' '+N+'" shape-rendering="crispEdges" aria-hidden="true">';function fin(x,y){q+='<rect x="'+x+'" y="'+y+'" width="7" height="7" fill="#111"/><rect x="'+(x+1)+'" y="'+(y+1)+'" width="5" height="5" fill="#fff"/><rect x="'+(x+2)+'" y="'+(y+2)+'" width="3" height="3" fill="#111"/>'}
+function inFin(x,y){return (x<8&&y<8)||(x>=N-8&&y<8)||(x<8&&y>=N-8)}
+for(var y=0;y<N;y++)for(var x=0;x<N;x++){if(inFin(x,y))continue;if(rnd()<.46)q+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="#111"/>'}
+fin(0,0);fin(N-7,0);fin(0,N-7);q+='</svg>';el.innerHTML=q}
+(function(){var tk=$('#cbTrack');if(!tk)return;tk.addEventListener('scroll',function(){var i=Math.round(tk.scrollLeft/tk.clientWidth);$$('#cardbuy .cb-dots span').forEach(function(d,j){d.classList.toggle('on',j===i)})},{passive:true})})();
 $('#wlMain').onclick=function(){closeSheets();COINCTX='new';openCoinSend(0)};
 $('#cbGo').onclick=function(){var g=$('#cbGo');g.textContent='Buying\u2026';sb.rpc('card_buy').then(function(r){g.textContent='Buy it.';
 if(r.error){var m=String(r.error.message||'');toast(/not_enough/.test(m)?'Not enough Deedcoin yet. A deed pays 200.':'Could not buy it: '+m);return}
