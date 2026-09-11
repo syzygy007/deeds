@@ -4382,7 +4382,7 @@ if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}}
 LPURL=URL.createObjectURL(bl);im.src=LPURL;
 var m=$('#lpvmeta');if(m)m.textContent='PHOTO ATTACHED'+((w&&h)?(' \u00B7 '+w+'\u00D7'+h):'');
 LSIMG=null;LSCACHE=null;lsSet('plain');
-p.style.display=''}
+p.style.display='';setTimeout(function(){try{hwComposerPaint()}catch(e){}},0)}
 var LSTYLE='plain',LSIMG=null;
 function lsNote(){var e=$('#lsnote');if(!e)return;
 e.textContent=LSTYLE==='memory'?'THE WHITE PRINT.':LSTYLE==='forest'?'LAID ON THE FOREST.':LSTYLE==='art'?'FRAMED AND GILDED.':'THE PHOTO AS IT IS.'}
@@ -4413,7 +4413,7 @@ cb(c.blob,c.w,c.h,LSTYLE==='art'?'art-':LSTYLE==='memory'?'mem-':'for-')})}
 function hidePrev(){var p=$('#logprev');if(p)p.style.display='none';
 var im=$('#lpvimg');if(im)im.removeAttribute('src');
 if(LPURL){try{URL.revokeObjectURL(LPURL)}catch(e){}LPURL=null}}
-function clearPhoto(){LPHOTO=null;LSIMG=null;LSTYLE='plain';LSCACHE=null;
+function clearPhoto(){LPHOTO=null;LSIMG=null;LSTYLE='plain';LSCACHE=null;setTimeout(function(){try{hwComposerPaint()}catch(e){}},0);
 var _lw=$('#lpvwrap');if(_lw)_lw.classList.remove('styled');
 $$('#lstyles [data-ls]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-ls')==='plain')});lsNote();
 var b=$('#logphoto');
@@ -6399,7 +6399,7 @@ ta.parentNode.insertBefore(w,ta);w.appendChild(ta)})();
 var HWPICK=null;
 function hwMyHand(){var P=window.PROFILE;var nm=(P&&P.handle)?{handle:P.handle,hand:P.hand}:{handle:(typeof my!=='undefined'&&my&&my.handle)||'',hand:HWPICK};return hwHandOf(nm)}
 function hwNextNo(){var mx=0,n=0;try{(my.deeds||[]).forEach(function(d){n++;var v=+(d.no||0);if(v>mx)mx=v})}catch(e){}if(!n)return 1;return mx?mx+1:0}
-function hwComposerPaint(){var ls=$('#logsheet'),w=$('#hwc'),ta=$('#logtext'),hd=$('#hwcHead');if(!ls||!w)return;var on=composeMode==='deed';
+function hwComposerPaint(){var ls=$('#logsheet'),w=$('#hwc'),ta=$('#logtext'),hd=$('#hwcHead');if(!ls||!w)return;var on=composeMode==='deed'&&!(typeof LPHOTO!=='undefined'&&LPHOTO);/* Sep 11: a deed with a photo posts as plain words, so the paper goes away once a photo is attached */
 ls.classList.toggle('hwd',on);w.classList.toggle('hwpaper',on);
 if(!on){if(ta){ta.style.font='';ta.style.fontFeatureSettings=''}if(hd){hd.style.fontFamily='';hd.style.fontSize=''}return}
 var k=hwMyHand(),f=HWFONTS[k];hwEnsure(k,function(){});
