@@ -37,7 +37,8 @@ h1{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-
 .pill + .pill{margin-top:10px}
 .hint{font-size:11.5px;color:var(--faint);text-align:center;margin-top:14px}
 .err{font-size:12.5px;color:#D46A5A;text-align:center;margin-top:12px;display:none}
-input[type=file]{display:none}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+label.pill{display:block}
 .stack{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
 .card{border-radius:18px;background:radial-gradient(120% 90% at 12% 0%,#1E1E1E,#0C0C0C 70%);box-shadow:0 20px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(232,232,230,.05);padding:18px 20px 16px;position:relative}
 .card .name{font-size:12.5px;letter-spacing:.34em;text-transform:uppercase;color:rgba(232,232,230,.78);font-weight:500;line-height:1.3;margin-bottom:12px;padding-right:44px}
@@ -74,7 +75,7 @@ input[type=file]{display:none}
     <button class="x" id="clear">×</button>
   </div>
   <input type="file" id="file" accept="image/*" capture="environment">
-  <button class="pill" id="snap">Snap the cards.</button>
+  <label class="pill" for="file" id="snap">Snap the cards.</label>
   <button class="pill solid" id="read" disabled>Read the cards.</button>
   <p class="err" id="err"></p>
   <p class="hint">Six at a time. Sharp photo, straight on.</p>
@@ -114,7 +115,7 @@ function paintFrame(){
   if(shot){const i=document.createElement('img');i.src=shot;f.prepend(i);f.classList.add('filled')}else f.classList.remove('filled');
   $('#read').disabled=!shot;
 }
-$('#snap').onclick=()=>$('#file').click();
+
 $('#frame').onclick=e=>{if(e.target.id==='clear'){shot=null;paintFrame();return}if(!shot)$('#file').click()};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;err('');shot=await downscale(f);paintFrame()};
 
