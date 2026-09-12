@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.30">
+<meta name="world-build" content="6.31">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -194,7 +194,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 #lockchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:23;display:none;align-items:center;gap:7px;pointer-events:none;background:rgba(20,18,16,.72);color:#F6F3EB;border-radius:999px;padding:6px 12px;font:600 12px/1 ui-monospace,monospace;letter-spacing:.06em}#lockchip.on{display:flex}#lockchip.amber{color:#F3C64F}#lockchip svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.qbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}.qbtns .btn{padding:6px 10px;font-size:12px}
 #homechip{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(40px,calc(env(safe-area-inset-bottom) + 26px));z-index:24;background:rgba(20,18,16,.72);color:#F6F3EB;border:1px solid rgba(246,243,235,.35);border-radius:999px;padding:9px 13px;font:700 11px/1 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;pointer-events:auto;cursor:pointer}#homechip.off{display:none}
 #offchip{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(96px,calc(env(safe-area-inset-bottom) + 84px));z-index:24;display:none;background:rgba(20,18,16,.72);color:#F6F3EB;border:1px solid rgba(246,243,235,.35);border-radius:999px;padding:9px 13px;font:700 11px/1 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;pointer-events:auto}
-#nightchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:24;display:none;pointer-events:none;background:rgba(20,18,16,.78);color:#F3C64F;border:1px solid rgba(243,198,79,.45);border-radius:999px;padding:8px 14px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap}#nightchip.on{display:block;animation:nightpulse .9s ease-in-out 3}#nightleft{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:22;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.9}#nightleft.on{display:block}#wxchip{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:21;display:none;pointer-events:none;background:rgba(20,18,16,.55);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.85}#wxchip.on{display:block}#geychip{position:fixed;top:max(116px,calc(env(safe-area-inset-top) + 102px));left:50%;transform:translateX(-50%);z-index:23;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#BFE6FF;border:1px solid rgba(191,230,255,.4);border-radius:999px;padding:6px 12px;font:700 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap}#geychip.on{display:block}#wxchip.gold{color:#F3C64F;border:1px solid rgba(243,198,79,.45);opacity:1;animation:nightpulse .9s ease-in-out 3}#sackRows .btn{pointer-events:auto;padding:6px 12px;font-size:10px}#chestPick{position:fixed;inset:0;z-index:58;display:none;align-items:flex-end;justify-content:center;background:rgba(10,9,8,.66)}#chestPick.on{display:flex}#chestPick .card{width:min(520px,100%);background:#1c1915;color:#F4F1E8;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto}#chestPick h3{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}#chestPick .sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:12px}#chestPick .row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08)}#chestPick .row .nm{flex:1;font-size:15px}#chestPick .row .where{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55}#chestPick .row .tg{width:46px;height:28px;border-radius:999px;background:#3a3631;position:relative;border:0}#chestPick .row .tg:after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#bdb5a6;transition:left .15s}#chestPick .row .tg.on{background:#2ECB7A}#chestPick .row .tg.on:after{left:21px;background:#fff}#chestPick .foot{display:flex;gap:10px;align-items:center;margin-top:12px}#chestPick .foot .n{flex:1;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}#chestPick .btn[disabled]{opacity:.35}#hwShop{position:fixed;inset:0;z-index:58;display:none;align-items:flex-end;justify-content:center;background:rgba(10,9,8,.66)}#hwShop.on{display:flex}#hwShop .card{width:min(560px,100%);background:#1c1915;color:#F4F1E8;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:84vh;overflow:auto;border-top:2px solid #E86A17}#hwShop h3{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}#hwShop .sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:12px}#hwShop .row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08)}#hwShop .row .nm{flex:1;font-size:15px}#hwShop .row .where{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:2px}#hwShop .row .dsc{font-size:12px;opacity:.72;margin-top:3px;line-height:1.35}#hwShop .btn{pointer-events:auto;min-width:86px;text-align:center}#hwShop .btn[disabled]{opacity:.35}#hwShop .foot{display:flex;gap:10px;align-items:center;margin-top:12px}#hwShop .foot .n{flex:1;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}#floats{position:fixed;inset:0;pointer-events:none;z-index:38}#floats .fl{position:absolute;transform:translate(-50%,-50%);font:700 15px/1 ui-monospace,monospace;letter-spacing:.04em;color:#2ECB7A;text-shadow:0 1px 2px rgba(0,0,0,.55);white-space:nowrap;display:flex;align-items:center;gap:5px;animation:flrise 1.6s ease-out forwards}#floats .fl i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#2ECB7A;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}@keyframes flrise{0%{opacity:0;margin-top:6px}12%{opacity:1;margin-top:0}70%{opacity:1}100%{opacity:0;margin-top:-46px}}@keyframes nightpulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+#nightchip{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 38px));left:50%;transform:translateX(-50%);z-index:24;display:none;pointer-events:none;background:rgba(20,18,16,.78);color:#F3C64F;border:1px solid rgba(243,198,79,.45);border-radius:999px;padding:8px 14px;font:700 12px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap}#nightchip.on{display:block;animation:nightpulse .9s ease-in-out 3}#nightleft{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:22;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.9}#nightleft.on{display:block}#wxchip{position:fixed;top:max(84px,calc(env(safe-area-inset-top) + 70px));left:50%;transform:translateX(-50%);z-index:21;display:none;pointer-events:none;background:rgba(20,18,16,.55);color:#F6F3EB;border-radius:999px;padding:5px 11px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;opacity:.85}#wxchip.on{display:block}#geychip{position:fixed;top:max(116px,calc(env(safe-area-inset-top) + 102px));left:50%;transform:translateX(-50%);z-index:23;display:none;pointer-events:none;background:rgba(20,18,16,.62);color:#BFE6FF;border:1px solid rgba(191,230,255,.4);border-radius:999px;padding:6px 12px;font:700 11px/1 ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap}#geychip.on{display:block}#wxchip.gold{color:#F3C64F;border:1px solid rgba(243,198,79,.45);opacity:1;animation:nightpulse .9s ease-in-out 3}#sackRows .btn{pointer-events:auto;padding:6px 12px;font-size:10px}#chestPick{position:fixed;inset:0;z-index:58;display:none;align-items:flex-end;justify-content:center;background:rgba(10,9,8,.66)}#chestPick.on{display:flex}#chestPick .card{width:min(520px,100%);background:#1c1915;color:#F4F1E8;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto}#chestPick h3{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}#chestPick .sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:12px}#chestPick .row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08)}#chestPick .row .nm{flex:1;font-size:15px}#chestPick .row .where{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55}#chestPick .row .tg{width:46px;height:28px;border-radius:999px;background:#3a3631;position:relative;border:0}#chestPick .row .tg:after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#bdb5a6;transition:left .15s}#chestPick .row .tg.on{background:#2ECB7A}#chestPick .row .tg.on:after{left:21px;background:#fff}#chestPick .foot{display:flex;gap:10px;align-items:center;margin-top:12px}#chestPick .foot .n{flex:1;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}#chestPick .btn[disabled]{opacity:.35}#gaShop{position:fixed;inset:0;z-index:58;display:none;align-items:flex-end;justify-content:center;background:rgba(10,9,8,.66)}#gaShop.on{display:flex}#gaShop .card{width:min(560px,100%);background:#1c1915;color:#F4F1E8;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:84vh;overflow:auto;border-top:2px solid #D9A441}#gaShop h3{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}#gaShop .sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:12px}#gaShop .row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08)}#gaShop .row .nm{flex:1;font-size:15px}#gaShop .row .where{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:2px}#gaShop .row .dsc{font-size:12px;opacity:.72;margin-top:3px;line-height:1.35}#gaShop .btn{pointer-events:auto;min-width:96px;text-align:center}#gaShop .btn[disabled]{opacity:.35}#gaShop .foot{display:flex;gap:10px;align-items:center;margin-top:12px}#gaShop .foot .n{flex:1;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}#hwShop{position:fixed;inset:0;z-index:58;display:none;align-items:flex-end;justify-content:center;background:rgba(10,9,8,.66)}#hwShop.on{display:flex}#hwShop .card{width:min(560px,100%);background:#1c1915;color:#F4F1E8;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:84vh;overflow:auto;border-top:2px solid #E86A17}#hwShop h3{margin:0 0 4px;font-size:26px;letter-spacing:-.01em}#hwShop .sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:12px}#hwShop .row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid rgba(255,255,255,.08)}#hwShop .row .nm{flex:1;font-size:15px}#hwShop .row .where{font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.55;margin-top:2px}#hwShop .row .dsc{font-size:12px;opacity:.72;margin-top:3px;line-height:1.35}#hwShop .btn{pointer-events:auto;min-width:86px;text-align:center}#hwShop .btn[disabled]{opacity:.35}#hwShop .foot{display:flex;gap:10px;align-items:center;margin-top:12px}#hwShop .foot .n{flex:1;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}#floats{position:fixed;inset:0;pointer-events:none;z-index:38}#floats .fl{position:absolute;transform:translate(-50%,-50%);font:700 15px/1 ui-monospace,monospace;letter-spacing:.04em;color:#2ECB7A;text-shadow:0 1px 2px rgba(0,0,0,.55);white-space:nowrap;display:flex;align-items:center;gap:5px;animation:flrise 1.6s ease-out forwards}#floats .fl i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#2ECB7A;box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}@keyframes flrise{0%{opacity:0;margin-top:6px}12%{opacity:1;margin-top:0}70%{opacity:1}100%{opacity:0;margin-top:-46px}}@keyframes nightpulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 #hearts{position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:23;display:none;gap:6px;pointer-events:none}#hearts.on{display:flex}#hearts i{width:24px;height:24px;display:block}#hearts i svg{width:24px;height:24px;fill:#C8322B;stroke:#3a0d0b;stroke-width:1.2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}#hearts i.off svg{fill:rgba(0,0,0,.35);stroke:#C8322B}
 #hurt{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(200,50,43,0) 42%,rgba(200,50,43,.62) 100%);opacity:0;transition:opacity .5s;z-index:30}#hurt.on{opacity:1;transition:opacity .06s}
 #dead{position:fixed;inset:0;background:#0b0a0d;color:#F4F1E8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;opacity:0;pointer-events:none;transition:opacity 1s;font-size:34px;letter-spacing:.01em;text-align:center;padding:0 24px}#dead.on{opacity:1;pointer-events:auto}#dead small{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.7;line-height:1.6}
@@ -287,7 +287,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 
 <div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
 <div id="status" class="micro"></div>
-<div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="wxchip"></div><div id="geychip"></div><div id="offchip">Get off</div><div id="homechip">Home</div><div id="floats"></div><div id="hwShop" onclick="if(event.target.id==='hwShop')closeHwShop()"><div class="card"><h3>Morgana's Halloween shop.</h3><div class="sub" id="hwSub">Everything is set for you the moment you pay, and comes down 48 hours after Halloween.</div><div id="hwRows"></div><div class="foot"><div class="n" id="hwBal"></div><button class="btn" onclick="closeHwShop()">Close.</button></div></div></div><div id="chestPick"><div class="card"><h3>Five in hand.</h3><div class="sub" id="cpSub">The rest wait in the chest in the hall.</div><div id="cpRows"></div><div class="foot"><div class="n" id="cpN"></div><button class="btn" id="cpClose">Close</button><button class="btn on" id="cpSave">Keep these</button></div></div></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
+<div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="wxchip"></div><div id="geychip"></div><div id="offchip">Get off</div><div id="homechip">Home</div><div id="floats"></div><div id="hwShop" onclick="if(event.target.id==='hwShop')closeHwShop()"><div class="card"><h3>Morgana's Halloween shop.</h3><div class="sub" id="hwSub">Everything is set for you the moment you pay, and comes down 48 hours after Halloween.</div><div id="hwRows"></div><div class="foot"><div class="n" id="hwBal"></div><button class="btn" onclick="closeHwShop()">Close.</button></div></div></div><div id="gaShop" onclick="if(event.target.id==='gaShop')closeGaShop()"><div class="card"><h3>Hank’s garage.</h3><div class="sub" id="gaSub"></div><div id="gaRows"></div><div class="foot"><div class="n" id="gaBal"></div><button class="btn" onclick="closeGaShop()">Close.</button></div></div></div><div id="chestPick"><div class="card"><h3>Five in hand.</h3><div class="sub" id="cpSub">The rest wait in the chest in the hall.</div><div id="cpRows"></div><div class="foot"><div class="n" id="cpN"></div><button class="btn" id="cpClose">Close</button><button class="btn on" id="cpSave">Keep these</button></div></div></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
 <div id="pianoUI"><div id="pnBar"><button class="btn" id="pnStand">Stand up</button><button class="btn" id="pnSus">Sustain off</button><button class="btn" id="pnLeft">&#9664;</button><span class="micro" id="pnOct"></span><button class="btn" id="pnRight">&#9654;</button><button class="btn" id="pnSheets">Sheets</button><button class="btn" id="pnGold" style="display:none;border-color:var(--gold);color:var(--gold)">Gold &#183; 5,000</button><span id="pnXp"></span><span id="pnChip"></span></div>
 <div id="pnList"></div><div id="pnSong"><b id="pnTitle"></b><span id="pnStep"></span><button class="btn" id="pnHands">Right hand</button><button class="btn" id="pnListen">Listen</button><button class="btn" id="pnStop">Close the sheet</button></div><div id="pnSecs"></div><div id="pnKeys"></div></div>
 <div id="pianoBuy" class="sheet"><div class="panel small"><h2>The piano<span>.</span></h2><p>A grand for the music room. Sit at it and play: every key, sustain, and sheets that light the notes.</p>
@@ -4364,7 +4364,7 @@ function facadeTex(kind){const S=256,c=document.createElement('canvas');c.width=
  /* bake the kit: one InstancedMesh per stage and part */
  Object.entries(INST).forEach(([k,ms])=>{const [st,part]=k.split(':');const [g,m]=PART[part];const im=new THREE.InstancedMesh(g,m,ms.length);ms.forEach((mm,i)=>im.setMatrixAt(i,mm));im.instanceMatrix.needsUpdate=true;im.castShadow=true;im.receiveShadow=true;HG.add(im);STAGE[+st].push(im)});
 }
-function renderHouse(){try{placeHW()}catch(e){}const st=LIVE?S.house.stage:Math.max(S.house.stage,HOUSE_PREVIEW);for(let k=1;k<=3;k++)STAGE[k].forEach(o=>o.visible=k<=st);STAGE[2].forEach(o=>{if(o.userData&&o.userData.roof2)o.visible=st===2});renderPile()}
+function renderHouse(){try{placeHW()}catch(e){}try{placeGA()}catch(e){}const st=LIVE?S.house.stage:Math.max(S.house.stage,HOUSE_PREVIEW);for(let k=1;k<=3;k++)STAGE[k].forEach(o=>o.visible=k<=st);STAGE[2].forEach(o=>{if(o.userData&&o.userData.roof2)o.visible=st===2});renderPile()}
 /* the builder and his woodpile */
 const BUILDER={swing:-1};
 {const B=new THREE.Group();B.position.set(HOUSE.front.x,0,HOUSE.front.z-1.6);B.rotation.y=Math.PI;scene.add(B);BUILDER.g=B;
@@ -4598,7 +4598,7 @@ function distTo(kind,id){if(kind==='compass')return Math.hypot(you.x-COMPASS.x,y
   if(kind==='plinth'){const p=PLINTHS[id];return Math.hypot(p.x-you.x,p.z-you.z)}if(kind==='chest')return Math.hypot(CHEST.x-you.x,CHEST.z-you.z);
   if(kind==='tree'){const [ox,oz]=TREEPOS[id];return Math.hypot(ox-you.x,oz-you.z)}if(kind==='house')return Math.hypot(HOUSE.front.x-you.x,HOUSE.front.z-you.z);if(kind==='door')return Math.hypot(DOORW.x-you.x,DOORW.z-you.z);return bedDist(BED[id])}
 function oakNear(){let best=-1,bd=1e9;const awake=treesAwake();TREEPOS.forEach(([ox,oz],i)=>{if(isRing(i)&&(!awake||(!planted(i)&&!ringOpen(i))))return;const d=Math.hypot(ox-you.x,oz-you.z);if(d<bd){bd=d;best=i}});return {i:best,d:bd}}
-function nearest(){if(DRIVE)return null;if(MOWER.visible){const dm=Math.hypot(you.x-MOWER.position.x,you.z-MOWER.position.z);if(dm<2.4)return {kind:'mower',id:0,d:dm}}const dp=Math.hypot(you.x-PORTAL.x,you.z-PORTAL.z);if(dp<PORTAL.r+0.9)return {kind:'portal',id:0,d:dp};const dfl=Math.hypot(you.x-FLAGP.x,you.z-FLAGP.z);if(dfl<FLAGP.r+0.9)return {kind:'flag',id:0,d:dfl};if(WITCH.visible){const dw=Math.hypot(you.x-HW.x,you.z-HW.z);if(dw<2.7)return {kind:'witch',id:0,d:dw}}const dg=distTo('gate',0);if(dg<ENTER.gate)return {kind:'gate',id:0,d:dg};const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
+function nearest(){if(DRIVE)return null;{let c=null;try{c=gaCarNear()}catch(e){}if(c)return {kind:'car',id:c.i,d:c.d}}if(typeof HANK!=='undefined'&&HANK.visible){const dk=Math.hypot(you.x-GA.x,you.z-GA.z);if(dk<2.9)return {kind:'hank',id:0,d:dk}}if(MOWER.visible){const dm=Math.hypot(you.x-MOWER.position.x,you.z-MOWER.position.z);if(dm<2.4)return {kind:'mower',id:0,d:dm}}const dp=Math.hypot(you.x-PORTAL.x,you.z-PORTAL.z);if(dp<PORTAL.r+0.9)return {kind:'portal',id:0,d:dp};const dfl=Math.hypot(you.x-FLAGP.x,you.z-FLAGP.z);if(dfl<FLAGP.r+0.9)return {kind:'flag',id:0,d:dfl};if(WITCH.visible){const dw=Math.hypot(you.x-HW.x,you.z-HW.z);if(dw<2.7)return {kind:'witch',id:0,d:dw}}const dg=distTo('gate',0);if(dg<ENTER.gate)return {kind:'gate',id:0,d:dg};const ds=distTo('stand',0);if(ds<ENTER.stand)return {kind:'stand',id:0,d:ds};const df=distTo('florist',0);if(df<ENTER.florist)return {kind:'florist',id:0,d:df};
   const dh=distTo('fish',0);if(dh<ENTER.fish)return {kind:'fish',id:0,d:dh};const dq=distTo('fountain',0);if(dq<ENTER.fountain)return {kind:'fountain',id:0,d:dq};
   const pl=plinthNear();if(pl.p&&pl.d<ENTER.plinth)return {kind:'plinth',id:pl.p.i,d:pl.d};const dc=distTo('chest',0);if(dc<ENTER.chest)return {kind:'chest',id:0,d:dc};const dcm=distTo('compass',0);if(dcm<ENTER.compass)return {kind:'compass',id:0,d:dcm};
   const ok=oakNear();if(ok.i>=0&&ok.d<ENTER.tree)return {kind:'tree',id:ok.i,d:ok.d};if(houseLvl()>=3||ROOMS_PREVIEW){const dd=distTo('door',0);if(dd<ENTER.door)return {kind:'door',id:0,d:dd}}const dh2=distTo('house',0);if(dh2<ENTER.house)return {kind:'house',id:0,d:dh2};const bn=bedNear();if(bn.b&&bn.d<ENTER.bed)return {kind:'bed',id:bn.b.plot,d:bn.d};if(TOOL==='chainsaw'&&owns('chainsaw')){const wn=wildNear();if(wn.i>=0&&wn.d<ENTER.wild)return {kind:'wild',id:wn.i,d:wn.d}}return null}
@@ -4627,7 +4627,9 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(farmAct())return;   /* 6.16 */
   const T=pickTarget();
   if(T.kind==='door'){showAct('Go inside.','enter',null,null,houseLocked()?'locked \u00B7 '+mmss(lockLeft())+' left':roomsWord(),(houseLvl()>=1&&!VISIT)?[{l:houseLocked()?'Lock again.':'Lock the house.',f:lockHouse}].concat(EST().fence?[]:[{l:'Picket fence \u00B7 '+FENCE_GC.toLocaleString()+'.',f:fenceBuy}]):null,[DOORW.x,2.6,DOORW.z]);return}
-  if(T.kind==='mower'){showAct('Ride the mower.','mower',null,null,'parked by the house',null,[MOWER.position.x,1.9,MOWER.position.z]);return}
+  if(T.kind==='mower'){showAct('Ride the mower.','mower',null,null,gaHas()?'bay one':'parked by the house',null,[MOWER.position.x,1.9,MOWER.position.z]);return}
+  if(T.kind==='car'){const C=GA_CARS[T.id],g=GACAR[C.k];showAct('Drive '+C.n+'.','car',T.id,null,'bay '+(T.id+2),null,[g.position.x,1.8,g.position.z]);return}
+  if(T.kind==='hank'){showAct(gaHas()?'Hank\u2019s garage.':'Hank builds the garage \u00B7 '+GA_GC.toLocaleString()+' gardencoin.','hank',null,null,gaHas()?'six bays \u00B7 the mower, and five cars':'six bays, a slate roof and a weathervane',null,[GA.x,2.3,GA.z]);return}
   if(T.kind==='witch'){showAct('Morgana\'s Halloween shop.','witch',null,null,'pumpkins, lights, cobwebs, cauldrons',null,[HW.x,2.3,HW.z]);return}
   if(T.kind==='portal'){showAct('Step into the circle.','portal',null,null,ph==='night'?'the club is open':'the club, any hour',null,[PORTAL.x,2.2,PORTAL.z]);return}
   if(T.kind==='flag'){showAct('Step into the circle.','flag',null,null,'capture the flag \u00b7 pick a team, run the wolves',null,[FLAGP.x,2.2,FLAGP.z]);return}
@@ -4697,7 +4699,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='hank')openGaShop();else if(ACT.mode==='car')carRide(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -4736,10 +4738,10 @@ function grassTick(dt,skid,sp){const P=GRASS.pos,V=GRASS.vel,L=GRASS.life;let an
   GRASS.mesh.visible=any;if(any)GRASS.mesh.geometry.attributes.position.needsUpdate=true}
 function seatW(x,z){const s=BOUND<0?0:BOUND;const [ox,oz]=SEATXZ[s],th=SEATROT[s];const [rx,rz]=rotXZ(x,z,th);return [ox+rx,oz+rz]}
 /* 6.4 THE GOLD MOWER (5,000 gardencoin): a ride on mower in gold with a black seat, parked west of the porch. Ride it and the garden is small again */
-const MOWER=new THREE.Group();MOWER.visible=false;scene.add(MOWER);MOWER.wheels=[];{const c=$('#offchip');if(c)c.onclick=()=>{if(DRIVE)mowerToggle()}}
+const MOWER=new THREE.Group();MOWER.visible=false;scene.add(MOWER);MOWER.wheels=[];MOWER.userData={sp:1,sit:0.62,name:'the mower'};let RIDE=MOWER;const rideSp=()=>(RIDE&&RIDE.userData&&RIDE.userData.sp)||1,rideSit=()=>(RIDE&&RIDE.userData&&RIDE.userData.sit)||0.62;{const c=$('#offchip');if(c)c.onclick=()=>{if(DRIVE)mowerToggle()}}
 /* 6.8.2 HOME: lost in the wood, one tap puts you at your own front door (on the mower, you ride it there). Hidden inside the house */
 function goHome(){if(INSIDE||SEATED||INST.on||DYING)return;if(FLAME.on)flameToggle(false);if(CUT.on)cutEnd();{const [gx,gz]=homeOut();you.x=DOORW.x+gx*2.6;you.z=DOORW.z+gz*2.6;you.yaw=Math.atan2(-gx,-gz);you.face=you.yaw}you.feet=floorAtW(you.x,you.z);you.vx=you.vz=you.vy=0;you.grounded=true;KS=0;   /* 6.26: the door path turns with the seat */
-  if(DRIVE){MOWER.position.set(you.x,you.feet,you.z);MOWER.rotation.y=you.face}SND.buy(2);hideAct();toast(VISIT?'The house.':'Home. The front door is right there.');updateAct()}
+  if(DRIVE&&RIDE){RIDE.position.set(you.x,you.feet,you.z);RIDE.rotation.y=you.face}SND.buy(2);hideAct();toast(VISIT?'The house.':'Home. The front door is right there.');updateAct()}
 {const h=$('#homechip');if(h)h.onclick=e=>{e.stopPropagation();goHome()}}
 function paintHome(){const h=$('#homechip');if(!h)return;const on=!INSIDE&&!SEATED&&!INST.on&&!STORE_ON&&!BLOOM;h.classList.toggle('off',!on)}
 {const gold=MAT.gold,blk=new THREE.MeshStandardMaterial({color:0x1b1712,roughness:0.7}),tyre=new THREE.MeshStandardMaterial({color:0x2a2420,roughness:0.95}),chrome=new THREE.MeshStandardMaterial({color:0xd9d9d9,roughness:0.25,metalness:0.8});
@@ -4749,8 +4751,10 @@ function paintHome(){const h=$('#homechip');if(!h)return;const on=!INSIDE&&!SEAT
  km(new THREE.CylinderGeometry(0.02,0.02,0.6,8),chrome,0,1.15,-0.1).rotation.x=0.7;km(new THREE.TorusGeometry(0.17,0.025,8,20),blk,0,1.42,-0.28).rotation.x=0.9;   /* the column and the wheel */
  km(new THREE.CylinderGeometry(0.06,0.06,0.5,10),chrome,0.36,1.05,-0.7).rotation.z=Math.PI/2;
  [[-0.56,0.66,0.30],[0.56,0.66,0.30],[-0.5,-0.7,0.22],[0.5,-0.7,0.22]].forEach(([x,z,r])=>{const w=km(new THREE.CylinderGeometry(r,r,0.22,16),tyre,x,r,z);w.rotation.z=Math.PI/2;MOWER.wheels.push(w);const hub=km(new THREE.CylinderGeometry(r*0.5,r*0.5,0.24,12),gold,x,r,z);hub.rotation.z=Math.PI/2;MOWER.wheels.push(hub)})}
-function showMower(){const on=!VISIT&&!!(S.tools&&S.tools.mower);MOWER.visible=on;if(!on){if(DRIVE)DRIVE=false;return}if(!DRIVE){const [x,z]=seatW(-8.6,-51.8);MOWER.position.set(x,floorAtW(x,z),z);MOWER.rotation.y=-SEATROT[BOUND<0?0:BOUND]+Math.PI/2}}
-function mowerToggle(){if(!MOWER.visible)return;DRIVE=!DRIVE;KS=0;SKID=0;STEER=0;DRIVE_DX=0;$('#offchip').style.display=DRIVE?'block':'none';if(!DRIVE)GRASS.mesh.visible=false;SND.buy(DRIVE?4:2);if(DRIVE){you.stepOff=0;you.face=MOWER.rotation.y;toast(COARSE?'On the mower. It drives itself; drag your right thumb to steer, pull the stick back to stop.':'On the mower. It drives itself; the mouse or A and D steer, S stops. E to get off.')}else{MOWER.position.set(you.x,you.feet,you.z);MOWER.rotation.y=you.face;you.x+=Math.sin(you.face+Math.PI/2)*1.1;you.z+=Math.cos(you.face+Math.PI/2)*1.1}hideAct()}
+function showMower(){const on=!VISIT&&!!(S.tools&&S.tools.mower);MOWER.visible=on;if(!on){if(DRIVE&&RIDE===MOWER)DRIVE=false;return}if(!DRIVE){let p=null;try{p=gaBayW(0)}catch(e){}if(p){MOWER.position.set(p[0],floorAtW(p[0],p[1]),p[1]);MOWER.rotation.y=HG.rotation.y+Math.PI}else{const [x,z]=seatW(-8.6,-51.8);MOWER.position.set(x,floorAtW(x,z),z);MOWER.rotation.y=-SEATROT[BOUND<0?0:BOUND]+Math.PI/2}}}
+function rideToggle(g){if(g&&!DRIVE)RIDE=g;const R=RIDE;if(!R||!R.visible)return;DRIVE=!DRIVE;KS=0;SKID=0;STEER=0;DRIVE_DX=0;$('#offchip').style.display=DRIVE?'block':'none';if(!DRIVE)GRASS.mesh.visible=false;SND.buy(DRIVE?4:2);if(DRIVE){you.stepOff=0;you.face=R.rotation.y;if(R!==MOWER){try{carEngineOn()}catch(e){}}const nm=(R.userData&&R.userData.name)||'the mower';toast(COARSE?'On '+nm+'. It drives itself; drag your right thumb to steer, pull the stick back to stop.':'On '+nm+'. It drives itself; the mouse or A and D steer, S stops. E to get off.')}else{try{carEngineOff()}catch(e){}R.position.set(you.x,you.feet,you.z);R.rotation.y=you.face;if(R.userData)R.userData.seat=-9;you.x+=Math.sin(you.face+Math.PI/2)*1.4;you.z+=Math.cos(you.face+Math.PI/2)*1.4;RIDE=MOWER}hideAct()}
+function rideOff(){if(DRIVE)rideToggle(null)}
+function mowerToggle(){rideToggle(MOWER)}
 function mowerBuy(){if(visitGuard('buy the mower'))return;if(S.tools.mower){toast('It is parked by the house.');return}const cost=gcv(TOOLS.mower.dc);
   const done=()=>{S.tools.mower=1;save();renderHud();SND.buy(8);closeStore();showMower();toast('The gold mower is yours. It is parked by the house.')};
   if(LIVE){if(BUSY)return;BUSY=true;renderTabs();RPC('mower_buy').then(r=>{BUSY=false;
@@ -4783,7 +4787,7 @@ function bindSeat0(seat){seat=Math.max(0,Math.min(3,seat|0));if(BOUND===seat)ret
   [[80,80],[920,80],[80,920],[920,920]].forEach(([x,y],i)=>{const [wx,wz]=px2w(x,y);LANTERNS[i].position.set(wx,3.9,wz)});
   const box=(x0,z0,x1,z1,h)=>markPoly([W(x0,z0),W(x1,z0),W(x1,z1),W(x0,z1)],h);
   box(SEATBASE.house[0]-11,SEATBASE.house[1]-3.5,SEATBASE.house[0]+11,SEATBASE.house[1]+4.1,4.6);markDisk(HOUSE.front.x,HOUSE.front.z,0.4,1.2);box(SEATBASE.front[0]+1.6,SEATBASE.front[1]-3.2,SEATBASE.front[0]+3.2,SEATBASE.front[1]-1.2,0.9);
-  if(typeof TREE!=='undefined'&&TREE.marked)TREE.marked.length=0;if(typeof paintSigns==='function')setTimeout(paintSigns,0);if(typeof showMower==='function'&&typeof S!=='undefined')showMower()}
+  if(typeof TREE!=='undefined'&&TREE.marked)TREE.marked.length=0;if(typeof paintSigns==='function')setTimeout(paintSigns,0);try{placeGA()}catch(e){}if(typeof showMower==='function'&&typeof S!=='undefined')showMower()}
 const you={x:SPAWN.x,z:SPAWN.z,yaw:SPAWN.yaw,pitch:-0.36,face:SPAWN.yaw,dist:COARSE?5.2:4.6,vx:0,vz:0,feet:0,vy:0,grounded:true,stepOff:0,moving:0};
 let camDist=you.dist;
 camera.rotation.order='YXZ';
@@ -4926,7 +4930,7 @@ function loop(now){
        the drag is low, and the wheels only mostly follow the nose so a hard turn at speed slides a little. The camera swings in behind */
     /* 6.6: it drives itself at cruise; pull back (S, or the stick back) to brake and stop; push forward for a little extra.
        Steering is the right thumb dragging across the screen (the mouse on desktop), or A and D, or the stick sideways */
-    const th=Math.max(-1,Math.min(1,-iz));const want=th<-0.2?0:KCRUISE+Math.max(0,th)*(DRIVEV-KCRUISE);
+    const th=Math.max(-1,Math.min(1,-iz));const RSP=rideSp();const want=th<-0.2?0:(KCRUISE+Math.max(0,th)*(DRIVEV-KCRUISE))*RSP;
     KS+=(want-KS)*Math.min(1,(want<KS?KBRAKE/6:KACC/6)*dt);
     const dragSteer=DRIVE_DX*0.0032;DRIVE_DX=0;const st=Math.max(-1.6,Math.min(1.6,ix*0.8+dragSteer/Math.max(0.02,dt)/KTURN));
     STEER+=(st-STEER)*Math.min(1,10*dt);
@@ -4936,7 +4940,7 @@ function loop(now){
     you.vx+=(wantX-you.vx)*grip;you.vz+=(wantZ-you.vz)*grip;sp=Math.hypot(you.vx,you.vz);mag=KS>0.5?1:0;
     if(sp>0.4)you.moving+=dt;else you.moving=0;
     {const dA=wrapA(you.face-you.yaw);you.yaw+=dA*Math.min(1,4.2*dt)}
-    grassTick(dt,SKID,sp);
+    if(RIDE===MOWER)grassTick(dt,SKID,sp);else GRASS.mesh.visible=false;
   }else{
     const run=(keys['shift']||RUNNING)?RUN:SPEED;mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
     const fx=Math.sin(you.yaw),fz=Math.cos(you.yaw);
@@ -4961,7 +4965,7 @@ function loop(now){
   if(!you.grounded){you.vy-=GRAV*dt;you.feet+=you.vy*dt;if(you.feet<=fl){if(you.vy<-3)you.stepOff-=Math.min(0.12,(-you.vy-3)*0.02);if(!INSIDE&&you.vy<-1.5&&fl>0.8&&Math.hypot(you.x-EOX,you.z-EOZ)<3.4)fountainDive();you.feet=fl;you.vy=0;you.grounded=true}}
   you.stepOff+=(0-you.stepOff)*Math.min(1,12*dt);
   /* the body, then the camera: behind and above, pulled in when a hedge or a tree would come between */
-  AV.g.position.set(you.x,you.feet+you.stepOff+(DRIVE?0.62:0),you.z);AV.g.rotation.y=you.face;if(DRIVE){MOWER.position.set(you.x,you.feet,you.z);MOWER.rotation.y=you.face;MOWER.wheels.forEach(wh=>wh.rotation.x+=sp*dt*2.4)}avatarTick(t,dt,sp,mag);friendsTick(dt);pulsePos(now,sp);
+  AV.g.position.set(you.x,you.feet+you.stepOff+(DRIVE?rideSit():0),you.z);AV.g.rotation.y=you.face;if(DRIVE&&RIDE){RIDE.position.set(you.x,you.feet,you.z);RIDE.rotation.y=you.face;(RIDE.wheels||[]).forEach(wh=>wh.rotation.x+=sp*dt*2.4)}avatarTick(t,dt,sp,mag);friendsTick(dt);pulsePos(now,sp);
   const ty=you.feet+you.stepOff+(INSIDE?1.85:1.45);
   lookV.set(-Math.sin(you.yaw)*Math.cos(you.pitch),Math.sin(you.pitch),-Math.cos(you.yaw)*Math.cos(you.pitch));
   let want=INSIDE?Math.min(you.dist,3.4):you.dist;for(let s=INSIDE?0.3:0.7;s<want;s+=0.25){const px=you.x-lookV.x*s,py=ty-lookV.y*s,pz=you.z-lookV.z*s;if(py<0.32||(INSIDE?INTERIOR.floorPt(px,pz,you.feet):floorAt(px,pz))>py-0.22){want=Math.max(INSIDE?0.5:1.3,s-0.3);break}}
@@ -4981,7 +4985,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);gaTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -5662,7 +5666,303 @@ function portalTick(t,dt){const k=ph==='night'?1.35:1;PORTAL_RING.material.color
   PORTAL_MOTES.forEach(p=>{p.y+=p.v*dt*(PORTAL_GOING?6:1);if(p.y>2.8)p.y=0;p.a+=dt*0.8;p.m.position.set(Math.cos(p.a)*p.r,p.y,Math.sin(p.a)*p.r);p.m.material.opacity=0.85*Math.min(1,(2.8-p.y)/0.6)})}
 function portalGo(dest){if(PORTAL_GOING)return;PORTAL_GOING=true;SND.tier();toast(dest==='flag'?'The circle takes you to the flag.':dest==='chess'?'The board takes you to the study.':'The circle takes you.');const v=document.createElement('div');v.style.cssText='position:fixed;inset:0;background:#07060a;opacity:0;transition:opacity .9s;z-index:80;pointer-events:none';document.body.appendChild(v);requestAnimationFrame(()=>{v.style.opacity='1'});
   setTimeout(()=>{const p=dest==='flag'?'flag':dest==='chess'?'chess':'club';location.href=(/(^|\.)deeds\.fun$/.test(location.hostname)?'/garden/'+p+'/':'../'+p+'/')},1000)}
-window.__walk={HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+/* ======================================================================
+   6.31 THE GARAGE. Hank stands at the side of the house in a hard hat with a roll of plans under his arm.
+   Five thousand gardencoin and the garage is up by the afternoon: six bays, a slate roof, a cupola and a
+   weathervane. The mower parks in the first bay. The other five are cars, and they climb from a cream
+   roadster to a two tone thing with a horseshoe grille that costs two million.
+   ====================================================================== */
+const GA={on:false,own:new Set(),synced:'',x:0,z:0,marked:-9,built:false,near:0};
+const GA_PATCH=82,GA_GC=5000;
+const GA_CARS=[
+ {k:'car_classic',n:'The Classic',gc:25000,d:'A cream roadster from before the war. Wire wheels, a long bonnet, the top down.'},
+ {k:'car_luxury',n:'The Luxury',gc:100000,d:'A black saloon a mile long, chrome to the ground, a silver lady on the nose.'},
+ {k:'car_super',n:'The Supercar',gc:400000,d:'Italian red, low as a letterbox, a scoop over each shoulder.'},
+ {k:'car_hyper',n:'The Supercar II',gc:900000,d:'Carbon and orange, a wing across the whole back, and it never stops pulling.'},
+ {k:'car_royale',n:'The Royale',gc:2000000,d:'Two tone blue over black, a horseshoe grille, sixteen cylinders. The best thing in the garage.'}];
+const GA_ROWS=[{k:'garage',n:'The garage',gc:GA_GC,d:'Six bays, a slate roof and a cupola, put up beside the house in an afternoon. The mower gets the first bay.'}].concat(GA_CARS);
+const GA_SPEC={
+ car_classic:{L:4.24,W:1.74,body:0xF0E4C4,accent:0x6B2A2A,wheel:0.40,sit:0.80,sp:1.45,form:'classic'},
+ car_luxury:{L:5.10,W:1.98,body:0x14161C,accent:0xD8DCE0,wheel:0.42,sit:0.82,sp:1.75,form:'luxury'},
+ car_super:{L:4.44,W:1.96,body:0xC8102E,accent:0x18181C,wheel:0.38,sit:0.60,sp:2.30,form:'super'},
+ car_hyper:{L:4.62,W:2.02,body:0x1A1A1E,accent:0xF07A18,wheel:0.39,sit:0.60,sp:2.80,form:'hyper'},
+ car_royale:{L:4.86,W:2.08,body:0x1B4A8F,accent:0x0B1220,wheel:0.41,sit:0.64,sp:3.40,form:'royale'}};
+function gaOwns(k){return GA.own.has(k)}
+function gaHas(){return GA.own.has('garage')}
+function gaLocalLoad(){try{const a=JSON.parse(localStorage.getItem('deeds_garage')||'[]');if(Array.isArray(a))a.forEach(k=>GA.own.add(k))}catch(e){}}
+function gaLocalSave(){try{localStorage.setItem('deeds_garage',JSON.stringify(Array.from(GA.own)))}catch(e){}}
+/* the plan, in the house's own frame: the garage stands off the east side with a drive in front of it */
+const GA_BW=3.0,GA_PW=0.5,GA_WT=0.45,GA_DP=7.2,GA_HT=3.55,GA_DH=2.62;
+const GA_AX=25.5,GA_AZ=-1.0,GA_HW=(6*GA_BW+5*GA_PW)/2+GA_WT,GA_Z0=GA_AZ-GA_DP/2,GA_Z1=GA_AZ+GA_DP/2;
+const gaBayL=i=>GA_AX+(i-2.5)*(GA_BW+GA_PW);
+const GAMAT={
+ stucco:new THREE.MeshStandardMaterial({color:0xEDE5D0,roughness:0.93}),
+ gable:new THREE.MeshStandardMaterial({color:0xEDE5D0,roughness:0.93,side:THREE.DoubleSide}),
+ stone:new THREE.MeshStandardMaterial({color:0xDBCFB2,roughness:0.88}),
+ slate:new THREE.MeshStandardMaterial({color:0x596068,roughness:0.86}),
+ trim:new THREE.MeshStandardMaterial({color:0xF6F1E4,roughness:0.72}),
+ door:new THREE.MeshStandardMaterial({color:0xE7DFC9,roughness:0.76}),
+ dark:new THREE.MeshStandardMaterial({color:0x201D19,roughness:0.62}),
+ slab:new THREE.MeshStandardMaterial({color:0x6F6B63,roughness:0.78}),
+ drive:new THREE.MeshStandardMaterial({color:0x7C776D,roughness:0.85}),
+ line:new THREE.MeshBasicMaterial({color:0xE9DCAE}),
+ chrome:new THREE.MeshStandardMaterial({color:0xD6DADE,roughness:0.16,metalness:0.95}),
+ gold:new THREE.MeshStandardMaterial({color:0xD9A441,roughness:0.3,metalness:0.85}),
+ tyre:new THREE.MeshStandardMaterial({color:0x18171B,roughness:0.96}),
+ glass:new THREE.MeshStandardMaterial({color:0x1C2C3E,roughness:0.12,metalness:0.6,transparent:true,opacity:0.86}),
+ lampM:new THREE.MeshStandardMaterial({color:0xFFE9B0,emissive:0xFFB347,emissiveIntensity:0.2,roughness:0.4}),
+ head:new THREE.MeshStandardMaterial({color:0xFFF6DC,emissive:0xFFE9A8,emissiveIntensity:0.35,roughness:0.3}),
+ tail:new THREE.MeshStandardMaterial({color:0x8C1420,emissive:0x8C1420,emissiveIntensity:0.5,roughness:0.4}),
+ rub:new THREE.MeshStandardMaterial({color:0x3A3630,roughness:0.9}),
+ red:new THREE.MeshStandardMaterial({color:0xB0261F,roughness:0.5,metalness:0.25}),
+ hivis:new THREE.MeshStandardMaterial({color:0xE7B21A,roughness:0.7}),
+ denim:new THREE.MeshStandardMaterial({color:0x2C3E56,roughness:0.9}),
+ skin:new THREE.MeshStandardMaterial({color:0xD8A87C,roughness:0.72}),
+ boot:new THREE.MeshStandardMaterial({color:0x3B2A1C,roughness:0.9}),
+ hair:new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9}),
+ paper:new THREE.MeshStandardMaterial({color:0xE8E4D6,roughness:0.9})};
+const GARG=new THREE.Group();GARG.visible=false;HG.add(GARG);   /* the garage rides the house group, so it turns with the seat */
+const GADOOR=[],GALAMP=[],GACAR={};
+function gaPut(host,geo,mat,x,y,z,ry){const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);if(ry)o.rotation.y=ry;o.castShadow=true;o.receiveShadow=true;host.add(o);return o}
+function gaBuild(){if(GA.built)return;GA.built=true;const G=GARG,B=(g,m,x,y,z,ry)=>gaPut(G,g,m,x,y,z,ry);
+ const W2=GA_HW*2,x0=GA_AX-GA_HW,x1=GA_AX+GA_HW;
+ /* the slab, the apron, and the drive that runs back to the front of the house */
+ {const s=B(new THREE.BoxGeometry(W2,0.08,GA_DP),GAMAT.slab,GA_AX,0.04,GA_AZ);s.castShadow=false;
+  const ap=B(new THREE.BoxGeometry(W2+1.6,0.06,6.2),GAMAT.drive,GA_AX,0.03,GA_Z1+3.1);ap.castShadow=false;
+  const dr=B(new THREE.BoxGeometry(14.0,0.06,5.0),GAMAT.drive,GA_AX-GA_HW-6.6,0.03,GA_Z1+2.2);dr.castShadow=false;
+  for(let i=1;i<6;i++){const l=B(new THREE.BoxGeometry(0.08,0.02,GA_DP-1.4),GAMAT.line,gaBayL(i)-(GA_BW+GA_PW)/2,0.09,GA_AZ);l.castShadow=false}}
+ /* the walls: a back, two ends, five piers, and the header over the doors */
+ B(new THREE.BoxGeometry(W2,GA_HT,GA_WT),GAMAT.stucco,GA_AX,GA_HT/2,GA_Z0+GA_WT/2);
+ [x0+GA_WT/2,x1-GA_WT/2].forEach(x=>B(new THREE.BoxGeometry(GA_WT,GA_HT,GA_DP),GAMAT.stucco,x,GA_HT/2,GA_AZ));
+ for(let i=1;i<6;i++)B(new THREE.BoxGeometry(GA_PW,GA_HT,1.0),GAMAT.stone,gaBayL(i)-(GA_BW+GA_PW)/2,GA_HT/2,GA_Z1-0.5);
+ B(new THREE.BoxGeometry(W2,GA_HT-GA_DH-0.1,1.0),GAMAT.stucco,GA_AX,GA_DH+0.1+(GA_HT-GA_DH-0.1)/2,GA_Z1-0.5);
+ B(new THREE.BoxGeometry(W2+0.3,0.2,GA_DP+0.3),GAMAT.trim,GA_AX,GA_HT+0.06,GA_AZ);
+ /* the doors: four rows of panels each, rolling up into the header as you come near */
+ for(let i=0;i<6;i++){const d=new THREE.Group();d.position.set(gaBayL(i),0,GA_Z1-0.62);G.add(d);
+  gaPut(d,new THREE.BoxGeometry(GA_BW-0.06,GA_DH,0.1),GAMAT.door,0,GA_DH/2,0);
+  for(let r=0;r<4;r++)for(let c=0;c<2;c++)gaPut(d,new THREE.BoxGeometry(GA_BW/2-0.46,GA_DH/4-0.16,0.04),GAMAT.trim,(c-0.5)*(GA_BW/2-0.1),GA_DH/8+r*GA_DH/4,0.07);
+  d.userData={u:0};GADOOR.push(d)}
+ /* carriage lamps between the bays */
+ [x0+GA_WT/2,gaBayL(1)-(GA_BW+GA_PW)/2,gaBayL(3)-(GA_BW+GA_PW)/2,gaBayL(5)-(GA_BW+GA_PW)/2,x1-GA_WT/2].forEach(x=>{
+  const L=new THREE.Group();L.position.set(x,2.3,GA_Z1-0.02);G.add(L);
+  gaPut(L,new THREE.BoxGeometry(0.07,0.3,0.07),GAMAT.dark,0,-0.26,0);
+  gaPut(L,new THREE.BoxGeometry(0.2,0.28,0.2),GAMAT.lampM,0,0,0);
+  gaPut(L,new THREE.ConeGeometry(0.19,0.16,4),GAMAT.dark,0,0.2,0);
+  const pt=new THREE.PointLight(0xFFB347,0,5.5,2);pt.position.set(0,0,0.25);L.add(pt);GALAMP.push(pt)});
+ /* the roof: two slopes in slate, gable ends, a cupola and a weathervane */
+ {const rh=1.5,ov=0.42,rw=W2+ov*2,rd=GA_DP+ov*2,sl=Math.hypot(rd/2,rh),ang=Math.atan2(rh,rd/2);
+  const roof=new THREE.Group();roof.position.set(GA_AX,GA_HT+0.16,GA_AZ);G.add(roof);
+  gaPut(roof,new THREE.BoxGeometry(rw,0.16,sl),GAMAT.slate,0,rh/2,rd/4).rotation.x=ang;
+  gaPut(roof,new THREE.BoxGeometry(rw,0.16,sl),GAMAT.slate,0,rh/2,-rd/4).rotation.x=-ang;
+  gaPut(roof,new THREE.BoxGeometry(rw+0.08,0.18,0.36),GAMAT.slate,0,rh+0.02,0);
+  const tri=new THREE.Shape();tri.moveTo(-rd/2,0);tri.lineTo(rd/2,0);tri.lineTo(0,rh);tri.lineTo(-rd/2,0);
+  const tg=new THREE.ShapeGeometry(tri);
+  [-1,1].forEach(s=>{const m=new THREE.Mesh(tg,GAMAT.gable);m.position.set(s*GA_HW,0,0);m.rotation.y=s*Math.PI/2;roof.add(m)});
+  const cup=new THREE.Group();cup.position.set(0,rh,0);roof.add(cup);
+  gaPut(cup,new THREE.BoxGeometry(1.15,0.9,1.15),GAMAT.trim,0,0.45,0);
+  [-1,1].forEach(s=>{gaPut(cup,new THREE.BoxGeometry(0.86,0.48,0.04),GAMAT.dark,0,0.5,s*0.58);gaPut(cup,new THREE.BoxGeometry(0.04,0.48,0.86),GAMAT.dark,s*0.58,0.5,0)});
+  gaPut(cup,new THREE.ConeGeometry(0.95,0.7,4),GAMAT.slate,0,1.25,0,Math.PI/4);
+  gaPut(cup,new THREE.CylinderGeometry(0.025,0.025,0.9,6),GAMAT.gold,0,1.95,0);
+  const van=new THREE.Group();van.position.set(0,2.34,0);cup.add(van);GARG.vane=van;
+  gaPut(van,new THREE.BoxGeometry(0.62,0.09,0.03),GAMAT.gold,0.06,0,0);
+  gaPut(van,new THREE.BoxGeometry(0.2,0.22,0.03),GAMAT.gold,-0.3,0,0);
+  gaPut(van,new THREE.ConeGeometry(0.08,0.2,4),GAMAT.gold,0.44,0,0).rotation.z=-Math.PI/2}
+ /* the back of the last bays: a bench, a pegboard, a red tool chest and a stack of tyres */
+ {const bz=GA_Z0+GA_WT+0.34;
+  gaPut(G,new THREE.BoxGeometry(3.2,0.1,0.62),GAMAT.rub,gaBayL(5),0.92,bz);
+  [-1,1].forEach(s=>gaPut(G,new THREE.BoxGeometry(0.1,0.9,0.5),GAMAT.dark,gaBayL(5)+s*1.5,0.46,bz));
+  gaPut(G,new THREE.BoxGeometry(3.0,1.4,0.06),GAMAT.dark,gaBayL(5),2.0,GA_Z0+GA_WT+0.06);
+  for(let i=0;i<7;i++)gaPut(G,new THREE.BoxGeometry(0.07,0.42,0.05),GAMAT.chrome,gaBayL(5)-1.2+i*0.4,2.0,GA_Z0+GA_WT+0.12).rotation.z=(i%2?1:-1)*0.12;
+  gaPut(G,new THREE.BoxGeometry(1.0,1.1,0.56),GAMAT.red,gaBayL(4),0.55,bz);
+  for(let r=0;r<3;r++)gaPut(G,new THREE.BoxGeometry(0.9,0.05,0.02),GAMAT.chrome,gaBayL(4),0.3+r*0.3,bz+0.29);
+  for(let k=0;k<3;k++)gaPut(G,new THREE.CylinderGeometry(0.34,0.34,0.22,16),GAMAT.tyre,gaBayL(0),0.12+k*0.23,bz).rotation.x=Math.PI/2}}
+/* THE CARS. Each is drawn in geometry, parks nose out in its bay, and drives like the mower but faster */
+function gaCarBuild(k){const C=GA_SPEC[k],g=new THREE.Group();g.wheels=[];
+ const body=new THREE.MeshStandardMaterial({color:C.body,roughness:C.form==='classic'?0.42:0.28,metalness:C.form==='hyper'?0.35:0.55});
+ const acc=new THREE.MeshStandardMaterial({color:C.accent,roughness:0.4,metalness:0.5});
+ const L=C.L,W=C.W,wr=C.wheel,y0=wr,AD=(geo,mat,x,y,z,ry)=>gaPut(g,geo,mat,x,y,z,ry);
+ const hubM=C.form==='super'||C.form==='hyper'?GAMAT.gold:GAMAT.chrome;
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{const x=sx*(W/2-0.1),z=sz*(L*0.33);
+  const t=AD(new THREE.CylinderGeometry(wr,wr,0.26,18),GAMAT.tyre,x,wr,z);t.rotation.z=Math.PI/2;g.wheels.push(t);
+  const h=AD(new THREE.CylinderGeometry(wr*0.6,wr*0.6,0.28,14),hubM,x,wr,z);h.rotation.z=Math.PI/2;g.wheels.push(h)});
+ AD(new THREE.BoxGeometry(W*0.96,0.3,L*0.94),body,0,y0+0.06,0);
+ if(C.form==='classic'){
+  AD(new THREE.BoxGeometry(W*0.84,0.46,L*0.9),body,0,y0+0.36,0);
+  AD(new THREE.BoxGeometry(W*0.74,0.42,L*0.34),body,0,y0+0.72,-L*0.22);
+  AD(new THREE.BoxGeometry(W*0.8,0.5,L*0.3),body,0,y0+0.7,L*0.26);
+  [-1,1].forEach(s=>{AD(new THREE.BoxGeometry(0.26,0.3,L*0.96),body,s*(W/2-0.02),y0+0.3,0);
+   AD(new THREE.CylinderGeometry(wr+0.16,wr+0.16,0.3,14,1,false,0,Math.PI),body,s*(W/2-0.06),wr,-L*0.33).rotation.z=Math.PI/2;
+   AD(new THREE.CylinderGeometry(wr+0.16,wr+0.16,0.3,14,1,false,0,Math.PI),body,s*(W/2-0.06),wr,L*0.33).rotation.z=Math.PI/2;
+   AD(new THREE.BoxGeometry(0.24,0.08,L*0.3),GAMAT.dark,s*(W/2-0.02),y0-0.08,0)});
+  AD(new THREE.BoxGeometry(W*0.52,0.5,0.12),GAMAT.chrome,0,y0+0.74,-L*0.47);
+  AD(new THREE.BoxGeometry(W*0.42,0.4,0.05),GAMAT.dark,0,y0+0.74,-L*0.48);
+  [-1,1].forEach(s=>{AD(new THREE.SphereGeometry(0.17,12,10),GAMAT.head,s*(W*0.3),y0+0.84,-L*0.42);
+   AD(new THREE.CylinderGeometry(0.03,0.03,0.22,6),GAMAT.chrome,s*(W*0.3),y0+0.68,-L*0.42)});
+  AD(new THREE.CylinderGeometry(wr*0.9,wr*0.9,0.2,14),GAMAT.tyre,0,y0+0.52,L*0.46).rotation.x=Math.PI/2;
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(W*0.7,0.08,0.36),GAMAT.chrome,0,y0+0.34,s*L*0.5));
+  AD(new THREE.BoxGeometry(W*0.66,0.42,0.05),GAMAT.glass,0,y0+1.06,-L*0.05).rotation.x=-0.24;
+ }else if(C.form==='luxury'){
+  AD(new THREE.BoxGeometry(W*0.98,0.62,L*0.94),body,0,y0+0.4,0);
+  AD(new THREE.BoxGeometry(W*0.86,0.38,L*0.36),body,0,y0+0.86,-L*0.26);
+  AD(new THREE.BoxGeometry(W*0.82,0.72,L*0.3),body,0,y0+1.0,L*0.24);
+  AD(new THREE.BoxGeometry(W*0.72,0.56,0.06),GAMAT.glass,0,y0+1.06,L*0.08).rotation.x=-0.16;
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.05,0.5,L*0.28),GAMAT.glass,s*(W*0.41),y0+1.0,L*0.24));
+  AD(new THREE.BoxGeometry(W*0.5,0.66,0.16),GAMAT.chrome,0,y0+0.9,-L*0.46);
+  for(let i=0;i<9;i++)AD(new THREE.BoxGeometry(0.03,0.56,0.04),GAMAT.dark,(i-4)*0.052*W,y0+0.9,-L*0.475);
+  AD(new THREE.ConeGeometry(0.07,0.2,7),GAMAT.chrome,0,y0+1.3,-L*0.45);
+  [-1,1].forEach(s=>AD(new THREE.SphereGeometry(0.16,12,10),GAMAT.head,s*(W*0.33),y0+0.9,-L*0.43));
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.1,0.16,0.4),GAMAT.tail,s*(W*0.34),y0+0.72,L*0.47));
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(W*0.92,0.1,0.34),GAMAT.chrome,0,y0+0.26,s*L*0.49));
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.06,0.1,L*0.7),GAMAT.chrome,s*(W*0.49),y0+0.22,0));
+ }else if(C.form==='super'||C.form==='hyper'){
+  const hy=C.form==='hyper';
+  AD(new THREE.BoxGeometry(W*0.98,0.34,L*0.92),body,0,y0+0.16,0);
+  AD(new THREE.BoxGeometry(W*0.8,0.3,L*0.5),body,0,y0+0.42,L*0.02);
+  AD(new THREE.BoxGeometry(W*0.62,0.2,L*0.34),body,0,y0+0.36,-L*0.34).rotation.x=0.1;
+  AD(new THREE.BoxGeometry(W*0.7,0.46,L*0.26),body,0,y0+0.64,L*0.3);
+  AD(new THREE.BoxGeometry(W*0.62,0.44,0.06),GAMAT.glass,0,y0+0.74,-L*0.06).rotation.x=-0.48;
+  AD(new THREE.BoxGeometry(W*0.5,0.34,0.06),GAMAT.glass,0,y0+0.82,L*0.17).rotation.x=0.42;
+  [-1,1].forEach(s=>{AD(new THREE.BoxGeometry(0.16,0.3,L*0.24),acc,s*(W*0.45),y0+0.5,L*0.08);
+   AD(new THREE.BoxGeometry(0.1,0.1,L*0.46),acc,s*(W*0.49),y0+0.1,0)});
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.36,0.08,0.3),GAMAT.head,s*(W*0.3),y0+0.42,-L*0.46));
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.42,0.09,0.06),GAMAT.tail,s*(W*0.28),y0+0.62,L*0.46));
+  AD(new THREE.BoxGeometry(W*0.4,0.14,0.26),GAMAT.dark,0,y0+0.24,L*0.46);
+  [-1,1].forEach(s=>AD(new THREE.CylinderGeometry(0.08,0.08,0.2,10),GAMAT.chrome,s*0.22,y0+0.2,L*0.48).rotation.x=Math.PI/2);
+  if(hy){AD(new THREE.BoxGeometry(W*0.94,0.06,0.44),acc,0,y0+1.02,L*0.4);
+   [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.07,0.42,0.16),acc,s*(W*0.4),y0+0.82,L*0.4));
+   AD(new THREE.BoxGeometry(W*0.86,0.05,0.22),acc,0,y0+0.06,-L*0.43);
+   [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.12,0.24,0.5),acc,s*(W*0.44),y0+0.3,-L*0.3))}
+  else{AD(new THREE.BoxGeometry(W*0.72,0.05,0.28),acc,0,y0+0.78,L*0.42);
+   [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.06,0.2,0.12),acc,s*(W*0.3),y0+0.68,L*0.42))}
+ }else{
+  AD(new THREE.BoxGeometry(W*0.98,0.42,L*0.94),acc,0,y0+0.2,0);
+  AD(new THREE.BoxGeometry(W*0.9,0.36,L*0.9),body,0,y0+0.56,0);
+  AD(new THREE.BoxGeometry(W*0.74,0.34,L*0.4),body,0,y0+0.82,-L*0.24);
+  AD(new THREE.BoxGeometry(W*0.66,0.46,L*0.26),acc,0,y0+0.92,L*0.3);
+  AD(new THREE.BoxGeometry(W*0.6,0.42,0.06),GAMAT.glass,0,y0+0.98,-L*0.04).rotation.x=-0.4;
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.05,0.44,L*0.44),GAMAT.chrome,s*(W*0.46),y0+0.6,L*0.04).rotation.x=0.12);
+  const hs=new THREE.Group();hs.position.set(0,y0+0.74,-L*0.46);g.add(hs);
+  gaPut(hs,new THREE.CylinderGeometry(0.36,0.36,0.1,20,1,false,0,Math.PI),GAMAT.chrome,0,0.06,0).rotation.x=Math.PI/2;
+  gaPut(hs,new THREE.BoxGeometry(0.72,0.42,0.1),GAMAT.chrome,0,-0.15,0);
+  gaPut(hs,new THREE.BoxGeometry(0.58,0.52,0.04),GAMAT.dark,0,-0.02,0.04);
+  for(let i=0;i<7;i++)gaPut(hs,new THREE.BoxGeometry(0.03,0.46,0.05),GAMAT.chrome,(i-3)*0.082,-0.02,0.06);
+  [-1,1].forEach(s=>{AD(new THREE.SphereGeometry(0.15,12,10),GAMAT.head,s*(W*0.34),y0+0.76,-L*0.43);
+   AD(new THREE.SphereGeometry(0.11,10,8),GAMAT.head,s*(W*0.21),y0+0.72,-L*0.445)});
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.5,0.1,0.06),GAMAT.tail,s*(W*0.26),y0+0.66,L*0.47));
+  [-1,1].forEach(s=>[0,1].forEach(j=>AD(new THREE.CylinderGeometry(0.07,0.07,0.18,10),GAMAT.chrome,s*(0.2+j*0.19),y0+0.16,L*0.47).rotation.x=Math.PI/2));
+  [-1,1].forEach(s=>AD(new THREE.BoxGeometry(W*0.9,0.1,0.32),GAMAT.chrome,0,y0+0.2,s*L*0.49));
+ }
+ AD(new THREE.BoxGeometry(W*0.34,0.1,0.42),GAMAT.rub,0,y0+C.sit-0.22,0.08);
+ AD(new THREE.BoxGeometry(W*0.34,0.44,0.09),GAMAT.rub,0,y0+C.sit,0.28);
+ AD(new THREE.TorusGeometry(0.17,0.03,8,16),GAMAT.dark,0,y0+C.sit+0.06,-0.3).rotation.x=1.1;
+ g.userData={sp:C.sp,sit:C.sit,name:''};
+ return g}
+function gaCar(k){if(!GACAR[k]){const g=gaCarBuild(k);g.visible=false;scene.add(g);const r=GA_CARS.find(c=>c.k===k);g.userData.name=r?r.n:'the car';GACAR[k]=g}return GACAR[k]}
+function gaBayW(i){if(!gaHas())return null;const v=new THREE.Vector3(gaBayL(i),0,GA_AZ-0.9);HG.localToWorld(v);return [v.x,v.z]}
+function gaFrontW(){const v=new THREE.Vector3(GA_AX,0,GA_Z1+1.6);HG.localToWorld(v);return [v.x,v.z]}
+function gaMark(){if(!gaHas()||GA.marked===BOUND)return;GA.marked=BOUND;
+ const W=(x,z)=>{const v=new THREE.Vector3(x,0,z);HG.localToWorld(v);return [v.x,v.z]};
+ const x0=GA_AX-GA_HW,x1=GA_AX+GA_HW;
+ markPoly([W(x0,GA_Z0),W(x1,GA_Z0),W(x1,GA_Z0+GA_WT),W(x0,GA_Z0+GA_WT)],3.2);
+ markPoly([W(x0,GA_Z0),W(x0+GA_WT,GA_Z0),W(x0+GA_WT,GA_Z1),W(x0,GA_Z1)],3.2);
+ markPoly([W(x1-GA_WT,GA_Z0),W(x1,GA_Z0),W(x1,GA_Z1),W(x1-GA_WT,GA_Z1)],3.2);
+ for(let i=1;i<6;i++){const cx=gaBayL(i)-(GA_BW+GA_PW)/2;
+  markPoly([W(cx-GA_PW/2,GA_Z1-1.0),W(cx+GA_PW/2,GA_Z1-1.0),W(cx+GA_PW/2,GA_Z1),W(cx-GA_PW/2,GA_Z1)],3.2)}}
+/* what shows: the garage once it is bought, and every car that is owned, parked in its bay */
+function placeGA(){GA.on=gaHas();gaBuild();GARG.visible=GA.on;if(GA.on)gaMark();
+ GA_CARS.forEach((c,i)=>{const own=gaOwns(c.k);const g=own?gaCar(c.k):GACAR[c.k];if(!g)return;
+  const show=own&&GA.on;if(DRIVE&&RIDE===g){if(!show)rideOff();else return}
+  g.visible=show;if(!show)return;const p=gaBayW(i+1);if(!p)return;
+  g.position.set(p[0],floorAtW(p[0],p[1]),p[1]);g.rotation.y=HG.rotation.y+Math.PI});
+ hankPlace();if(typeof showMower==='function')showMower()}
+function gaSync(){if(!LIVE){gaLocalLoad();placeGA();return}const key=VISIT?'v:'+VISIT.owner:'me';if(GA.synced===key)return;GA.synced=key;GA.own=new Set();placeGA();
+ RPC('garage_list',{p_owner:VISIT?VISIT.owner:null}).then(r=>{const d=r.data||{};if(r.error||!d.ok){GA.synced='';return}GA.own=new Set(Array.isArray(d.kinds)?d.kinds:[]);placeGA()}).catch(()=>{GA.synced=''})}
+/* HANK: the man in the hard hat who puts the garage up and sells you what goes in it */
+const HANK=new THREE.Group();HANK.visible=false;scene.add(HANK);
+{const H=HANK,AD=(geo,mat,x,y,z,ry)=>gaPut(H,geo,mat,x,y,z,ry);
+ AD(new THREE.CylinderGeometry(0.17,0.2,0.82,12),GAMAT.denim,0,0.42,0);
+ AD(new THREE.BoxGeometry(0.46,0.52,0.3),GAMAT.hivis,0,1.16,0);
+ [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.07,0.5,0.02),GAMAT.trim,s*0.12,1.16,0.16));
+ AD(new THREE.BoxGeometry(0.48,0.06,0.32),GAMAT.trim,0,1.12,0);
+ AD(new THREE.BoxGeometry(0.44,0.14,0.3),GAMAT.rub,0,0.86,0);
+ [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.16,0.1,0.3),GAMAT.boot,s*0.11,0.05,0.04));
+ const head=new THREE.Group();head.position.y=1.56;H.add(head);H.head=head;
+ gaPut(head,new THREE.SphereGeometry(0.155,14,12),GAMAT.skin,0,0,0);
+ gaPut(head,new THREE.SphereGeometry(0.17,14,10,0,6.283,0,1.5),GAMAT.hivis,0,0.03,0);
+ gaPut(head,new THREE.CylinderGeometry(0.215,0.215,0.03,16),GAMAT.hivis,0,0.02,0);
+ gaPut(head,new THREE.BoxGeometry(0.2,0.02,0.12),GAMAT.hivis,0,0.02,0.16);
+ [-1,1].forEach(s=>gaPut(head,new THREE.SphereGeometry(0.02,6,5),GAMAT.dark,s*0.06,-0.01,0.14));
+ gaPut(head,new THREE.BoxGeometry(0.12,0.05,0.04),GAMAT.hair,0,-0.08,0.13);
+ const arm=s=>{const a=new THREE.Group();a.position.set(s*0.27,1.34,0);
+  gaPut(a,new THREE.CylinderGeometry(0.05,0.045,0.36,8),GAMAT.hivis,0,-0.18,0);
+  const fore=new THREE.Group();fore.position.y=-0.36;a.add(fore);
+  gaPut(fore,new THREE.CylinderGeometry(0.042,0.04,0.34,8),GAMAT.skin,0,-0.17,0);
+  gaPut(fore,new THREE.SphereGeometry(0.05,8,6),GAMAT.skin,0,-0.36,0);a.fore=fore;H.add(a);return a};
+ H.armL=arm(-1);H.armR=arm(1);H.armL.rotation.x=0.2;H.armL.fore.rotation.x=-0.6;H.armR.rotation.x=-0.5;H.armR.fore.rotation.x=-1.1;
+ gaPut(H.armR.fore,new THREE.CylinderGeometry(0.05,0.05,0.5,10),GAMAT.paper,0,-0.3,0.1).rotation.z=Math.PI/2}
+const HANK_AT={x:13.6,z:3.2};
+function hankPlace(){const v=new THREE.Vector3(HANK_AT.x,0,HANK_AT.z);HG.localToWorld(v);GA.x=v.x;GA.z=v.z;
+ HANK.position.set(v.x,floorAtW(v.x,v.z),v.z);HANK.rotation.y=HG.rotation.y+Math.atan2(0-HANK_AT.x,9-HANK_AT.z);
+ HANK.visible=!VISIT&&houseLvl()>=1}
+/* the shop */
+function openGaShop(){$('#gaShop').classList.add('on');gaRender()}
+function closeGaShop(){$('#gaShop').classList.remove('on')}
+function gaRender(){const host=$('#gaRows');if(!host)return;host.innerHTML='';const has=gaHas();
+ GA_ROWS.forEach((it,i)=>{const own=gaOwns(it.k),lock=it.k!=='garage'&&!has;const row=document.createElement('div');row.className='row';
+  const where=it.k==='garage'?(own?'built \u00B7 beside the house':'beside the house'):(own?'bay '+(i+1):lock?'the garage first':'bay '+(i+1));
+  row.innerHTML='<div class="nm">'+it.n+'<div class="where">'+where+'</div><div class="dsc">'+it.d+'</div></div>';
+  const b=document.createElement('button');b.className='btn'+(own||lock?'':' on');b.textContent=own?(it.k==='garage'?'Built.':'Yours.'):it.gc.toLocaleString()+' gc';
+  b.disabled=own||BUSY||lock;if(!own&&!lock)b.onclick=()=>gaBuy(it.k);row.appendChild(b);host.appendChild(row)});
+ const bal=$('#gaBal');if(bal)bal.textContent=(S.gc|0).toLocaleString()+' gardencoin';
+ const sub=$('#gaSub');if(sub)sub.textContent=has?'Six bays. The mower has the first. Walk up to a car and drive it out.':'Five thousand, and it is up by the afternoon. Six bays and a weathervane.'}
+function gaBuy(k){const it=GA_ROWS.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard('buy the garage');return}
+ if(k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
+ const done=()=>{GA.own.add(k);gaLocalSave();SND.buy(8);placeGA();gaRender();renderHud();
+  if(k==='garage'){setTimeout(()=>SND.carved(),700);[0,260,520].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast('The garage is up. Six bays, and the mower has a home.')}
+  else{SND.tier();toast(it.n+' is in bay '+(GA_ROWS.indexOf(it)+1)+'. Walk up to it and drive it out.')}};
+ if(!LIVE){if(reach()<it.gc){showShort(it.gc);return}payGc(it.gc);save();done();return}
+ if(BUSY)return;BUSY=true;gaRender();
+ RPC('garage_buy',{p_kind:k}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');
+   if(/not_enough/.test(m))showShort(it.gc);
+   else if(/not find|function|schema cache/i.test(m))toast('Run patch '+GA_PATCH+' on DEEDS first.');
+   else if(/no_garage/.test(m))toast('The garage first.');
+   else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Hank said: '+(m||'nothing')));
+   gaRender();return}
+  const d=r.data||{};if(Array.isArray(d.kinds))GA.own=new Set(d.kinds);
+  if(typeof d.balance==='number'){S.gc=d.balance;save()}ledger(it.n,-it.gc,'Hank');done()},
+  e=>{BUSY=false;toast('Hank said: '+String(e&&e.message||e||'nothing'));gaRender()})}
+/* riding: the mower and every car share the kart, the cars are simply faster */
+function gaCarNear(){let best=null,bd=2.7;GA_CARS.forEach((c,i)=>{const g=GACAR[c.k];if(!g||!g.visible)return;
+  const d=Math.hypot(you.x-g.position.x,you.z-g.position.z);if(d<bd){bd=d;best={i,d,g}}});return best}
+function carRide(i){const c=GA_CARS[i];if(!c)return;const g=GACAR[c.k];if(!g||!g.visible)return;
+ if(VISIT){visitGuard('drive the cars');return}rideToggle(g)}
+const GA_ENG={o:null,s:null,g:null,f:null};
+function carEngineOn(){try{const a=SND.ac&&SND.ac();if(!a||GA_ENG.o)return;const o=a.createOscillator(),s=a.createOscillator(),f=a.createBiquadFilter(),gn=a.createGain();
+ o.type='sawtooth';s.type='square';o.frequency.value=62;s.frequency.value=31;f.type='lowpass';f.frequency.value=760;f.Q.value=2.4;
+ gn.gain.value=0.0001;o.connect(f);s.connect(f);f.connect(gn);gn.connect(SND.bus()||a.destination);o.start();s.start();
+ GA_ENG.o=o;GA_ENG.s=s;GA_ENG.g=gn;GA_ENG.f=f}catch(e){}}
+function carEngineOff(){try{if(GA_ENG.g)GA_ENG.g.gain.value=0.0001;if(GA_ENG.o)GA_ENG.o.stop();if(GA_ENG.s)GA_ENG.s.stop()}catch(e){}GA_ENG.o=GA_ENG.s=GA_ENG.g=GA_ENG.f=null}
+function carEngineTick(){if(!GA_ENG.o)return;const sp=rideSp(),u=Math.min(1,Math.abs(KS)/(11*sp)),base=56*sp;
+ try{GA_ENG.o.frequency.value=base*(0.7+u*1.9);GA_ENG.s.frequency.value=base*(0.35+u*0.95);
+  GA_ENG.f.frequency.value=520+u*1500;GA_ENG.g.gain.value=0.016+u*0.05}catch(e){}}
+/* the tick: the doors roll up as you come near, the lamps light after dark, the vane turns, Hank waves */
+function gaTick(t,dt){
+ if(HANK.visible){const dx=you.x-GA.x,dz=you.z-GA.z,d=Math.hypot(dx,dz);
+  let a=Math.atan2(dx,dz)-HANK.rotation.y;while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;
+  HANK.head.rotation.y+=((d<10?Math.max(-0.9,Math.min(0.9,a)):0)-HANK.head.rotation.y)*Math.min(1,4*dt);
+  const wave=d<5.5;HANK.armL.rotation.x+=((wave?-2.5:0.2)-HANK.armL.rotation.x)*Math.min(1,5*dt);
+  HANK.armL.fore.rotation.x=wave?-0.3+Math.sin(t*7)*0.35:-0.6}
+ if(GA_ENG.o)carEngineTick();
+ if(!GA.on)return;
+ const f=gaFrontW(),near=f?Math.hypot(you.x-f[0],you.z-f[1])<12:false;GA.near=near?1:0;
+ GADOOR.forEach(d=>{const u=d.userData;u.u+=((near?1:0)-u.u)*Math.min(1,3.2*dt);
+  d.position.y=u.u*GA_DH*0.95;d.scale.y=Math.max(0.05,1-u.u*0.95)});
+ const dark=(ph==='night'||ph==='dusk')?1:ph==='golden'?0.4:0;
+ GAMAT.lampM.emissiveIntensity=0.15+dark*1.15;GALAMP.forEach(pt=>pt.intensity=dark*1.1);
+ if(GARG.vane)GARG.vane.rotation.y=Math.sin(t*0.13)*0.9}
+setTimeout(gaSync,0);
+
+window.__walk={GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
