@@ -165,19 +165,31 @@ $('#stack').addEventListener('click',e=>{
   if(!cards.length){$('#again').click();return}paintReview();
 });
 $('#all').onclick=()=>share(cards);
-$('#again').onclick=()=>{cards=[];shot=null;paintFrame();$('#read').textContent='Read the cards.';$('#review').classList.add('hide');$('#capture').classList.remove('hide');window.scrollTo(0,0)};
+$('#again').onclick=()=>{try{sessionStorage.removeItem('deedable_scan')}catch{}cards=[];shot=null;paintFrame();$('#read').textContent='Read the cards.';$('#review').classList.add('hide');$('#capture').classList.remove('hide');window.scrollTo(0,0)};
 
 function vcf(list){
   return list.map(c=>{const [first,...rest]=(c.name||'').trim().split(' ');
     return ['BEGIN:VCARD','VERSION:3.0',`N:${rest.join(' ')};${first};;;`,`FN:${c.name||''}`,c.company?`ORG:${c.company}`:'',c.title?`TITLE:${c.title}`:'',c.cell?`TEL;TYPE=CELL:${c.cell}`:'',c.office?`TEL;TYPE=WORK:${c.office}`:'',c.email?`EMAIL:${c.email}`:'',c.website?`URL:${c.website}`:'','END:VCARD'].filter(Boolean).join('\r\n')}).join('\r\n')+'\r\n';
 }
 async function share(list){
+  try{
+    if(!sb)throw new Error('Supabase lines at the top of scan.html are not filled in.');
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)throw new Error('Sign in on deedable first.');
+    const {data,error}=await sb.from('vcf_links').insert({user_id:session.user.id,cards:list}).select('token').single();
+    if(error||!data||!data.token)throw new Error(error?.message||'Could not make the contact link.');
+    try{sessionStorage.setItem('deedable_scan',JSON.stringify(cards))}catch{}
+    location.href=`${SUPABASE_URL}/functions/v1/vcf?t=${data.token}`;
+  }catch(e){toast(e.message||'Could not add.');shareFile(list)}
+}
+async function shareFile(list){
   const name=(list.length===1?(list[0].name||'card').replace(/[^\w]+/g,'-'):'cards')+'.vcf';
   const blob=new Blob([vcf(list)],{type:'text/vcard'});const f=new File([blob],name,{type:'text/vcard'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]})}catch{}}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()}
 }
 paintFrame();
+try{const k=sessionStorage.getItem('deedable_scan');if(k){const c=JSON.parse(k);if(Array.isArray(c)&&c.length){cards=c;paintReview()}}}catch{}
 </script>
 </body>
 </html>
