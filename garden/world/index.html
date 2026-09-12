@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.33">
+<meta name="world-build" content="6.34">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -4996,7 +4996,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);gaTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);gaTick(t,dt);gdnTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -5692,6 +5692,12 @@ const GA_CARS=[
  {k:'car_hyper',n:'The Supercar II',gc:900000,d:'Carbon and orange, a wing across the whole back, and it never stops pulling.'},
  {k:'car_royale',n:'The Royale',gc:2000000,d:'Two tone blue over black, a horseshoe grille, sixteen cylinders. The best thing in the garage.'}];
 const GA_ROWS=[{k:'garage',n:'The garage',gc:GA_GC,d:'Six bays, a slate roof and a cupola, put up beside the house in an afternoon. The mower gets the first bay.'}].concat(GA_CARS);
+/* 6.34 THE YARD: what Hank puts in the ground rather than what he parks in it. Bought, never given, and the gardener takes his time */
+const GDN_PATCH=83;
+const GDN_ROWS=[
+ {k:'front_walk',n:'The front garden',gc:15000,yard:1,d:'Hank plows the ground and sends the gardener: a box walk from the portico out to the lawn, clipped either side, a ribbon of flowers along the front of it and a pair of cones at the end.'},
+ {k:'rose_garden',n:'The rose garden',gc:40000,yard:1,d:'A box edged parterre on the east side, gravel crossing the middle, two beds of roses and a stone birdbath. The gardener plants it out in front of you.'}];
+const GA_ALL=GA_ROWS.concat(GDN_ROWS);
 const GA_SPEC={
  car_classic:{L:4.24,W:1.74,body:0xF0E4C4,accent:0x6B2A2A,wheel:0.40,sit:0.80,sp:1.45,form:'classic'},
  car_luxury:{L:5.10,W:1.98,body:0x14161C,accent:0xD8DCE0,wheel:0.42,sit:0.82,sp:1.75,form:'luxury'},
@@ -5919,23 +5925,24 @@ function hankPlace(){const v=new THREE.Vector3(HANK_AT.x,0,HANK_AT.z);HG.localTo
 function openGaShop(){$('#gaShop').classList.add('on');gaRender()}
 function closeGaShop(){$('#gaShop').classList.remove('on')}
 function gaRender(){const host=$('#gaRows');if(!host)return;host.innerHTML='';const has=gaHas();
- GA_ROWS.forEach((it,i)=>{const own=gaOwns(it.k),lock=it.k!=='garage'&&!has;const row=document.createElement('div');row.className='row';
-  const where=it.k==='garage'?(own?'built \u00B7 beside the house':'beside the house'):(own?'bay '+(i+1):lock?'the garage first':'bay '+(i+1));
+ GA_ALL.forEach((it,i)=>{const own=gaOwns(it.k),lock=!it.yard&&it.k!=='garage'&&!has;const row=document.createElement('div');row.className='row';
+  const where=it.yard?(own?(GDB.k===it.k?'the gardener is at it':'in front of the house'):'in front of the house'):it.k==='garage'?(own?'built \u00B7 beside the house':'beside the house'):(own?'bay '+(i+1):lock?'the garage first':'bay '+(i+1));
   row.innerHTML='<div class="nm">'+it.n+'<div class="where">'+where+'</div><div class="dsc">'+it.d+'</div></div>';
-  const b=document.createElement('button');b.className='btn'+(own||lock?'':' on');b.textContent=own?(it.k==='garage'?'Built.':'Yours.'):it.gc.toLocaleString()+' gc';
+  const b=document.createElement('button');b.className='btn'+(own||lock?'':' on');b.textContent=own?(it.yard?(GDB.k===it.k?'Going in.':'Planted.'):it.k==='garage'?'Built.':'Yours.'):it.gc.toLocaleString()+' gc';
   b.disabled=own||BUSY||lock;if(!own&&!lock)b.onclick=()=>gaBuy(it.k);row.appendChild(b);host.appendChild(row)});
  const bal=$('#gaBal');if(bal)bal.textContent=(S.gc|0).toLocaleString()+' gardencoin';
  const sub=$('#gaSub');if(sub)sub.textContent=has?'Six bays. The mower has the first. Walk up to a car and drive it out.':'Five thousand, and it is up by the afternoon. Six bays and a weathervane.'}
-function gaBuy(k){const it=GA_ROWS.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard('buy the garage');return}
- if(k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
+function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard(it.yard?'buy the garden':'buy the garage');return}
+ if(!it.yard&&k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
  const done=()=>{GA.own.add(k);gaLocalSave();SND.buy(8);placeGA();gaRender();renderHud();
+  if(it.yard){gdnStart(k);return}
   if(k==='garage'){setTimeout(()=>SND.carved(),700);[0,260,520].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast('The garage is up. Six bays, and the mower has a home.')}
   else{SND.tier();toast(it.n+' is in bay '+(GA_ROWS.indexOf(it)+1)+'. Walk up to it and drive it out.')}};
  if(!LIVE){if(reach()<it.gc){showShort(it.gc);return}payGc(it.gc);save();done();return}
  if(BUSY)return;BUSY=true;gaRender();
  RPC('garage_buy',{p_kind:k}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');
    if(/not_enough/.test(m))showShort(it.gc);
-   else if(/not find|function|schema cache/i.test(m))toast('Run patch '+GA_PATCH+' on DEEDS first.');
+   else if(/not find|function|schema cache|no_such_kind/i.test(m))toast('Run patch '+(it.yard?GDN_PATCH:GA_PATCH)+' on DEEDS first.');
    else if(/no_garage/.test(m))toast('The garage first.');
    else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Hank said: '+(m||'nothing')));
    gaRender();return}
@@ -5981,86 +5988,126 @@ setTimeout(gaSync,0);
    ====================================================================== */
 const GDN=new THREE.Group();HG.add(GDN);      /* the walk */
 const GDR=new THREE.Group();HG.add(GDR);      /* the rose garden */
-const GDM={
- hedge:new THREE.MeshStandardMaterial({color:0x35552F,roughness:0.95}),
- hedge2:new THREE.MeshStandardMaterial({color:0x2C4A28,roughness:0.95}),
- gravel:new THREE.MeshStandardMaterial({color:0xC9BFA6,roughness:1}),
- soil:new THREE.MeshStandardMaterial({color:0x5A4433,roughness:1}),
- stone:new THREE.MeshStandardMaterial({color:0xD5CBB4,roughness:0.9}),
- water:new THREE.MeshStandardMaterial({color:0x5E7E8C,roughness:0.25,metalness:0.2}),
- leaf:new THREE.MeshStandardMaterial({color:0x3E6B34,roughness:1}),
- red:new THREE.MeshStandardMaterial({color:0xC8324A,roughness:0.85}),
- white:new THREE.MeshStandardMaterial({color:0xF4EFE2,roughness:0.85}),
- rose:new THREE.MeshStandardMaterial({color:0xC0304B,roughness:0.8}),
- rose2:new THREE.MeshStandardMaterial({color:0xE8B7C4,roughness:0.8}),
- stem:new THREE.MeshStandardMaterial({color:0x3A5A2E,roughness:1})};
-let GDN_BUILT=false;
-/* a hedge run: a box body with a rounded cap along the top */
-function gdnHedge(host,x0,z0,x1,z1,h,w){const L=Math.hypot(x1-x0,z1-z0);if(L<0.01)return null;
- const g=new THREE.Group();g.position.set((x0+x1)/2,0,(z0+z1)/2);g.rotation.y=Math.atan2(-(z1-z0),x1-x0);host.add(g);
- const b=new THREE.Mesh(new THREE.BoxGeometry(L,h-w/2,w),GDM.hedge);b.position.y=(h-w/2)/2;b.castShadow=true;b.receiveShadow=true;g.add(b);
- const c=new THREE.Mesh(new THREE.CylinderGeometry(w/2,w/2,L,10),GDM.hedge2);c.rotation.z=Math.PI/2;c.position.y=h-w/2;c.castShadow=true;g.add(c);
- return g}
-/* the ribbon: cushions of leaf along a run, with heads of red and white in runs of five */
-function gdnRibbon(host,x0,z0,x1,z1){const L=Math.hypot(x1-x0,z1-z0),n=Math.max(2,Math.round(L/0.62));
- const ux=(x1-x0)/L,uz=(z1-z0)/L;
- const cush=new THREE.InstancedMesh(new THREE.SphereGeometry(0.2,10,7),GDM.leaf,n);
- const heads=[new THREE.InstancedMesh(new THREE.SphereGeometry(0.055,7,6),GDM.red,n*3),
-              new THREE.InstancedMesh(new THREE.SphereGeometry(0.055,7,6),GDM.white,n*3)];
- const m=new THREE.Object3D();const c=[0,0];
- for(let i=0;i<n;i++){const t=(i+0.5)/n*L,x=x0+ux*t,z=z0+uz*t;const w=(i*37%11)/11;
-  m.position.set(x+(w-0.5)*0.1,0.14,z+(w-0.5)*0.1);m.scale.set(1.25,0.72,1.25);m.rotation.set(0,w*3,0);m.updateMatrix();cush.setMatrixAt(i,m.matrix);
-  const kind=Math.floor(i/5)%2;const H=heads[kind];
-  for(let k=0;k<3;k++){const a=(i*2.1+k*2.09);m.position.set(x+Math.cos(a)*0.13,0.25+((k+w)%2)*0.03,z+Math.sin(a)*0.13);
-   m.scale.set(1,1,1);m.rotation.set(0,0,0);m.updateMatrix();H.setMatrixAt(c[kind]++,m.matrix)}}
- cush.castShadow=true;host.add(cush);heads.forEach((H,i)=>{H.count=c[i];H.instanceMatrix.needsUpdate=true;host.add(H)});
- cush.instanceMatrix.needsUpdate=true}
+const GDP=new THREE.Group();HG.add(GDP);      /* the plow: turned ground, stakes and string while the gardener is at it */
+const GDPW=new THREE.Group(),GDPR=new THREE.Group();GDP.add(GDPW);GDP.add(GDPR);
+const GWALK={x:2.55,z0:7.0,z1:16.8,out:5.2,gw:1.72,rib:1.95};
+const GROSE={cx:11.0,cz:8.0,hw:3.5,hd:2.4};
+const GWPROF=boxProfile(0.69,0.85,0.26),GRPROF=boxProfile(0.56,0.42,0.15);   /* the parterre's own profiles: the quadrant hedge and a bed edging */
+const GDM={dirt:new THREE.MeshStandardMaterial({color:0x4A3626,roughness:1}),
+ stake:new THREE.MeshStandardMaterial({color:0xA98A5F,roughness:1}),
+ line:new THREE.MeshBasicMaterial({color:0xF4EEDC})};
+let GDN_BUILT=false,GDN_MARKED=-9;
+const GDB={k:'',t0:0,fig:null};              /* what the gardener is building right now */
+const GDN_DUR=100000;                        /* he takes a minute and a half, and you watch him do it */
+const GDN_FL=[];                             /* the flower billboards, in world space, replaced when the seat binds */
+const gRect=(x,z,w,d)=>[[x-w/2,z-d/2],[x+w/2,z-d/2],[x+w/2,z+d/2],[x-w/2,z+d/2]];
+function gdnOwns(k){return GA.own.has(k)}
+function gdnFlat(host,path,y,mat){const m=new THREE.Mesh(flatGeo(path,y),mat);m.receiveShadow=true;host.add(m);return m}
+/* a hedge run, swept the way the parterre's hedges are swept, in the same texture, with leaves on the cut ends */
+function gdnRun(host,pts,prof,seed){const P=resample(pts,false,0.14);const m=new THREE.Mesh(sweepGeo(P,prof,false,0.9,1.9,0.022,seed),MAT.hedge);
+ m.castShadow=true;m.receiveShadow=true;host.add(m);return m}
 function gdnCone(host,x,z,h){const g=new THREE.Group();g.position.set(x,0,z);host.add(g);
- const p=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.4,0.28,10),GDM.stone);p.position.y=0.14;p.receiveShadow=true;g.add(p);
- const c=new THREE.Mesh(new THREE.ConeGeometry(0.42,h,12),GDM.hedge);c.position.y=0.28+h/2;c.castShadow=true;g.add(c);
- const t=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,6),GDM.hedge2);t.position.y=0.28+h+0.04;g.add(t);return g}
-/* a rose bush, and the standard rose on its little trunk */
-function gdnBush(host,x,z,std){const g=new THREE.Group();g.position.set(x,0,z);host.add(g);
- if(std){const st=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,0.62,7),GDM.stem);st.position.y=0.31;g.add(st)}
- const y=std?0.78:0.26;
- const b=new THREE.Mesh(new THREE.SphereGeometry(std?0.24:0.3,11,8),GDM.leaf);b.position.y=y;b.scale.set(1,0.82,1);b.castShadow=true;g.add(b);
- for(let k=0;k<(std?5:4);k++){const a=k/(std?5:4)*6.283+x;const r=(std?0.2:0.25);
-  const f=new THREE.Mesh(new THREE.SphereGeometry(0.062,8,6),k%2?GDM.rose:GDM.rose2);
-  f.position.set(Math.cos(a)*r,y+0.08+(k%3)*0.05,Math.sin(a)*r);g.add(f)}
- return g}
-function gdnGravel(host,x,z,w,d){const m=new THREE.Mesh(new THREE.BoxGeometry(w,0.06,d),GDM.gravel);m.position.set(x,0.03,z);m.receiveShadow=true;host.add(m);return m}
+ const p=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.4,0.28,10),MAT.ashlar);p.position.y=0.14;p.receiveShadow=true;g.add(p);
+ const c=new THREE.Mesh(new THREE.ConeGeometry(0.42,h,12),MAT.hedge);c.position.y=0.28+h/2;c.castShadow=true;g.add(c);
+ const t=new THREE.Mesh(new THREE.SphereGeometry(0.11,10,8),MAT.hedge);t.position.y=0.28+h+0.05;g.add(t);return g}
+function gdnStakes(host,x0,z0,x1,z1,n){const L=Math.hypot(x1-x0,z1-z0),ux=(x1-x0)/L,uz=(z1-z0)/L;
+ for(let i=0;i<=n;i++){const t=i/n*L,s=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.025,0.62,6),GDM.stake);
+  s.position.set(x0+ux*t,0.31,z0+uz*t);s.rotation.z=((i*37)%7-3)*0.012;host.add(s)}
+ const ln=new THREE.Mesh(new THREE.BoxGeometry(L,0.012,0.012),GDM.line);ln.position.set((x0+x1)/2,0.56,(z0+z1)/2);
+ ln.rotation.y=Math.atan2(-(z1-z0),x1-x0);host.add(ln)}
 function gdnBuild(){if(GDN_BUILT)return;GDN_BUILT=true;
- /* THE WALK: gravel from the portico out to the lawn, box either side, a ribbon along the front of the box */
- gdnGravel(GDN,0,11.8,3.4,11.6);
- [-1,1].forEach(s=>{gdnHedge(GDN,s*2.55,7.0,s*2.55,16.8,0.62,0.7);          /* the long run */
-  gdnHedge(GDN,s*2.55,16.8,s*5.2,16.8,0.62,0.7);                            /* the return, out to the lawn */
-  gdnRibbon(GDN,s*1.95,7.2,s*1.95,16.6);
-  gdnCone(GDN,s*2.55,17.5,1.35)});
- /* THE ROSE GARDEN: a box parterre on the east side, open to the walk and open to the front */
- const CX=10.0,CZ=7.6,HW=3.8,HD=2.4,h=0.5,w=0.55;
- gdnGravel(GDR,CX,CZ,HW*2-0.5,HD*2-0.5);
- gdnHedge(GDR,CX-HW,CZ-HD,CX+HW,CZ-HD,h,w);                                  /* the back, along the house side */
- gdnHedge(GDR,CX+HW,CZ-HD,CX+HW,CZ+HD,h,w);                                  /* the far end */
- gdnHedge(GDR,CX-HW,CZ+HD,CX-HW+1.4,CZ+HD,h,w);                              /* the front, with the way in */
- gdnHedge(GDR,CX+HW-1.4,CZ+HD,CX+HW,CZ+HD,h,w);
- gdnHedge(GDR,CX-HW,CZ-HD,CX-HW,CZ-HD+1.2,h,w);                              /* the walk side, with the way in */
- gdnHedge(GDR,CX-HW,CZ+HD-1.2,CX-HW,CZ+HD,h,w);
- [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{const b=new THREE.Mesh(new THREE.SphereGeometry(0.34,12,9),GDM.hedge);
-  b.position.set(CX+sx*HW,0.5,CZ+sz*HD);b.castShadow=true;GDR.add(b)});
- gdnGravel(GDR,CX,CZ,HW*2-1.1,0.9);gdnGravel(GDR,CX,CZ,0.9,HD*2-1.1);
- [-1,1].forEach(s=>{const bx=CX+s*1.85;const soil=new THREE.Mesh(new THREE.BoxGeometry(2.7,0.08,2.6),GDM.soil);
-  soil.position.set(bx,0.07,CZ);soil.receiveShadow=true;GDR.add(soil);
-  [[-0.85,-0.75],[0.85,-0.75],[-0.85,0.75],[0.85,0.75]].forEach(([dx,dz])=>gdnBush(GDR,bx+dx,CZ+dz,false));
-  gdnBush(GDR,bx,CZ,true)});
- /* the birdbath in the middle */
- {const g=new THREE.Group();g.position.set(CX,0,CZ);GDR.add(g);
-  const b=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.42,0.16,14),GDM.stone);b.position.y=0.08;g.add(b);
-  const st=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.17,0.62,12),GDM.stone);st.position.y=0.47;st.castShadow=true;g.add(st);
-  const bowl=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.3,0.18,16),GDM.stone);bowl.position.y=0.87;bowl.castShadow=true;g.add(bowl);
-  const wtr=new THREE.Mesh(new THREE.CircleGeometry(0.4,18),GDM.water);wtr.rotation.x=-Math.PI/2;wtr.position.y=0.955;g.add(wtr)}}
-function placeGarden(){gdnBuild();const st=houseLvl();GDN.visible=st>=2;GDR.visible=st>=3}
+ const W=GWALK,R=GROSE;
+ /* THE WALK: gravel from the portico out to the lawn, a clipped run either side, a pair of cones where it meets the grass */
+ gdnFlat(GDN,gRect(0,(W.z0+W.z1)/2-0.7,W.gw*2,W.z1-W.z0+2.6),0.02,MAT.gravel);
+ [-1,1].forEach(s=>{const i=s>0?1:0;
+  gdnRun(GDN,[[s*W.x,W.z0],[s*W.x,W.z1]],GWPROF,410+i);
+  gdnRun(GDN,[[s*W.x,W.z1],[s*W.out,W.z1]],GWPROF,420+i);
+  gdnFlat(GDN,gRect(s*W.rib,(W.z0+W.z1)/2,0.66,W.z1-W.z0-0.4),0.03,MAT.soil);
+  gdnCone(GDN,s*W.x,W.z1+0.75,1.35)});
+ /* THE ROSE GARDEN: a box edged parterre, open to the walk and open to the front, gravel crossing it */
+ gdnFlat(GDR,gRect(R.cx,R.cz,R.hw*2-0.4,R.hd*2-0.4),0.02,MAT.gravel);
+ const e=(x0,z0,x1,z1,i)=>gdnRun(GDR,[[x0,z0],[x1,z1]],GRPROF,500+i);
+ e(R.cx-R.hw,R.cz-R.hd,R.cx+R.hw,R.cz-R.hd,0);
+ e(R.cx+R.hw,R.cz-R.hd,R.cx+R.hw,R.cz+R.hd,1);
+ e(R.cx-R.hw,R.cz+R.hd,R.cx-R.hw+1.4,R.cz+R.hd,2);
+ e(R.cx+R.hw-1.4,R.cz+R.hd,R.cx+R.hw,R.cz+R.hd,3);
+ e(R.cx-R.hw,R.cz-R.hd,R.cx-R.hw,R.cz-R.hd+1.2,4);
+ e(R.cx-R.hw,R.cz+R.hd-1.2,R.cx-R.hw,R.cz+R.hd,5);
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz])=>{const b=new THREE.Mesh(new THREE.SphereGeometry(0.36,14,10),MAT.hedge);
+  b.position.set(R.cx+sx*R.hw,0.4,R.cz+sz*R.hd);b.castShadow=true;GDR.add(b)});
+ [-1,1].forEach(s=>gdnFlat(GDR,gRect(R.cx+s*1.85,R.cz,2.6,2.5),0.05,MAT.soil));
+ {const g=new THREE.Group();g.position.set(R.cx,0,R.cz);GDR.add(g);
+  const b=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.42,0.16,14),MAT.ashlar);b.position.y=0.08;g.add(b);
+  const st=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.17,0.62,12),MAT.stone);st.position.y=0.47;st.castShadow=true;g.add(st);
+  const bowl=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.3,0.18,16),MAT.stone);bowl.position.y=0.87;bowl.castShadow=true;g.add(bowl);
+  const wtr=new THREE.Mesh(new THREE.CircleGeometry(0.4,18),MAT.water);wtr.rotation.x=-Math.PI/2;wtr.position.y=0.955;g.add(wtr)}
+ /* THE PLOW: what the ground looks like while he is working it */
+ [-1,1].forEach(s=>{gdnFlat(GDPW,gRect(s*W.x,(W.z0+W.z1)/2,0.9,W.z1-W.z0),0.025,GDM.dirt);
+  gdnFlat(GDPW,gRect(s*W.rib,(W.z0+W.z1)/2,0.7,W.z1-W.z0-0.4),0.03,GDM.dirt);
+  gdnStakes(GDPW,s*W.x,W.z0,s*W.x,W.z1,7)});
+ gdnFlat(GDPW,gRect(0,(W.z0+W.z1)/2-0.7,W.gw*2,W.z1-W.z0+2.6),0.021,GDM.dirt);
+ gdnFlat(GDPR,gRect(R.cx,R.cz,R.hw*2,R.hd*2),0.022,GDM.dirt);
+ gdnStakes(GDPR,R.cx-R.hw,R.cz-R.hd,R.cx+R.hw,R.cz-R.hd,6);
+ gdnStakes(GDPR,R.cx-R.hw,R.cz+R.hd,R.cx+R.hw,R.cz+R.hd,6);
+ GDN.visible=false;GDR.visible=false;GDP.visible=false;
+ gdnLoad()}
+/* the flowers are the real renders, the same ones that grow in the beds, never painted balls */
+function gdnDropFl(){GDN_FL.forEach(dropStand);GDN_FL.length=0}
+function gdnFlowers(){gdnDropFl();
+ const Wv=(x,z)=>{const v=new THREE.Vector3(x,0,z);HG.localToWorld(v);return v};
+ const by={},put=(t,it)=>{(by[t]=by[t]||[]).push(it)};
+ if(GDN.visible&&GDN.scale.y>0.98){const W=GWALK,span=W.z1-W.z0-0.6,n=Math.max(2,Math.round(span/0.5));
+  for(let s=-1;s<=1;s+=2)for(let i=0;i<n;i++){const z=W.z0+0.3+(i+0.5)*(span/n),v=Wv(s*W.rib,z);
+   put(Math.floor(i/5)%2?'cosmos':'tulip',{x:v.x,z:v.z,y:floorAtW(v.x,v.z)+0.04,h:0.5+((i*7)%5)*0.03,flip:i%2===0})}}
+ if(GDR.visible&&GDR.scale.y>0.98){const R=GROSE;
+  [-1,1].forEach(s=>{const bx=R.cx+s*1.85;
+   [[-0.82,-0.72],[0.82,-0.72],[-0.82,0.72],[0.82,0.72],[0,0]].forEach(([dx,dz],i)=>{const v=Wv(bx+dx,R.cz+dz);
+    put(i===4?'peony':'rose',{x:v.x,z:v.z,y:floorAtW(v.x,v.z)+0.05,h:i===4?1.12:0.86,flip:i%2===0})})})}
+ Object.entries(by).forEach(([t,items])=>{const m=placeStand(flowerKind(t),items);if(m)GDN_FL.push(m)})}
+/* the walk's hedges are solid, the way the parterre's are; the corridor is open at both ends and the rose garden is never marked */
+function gdnMark(){if(!GDN.visible||GDN.scale.y<0.98||GDN_MARKED===BOUND)return;GDN_MARKED=BOUND;
+ const W=(x,z)=>{const v=new THREE.Vector3(x,0,z);HG.localToWorld(v);return [v.x,v.z]};
+ const G=GWALK,hw=0.35,h=0.85;
+ [-1,1].forEach(s=>{const x=s*G.x;
+  markPoly([W(x-hw,G.z0),W(x+hw,G.z0),W(x+hw,G.z1),W(x-hw,G.z1)],h);
+  const a=Math.min(x,s*G.out),b=Math.max(x,s*G.out);
+  markPoly([W(a,G.z1-hw),W(b,G.z1-hw),W(b,G.z1+hw),W(a,G.z1+hw)],h)})}
+function gdnU(){return GDB.k?Math.max(0,Math.min(1.2,(Date.now()-GDB.t0)/GDN_DUR)):1}
+function gdnVis(){const st=houseLvl(),u=gdnU();
+ const w=gdnOwns('front_walk')&&st>=1,r=gdnOwns('rose_garden')&&st>=1;
+ GDN.visible=w&&(GDB.k!=='front_walk'||u>0.5);
+ GDR.visible=r&&(GDB.k!=='rose_garden'||u>0.5);
+ GDN.scale.y=GDB.k==='front_walk'?Math.max(0.04,Math.min(1,(u-0.5)/0.4)):1;
+ GDR.scale.y=GDB.k==='rose_garden'?Math.max(0.04,Math.min(1,(u-0.5)/0.4)):1;
+ GDP.visible=!!GDB.k&&!VISIT;GDPW.visible=GDB.k==='front_walk';GDPR.visible=GDB.k==='rose_garden'}
+function placeGarden(){gdnBuild();gdnVis();gdnFlowers();gdnMark()}
+/* the gardener Hank sends over: he stands in the middle of it and works until it is done */
+function gdnFig(on){if(on&&!GDB.fig)GDB.fig=buildGardFigure();if(GDB.fig)GDB.fig.g.visible=!!on&&!VISIT}
+function gdnSave(){try{if(GDB.k)localStorage.setItem('deeds_gdn_build',JSON.stringify({k:GDB.k,t0:GDB.t0}));else localStorage.removeItem('deeds_gdn_build')}catch(e){}}
+function gdnLoad(){try{const a=JSON.parse(localStorage.getItem('deeds_gdn_build')||'null');
+ if(a&&a.k&&Date.now()-a.t0<GDN_DUR){GDB.k=a.k;GDB.t0=a.t0;gdnFig(true)}else if(a)localStorage.removeItem('deeds_gdn_build')}catch(e){}}
+function gdnStart(k){GDB.k=k;GDB.t0=Date.now();gdnSave();gdnFig(true);
+ SND.chip();[300,620,940].forEach(ms=>setTimeout(()=>SND.chip(),ms));
+ gdnVis();gdnFlowers();gaRender();
+ toast(k==='front_walk'?'Hank is plowing it now. The gardener is on his way with the box.':'Hank has marked it out. The gardener is planting the roses.')}
+function gdnDone(){const k=GDB.k;GDB.k='';gdnSave();gdnFig(false);GDN_MARKED=-9;
+ gdnVis();gdnFlowers();gdnMark();gaRender();SND.tier();
+ toast(k==='front_walk'?'The front garden is in.':'The rose garden is in.')}
+function gdnTick(t,dt){if(!GDB.k)return;
+ if(gdnU()>=1){gdnDone();return}
+ gdnVis();
+ const F=GDB.fig;if(!F||!F.g.visible)return;
+ const W=GWALK,R=GROSE,u=gdnU();
+ const lx=GDB.k==='front_walk'?(u<0.5?-1:1)*1.1:R.cx+(u<0.5?-1.4:1.4);
+ const lz=GDB.k==='front_walk'?W.z0+1.2+((t*0.55)%1)*(W.z1-W.z0-2.4):R.cz+Math.sin(t*0.5)*1.4;
+ const v=new THREE.Vector3(lx,0,lz);HG.localToWorld(v);
+ F.g.position.set(v.x,floorAtW(v.x,v.z),v.z);
+ F.g.rotation.y=HG.rotation.y+(GDB.k==='front_walk'?0:Math.PI/2);
+ if(F.arm)F.arm.rotation.x=-0.6+Math.sin(t*4.2)*0.85;
+ if(F.body)F.body.rotation.x=0.12+Math.sin(t*4.2)*0.06;
+ if(F.head)F.head.rotation.x=0.25}
 
-window.__walk={GDN,GDR,GDM,gdnBuild,gdnHedge,gdnRibbon,gdnBush,gdnCone,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={GDN,GDR,GDP,GDPW,GDPR,GDM,GDB,GWALK,GROSE,GDN_ROWS,GA_ALL,gdnBuild,gdnRun,gdnCone,gdnFlowers,gdnMark,gdnVis,gdnU,gdnStart,gdnDone,gdnTick,gdnOwns,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
