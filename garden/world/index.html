@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.29">
+<meta name="world-build" content="6.30">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -5520,7 +5520,7 @@ const HW_ITEMS=[
  {k:'cobwebs',n:'Cobwebs',w:'inside',gc:300,d:'On the chandeliers, the sconces and in the corners.',need:2},
  {k:'cauldrons',n:'Fogging cauldrons',w:'inside',gc:500,d:'Two iron cauldrons, green, fog rolling over the rim.',need:2},
  {k:'ghosts',n:'Ghosts',w:'inside',gc:500,d:'Two of them. They drift about and mean no harm.',need:2}];
-function hwSeason(){const q=QS.get('hw');if(q==='1')return true;if(q==='0')return false;const d=new Date(),m=d.getMonth(),day=d.getDate();return m===9||(m===10&&day<=2)}
+function hwSeason(){const q=QS.get('hw');if(q==='1')return true;if(q==='0')return false;return true}
 function hwOwns(k){return HW.own.has(k)}
 function hwLocalLoad(){try{const a=JSON.parse(localStorage.getItem('deeds_hw')||'[]');if(Array.isArray(a))a.forEach(k=>HW.own.add(k))}catch(e){}}
 function hwLocalSave(){try{localStorage.setItem('deeds_hw',JSON.stringify(Array.from(HW.own)))}catch(e){}}
