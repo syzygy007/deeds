@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.34">
+<meta name="world-build" content="6.35">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -4413,7 +4413,7 @@ function enterHouse(){if(INSIDE)return;if(FLAME.on)flameToggle(false);if(DRIVE)m
   toast(L[0]?'Your house \u00B7 '+roomsWord()+'.':'The bare shell \u00B7 bring the builder 20 bundles for downstairs.')}
 function leaveHouse(){if(!INSIDE)return;INSIDE=false;INTERIOR.scene.remove(AV.g);scene.add(AV.g);hideAct();LOCK.kind=null;LOCK.id=-1;
   you.x=DOORW.x;you.z=DOORW.z+2.9;you.feet=floorAtW(you.x,you.z);   /* 4.26: always out on the path, clear of the steps and the door prompt */you.vy=0;you.vx=0;you.vz=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;you.pitch=-0.36;camDist=you.dist;areaNow='';camera.fov=66;camera.updateProjectionMatrix();SND.knock()}
-function insideAct(){const L=roomLevels();placeToolChest();placePiano();placeChess();placeInst();if(SEATED||INST.on){hideAct();return}if(pianoAct())return;if(instAct())return;if(chessAct())return;if(artAct())return;   /* 6.21 */   /* 6.15 */   /* 6.7 */
+function insideAct(){const L=roomLevels();placeToolChest();placePiano();placeChess();placeInst();flPlace();if(SEATED||INST.on){hideAct();return}if(pianoAct())return;if(instAct())return;if(chessAct())return;if(flAct())return;if(artAct())return;   /* 6.21 */   /* 6.15 */   /* 6.7 */
   if(you.feet<1&&!VISIT&&Math.hypot(you.x-CHEST_AT.x,you.z-CHEST_AT.z)<2.4){const c=chestList().length;showAct('The tool chest.','toolchest',null,null,c?plural(c,'tool')+' inside \u00B7 five in hand':'five in hand, nothing inside',null,[CHEST_AT.x,1.6,CHEST_AT.z]);return}
   if(you.feet<1&&!owns('sword')&&Math.hypot(you.x-SWORD_AT.x,you.z-SWORD_AT.z)<2.8){showAct('Take the sword.','takesword',null,null,'it hangs over the hearth',null,[SWORD_AT.x+0.4,2.6,SWORD_AT.z]);return}
   if(you.feet<1){const dd=Math.hypot(you.x-INTERIOR.DOOR.x,you.z-INTERIOR.DOOR.z);if(dd<2.0){showAct('Go outside.','leave',null,null,'the front door',null,[0,3.0,INTERIOR.DOOR.z+0.3]);return}
@@ -4710,7 +4710,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='hank')openGaShop();else if(ACT.mode==='car')carRide(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='rosie')flTalk();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='hank')openGaShop();else if(ACT.mode==='car')carRide(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -4996,7 +4996,7 @@ function loop(now){
   starMat.uniforms.time.value=t;
   BB_MATS.forEach(m=>m.uniforms.time.value=t);
   MAT.water.normalMap.offset.set(t*0.013,t*0.009);
-  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);gaTick(t,dt);gdnTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
+  tickDrops(t);tickSpring(t);tickFish(t,fishNow());airTick(t,dt,you.yaw);fireflyTick(t);rainTick(dt);balloonTick(t);wxTick(dt);portalTick(t,dt);hwTick(t,dt);gaTick(t,dt);flTick(t,dt);gdnTick(t,dt);flagTick(t,dt);farmTick(t,dt);instTick(t,dt);tickWorld(t,dt);
   /* the Keeper: breathes, shifts his weight, turns his head to whoever is close (his face is on local -x, the stall is turned by STAND.rot), waves as you arrive */
   {const dx=you.x-STAND.x,dz=you.z-STAND.z,near=Math.hypot(dx,dz);
    KEEPER.g.scale.y=1.03+Math.sin(t*1.6)*0.006;KEEPER.g.rotation.z=Math.sin(t*0.5)*0.012;
@@ -5697,7 +5697,133 @@ const GDN_PATCH=83;
 const GDN_ROWS=[
  {k:'front_walk',n:'The front garden',gc:15000,yard:1,d:'Hank plows the ground and sends the gardener: a box walk from the portico out to the lawn, clipped either side, a ribbon of flowers along the front of it and a pair of cones at the end.'},
  {k:'rose_garden',n:'The rose garden',gc:40000,yard:1,d:'A box edged parterre on the east side, gravel crossing the middle, two beds of roses and a stone birdbath. The gardener plants it out in front of you.'}];
-const GA_ALL=GA_ROWS.concat(GDN_ROWS);
+/* 6.35 THE HOUSE FLORIST. Hank sells six vases for the house (3,000 gc each) and the florist herself (20,000 gc). The vases stand
+   empty on their tables until she is bought; then she stands in the hall with her shears and every vase is full, forever.
+   Reference: his Sep 12 render (brown ponytail, red dress, white shoes, shears right, pink flowers left), drawn in geometry. */
+const FL_PATCH=84;
+const FL_VASES=[
+ {k:'vase_hall',    n:'A vase for the hall',        fl:0,lv:1,x:-2.3, y:0.85,   z:-2.1, vase:'tall',    fw:'peony',     d:'A tall white porcelain vase on the console by the door. Peonies, when the florist comes.'},
+ {k:'vase_library', n:'A vase for the library',     fl:0,lv:1,x:-6.75,y:0.77,   z:1.9,  vase:'jar',     fw:'lavender',  d:'A squat green jar on the reading desk. Lavender.'},
+ {k:'vase_dining',  n:'A vase for the dining room', fl:0,lv:2,x:15.85,y:1.02,   z:-1.5, vase:'crystal', fw:'rose',      d:'Cut crystal on the sideboard. Red roses.'},
+ {k:'vase_music',   n:'An urn for the music room',  fl:0,lv:1,x:8.55, y:0,      z:5.45, vase:'urn',     fw:'delphinium',d:'A stone urn on a pedestal in the corner. Delphiniums, taller than the harp.'},
+ {k:'vase_bedroom', n:'A vase for the bedroom',     fl:1,lv:1,x:-8.3, y:INTERIOR.H.UF+0.7, z:4.2,  vase:'jug',     fw:'tulip',     d:'A little blue and white jug on the dresser. Tulips.'},
+ {k:'vase_gallery', n:'A vase for the gallery',     fl:1,lv:2,x:-0.6, y:INTERIOR.H.UF+0.48,z:4.8,  vase:'bowl',    fw:'hydrangea', d:'A black lacquer bowl on the console upstairs. Hydrangeas.'}];
+const FL_ROWS=FL_VASES.map(v=>({k:v.k,n:v.n,gc:3000,house:1,d:v.d})).concat([
+ {k:'florist',n:'The florist',gc:20000,house:1,d:'Rosie keeps every vase in the house fresh and full, forever. Until she comes, the vases stand empty.'}]);
+const FLMAT={
+ skin:new THREE.MeshStandardMaterial({color:0xF2C9A0,roughness:0.85}),
+ hair:new THREE.MeshStandardMaterial({color:0x5B3A22,roughness:0.9}),
+ hair2:new THREE.MeshStandardMaterial({color:0x4A2E1B,roughness:0.9}),
+ red:new THREE.MeshStandardMaterial({color:0xCC2A2A,roughness:0.8}),
+ shoe:new THREE.MeshStandardMaterial({color:0xF3EEE0,roughness:0.7}),
+ sole:new THREE.MeshStandardMaterial({color:0xD9CFBA,roughness:0.9}),
+ dark:new THREE.MeshStandardMaterial({color:0x1E1A16,roughness:0.6}),
+ handle:new THREE.MeshStandardMaterial({color:0x2F4A3A,roughness:0.7}),
+ blade:new THREE.MeshStandardMaterial({color:0xB9BCC0,metalness:0.7,roughness:0.35}),
+ stem:new THREE.MeshStandardMaterial({color:0x4C7A3A,roughness:0.9}),
+ leaf:new THREE.MeshStandardMaterial({color:0x5E8F45,roughness:0.9}),
+ pink:new THREE.MeshStandardMaterial({color:0xF3A6C6,roughness:0.8}),
+ pink2:new THREE.MeshStandardMaterial({color:0xE98BB2,roughness:0.8}),
+ gold:new THREE.MeshStandardMaterial({color:0xF2C94C,roughness:0.6}),
+ rose:new THREE.MeshStandardMaterial({color:0xB8202E,roughness:0.75}),
+ tulip:new THREE.MeshStandardMaterial({color:0xF06A3B,roughness:0.8}),
+ lav:new THREE.MeshStandardMaterial({color:0x9A7DC9,roughness:0.85}),
+ delph:new THREE.MeshStandardMaterial({color:0x4E6FD1,roughness:0.85}),
+ hyd:new THREE.MeshStandardMaterial({color:0xA9BFE6,roughness:0.85}),
+ hyd2:new THREE.MeshStandardMaterial({color:0xC8B7E8,roughness:0.85}),
+ white:new THREE.MeshStandardMaterial({color:0xF4F1E8,roughness:0.5}),
+ green:new THREE.MeshStandardMaterial({color:0x3E6B4E,roughness:0.5}),
+ crystal:new THREE.MeshStandardMaterial({color:0xDCEBF2,roughness:0.15,metalness:0.1,transparent:true,opacity:0.72}),
+ stone:new THREE.MeshStandardMaterial({color:0xC9C2B2,roughness:0.95}),
+ delft:new THREE.MeshStandardMaterial({color:0xE9EEF3,roughness:0.45}),
+ delftb:new THREE.MeshStandardMaterial({color:0x2E5AA8,roughness:0.5}),
+ lacquer:new THREE.MeshStandardMaterial({color:0x161412,roughness:0.25,metalness:0.2}),
+ water:new THREE.MeshStandardMaterial({color:0xBFD9DC,roughness:0.1,transparent:true,opacity:0.5})};
+function flPut(host,geo,mat,x,y,z,rx,ry,rz){const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);if(rx)o.rotation.x=rx;if(ry)o.rotation.y=ry;if(rz)o.rotation.z=rz;o.castShadow=true;o.receiveShadow=true;host.add(o);return o}
+/* a low poly flower head, the way the render draws them: five flat petals round a gold centre */
+function flHead(kind,s){const g=new THREE.Group();s=s||1;
+ if(kind==='peony'){for(let i=0;i<8;i++){const a=i/8*6.283;flPut(g,new THREE.SphereGeometry(0.05*s,7,6),i%2?FLMAT.pink:FLMAT.pink2,Math.cos(a)*0.045*s,(i%2?0.02:0)*s,Math.sin(a)*0.045*s)}flPut(g,new THREE.SphereGeometry(0.05*s,7,6),FLMAT.pink,0,0.03*s,0)}
+ else if(kind==='rose'){flPut(g,new THREE.SphereGeometry(0.055*s,8,7),FLMAT.rose,0,0,0);for(let i=0;i<5;i++){const a=i/5*6.283;flPut(g,new THREE.SphereGeometry(0.035*s,6,5),FLMAT.rose,Math.cos(a)*0.05*s,-0.01*s,Math.sin(a)*0.05*s)}}
+ else if(kind==='tulip'){flPut(g,new THREE.CylinderGeometry(0.05*s,0.028*s,0.11*s,7),FLMAT.tulip,0,0.04*s,0);for(let i=0;i<3;i++){const a=i/3*6.283;flPut(g,new THREE.BoxGeometry(0.035*s,0.06*s,0.01*s),FLMAT.tulip,Math.cos(a)*0.045*s,0.1*s,Math.sin(a)*0.045*s,0,-a)}}
+ else if(kind==='lavender'){for(let i=0;i<5;i++)flPut(g,new THREE.SphereGeometry(0.02*s,5,4),FLMAT.lav,(i%2?0.012:-0.012)*s,i*0.03*s,0)}
+ else if(kind==='delphinium'){for(let i=0;i<9;i++){const a=i*2.1;flPut(g,new THREE.SphereGeometry(0.024*s,5,4),FLMAT.delph,Math.cos(a)*0.025*s,i*0.038*s,Math.sin(a)*0.025*s)}}
+ else if(kind==='hydrangea'){for(let i=0;i<14;i++){const a=i*2.4,r=0.055*s;flPut(g,new THREE.SphereGeometry(0.03*s,5,4),i%3?FLMAT.hyd:FLMAT.hyd2,Math.cos(a)*r*Math.sin(i*0.9),Math.cos(i*0.9)*r*0.6,Math.sin(a)*r*Math.sin(i*0.9))}}
+ else{for(let i=0;i<5;i++){const a=i/5*6.283;const p=flPut(g,new THREE.BoxGeometry(0.06*s,0.012*s,0.045*s),FLMAT.pink,Math.cos(a)*0.05*s,0,Math.sin(a)*0.05*s);p.rotation.y=-a}flPut(g,new THREE.CylinderGeometry(0.02*s,0.02*s,0.016*s,8),FLMAT.gold,0,0.008*s,0)}
+ return g}
+function flStem(host,kind,x,z,h,lean,ry,s){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=ry||0;g.rotation.z=lean||0;host.add(g);
+ flPut(g,new THREE.CylinderGeometry(0.008,0.01,h,5),FLMAT.stem,0,h/2,0);
+ const lf=flPut(g,new THREE.BoxGeometry(0.05,0.008,0.1),FLMAT.leaf,0.03,h*0.45,0);lf.rotation.z=-0.5;lf.rotation.y=0.4;
+ const hd=flHead(kind,s||1);hd.position.y=h;g.add(hd);return g}
+/* the six vases, each its own shape, and the arrangement that goes in it when the florist keeps it */
+function flVase(spec,full){const g=new THREE.Group();const V=spec.vase;let top=0,fan=0.06,n=7,h=0.34;
+ if(V==='tall'){flPut(g,new THREE.CylinderGeometry(0.075,0.055,0.34,14),FLMAT.white,0,0.17,0);flPut(g,new THREE.CylinderGeometry(0.09,0.075,0.05,14),FLMAT.white,0,0.365,0);flPut(g,new THREE.CylinderGeometry(0.075,0.09,0.03,14),FLMAT.white,0,0.015,0);top=0.38;h=0.3;n=6;fan=0.08}
+ else if(V==='jar'){flPut(g,new THREE.SphereGeometry(0.11,14,10),FLMAT.green,0,0.11,0).scale.y=0.8;flPut(g,new THREE.CylinderGeometry(0.06,0.05,0.06,12),FLMAT.green,0,0.2,0);top=0.22;h=0.24;n=11;fan=0.05}
+ else if(V==='crystal'){flPut(g,new THREE.CylinderGeometry(0.1,0.06,0.28,8),FLMAT.crystal,0,0.14,0);flPut(g,new THREE.CylinderGeometry(0.06,0.08,0.03,8),FLMAT.crystal,0,0.015,0);flPut(g,new THREE.CylinderGeometry(0.085,0.075,0.14,8),FLMAT.water,0,0.13,0);top=0.27;h=0.3;n=9;fan=0.09}
+ else if(V==='urn'){flPut(g,new THREE.BoxGeometry(0.4,0.62,0.4),FLMAT.stone,0,0.31,0);flPut(g,new THREE.BoxGeometry(0.48,0.05,0.48),FLMAT.stone,0,0.645,0);flPut(g,new THREE.CylinderGeometry(0.19,0.08,0.3,16),FLMAT.stone,0,0.82,0);flPut(g,new THREE.CylinderGeometry(0.08,0.13,0.05,16),FLMAT.stone,0,0.695,0);flPut(g,new THREE.TorusGeometry(0.19,0.025,8,20),FLMAT.stone,0,0.97,0,Math.PI/2);top=0.96;h=0.5;n=12;fan=0.17}
+ else if(V==='jug'){flPut(g,new THREE.CylinderGeometry(0.07,0.08,0.2,12),FLMAT.delft,0,0.1,0);flPut(g,new THREE.TorusGeometry(0.08,0.008,6,20),FLMAT.delftb,0,0.06,0,Math.PI/2);flPut(g,new THREE.TorusGeometry(0.07,0.008,6,20),FLMAT.delftb,0,0.17,0,Math.PI/2);flPut(g,new THREE.TorusGeometry(0.045,0.012,6,12),FLMAT.delft,0.1,0.12,0);top=0.2;h=0.26;n=7;fan=0.06}
+ else{flPut(g,new THREE.CylinderGeometry(0.15,0.09,0.13,16),FLMAT.lacquer,0,0.065,0);flPut(g,new THREE.CylinderGeometry(0.13,0.13,0.02,16),FLMAT.water,0,0.125,0);top=0.12;h=0.2;n=5;fan=0.1}
+ if(full){const fw=spec.fw,s=V==='urn'?1.5:1;for(let i=0;i<n;i++){const a=i/n*6.283+0.4,r=i?fan*(0.55+(i%3)*0.22):0;
+   flStem(g,fw,Math.cos(a)*r*0.5,Math.sin(a)*r*0.5,h*(0.8+((i*7)%5)*0.06),i?(Math.cos(a)*0.32*(fw==='lavender'||fw==='delphinium'?0.5:1)):0,a,s).position.y=top;
+   if(fw==='hydrangea')break}
+  if(fw==='hydrangea'){for(let i=0;i<4;i++){const a=i/4*6.283;const st=flStem(g,fw,Math.cos(a)*0.06,Math.sin(a)*0.06,0.16,Math.cos(a)*0.5,a,1.4);st.position.y=top}}
+  const leaves=flPut(g,new THREE.SphereGeometry(V==='urn'?0.22:0.09,8,6),FLMAT.leaf,0,top+0.03,0);leaves.scale.y=0.35}
+ g.position.set(spec.x,spec.y,spec.z);if(V!=='urn')g.scale.setScalar(1.4);return g}
+/* ROSIE: the florist, in the hall by the console. Boxes, like the toys in the wardrobe; front is +z */
+function flBuildRosie(){const H=new THREE.Group(),AD=(geo,mat,x,y,z,rx,ry,rz)=>flPut(H,geo,mat,x,y,z,rx,ry,rz);
+ [-1,1].forEach(s=>{AD(new THREE.BoxGeometry(0.17,0.72,0.17),FLMAT.skin,s*0.115,0.46,0);AD(new THREE.BoxGeometry(0.2,0.09,0.32),FLMAT.shoe,s*0.115,0.075,0.03);AD(new THREE.BoxGeometry(0.21,0.04,0.33),FLMAT.sole,s*0.115,0.02,0.03)});
+ AD(new THREE.BoxGeometry(0.42,0.3,0.3),FLMAT.red,0,0.96,0);AD(new THREE.BoxGeometry(0.4,0.4,0.27),FLMAT.red,0,1.3,0);AD(new THREE.BoxGeometry(0.45,0.06,0.32),FLMAT.red,0,0.83,0);
+ [-1,1].forEach(s=>AD(new THREE.BoxGeometry(0.06,0.14,0.03),FLMAT.red,s*0.13,1.52,0.11));AD(new THREE.BoxGeometry(0.38,0.1,0.28),FLMAT.skin,0,1.5,0);AD(new THREE.CylinderGeometry(0.07,0.08,0.1,10),FLMAT.skin,0,1.58,0);
+ const head=new THREE.Group();head.position.y=1.78;H.add(head);H.head=head;
+ flPut(head,new THREE.BoxGeometry(0.32,0.34,0.3),FLMAT.skin,0,0,0);
+ flPut(head,new THREE.BoxGeometry(0.36,0.14,0.34),FLMAT.hair,0,0.14,-0.01);flPut(head,new THREE.BoxGeometry(0.36,0.3,0.1),FLMAT.hair,0,0.02,-0.16);
+ flPut(head,new THREE.BoxGeometry(0.12,0.22,0.05),FLMAT.hair2,-0.14,0.02,0.14).rotation.y=-0.25;flPut(head,new THREE.BoxGeometry(0.06,0.18,0.06),FLMAT.hair,0.16,0.04,0.02);
+ const tail=new THREE.Group();tail.position.set(-0.08,0.2,-0.17);head.add(tail);H.tail=tail;
+ [[0,0.02,-0.02,0.16,0.14,0.14],[-0.05,-0.08,-0.06,0.13,0.2,0.12],[-0.09,-0.26,-0.08,0.11,0.2,0.1],[-0.12,-0.42,-0.06,0.09,0.16,0.08]].forEach(([x,y,z,w,h,d],i)=>flPut(tail,new THREE.BoxGeometry(w,h,d),i%2?FLMAT.hair:FLMAT.hair2,x,y,z,0,0,-0.15));
+ [-1,1].forEach(s=>flPut(head,new THREE.BoxGeometry(0.03,0.07,0.02),FLMAT.dark,s*0.075,0.02,0.151));
+ flPut(head,new THREE.TorusGeometry(0.04,0.008,6,10,Math.PI),FLMAT.dark,0,-0.085,0.151,0,0,Math.PI);
+ const arm=s=>{const a=new THREE.Group();a.position.set(s*0.26,1.47,0);H.add(a);
+  flPut(a,new THREE.BoxGeometry(0.12,0.34,0.12),FLMAT.skin,0,-0.17,0);const fore=new THREE.Group();fore.position.y=-0.34;a.add(fore);a.fore=fore;
+  flPut(fore,new THREE.BoxGeometry(0.11,0.32,0.11),FLMAT.skin,0,-0.16,0);flPut(fore,new THREE.BoxGeometry(0.12,0.1,0.12),FLMAT.skin,0,-0.36,0);return a};
+ H.armL=arm(-1);H.armR=arm(1);
+ /* right hand: the shears, blades down */
+ const sh=new THREE.Group();sh.position.set(0,-0.38,0.04);H.armR.fore.add(sh);H.shears=sh;
+ [-1,1].forEach(s=>{flPut(sh,new THREE.CylinderGeometry(0.014,0.014,0.13,8),FLMAT.handle,s*0.02,0.05,0,0,0,s*0.25);
+  const bl=flPut(sh,new THREE.BoxGeometry(0.03,0.16,0.006),FLMAT.blade,s*0.022,-0.11,0,0,0,s*-0.12);bl.geometry.translate(0,0,0);if(s>0)H.blade=bl});
+ flPut(sh,new THREE.CylinderGeometry(0.012,0.012,0.02,8),FLMAT.dark,0,-0.02,0,Math.PI/2);
+ /* left hand: two pink flowers */
+ const bq=new THREE.Group();bq.position.set(0,-0.38,0.05);H.armL.fore.add(bq);H.bouquet=bq;
+ flStem(bq,'pink',0.01,0,0.34,-0.1,0.4,1.1);flStem(bq,'pink',-0.02,0.02,0.28,0.15,2.4,1.0);
+ H.armR.rotation.x=0.25;H.armR.fore.rotation.x=-0.35;H.armL.rotation.x=-0.6;H.armL.fore.rotation.x=-1.25;
+ H.traverse(o=>{o.castShadow=true;o.receiveShadow=true});return H}
+const ROSIE_AT={x:-2.0,z:0.4};
+let ROSIE=null,FLG={},FL_SIG='';
+function flOwned(k){return typeof GA!=='undefined'&&GA.own&&GA.own.has(k)}
+function flHas(){return flOwned('florist')}
+function flVasesOwned(){return FL_VASES.filter(v=>flOwned(v.k)).length}
+function flPlace(force){const L=roomLevels(),full=flHas();
+ const sig=FL_VASES.map(v=>flOwned(v.k)&&L[v.fl]>=v.lv?1:0).join('')+(full?'F':'')+(VISIT?'v':'');
+ if(!force&&sig===FL_SIG)return;FL_SIG=sig;
+ FL_VASES.forEach(v=>{if(FLG[v.k]){INTERIOR.scene.remove(FLG[v.k]);FLG[v.k]=null}
+  if(flOwned(v.k)&&L[v.fl]>=v.lv){FLG[v.k]=flVase(v,full);INTERIOR.scene.add(FLG[v.k])}});
+ if(full){if(!ROSIE){ROSIE=flBuildRosie();ROSIE.position.set(ROSIE_AT.x,0,ROSIE_AT.z);ROSIE.rotation.y=0;INTERIOR.scene.add(ROSIE)}ROSIE.visible=true}
+ else if(ROSIE)ROSIE.visible=false}
+const FL_LINES=['Fresh this morning. Every one of them.','Peonies do not last, so I bring more.','I was up at five for these.','Your roses are the best in the garden. I only cut the best.','Smell that. That is the lavender.','Nobody sees the hall vase and does not smile.','The delphiniums wanted the tall urn. I gave in.','Six vases. I know each one by name.'];
+let FL_LINE=0;
+function flAct(){if(you.feet>=1||!ROSIE||!ROSIE.visible)return false;const d=Math.hypot(you.x-ROSIE_AT.x,you.z-ROSIE_AT.z);if(d>2.4)return false;
+ const n=flVasesOwned();showAct('Rosie.','rosie',null,null,n?'the florist \u00B7 '+n+' of 6 vases kept fresh':'the florist \\u00B7 Hank sells the vases',null,[ROSIE_AT.x,2.1,ROSIE_AT.z]);return true}
+function flTalk(){if(!ROSIE)return;const n=flVasesOwned();const line=n?FL_LINES[FL_LINE++%FL_LINES.length]:'Bring me a vase or six. Hank sells them.';toast('Rosie: '+line);try{SND.chip()}catch(e){}
+ if(ROSIE.armR)ROSIE.snip=performance.now()}
+function flTick(t,dt){if(!INSIDE||!ROSIE||!ROSIE.visible)return;const R=ROSIE;
+ const dx=you.x-ROSIE_AT.x,dz=you.z-ROSIE_AT.z,d=Math.hypot(dx,dz);
+ let a=Math.atan2(dx,dz)-R.rotation.y;while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;
+ R.head.rotation.y+=((d<8?Math.max(-0.9,Math.min(0.9,a)):0)-R.head.rotation.y)*Math.min(1,4*dt);
+ R.position.y=Math.sin(t*1.6)*0.006;R.tail.rotation.z=-0.15+Math.sin(t*1.6+1)*0.05;
+ const wave=d<3.2;R.armL.rotation.x+=((wave?-2.6:-0.6)-R.armL.rotation.x)*Math.min(1,5*dt);
+ R.armL.fore.rotation.x=wave?-0.4+Math.sin(t*7)*0.3:-1.25;
+ const sn=R.snip?(performance.now()-R.snip):1e9;const open=sn<600?Math.abs(Math.sin(sn/600*Math.PI*3))*0.35:Math.abs(Math.sin(t*0.7))<0.06?0.2:0;
+ if(R.blade)R.blade.rotation.z=-0.12-open}
+
+const GA_ALL=GA_ROWS.concat(GDN_ROWS).concat(FL_ROWS);
 const GA_SPEC={
  car_classic:{L:4.24,W:1.74,body:0xF0E4C4,accent:0x6B2A2A,wheel:0.40,sit:0.80,sp:1.45,form:'classic'},
  car_luxury:{L:5.10,W:1.98,body:0x14161C,accent:0xD8DCE0,wheel:0.42,sit:0.82,sp:1.75,form:'luxury'},
@@ -5925,24 +6051,26 @@ function hankPlace(){const v=new THREE.Vector3(HANK_AT.x,0,HANK_AT.z);HG.localTo
 function openGaShop(){$('#gaShop').classList.add('on');gaRender()}
 function closeGaShop(){$('#gaShop').classList.remove('on')}
 function gaRender(){const host=$('#gaRows');if(!host)return;host.innerHTML='';const has=gaHas();
- GA_ALL.forEach((it,i)=>{const own=gaOwns(it.k),lock=!it.yard&&it.k!=='garage'&&!has;const row=document.createElement('div');row.className='row';
-  const where=it.yard?(own?(GDB.k===it.k?'the gardener is at it':'in front of the house'):'in front of the house'):it.k==='garage'?(own?'built \u00B7 beside the house':'beside the house'):(own?'bay '+(i+1):lock?'the garage first':'bay '+(i+1));
+ GA_ALL.forEach((it,i)=>{const own=gaOwns(it.k),lock=it.house?houseLvl()<3:(!it.yard&&it.k!=='garage'&&!has);const row=document.createElement('div');row.className='row';
+  const where=it.house?(own?(it.k==='florist'?'in the hall':'in the house'):(lock?'the mansion first':'in the house')):it.yard?(own?(GDB.k===it.k?'the gardener is at it':'in front of the house'):'in front of the house'):it.k==='garage'?(own?'built \u00B7 beside the house':'beside the house'):(own?'bay '+(i+1):lock?'the garage first':'bay '+(i+1));
   row.innerHTML='<div class="nm">'+it.n+'<div class="where">'+where+'</div><div class="dsc">'+it.d+'</div></div>';
-  const b=document.createElement('button');b.className='btn'+(own||lock?'':' on');b.textContent=own?(it.yard?(GDB.k===it.k?'Going in.':'Planted.'):it.k==='garage'?'Built.':'Yours.'):it.gc.toLocaleString()+' gc';
+  const b=document.createElement('button');b.className='btn'+(own||lock?'':' on');b.textContent=own?(it.house?(it.k==='florist'?'Hired.':'In the house.'):it.yard?(GDB.k===it.k?'Going in.':'Planted.'):it.k==='garage'?'Built.':'Yours.'):it.gc.toLocaleString()+' gc';
   b.disabled=own||BUSY||lock;if(!own&&!lock)b.onclick=()=>gaBuy(it.k);row.appendChild(b);host.appendChild(row)});
  const bal=$('#gaBal');if(bal)bal.textContent=(S.gc|0).toLocaleString()+' gardencoin';
  const sub=$('#gaSub');if(sub)sub.textContent=has?'Six bays. The mower has the first. Walk up to a car and drive it out.':'Five thousand, and it is up by the afternoon. Six bays and a weathervane.'}
-function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard(it.yard?'buy the garden':'buy the garage');return}
- if(!it.yard&&k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
+function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard(it.house?'buy for the house':it.yard?'buy the garden':'buy the garage');return}
+ if(it.house&&houseLvl()<3){SND.knock();toast('The mansion first.');return}
+ if(!it.yard&&!it.house&&k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
  const done=()=>{GA.own.add(k);gaLocalSave();SND.buy(8);placeGA();gaRender();renderHud();
   if(it.yard){gdnStart(k);return}
+  if(it.house){SND.tier();flPlace(true);toast(k==='florist'?'Rosie is in the hall. Every vase is full, and stays full.':it.n.replace(/^A |^An /,'')+' stands in the house'+(flHas()?', and Rosie has already filled it.':'. Empty until the florist comes.'));return}
   if(k==='garage'){setTimeout(()=>SND.carved(),700);[0,260,520].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast('The garage is up. Six bays, and the mower has a home.')}
   else{SND.tier();toast(it.n+' is in bay '+(GA_ROWS.indexOf(it)+1)+'. Walk up to it and drive it out.')}};
  if(!LIVE){if(reach()<it.gc){showShort(it.gc);return}payGc(it.gc);save();done();return}
  if(BUSY)return;BUSY=true;gaRender();
  RPC('garage_buy',{p_kind:k}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');
    if(/not_enough/.test(m))showShort(it.gc);
-   else if(/not find|function|schema cache|no_such_kind/i.test(m))toast('Run patch '+(it.yard?GDN_PATCH:GA_PATCH)+' on DEEDS first.');
+   else if(/not find|function|schema cache|no_such_kind/i.test(m))toast('Run patch '+(it.house?FL_PATCH:it.yard?GDN_PATCH:GA_PATCH)+' on DEEDS first.');
    else if(/no_garage/.test(m))toast('The garage first.');
    else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Hank said: '+(m||'nothing')));
    gaRender();return}
@@ -6107,7 +6235,7 @@ function gdnTick(t,dt){if(!GDB.k)return;
  if(F.body)F.body.rotation.x=0.12+Math.sin(t*4.2)*0.06;
  if(F.head)F.head.rotation.x=0.25}
 
-window.__walk={GDN,GDR,GDP,GDPW,GDPR,GDM,GDB,GWALK,GROSE,GDN_ROWS,GA_ALL,gdnBuild,gdnRun,gdnCone,gdnFlowers,gdnMark,gdnVis,gdnU,gdnStart,gdnDone,gdnTick,gdnOwns,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={FL_VASES,FL_ROWS,FL_PATCH,ROSIE_AT,ROSIE:()=>ROSIE,FLG,flPlace,flAct,flTalk,flTick,flVase,flBuildRosie,flOwned,flHas,flVasesOwned,GDN,GDR,GDP,GDPW,GDPR,GDM,GDB,GWALK,GROSE,GDN_ROWS,GA_ALL,gdnBuild,gdnRun,gdnCone,gdnFlowers,gdnMark,gdnVis,gdnU,gdnStart,gdnDone,gdnTick,gdnOwns,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,readyOaks,lumberAt,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
