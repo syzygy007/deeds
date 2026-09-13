@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.37">
+<meta name="world-build" content="6.38">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -31,6 +31,7 @@ canvas{display:block;touch-action:none;cursor:default}
 .chip.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
 #status{position:fixed;left:50%;top:15%;transform:translateX(-50%);background:rgba(21,19,14,.86);color:var(--ivory);padding:10px 18px;border-radius:999px;opacity:0;transition:opacity .25s;z-index:40;max-width:86vw;text-align:center;pointer-events:none}
 #status.on{opacity:1}
+#saychip{position:fixed;left:50%;bottom:max(140px,calc(env(safe-area-inset-bottom) + 128px));transform:translateX(-50%);z-index:39;background:rgba(20,18,16,.55);color:#F6F3EB;border-radius:999px;padding:6px 13px;font:600 11px/1 ui-monospace,monospace;letter-spacing:.08em;max-width:80vw;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}#saychip.on{opacity:.92}
 .sheet{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(21,19,14,.6);z-index:30;pointer-events:auto;padding:14px}
 .sheet.on{display:flex}
 /* 6.7 the piano panel */
@@ -287,6 +288,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
 
 <div id="act"><button class="abtn" id="actMain">Buy seeds.</button><div id="actChips"></div><div class="micro" id="actKey"></div></div>
 <div id="status" class="micro"></div>
+<div id="saychip"></div>
 <div id="hearts"></div><div id="lockchip"></div><div id="nightchip"></div><div id="nightleft"></div><div id="wxchip"></div><div id="geychip"></div><div id="offchip">Get off</div><div id="homechip">Home</div><div id="floats"></div><div id="hwShop" onclick="if(event.target.id==='hwShop')closeHwShop()"><div class="card"><h3>Morgana's Halloween shop.</h3><div class="sub" id="hwSub">Everything is set for you the moment you pay, and comes down 48 hours after Halloween.</div><div id="hwRows"></div><div class="foot"><div class="n" id="hwBal"></div><button class="btn" onclick="closeHwShop()">Close.</button></div></div></div><div id="gaShop" onclick="if(event.target.id==='gaShop')closeGaShop()"><div class="card"><h3>Hank’s garage.</h3><div class="sub" id="gaSub"></div><div id="gaRows"></div><div class="foot"><div class="n" id="gaBal"></div><button class="btn" onclick="closeGaShop()">Close.</button></div></div></div><div id="chestPick"><div class="card"><h3>Five in hand.</h3><div class="sub" id="cpSub">The rest wait in the chest in the hall.</div><div id="cpRows"></div><div class="foot"><div class="n" id="cpN"></div><button class="btn" id="cpClose">Close</button><button class="btn on" id="cpSave">Keep these</button></div></div></div><div id="hurt"></div><div id="dead"><div>The wolves got you.</div><small id="deadLine">the night takes what you carried</small></div>
 <div id="pianoUI"><div id="pnBar"><button class="btn" id="pnStand">Stand up</button><button class="btn" id="pnSus">Sustain off</button><button class="btn" id="pnLeft">&#9664;</button><span class="micro" id="pnOct"></span><button class="btn" id="pnRight">&#9654;</button><button class="btn" id="pnSheets">Sheets</button><button class="btn" id="pnGold" style="display:none;border-color:var(--gold);color:var(--gold)">Gold &#183; 5,000</button><span id="pnXp"></span><span id="pnChip"></span></div>
 <div id="pnList"></div><div id="pnSong"><b id="pnTitle"></b><span id="pnStep"></span><button class="btn" id="pnHands">Right hand</button><button class="btn" id="pnListen">Listen</button><button class="btn" id="pnStop">Close the sheet</button></div><div id="pnSecs"></div><div id="pnKeys"></div></div>
@@ -1613,7 +1615,7 @@ function wildBoot(){const now=Date.now();Object.keys(WILDCUT).forEach(k=>{const 
 function fellWild(w){const it=WILD[w];WILDCUT[w]=Date.now();wildSave();WILDFALL[w]={t:0,dir:(it.x*7+it.z*3)%2<1?1:-1};lepDrop('wild',w,it.x,it.z);setTimeout(()=>SND.rustle(),500);setTimeout(()=>SND.knock(),1150);toast(['Timber.','Down it goes.','And another one.','Just for fun. Back in five.'][Math.floor(Math.random()*4)]);updateAct()}
 /* press and hold: the engine climbs, dust flies, the tree shudders, and at the top of the throttle it comes down */
 const CUT={on:false,mode:null,plot:-1,t:0,need:1.35,burT:0};
-function cutStart(mode,plot){if(CUT.on)return;if(mode==='wild'){const it=WILD[plot];if(!it||!owns('chainsaw')||WILDCUT[plot]||WILDFALL[plot])return;if(!wildOk(it)){SND.knock();toast('Not yet. That one takes the house at level '+WILD_LVL[it.kind]+'.');return}}
+function cutStart(mode,plot){if(CUT.on)return;if(mode==='wild'){const it=WILD[plot];if(!it||!owns('chainsaw')||WILDCUT[plot]||WILDFALL[plot])return;if(!wildOk(it)){SND.knock();chip('Not yet. That one takes the house at level '+WILD_LVL[it.kind]+'.');return}}
   if(mode==='saw'){const tr=S.trees[plot]||{st:0};if(!owns('chainsaw')||houseLvl()<3||!treesAwake()||!planted(plot)||growLeft(tr)>0||S.wood>=woodCap())return}
   CUT.on=true;CUT.mode=mode;CUT.plot=plot;CUT.t=0;CUT.burT=0.15;SND.sawOn()}
 function cutEnd(){if(!CUT.on)return;CUT.on=false;SND.sawThrottle(0);if(CUT.mode==='wild'){const it=WILD[CUT.plot];if(it&&!WILDFALL[CUT.plot]&&!WILDCUT[CUT.plot]){it.lean=0;layStand(it.im)}}updateAct()}
@@ -1832,6 +1834,8 @@ const tierOf=d=>{let t=0;TIERS.forEach((x,i)=>{if(d>=x)t=i});return t};
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
 function rpcFail(e,fallback){const m=String(e&&e.message||e||'');return /owner_only/.test(m)?'Only '+(VISIT?VISIT.handle:'the owner')+' can spend here.':/not find|function|schema cache/i.test(m)?'Run patch 46 on DEEDS first.':/sign in/i.test(m)?'Sign in on DEEDS first.':(fallback||('Not done: '+m))}
 let toastT;/* 6.36: the black alerts are gone. Coin floats green, losses float red, everything else is a sound. window.__TOASTS=true brings them back for a debug */
+let sayT;/* 6.38: an action that is refused says why, small and low, never the big black bar */
+function chip(m){if(!m)return;const c=$('#saychip');if(!c)return;c.textContent=m;c.classList.add('on');clearTimeout(sayT);sayT=setTimeout(()=>c.classList.remove('on'),2200)}
 function toast(m){if(!window.__TOASTS)return;const t=$('#status');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3000)}
 const KINDW={deed:'a deed',seed_buy:'seed store',seed_sell:'seed store',send:'sent',receive:'received',return:'returned',starter:'the purse opens'};
 
@@ -1875,8 +1879,8 @@ function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){re
   sb.auth.getSession().then(r=>{const s=r.data&&r.data.session;if(!s){bindSeat(0);return}ME=s.user.id;loadLook();
     return roomEnter().then(loadState).then(r2=>{
       if(r2.error){const m=String(r2.error.message||'');
-        if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){toast(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
-        toast(rpcFail(r2.error,'The garden could not load your sack.'));return}
+        if(/not find|function|schema cache/i.test(m)){toast('Run patch 45 on DEEDS first.');return sb.rpc('garden_state2').then(r3=>{if(r3.error){chip(rpcFail(r3.error,'The garden could not load your sack.'));return}hydrate(r3.data||{})})}
+        chip(rpcFail(r2.error,'The garden could not load your sack.'));return}
       hydrate(r2.data||{});joinGarden(VISIT?VISIT.owner:(WROOM&&WROOM.host)||ME);roomStart();
       if(VISIT)setTimeout(()=>toast('You are in '+VISIT.handle+'\u2019s garden. What you pick, sell or chop is theirs.'),1200);else Promise.resolve(sb.rpc('garden_visit_recent')).then(r=>{if(!r.error)showAway(r.data)}).catch(()=>{});
       try{sb.channel('garden-wallet-'+ME).on('postgres_changes',{event:'UPDATE',schema:'public',table:'coin_wallets',filter:'profile_id=eq.'+ME},pl=>{const w=pl&&pl.new;if(!w||VISIT)return;S.coins=+w.balance;S.earned=+w.earned;S.sent=+w.sent;save();renderHud();if(STORE_ON)renderStore()}).subscribe()}catch(e){}
@@ -2059,22 +2063,22 @@ const SAP_IMG='data:image/webp;base64,UklGRgZMAABXRUJQVlA4WAoAAAAQAAAAmwAAZwEAQU
 function buyTool(k){const t=TOOLS[k];if(!t||S.tools[k])return;const cost=gcv(t.dc);
   const done=()=>{S.tools[k]=1;save();paintBar();renderHud();SND.buy(8);closeStore();handAdd(k);setTool(k);toast('The '+t.n.toLowerCase()+' is yours. Slot '+t.slot+' in your hotbar.')};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC(k==='flamethrower'?'flame_buy':'tool_buy',k==='flamethrower'?{}:{p_kind:k}).then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||r.error.hint||r.error.code||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper said: '+(m||'nothing')));return}
+      if(r.error){renderTabs();const m=String(r.error.message||r.error.hint||r.error.code||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper said: '+(m||'nothing')));return}
       const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger(t.n,-cost,'the Keeper');done()}).catch(e=>{BUSY=false;renderTabs();toast('The Keeper did not answer: '+String(e&&e.message||e))});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger(t.n,-cost,'the Keeper');done()}
 function buyPack(){if(S.packs.pack_basic)return;const cost=PACK_GC;
   const done=()=>{S.packs.pack_basic=1;WOOD_CAPS=null;if(!S.worn){S.worn='pack_basic';setPack('pack_basic')}save();paintHotbar();renderHud();SND.buy(10);closeStore();toast('The backpack is on your back. Your tools ride in it now, and it carries five bundles of wood.')};
   if(LIVE){if(!PATCH55){toast('Run patch 55 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC('tool_buy',{p_kind:'pack_basic'}).then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The backpack',-cost,'the Shop');done()}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'You already have it.':'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The backpack',-cost,'the Shop');done()}).catch(()=>{BUSY=false;renderTabs();chip('The Keeper did not answer.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('The backpack',-cost,'the Shop');done()}
 function wearPack(k){if(!PACKS[k]||!S.packs[k]||S.worn===k)return;
-  if(!hasPack()){SND.knock();toast('Buy the backpack at THE SHOP first. Your designs wait in the sack.');return}
+  if(!hasPack()){SND.knock();chip('Buy the backpack at THE SHOP first. Your designs wait in the sack.');return}
   const done=()=>{S.worn=k;setPack(k);save();renderSack();SND.grow();toast(PACKS[k].n+' is on your back.')};
-  if(LIVE&&PATCH55){RPC('pack_wear',{p_kind:k}).then(r=>{const d=r.data||{};if(r.error||d.ok===false){if(d.reason==='no_backpack'){SND.knock();toast('Buy the backpack at THE SHOP first. Your designs wait in the sack.')}else toast('That one would not go on.');return}done()}).catch(()=>toast('That one would not go on.'));return}
+  if(LIVE&&PATCH55){RPC('pack_wear',{p_kind:k}).then(r=>{const d=r.data||{};if(r.error||d.ok===false){if(d.reason==='no_backpack'){SND.knock();chip('Buy the backpack at THE SHOP first. Your designs wait in the sack.')}else toast('That one would not go on.');return}done()}).catch(()=>toast('That one would not go on.'));return}
   done()}
-function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();toast('Opens at '+TIERS[c.tier]+' deeds.');return}
-  if(d>0&&cartTotal()+gcv(c.price)>reach()){SND.knock();toast('That is all you can afford. Sell flowers or log a deed for more.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
+function cartAdd(id,d){const c=CAT[id];if(c.tier>tierOf(S.deeds)){SND.knock();chip('Opens at '+TIERS[c.tier]+' deeds.');return}
+  if(d>0&&cartTotal()+gcv(c.price)>reach()){SND.knock();chip('That is all you can afford. Sell flowers or log a deed for more.');return}CART[id]=Math.max(0,(CART[id]||0)+d);if(!CART[id])delete CART[id];if(d>0)SND.tickUp(Object.values(CART).reduce((x,y)=>x+y,0));else SND.tickDown();renderStore()}
 function showShort(total){SND.nope();const bq=basketQty();$('#shBody').textContent='You have '+S.gc.toLocaleString()+' gardencoin and '+S.coins.toLocaleString()+' Deedcoins (worth '+Math.floor(S.coins*RATE).toLocaleString()+' more), and this comes to '+total.toLocaleString()+'. '+(bq?'Sell your '+plural(bq,'flower')+' to Flora, or log':'Grow and sell flowers, or log')+' a deed and '+DEED_PAY+' Deedcoins arrive.';$('#short').classList.add('on')}
 $('#shKeep').onclick=()=>$('#short').classList.remove('on');
 $('#shDeed').onclick=()=>{$('#short').classList.remove('on');$('#deed').click()};
@@ -2095,7 +2099,7 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
           ledger(plural(n,c.n.toLowerCase()+' seed'),-(+d.cost||0),'seed store');got+=n;want-=n;CART[id]=Math.max(0,(CART[id]||0)-n);if(!CART[id])delete CART[id];save()}
         if(fail)break}
       BUSY=false;
-      if(fail)toast(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough for all of those. Sell flowers or log a deed.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
+      if(fail)chip(rpcFail(fail,/not_enough/.test(fail.message||'')?'Not enough for all of those. Sell flowers or log a deed.':/locked/.test(fail.message||'')?'Some of those seeds are not open yet.':'The store did not answer.'));
       renderHud();
       if(got&&!fail){CART={};SND.buy(got);SOWT=items[0][0];closeStore();toast('Bought for '+payWords({gc,dc})+'. '+plural(sackTotal(),'seed')+' in your sack. Walk to a bed to sow them.');updateAct();refresh()}
       else renderStore()})().catch(()=>{BUSY=false;renderStore();toast('The store did not answer.')});return}
@@ -2105,41 +2109,41 @@ $('#stBuy').onclick=()=>{const items=Object.entries(CART).filter(([id,q])=>q>0);
 
 /* ---------- Flora: one press sells everything you picked, for gardencoin. The fish market does the same for the fish in your hand ---------- */
 function sellFlowers(){const types=Object.entries(S.basket).filter(([t,b])=>b.q>0);const bq=basketQty();
-  if(!bq){SND.knock();toast('Nothing to sell yet. Pick some flowers first.');return}
+  if(!bq){SND.knock();chip('Nothing to sell yet. Pick some flowers first.');return}
   const done=(n,coins)=>{save();renderHud();SND.buy(Math.min(16,n));floatGc(coins,null);updateAct()};
-  if(P69()){if(BUSY)return;BUSY=true;RPC('florist_sell2').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'Flora did not answer.'));return}if(!d.ok){SND.knock();toast('Nothing to sell yet.');refresh();return}
+  if(P69()){if(BUSY)return;BUSY=true;RPC('florist_sell2').then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'Flora did not answer.'));return}if(!d.ok){SND.knock();chip('Nothing to sell yet.');refresh();return}
     S.gc=+d.balance||S.gc;S.basket={};ledger(plural(+d.flowers||0,'flower'),+d.coins||0,d.golden?'Flora at golden hour':'the florist');save();renderHud();SND.buy(Math.min(16,+d.flowers||0));if(d.golden){setTimeout(()=>SND.tier(),300)}floatGc(+d.coins||0,null);
-    if(d.golden)gtip('GOLDEN HOUR. Three times the price.');updateAct();refresh()}).catch(()=>{BUSY=false;toast('Flora did not answer.')});return}
+    if(d.golden)gtip('GOLDEN HOUR. Three times the price.');updateAct();refresh()}).catch(()=>{BUSY=false;chip('Flora did not answer.')});return}
   if(LIVE){if(BUSY)return;BUSY=true;
     (async()=>{let n=0,coins=0,fail=null;
       for(const [t] of types){let r;try{r=await RPC('florist_sell',{p_type:t})}catch(e){r={error:e||{message:'network'}}}
         if(r.error){fail=r.error;break}
         const d=r.data||{};n+=(+d.sold||0);coins+=(+d.coins||0);S.gc=+d.balance||S.gc;delete S.basket[t];ledger(plural(+d.sold||0,t),+d.coins||0,'the florist');save()}
       BUSY=false;
-      if(fail)toast(rpcFail(fail,'Flora did not answer.'));
-      if(n)done(n,coins);refresh()})().catch(()=>{BUSY=false;toast('Flora did not answer.')});return}
+      if(fail)chip(rpcFail(fail,'Flora did not answer.'));
+      if(n)done(n,coins);refresh()})().catch(()=>{BUSY=false;chip('Flora did not answer.')});return}
   const coins=gcWorth();S.gc+=coins;S.basket={};ledger(plural(bq,'flower'),coins,'the florist');done(bq,coins)}
-function sellFish(){if(P69()){sellItems(fishItems(),'the fish market');return}const fn=fountainNow();if(!fn.held){SND.knock();toast('No fish in hand. Catch them at the fountain.');return}
+function sellFish(){if(P69()){sellItems(fishItems(),'the fish market');return}const fn=fountainNow();if(!fn.held){SND.knock();chip('No fish in hand. Catch them at the fountain.');return}
   const done=(n,coins)=>{save();renderHud();SND.buy(Math.min(16,n));floatGc(coins,null);updateAct()};
-  if(LIVE){if(BUSY)return;BUSY=true;RPC('fish_sell').then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The fish did not sell.'));return}const d=r.data||{};S.gc=+d.balance||S.gc;if(S.fountain){S.fountain.held=+d.held||0;S.fountain.sold=+d.sold||0}
+  if(LIVE){if(BUSY)return;BUSY=true;RPC('fish_sell').then(r=>{BUSY=false;if(r.error){chip(rpcFail(r.error,'The fish did not sell.'));return}const d=r.data||{};S.gc=+d.balance||S.gc;if(S.fountain){S.fountain.held=+d.held||0;S.fountain.sold=+d.sold||0}
     ledger(fishes(+d.sold_now||0),+d.coins||0,'the fish market');done(+d.sold_now||0,+d.coins||0);refresh()}).catch(()=>{BUSY=false;toast('The fish did not sell.')});return}
   const n=fn.held,coins=n*FISH_WORTH;S.gc+=coins;S.fountain.held=0;ledger(fishes(n),coins,'the fish market');done(n,coins)}
 function catchFish(){const fn=fountainNow();
-  if(!fn.sprung){SND.knock();toast('The fountain springs at 40 beds \u00B7 '+Object.keys(S.plants).length+' planted.');return}
-  if(fn.held>=HELD_CAP){SND.knock();toast('Your hands are full. Sell the fish at the market.');return}
+  if(!fn.sprung){SND.knock();chip('The fountain springs at 40 beds \u00B7 '+Object.keys(S.plants).length+' planted.');return}
+  if(fn.held>=HELD_CAP){SND.knock();chip('Your hands are full. Sell the fish at the market.');return}
   const done=held=>{save();renderHud();SND.splash();setTimeout(()=>SND.clink(),260);rain(0,0,1.6);gtip('Caught a fish \u00B7 '+fishes(held)+' in hand. The fish market pays '+FISH_WORTH+' each.');updateAct()};
-  if(LIVE){if(BUSY)return;BUSY=true;RPC(P69()?'fish_catch2':'fish_catch').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The fish got away.'));return}if(P69()&&d.ok&&typeof d.fish==='string'){fishCaught2(d);return}
+  if(LIVE){if(BUSY)return;BUSY=true;RPC(P69()?'fish_catch2':'fish_catch').then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The fish got away.'));return}if(P69()&&d.ok&&typeof d.fish==='string'){fishCaught2(d);return}
     if(d.fish!==undefined&&S.fountain){S.fountain.fish=+d.fish||0;S.fountain.held=+d.held||0;S.fountain.next_s=d.next_s==null?null:+d.next_s;S.fountain.at=snow();S.fountain.sprung=!!d.sprung}
-    if(!d.ok){SND.knock();toast(d.reason==='none'?'No fish yet \u00B7 the next comes in '+mmss(+d.next_s||0)+'.':d.reason==='full'?'Your hands are full. Sell the fish at the market.':'The fountain springs at 40 beds \u00B7 '+(+d.beds||0)+' planted.');save();renderHud();updateAct();return}
+    if(!d.ok){SND.knock();chip(d.reason==='none'?'No fish yet \u00B7 the next comes in '+mmss(+d.next_s||0)+'.':d.reason==='full'?'Your hands are full. Sell the fish at the market.':'The fountain springs at 40 beds \u00B7 '+(+d.beds||0)+' planted.');save();renderHud();updateAct();return}
     done(+d.held||0)}).catch(()=>{BUSY=false;toast('The fish got away.')});return}
-  if(!fn.fish){SND.knock();toast('No fish yet \u00B7 the next comes in '+mmss(fn.next)+'.');return}
+  if(!fn.fish){SND.knock();chip('No fish yet \u00B7 the next comes in '+mmss(fn.next)+'.');return}
   const f=S.fountain;if(f.fish>=FISH_CAP)f.last=Date.now();f.fish=Math.max(0,f.fish-1);f.held=(f.held||0)+1;done(f.held)}
 
 /* ---------- sowing and watering, from where you stand ---------- */
 let SOWT=null;                                      /* the seed type picked for sowing */
-function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knock();toast('Bed '+(plot+1)+' is taken.');return}
-  if(!(S.sack[id]>0)){SND.knock();toast('Out of '+c.n.toLowerCase()+' seeds.');return}
-  if(LIVE){S.plants[plot]={t:id,g:0,pending:1,cy:snow(),est:false,boost:0,watered:false};RPC('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud();toast(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud()})}
+function sowAt(plot,id){const c=CAT[id];if(!c)return;if(S.plants[plot]){SND.knock();chip('Bed '+(plot+1)+' is taken.');return}
+  if(!(S.sack[id]>0)){SND.knock();chip('Out of '+c.n.toLowerCase()+' seeds.');return}
+  if(LIVE){S.plants[plot]={t:id,g:0,pending:1,cy:snow(),est:false,boost:0,watered:false};RPC('garden_sow',{p_plot:plot,p_type:id}).then(r=>{if(r.error){delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud();chip(rpcFail(r.error,'That bed did not take the seed.'));return}if(S.plants[plot])delete S.plants[plot].pending;save()}).catch(()=>{delete S.plants[plot];S.sack[id]=(S.sack[id]||0)+1;save();plantBeds();renderHud()})}
   else S.plants[plot]={t:id,g:0,cy:snow(),est:false,boost:0,watered:false};
   S.sack[id]--;if(!S.sack[id])delete S.sack[id];save();plantBeds();renderHud();SND.sow();renderPlinths();
   if(Object.keys(S.plants).length>=40){setTimeout(()=>SND.allPlanted(),300);setTimeout(checkSpring,1200)}
@@ -2153,7 +2157,7 @@ const held=p=>p.hold>snow()?Math.ceil((p.hold-snow())/1000):0;   /* seconds a re
 function calibrate(p,stopped,next){if(!CAT[p.t])return;if(stopped){for(let k=0;k<4&&!ripe(p).stopped;k++)p.cy-=(ripe(p).next+1)*1000;return}
   if(!(next>0))return;const rp=ripe(p);if(rp.stopped)p.cy+=(next+1)*1000;else if(Math.abs(rp.next-next)>1)p.cy-=(rp.next-next)*1000}
 function pickAt(plot){const p=S.plants[plot];if(!p||p.pending||PICKING.has(plot))return;const c=CAT[p.t];const rp=ripe(p);
-  if(rp.flowers<1||held(p)){SND.knock();toast('Not yet. '+c.n+' blooms in '+mmss(Math.max(rp.next,held(p)))+'.');return}
+  if(rp.flowers<1||held(p)){SND.knock();chip('Not yet. '+c.n+' blooms in '+mmss(Math.max(rp.next,held(p)))+'.');return}
   const bb=S.basket[p.t]||{},was={cy:p.cy,est:p.est,boost:p.boost,watered:p.watered,picks:p.picks,g:p.g,bq:bb.q||0,bw:bb.w||0,fl:S.stats.flowers||0,wo:S.stats.worth||0,pk:S.stats.picks||0};
   const apply=(fl,w)=>{p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.picks=(was.picks||0)+1;p.g=1;
     if(was.bq+fl>0)S.basket[p.t]={q:was.bq+fl,w:was.bw+w};else delete S.basket[p.t];S.stats.flowers=was.fl+fl;S.stats.worth=was.wo+w;S.stats.picks=was.pk+1;save();plantBeds();renderHud()};
@@ -2164,7 +2168,7 @@ function pickAt(plot){const p=S.plants[plot];if(!p||p.pending||PICKING.has(plot)
   apply(rp.flowers,rp.value);cheer(rp.flowers,rp.value,rp.n);                   /* at once, on the press */
   if(!LIVE)return;
   PICKING.add(plot);RPC(P69()?'garden_pick2':'garden_pick',{p_plot:plot}).then(r=>{PICKING.delete(plot);const d=r.data||{};
-      if(r.error){undo();toast(rpcFail(r.error,'The pick did not count.'));return}
+      if(r.error){undo();chip(rpcFail(r.error,'The pick did not count.'));return}
       if(!d.ok){undo();SND.knock();if(d.reason==='empty'){delete S.plants[plot];save();plantBeds();renderHud();toast('Nothing planted there.')}
         else if(d.reason==='too_soon'){calibrate(p,false,+d.next_s||0);p.hold=snow()+(+d.next_s||0)*1000;save();gtip('Not yet. Blooms in '+mmss(+d.next_s||0)+'.')}else toast('That did not pick.');updateAct();return}
       const fl=+d.flowers||0,w=+d.worth||0;if(fl!==rp.flowers||w!==rp.value){apply(fl,w);floatPick(c,fl,w,plot);updateAct()}   /* the server's count is the truth */
@@ -2172,8 +2176,8 @@ function pickAt(plot){const p=S.plants[plot];if(!p||p.pending||PICKING.has(plot)
     }).catch(()=>{PICKING.delete(plot);undo();toast('The garden did not answer.')})}
 /* water: a boost, once per cycle, halving the wait to the next bloom */
 function waterAt(plot,fromCan){const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];const rp=ripe(p);
-  if(rp.stopped){SND.knock();toast(c.p+' in bed '+(plot+1)+' are full. Pick them.');return}
-  if(p.watered&&!freeWater()){SND.knock();toast('Bed '+(plot+1)+' is watered. It blooms in '+mmss(rp.next)+'.');return}
+  if(rp.stopped){SND.knock();chip(c.p+' in bed '+(plot+1)+' are full. Pick them.');return}
+  if(p.watered&&!freeWater()){SND.knock();chip('Bed '+(plot+1)+' is watered. It blooms in '+mmss(rp.next)+'.');return}
   const b=BED[plot];rain(b.cx,b.cz,b.rmax);SND.splash();
   const was=p.watered;p.watered=true;save();                                   /* marked at once, so a walk past never waters twice */
   const left=()=>thirsty().length;
@@ -2181,7 +2185,7 @@ function waterAt(plot,fromCan){const p=S.plants[plot];if(!p||p.pending)return;co
     gtip(fromCan?'Bed '+(plot+1)+' watered.'+(left()?' '+left()+' still thirsty.':''):'Watered. Bed '+(plot+1)+' blooms in '+mmss(r2.next)+'.');
     if(CAN&&!left()){setTimeout(()=>{setCan(false);setTimeout(()=>SND.allWatered(),150);gtip('Everything is watered. The can goes away.')},650)}updateAct()};
   if(LIVE){RPC('garden_water',{p_plot:plot,p_day:today()}).then(r=>{const d=r.data||{};
-      if(r.error){p.watered=was;save();toast(rpcFail(r.error,'The water did not reach bed '+(plot+1)+'.'));return}
+      if(r.error){p.watered=was;save();chip(rpcFail(r.error,'The water did not reach bed '+(plot+1)+'.'));return}
       if(!d.ok){if(d.reason!=='watered'){p.watered=was;save()}if(!fromCan){SND.knock();gtip(d.reason==='full'?'Full. Pick them.':d.reason==='watered'?'Already watered this round.':'That did not water.')}updateAct();return}
       done(+d.boost||0)}).catch(()=>{p.watered=was;save()});return}
   done(Math.ceil(rp.next/2))}
@@ -2256,7 +2260,7 @@ function canTick(){if(!CAN||BLOOM||STORE_ON||INSIDE)return;
 /* dig up: the seed goes back to the sack */
 function digAt(plot){if(visitGuard('dig up beds'))return;const p=S.plants[plot];if(!p||p.pending)return;const c=CAT[p.t];
   const done=(q)=>{delete S.plants[plot];S.sack[p.t]=q!==undefined?q:(S.sack[p.t]||0)+1;save();plantBeds();renderHud();SND.undo(2);toast(c.n+' dug up. The seed is back in your sack.');updateAct()};
-  if(LIVE){if(BUSY)return;BUSY=true;RPC('garden_dig',{p_plot:plot}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'That bed would not dig.'));return}const d=r.data||{};if(!d.ok){toast('Nothing planted there.');return}done(+d.qty||undefined)}).catch(()=>{BUSY=false});return}
+  if(LIVE){if(BUSY)return;BUSY=true;RPC('garden_dig',{p_plot:plot}).then(r=>{BUSY=false;if(r.error){chip(rpcFail(r.error,'That bed would not dig.'));return}const d=r.data||{};if(!d.ok){toast('Nothing planted there.');return}done(+d.qty||undefined)}).catch(()=>{BUSY=false});return}
   done()}
 /* a shower over a bed, sixty drops, gone in a second and a half */
 const RAINS=[];const rainMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xdff3ff,size:0.16,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2});
@@ -2292,16 +2296,16 @@ const FORMICON={obelisk:'<svg viewBox="0 0 60 64"><path d="M26 10 L34 10 L38 52 
   column:'<svg viewBox="0 0 60 64"><rect x="24" y="12" width="12" height="38" fill="#F1EEE7"/><rect x="18" y="6" width="24" height="7" fill="#E4E0D6"/><rect x="16" y="52" width="28" height="6" fill="#D9D4C8"/></svg>'};
 $('#fmClose').onclick=()=>$('#forms').classList.remove('on');
 $('#forms').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#forms').classList.remove('on')});
-function buyThing(spot,kind){if(VISIT&&!PATCH64&&visitGuard('set marble'))return;if(S.things[spot]){SND.knock();toast('That plinth is taken.');return}
-  if(plinthsOpen().indexOf(spot)<0){SND.knock();toast('That plinth is asleep. Fill a quadrant and three wake.');return}
+function buyThing(spot,kind){if(VISIT&&!PATCH64&&visitGuard('set marble'))return;if(S.things[spot]){SND.knock();chip('That plinth is taken.');return}
+  if(plinthsOpen().indexOf(spot)<0){SND.knock();chip('That plinth is asleep. Fill a quadrant and three wake.');return}
   const cost=gcv(MARBLE);if(reach()<cost){showShort(cost);return}
-  if(LIVE){if(BUSY)return;BUSY=true;RPC(VISIT?'thing_gift':'thing_buy2',VISIT?{p_owner:VISIT.owner,p_spot:spot,p_kind:kind}:{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough. Marble is '+cost+' gardencoin.':/taken/.test(r.error.message||'')?'That plinth is taken.':/asleep/.test(r.error.message||'')?'That plinth is asleep. Fill a quadrant and three wake.':'The stone did not come.'));return}
+  if(LIVE){if(BUSY)return;BUSY=true;RPC(VISIT?'thing_gift':'thing_buy2',VISIT?{p_owner:VISIT.owner,p_spot:spot,p_kind:kind}:{p_spot:spot,p_kind:kind}).then(r=>{BUSY=false;if(r.error){chip(rpcFail(r.error,/not_enough/.test(r.error.message||'')?'Not enough. Marble is '+cost+' gardencoin.':/taken/.test(r.error.message||'')?'That plinth is taken.':/asleep/.test(r.error.message||'')?'That plinth is asleep. Fill a quadrant and three wake.':'The stone did not come.'));return}
       const d=r.data||{};S.gc=+d.balance||0;if(d.dc_balance!=null)S.coins=+d.dc_balance;S.things[spot]={k:kind,st:0};ledger('Marble block',-cost,'the mason');save();renderThings();renderPlinths();renderHud();SND.buy(1);toast('A block of marble, for '+payWords({gc:+d.gc_used||0,dc:+d.dc_used||0})+'. Chisel it.');updateAct();refresh()}).catch(()=>{BUSY=false;toast('The stone did not come.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}
   S.things[spot]={k:kind,st:0};ledger('Marble block',-cost,'the mason');save();renderThings();renderPlinths();renderHud();SND.buy(1);toast('A block of marble, for '+payWords(pay)+'. Chisel it.');updateAct()}
 function chipThing(spot){const t=S.things[spot];if(!t||t.st>=3)return;const [x,z]=SPOTS[spot];
   const done=st=>{t.st=st;save();renderThings();if(st>=3){SND.carved();toast('Finished. '+FORMS[t.k]+' in marble, carved by you.')}else{SND.chip();toast('Chisel. '+st+' of 3.')}burst(x,1.1,z);updateAct()};
-  if(LIVE){if(BUSY)return;BUSY=true;RPC('thing_chip',{p_spot:spot}).then(r=>{BUSY=false;if(r.error){toast(rpcFail(r.error,'The chisel slipped.'));return}done(Math.min(3,+(r.data&&r.data.stage)||t.st+1))}).catch(()=>{BUSY=false});return}
+  if(LIVE){if(BUSY)return;BUSY=true;RPC('thing_chip',{p_spot:spot}).then(r=>{BUSY=false;if(r.error){chip(rpcFail(r.error,'The chisel slipped.'));return}done(Math.min(3,+(r.data&&r.data.stage)||t.st+1))}).catch(()=>{BUSY=false});return}
   done(t.st+1)}
 /* chips flying off the stone */
 const CHIPS=[];const chipMat=new THREE.PointsMaterial({map:dress(new THREE.CanvasTexture(glowTex())),color:0xffffff,size:0.11,transparent:true,opacity:0.95,depthWrite:false,alphaTest:0.2});
@@ -2360,8 +2364,8 @@ function lepCaught(){LEP_KILLS++;try{localStorage.setItem('deeds_lep_kills',Stri
   const local=()=>{S.gc=(S.gc|0)+LEP_GC;save();renderHud();ledger('The leprechaun',LEP_GC,'the wood')};
   toast('Got him. A thousand gardencoin, and off he vanishes.');
   if(!LIVE||VISIT){local();return}
-  RPC('lep_catch').then(r=>{const d=r.data||{};if(r.error){const m=String(r.error.message||'');if(/function|schema cache|does not exist/i.test(m))toast('Run patch 72 on DEEDS first.');else toast(rpcFail(r.error,'The Keeper did not answer.'));return}
-    if(d.balance!=null)S.gc=+d.balance;renderHud();ledger('The leprechaun',+d.pay||LEP_GC,'the wood');if(d.paid===false)toast('He got away with the gold this time. Three a day.')}).catch(()=>{toast('The Keeper did not answer.')})}
+  RPC('lep_catch').then(r=>{const d=r.data||{};if(r.error){const m=String(r.error.message||'');if(/function|schema cache|does not exist/i.test(m))toast('Run patch 72 on DEEDS first.');else chip(rpcFail(r.error,'The Keeper did not answer.'));return}
+    if(d.balance!=null)S.gc=+d.balance;renderHud();ledger('The leprechaun',+d.pay||LEP_GC,'the wood');if(d.paid===false)toast('He got away with the gold this time. Three a day.')}).catch(()=>{chip('The Keeper did not answer.')})}
 /* 6.17 THE LEPRECHAUN'S REVENGE. Catch him three times and the fourth time he is furious: he and three friends come for you at 10.5 studs a second,
    faster than a walk, slower than a run. Every grab is a heart. They cannot be killed, only knocked back with the sword or the flame. Get inside,
    or get forty studs clear and they lose you. After five minutes they giggle and vanish and the count starts again. */
@@ -2433,7 +2437,7 @@ function handAdd(t){if(!TOOLS[t]||VISIT)return;const h=handList();if(h.indexOf(t
 function openChestPick(newTool,forced){PICK=new Set(handList());PICK_FORCED=!!forced;$('#cpSub').textContent=forced?'Too much in hand. Pick the five you keep, the rest go to the chest in the hall.':(VISIT?'What you carry.':'The rest wait in the chest in the hall.');$('#cpClose').style.display=forced?'none':'';renderChestPick();$('#chestPick').classList.add('on');hideAct()}
 function renderChestPick(){const rows=ownedList().map(k=>{const on=PICK.has(k);return '<div class="row"><div><div class="nm">'+TOOLS[k].n+'</div><div class="where">'+(on?'IN HAND':'IN THE CHEST')+'</div></div><button class="tg'+(on?' on':'')+'" data-k="'+k+'" aria-label="'+TOOLS[k].n+'"></button></div>'}).join('');
   $('#cpRows').innerHTML=rows||'<div class="row"><div class="nm">Nothing yet. The Keeper sells tools, the trunk hides them.</div></div>';$('#cpN').textContent=PICK.size+' OF '+HAND_MAX+' IN HAND';$('#cpSave').disabled=PICK.size>HAND_MAX;
-  $$('#cpRows .tg').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(PICK.has(k))PICK.delete(k);else{if(PICK.size>=HAND_MAX){SND.knock();toast('Five is the hand. Put one in the chest first.');return}PICK.add(k)}SND.tickUp(PICK.size);renderChestPick()})}
+  $$('#cpRows .tg').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(PICK.has(k))PICK.delete(k);else{if(PICK.size>=HAND_MAX){SND.knock();chip('Five is the hand. Put one in the chest first.');return}PICK.add(k)}SND.tickUp(PICK.size);renderChestPick()})}
 function closeChestPick(save){if(save){if(PICK.size>HAND_MAX){SND.knock();return}HAND=TOOL_ORDER.filter(k=>PICK.has(k));handSave();if(!inHand(TOOL))setTool('hand');SND.carved();toast(chestList().length?plural(chestList().length,'tool')+' in the chest. Swap at the chest in the hall.':'Everything in hand.')}else if(PICK_FORCED)return;
   $('#chestPick').classList.remove('on');PICK=null;PICK_FORCED=false;paintHotbar();updateAct()}
 $('#cpSave').onclick=()=>closeChestPick(true);$('#cpClose').onclick=()=>closeChestPick(false);
@@ -2509,15 +2513,15 @@ function openPianoBuy(){$('#pianoBuy').classList.add('on');$$('#pianoBuy .btn.fi
 function pianoBuy(fin){if(visitGuard('buy the piano'))return;if(pianoFinish()){toast('The piano is yours already.');return}const key='piano_'+fin,cost=gcv(TOOLS[key].dc);
   const done=()=>{S.tools=S.tools||{};S.tools[key]=1;save();renderHud();SND.buy(10);$('#pianoBuy').classList.remove('on');placePiano();hideAct();toast('The '+fin+' grand is yours. Sit and play.')};
   if(LIVE){if(BUSY)return;BUSY=true;RPC('piano_buy',{p_finish:fin}).then(r=>{BUSY=false;
-      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'The piano is yours already.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The '+fin+' grand',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'The piano is yours already.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The '+fin+' grand',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
   if(reach()<cost){showShort(cost);return}S.gc-=cost;ledger('The '+fin+' grand',-cost,'the Keeper');done()}
 /* 6.14 THE UPGRADE. A black grand becomes the gold one for the difference, 5,000, from the bar while you sit at it (patch 74: piano_upgrade) */
 function pianoUpgrade(){if(visitGuard('upgrade the piano'))return;const fin=pianoFinish();if(fin==='gold'){toast('It is gold already.');return}if(fin!=='black'){toast('Buy the piano first.');return}const cost=5000;
   const done=()=>{S.tools=S.tools||{};delete S.tools.piano_black;S.tools.piano_gold=1;save();renderHud();SND.buy(10);pianoStand();placePiano();toast('Gold. The grand shines. Sit and play.')};
   if(LIVE){if(BUSY)return;BUSY=true;RPC('piano_upgrade',{}).then(r=>{BUSY=false;
-      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/no_piano/.test(m)?'Buy the piano first.':/owned/.test(m)?'It is gold already.':/Could not find the function|does not exist/i.test(m)?'Run patch 74 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger('The gold grand',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/no_piano/.test(m)?'Buy the piano first.':/owned/.test(m)?'It is gold already.':/Could not find the function|does not exist/i.test(m)?'Run patch 74 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger('The gold grand',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
   if(reach()<cost){showShort(cost);return}S.gc-=cost;ledger('The gold grand',-cost,'the Keeper');done()}
 /* sitting: you go to the bench facing the keys, the camera settles over your shoulder looking down at the keyboard, the panel slides up */
 function pianoSit(){if(SEATED||!PIANOG||!PIANOG.keys)return;SEATED=true;hideAct();if(CAN)setCan(false);
@@ -2675,7 +2679,7 @@ function songHit(m){if(!SONG||SONG.auto||SONG.ghost)return;const S_=songSteps(SO
   while(k<sc.b&&!songNeed(S_[k]).length){const g=S_[k];if(SONG.hands!=='both'&&g.l.length){const was=SONG;GHOSTS.push(setTimeout(()=>{if(SONG===was)songGhost(g,0.5)},delay))}delay+=g.b*songBeatMs();k++}
   SONG.k=k;SONG.hit={};
   if(k>=sc.b)songSectionDone();else songLight()}
-function songFail(){const sc=songSecs(SONG.s)[SONG.sec];SND.nope();toast(sc.name+': '+SONG.slips+' slips. From the top of it.');songGhostsClear();SONG.k=songNextK(sc.a);SONG.hit={};SONG.slips=0;songLight()}
+function songFail(){const sc=songSecs(SONG.s)[SONG.sec];SND.nope();chip(sc.name+': '+SONG.slips+' slips. From the top of it.');songGhostsClear();SONG.k=songNextK(sc.a);SONG.hit={};SONG.slips=0;songLight()}
 function songSectionDone(){const secs=songSecs(SONG.s),sc=secs[SONG.sec],key=secKey(SONG.i,SONG.sec);const first=!PX.done[key];const xp=first?sc.xp:Math.max(10,Math.round(sc.xp/10));
   PX.xp=(PX.xp|0)+xp;PX.done[key]=1;pxSave();pxPaint();floatXp(xp);SND.buy(first?9:4);
   const last=SONG.sec>=secs.length-1;
@@ -2808,11 +2812,11 @@ function artAct(){const A=artNear();if(!A)return false;placeArt();
  showAct('Paint this canvas \u00B7 '+ARTX.canvas_gc.toLocaleString()+' gardencoin.','artpaint',A.n,null,artWords(),
   [{l:'Commission an artist \u00B7 '+ARTX.commission_gc.toLocaleString()+'.',f:()=>openCommission(A.n)}],at);return true}
 function artStart(n){if(visitGuard('paint in this house'))return;
- if(!LIVE){SND.knock();toast('Sign in on deeds.fun to paint.');return}
+ if(!LIVE){SND.knock();chip('Sign in on deeds.fun to paint.');return}
  if(artEasel(n)){openPainter(n);return}
  if(BUSY)return;BUSY=true;
  RPC('paint_start',{p_slot:n}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');
-   if(/not_enough/.test(m)){SND.knock();toast('A canvas is '+ARTX.canvas_gc.toLocaleString()+' gardencoin. Sell flowers or log a deed.');return}
+   if(/not_enough/.test(m)){SND.knock();chip('A canvas is '+ARTX.canvas_gc.toLocaleString()+' gardencoin. Sell flowers or log a deed.');return}
    toast('The painter said: '+(m||'nothing'));return}
   const d=r.data||{};if(d.pay&&typeof d.pay.balance==='number'){S.gc=d.pay.balance;save();renderHud()}
   if(ARTX.easels.indexOf(n)<0)ARTX.easels.push(n);SND.buy(6);openPainter(n)},e=>{BUSY=false;toast('The painter said: '+String(e&&e.message||e||'nothing'))})}
@@ -3046,7 +3050,7 @@ function openCommission(n){if(visitGuard('commission a painting'))return;AB_SLOT
 function artCommission(k){if(BUSY)return;if(!LIVE){toast('Sign in on deeds.fun to commission it.');return}BUSY=true;
  RPC('art_commission',{p_slot:AB_SLOT,p_key:k}).then(r=>{BUSY=false;
   if(r.error){const m=String(r.error.message||'');
-   if(/not_enough/.test(m)){SND.knock();toast('The artist wants '+ARTX.commission_gc.toLocaleString()+' gardencoin.');return}
+   if(/not_enough/.test(m)){SND.knock();chip('The artist wants '+ARTX.commission_gc.toLocaleString()+' gardencoin.');return}
    toast('The artist said: '+(m||'nothing'));return}
   const d=r.data||{};if(d.pay&&typeof d.pay.balance==='number'){S.gc=d.pay.balance;save();renderHud()}
   ARTX.easels=ARTX.easels.filter(x=>x!==AB_SLOT);
@@ -3102,8 +3106,8 @@ function placeChess(){if(VISIT){if(CHESSG)CHESSG.visible=false;if(CHPORT)CHPORT.
 function chessAct(){if(you.feet>=1||VISIT)return false;const d=Math.hypot(you.x-CHESS_AT.x,you.z-CHESS_AT.z);if(d>2.4)return false;const at=[CHESS_AT.x,1.45,CHESS_AT.z];
   if(CHX.owned){showAct('Sit down at the board.','chess',null,null,'the study \u00B7 '+CHX.rank+' \u00B7 '+CHX.xp.toLocaleString()+' xp',null,at);return true}
   showAct('The chess board.','chessbuy',null,null,'3,000 gardencoin \u00B7 play the house, hang the greats',null,at);return true}
-function chessBuy(){if(visitGuard('buy the board'))return;if(!LIVE){SND.knock();toast('Sign in on deeds.fun to buy the board.');return}if(BUSY)return;BUSY=true;
-  RPC('chess_buy').then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(3000);else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':/Run patch/.test(m)?m:'The Keeper said: '+(m||'nothing')));return}
+function chessBuy(){if(visitGuard('buy the board'))return;if(!LIVE){SND.knock();chip('Sign in on deeds.fun to buy the board.');return}if(BUSY)return;BUSY=true;
+  RPC('chess_buy').then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(3000);else chip(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':/Run patch/.test(m)?m:'The Keeper said: '+(m||'nothing')));return}
     const d=r.data||{};CHX.owned=true;if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}SND.buy(10);hideAct();toast(d.already?'The board is yours already. Sit down.':'The board is yours. 3,000 gardencoin. Sit down and play.');updateAct()},e=>{BUSY=false;toast('The Keeper said: '+String(e&&e.message||e||'nothing'))})}
 setTimeout(pianoBind,0);
 function pianoPose(t){AV.g.position.y-=0.42;AV.g.rotation.y=SEAT_YAW;AV.legL.rotation.x=-1.5;AV.legR.rotation.x=-1.5;const pl=performance.now()-PHAND<220?-1.3:-1.05;AV.armL.rotation.x=pl+Math.sin(t*3)*0.02;AV.armR.rotation.x=pl;if(AV.armL.fore)AV.armL.fore.rotation.x=-0.55;if(AV.armR.fore)AV.armR.fore.rotation.x=-0.55}
@@ -3300,8 +3304,8 @@ function instAct(){if(you.feet>=1)return false;for(const k of INST_ORDER){const 
 function instBuy(k){const A=INST_AT[k];if(!A)return;if(visitGuard('buy '+A.n.toLowerCase()))return;if(instOwned(k)){toast(A.n+' is yours already.');return}const cost=A.price;
   const done=()=>{S.tools=S.tools||{};S.tools[k]=1;save();renderHud();SND.buy(10);placeInst();hideAct();toast(A.n+' is yours. '+(A.sit?'Sit and play.':'Pick it up and play.'))};
   if(LIVE){if(BUSY)return;BUSY=true;RPC('instrument_buy',{p_kind:k}).then(r=>{BUSY=false;
-      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?A.n+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 79 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(A.n,-cost,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?A.n+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 79 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(A.n,-cost,'the Keeper');done()}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
   if(reach()<cost){showShort(cost);return}S.gc-=cost;ledger(A.n,-cost,'the Keeper');done()}
 function instPlay(k){const A=INST_AT[k],g=INST.G[k];if(!A||!g||g.stand||INST.on)return;if(SEATED)pianoStand();INST.on=k;hideAct();if(CAN)setCan(false);
   const [sx,,sz]=instLocal(k,0,0,A.seat);you.x=sx;you.z=sz;you.vx=you.vy=you.vz=0;INST.face=A.out?A.ry+Math.PI:A.ry;you.face=INST.face;
@@ -3555,7 +3559,7 @@ function vlnClock(){if(!VS)return;const st=VS.mel[VS.k];if(!st)return;const win=
 function vlnChord(){if(!VS)return;const c=VS.ch[VS.chAt%VS.ch.length];const notes=VCH[c.c]||VCH.D;VB.chord(notes,c.b*VS.beat/1000,Math.min(VS.lay,vBow().lay));VS.chAt++}
 function vlnMiss(late){if(!VS)return;VS.streak=0;if(VS.lay>0)VS.lay--;if(VS.lvl>=4)VS.slips++;
  const el=$('#inPad .cell.now');if(el){el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),220)}
- if(VS.lvl>=4&&VS.slips>Math.max(3,Math.round(VS.mel.length*0.12))){SND.nope();toast('From the top of it.');const p=VS.p,i=VS.i;vlnStop();vlnStart(p,i);return}
+ if(VS.lvl>=4&&VS.slips>Math.max(3,Math.round(VS.mel.length*0.12))){SND.nope();chip('From the top of it.');const p=VS.p,i=VS.i;vlnStop();vlnStart(p,i);return}
  vlnHud();if(late&&VS.lvl>=6){VS.k++;if(VS.k>=VS.mel.length){vlnDone();return}vlnLight();vlnClock()}}
 function vlnHit(m){if(!VS)return false;const st=VS.mel[VS.k];if(!st)return false;
  if(m!==st.m){vlnMiss(false);return true}
@@ -3581,8 +3585,8 @@ function vlnBuy(kind,price,name,after){if(visitGuard('buy '+name.toLowerCase()))
  const done=()=>{S.tools=S.tools||{};S.tools[kind]=1;save();renderHud();SND.buy(10);toast(name+' is yours.');if(after)after()};
  if(LIVE){if(BUSY)return;BUSY=true;RPC('violin_buy',{p_kind:kind}).then(r=>{BUSY=false;
    if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(price);
-    else toast(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 80 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
-   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+    else chip(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 80 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
+   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
  if(reach()<price){showShort(price);return}S.gc-=price;ledger(name,-price,'the Keeper');done()}
 function vlnListPaint(open){const l=$('#vlnList');if(!l)return;const bx=vBowIx();
  let h='<div class="vhead"><b>Lessons</b><span class="micro">\u2605 '+(PX.xp|0).toLocaleString()+' XP \u00B7 '+vRank()+'</span><button class="btn" id="vlnClose">Close</button></div>';
@@ -3692,7 +3696,7 @@ function drmGood(){if(!DS)return;DS.streak++;const cap=dStick().lay,marks=[4,9,1
  marks.forEach(x=>{if(DS.streak>=x)lay++});DS.lay=Math.min(cap,Math.max(DS.lay,lay));drmHud()}
 function drmSlip(){if(!DS)return;DS.streak=0;if(DS.lay>0)DS.lay--;
  const b=$('#drmBar');if(b){b.classList.add('bad');setTimeout(()=>{const q=$('#drmBar');if(q)q.classList.remove('bad')},200)}
- if(DS.lvl>=4){DS.slips++;const cap=8+DS.lvl*2;if(DS.slips>cap){SND.nope();toast('From the top of it.');const i=DS.i;drmStop();setTimeout(()=>drmStart(i),400);return}}
+ if(DS.lvl>=4){DS.slips++;const cap=8+DS.lvl*2;if(DS.slips>cap){SND.nope();chip('From the top of it.');const i=DS.i;drmStop();setTimeout(()=>drmStart(i),400);return}}
  drmHud()}
 function drmTick(){if(!DS)return;const st=DS.step;
  for(const p in DS.s.pat){if(DS.s.yours.indexOf(p)>=0&&p!==DS.s.hold)continue;const c=dCharAt(p,st);if(c==='.')continue;
@@ -3755,8 +3759,8 @@ function drmBuy(kind,price,name,after){if(visitGuard('buy '+name.toLowerCase()))
  const done=()=>{S.tools=S.tools||{};S.tools[kind]=1;save();renderHud();SND.buy(10);toast(name+' is yours.');if(after)after()};
  if(LIVE){if(BUSY)return;BUSY=true;RPC('drum_buy',{p_kind:kind}).then(r=>{BUSY=false;
    if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(price);
-    else toast(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 81 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
-   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+    else chip(rpcFail(r.error,/owned/.test(m)?name+' is yours already.':/Could not find the function|does not exist|schema cache/i.test(m)?'Run patch 81 on DEEDS first.':/Run patch/.test(m)?m:'The Keeper said: '+m));return}
+   const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;ledger(name,-price,'the Keeper');done()}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
  if(reach()<price){showShort(price);return}S.gc-=price;ledger(name,-price,'the Keeper');done()}
 function drmListPaint(open){const l=$('#drmList');if(!l)return;const sx=dStickIx(),ki=dKitIx();
  let h='<div class="vhead"><b>The lineage</b><span class="micro">\u2605 '+(PX.xp|0).toLocaleString()+' XP \u00B7 '+pxRank()+'</span><button class="btn" id="drmClose">Close</button></div>';
@@ -3945,12 +3949,12 @@ function geyserFire(){flameToggle(false);GEYSER.t=0;GEYG.visible=true;SND.splash
     if(last){SND.allWatered();const parts=[];if(beds.length)parts.push(plural(beds.length,'bed'));if(trs.length)parts.push(plural(trs.length,'tree'));toast('The water goes up and comes down on the whole garden'+(parts.length?' \u00B7 '+parts.join(', '):'')+'.')}};
   if(!LIVE){setTimeout(()=>done(beds.map(pl=>({plot:pl,boost:Math.ceil(ripe(S.plants[pl]).next/2)})),trs.map(i=>({tree:i,next_s:Math.ceil(growLeft(S.trees[i])/2)})),true),1400);return}
   if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;
-  const half=h=>RPC(PATCH60?'garden_water_half2':'garden_water_half',{p_half:h,p_day:today()}).then(r=>{const d=r.data||{};if(r.error){BUSY=false;toast(rpcFail(r.error,'The water did not reach.'));return}if(h===0){done(d.beds||[],d.trees||[],false);half(1)}else{BUSY=false;done(d.beds||[],d.trees||[],true)}}).catch(()=>{BUSY=false;toast('The water did not reach.')});
+  const half=h=>RPC(PATCH60?'garden_water_half2':'garden_water_half',{p_half:h,p_day:today()}).then(r=>{const d=r.data||{};if(r.error){BUSY=false;chip(rpcFail(r.error,'The water did not reach.'));return}if(h===0){done(d.beds||[],d.trees||[],false);half(1)}else{BUSY=false;done(d.beds||[],d.trees||[],true)}}).catch(()=>{BUSY=false;toast('The water did not reach.')});
   half(0)}
 function takeSword(){if(owns('sword'))return;S.tools=S.tools||{};S.tools.sword=1;save();handAdd('sword');SWORDWALL.visible=false;paintHotbar();renderHud();SND.buy(6);hideAct();
   toast('The sword is yours. Slot 8 in your hotbar. The wolves come at night.');if(LIVE)RPC('sword_take').catch(()=>{});setTool('sword')}
-function burnAt(plot){const p=S.plants[plot];if(!p||p.pending)return;if(LIVE&&!VISIT&&!PATCH64){SND.knock();toast('Run patch 64 on DEEDS first.');return}
-  const rp=ripe(p),c=CAT[p.t];if(rp.flowers<1){SND.knock();toast('Nothing ripe to burn.');return}
+function burnAt(plot){const p=S.plants[plot];if(!p||p.pending)return;if(LIVE&&!VISIT&&!PATCH64){SND.knock();chip('Run patch 64 on DEEDS first.');return}
+  const rp=ripe(p),c=CAT[p.t];if(rp.flowers<1){SND.knock();chip('Nothing ripe to burn.');return}
   FLAME.t=1.4;SND.saw();const was={cy:p.cy,est:p.est,boost:p.boost,watered:p.watered,g:p.g};
   p.cy=snow();p.est=true;p.boost=0;p.watered=false;p.g=1;plantBeds();
   floatLoss(c,rp.flowers,plot);
@@ -4079,7 +4083,7 @@ function rocketMesh(){const G=new THREE.Group();const red=new THREE.MeshStandard
   const body=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.7,12),iv);G.add(body);const nose=new THREE.Mesh(new THREE.ConeGeometry(0.09,0.26,12),red);nose.position.y=0.48;G.add(nose);
   [0,1,2].forEach(i=>{const f=new THREE.Mesh(new THREE.BoxGeometry(0.02,0.22,0.16),red);f.position.set(0,-0.3,0.12);f.rotation.y=i*2.094;const p=new THREE.Group();p.add(f);p.rotation.y=i*2.094;G.add(p)});
   const flame=new THREE.Mesh(new THREE.ConeGeometry(0.07,0.3,8),new THREE.MeshBasicMaterial({color:0xFFC46B,transparent:true,opacity:0.9}));flame.rotation.x=Math.PI;flame.position.y=-0.5;G.add(flame);scene.add(G);return G}
-function fireRocket(q){if(q==null)return;const beds=ripeIn(q);if(!beds.length){SND.knock();toast('Nothing ripe in quadrant '+(q+1)+'.');return}
+function fireRocket(q){if(q==null)return;const beds=ripeIn(q);if(!beds.length){SND.knock();chip('Nothing ripe in quadrant '+(q+1)+'.');return}
   const c=QC[q];const R={g:rocketMesh(),t:0,from:[you.x,you.feet+1.3,you.z],to:[c.x,0.6,c.z],q,beds,answer:LIVE?null:{beds:beds.map(pl=>{const rp=ripe(S.plants[pl]);return {plot:pl,flowers:rp.flowers,worth:rp.value,full:rp.n}})},done:false};
   ROCKETS.push(R);SND.sow(1);
   if(LIVE){if(!PATCH46){R.fail='Run patch 46 on DEEDS first.';return}beds.forEach(pl=>PICKING.add(pl));
@@ -4088,20 +4092,20 @@ function rocketBurst(R){const c=QC[R.q];petals(c.x,c.z,9,240);SND.bloom();let fl
   save();plantBeds();renderHud();setTimeout(()=>SND.allWatered(),350);toast('Quadrant '+(R.q+1)+' \u00B7 '+plural(fl,'flower')+' \u00B7 '+w+'.');nudgeFlorist();updateAct()}
 function tickRockets(dt){for(let i=ROCKETS.length-1;i>=0;i--){const R=ROCKETS[i];R.t=Math.min(1,R.t+dt/1.4);const u=R.t;const x=R.from[0]+(R.to[0]-R.from[0])*u,z=R.from[2]+(R.to[2]-R.from[2])*u,y=R.from[1]+(9-R.from[1])*Math.sin(u*Math.PI/2)*(u<0.5?1:1)+(u>0.5?-(u-0.5)*2*(9-6):0);
     R.g.position.set(x,y,z);const dx=R.to[0]-R.from[0],dz=R.to[2]-R.from[2];R.g.rotation.set(0,Math.atan2(dx,dz),0);R.g.rotation.x=(u<0.5?-0.35:0.35)*Math.abs(dx+dz)>0?(u<0.5?-0.35:0.6):0;
-    if(R.t>=1&&!R.done){if(R.fail){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);SND.knock();toast(R.fail);continue}
+    if(R.t>=1&&!R.done){if(R.fail){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);SND.knock();chip(R.fail);continue}
       if(R.answer){R.done=true;scene.remove(R.g);ROCKETS.splice(i,1);rocketBurst(R)}}}}
 /* THE WATER LAUNCHER: an arc of water over one half of the garden, then rain on every thirsty bed in it */
 const LAUNCH={t:-1};
 /* 4.16: one shot waters the beds on that half and every growing sapling and regrowing stump on it (trees 0-5 west, 6-11 east, and so on by sixes) */
 const treeHalf=i=>((i/6)|0)%2;
 const thirstyTrees=h=>TREEPOS.map((p,i)=>i).filter(i=>treeHalf(i)===h&&planted(i)&&growLeft(S.trees[i])>0&&(freeWater()||!S.trees[i].wt));
-function fireLauncher(h){const beds=thirstyHalf(h),trs=thirstyTrees(h);if(!beds.length&&!trs.length){SND.knock();toast('The '+HALFN[h]+' half is watered.');return}
+function fireLauncher(h){const beds=thirstyHalf(h),trs=thirstyTrees(h);if(!beds.length&&!trs.length){SND.knock();chip('The '+HALFN[h]+' half is watered.');return}
   const done=(rows,trows)=>{rows.forEach(r=>{const p=S.plants[r.plot];if(!p)return;p.boost=(p.boost||0)+(+r.boost||0);p.watered=true;p.wd=today()});
     (trows||[]).forEach(r=>{const tr=S.trees[+r.tree];if(!tr)return;tr.wt=true;if(+r.next_s>0)tr.ready=Date.now()+(+r.next_s)*1000});
     save();plantBeds();if(trows&&trows.length)renderTrees();renderHud();SND.allWatered();
     const parts=[];if(rows.length)parts.push(plural(rows.length,'bed'));if(trows&&trows.length)parts.push(plural(trows.length,'tree'));toast('The '+HALFN[h]+' half is watered'+(parts.length?' \u00B7 '+parts.join(', '):'')+'.');updateAct()};
   beds.forEach((pl,i)=>setTimeout(()=>{const b=BED[pl];rain(b.cx,b.cz,b.rmax)},220+i*70));trs.forEach((i,k)=>setTimeout(()=>{const [tx,tz]=TREEPOS[i];rain(tx,tz,2.4)},500+k*90));LAUNCH.t=0;LAUNCH.h=h;SND.splash();
-  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC(PATCH60?'garden_water_half2':'garden_water_half',{p_half:h,p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}done(d.beds||[],d.trees||[])}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC(PATCH60?'garden_water_half2':'garden_water_half',{p_half:h,p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The water did not reach.'));return}done(d.beds||[],d.trees||[])}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
   setTimeout(()=>done(beds.map(pl=>({plot:pl,boost:Math.ceil(ripe(S.plants[pl]).next/2)})),trs.map(i=>({tree:i,next_s:Math.ceil(growLeft(S.trees[i])/2)}))),700)}
 const STREAM=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(90*3),3)),new THREE.PointsMaterial({map:chipMat.map,color:0xCFE9FF,size:0.22,transparent:true,opacity:0.9,depthWrite:false,alphaTest:0.2}));STREAM.visible=false;scene.add(STREAM);
 function tickLauncher(dt){if(LAUNCH.t<0)return;LAUNCH.t+=dt;if(LAUNCH.t>1.6){LAUNCH.t=-1;STREAM.visible=false;return}STREAM.visible=true;const a=STREAM.geometry.attributes.position;const tx=(LAUNCH.h?1:-1)*17,tz=0;
@@ -4129,9 +4133,9 @@ const CHESTG=new THREE.Group();scene.add(CHESTG);
  const lock=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.14,0.05),gold);lock.position.set(0,0.42,0.33);CHESTG.add(lock);const sw=sawModel();sw.position.set(0,0.58,0);sw.rotation.y=-0.4;sw.visible=false;CHESTG.add(sw);CHEST.saw=sw}
 function chestOpened(){if(P69())return CHEST_NEXT>Date.now();return S.chest&&S.chest.on===today()}
 function placeChest(){const [x,z]=chestSpot();CHEST.x=x;CHEST.z=z;CHESTG.position.set(x,0,z);CHESTG.rotation.y=(x*7+z*3)%6.28;markDisk(x,z,0.55,0.6);CHEST.open=chestOpened();CHEST.lid.rotation.x=CHEST.open?-1.6:0;CHEST.coins.visible=CHEST.open}
-function openChest(){if(visitGuard('open the trunk'))return;if(chestOpened()){SND.knock();toast(P69()?'Empty. It fills again in '+mmss(chestLeft())+'.':'Opened today. It moves tomorrow.');return}
-  if(P69()){if(BUSY)return;BUSY=true;RPC('chest_find').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The lid would not lift.'));return}
-    if(!d.ok){CHEST_NEXT=Date.now()+1000*Math.max(0,+d.next_s||0);CHEST.open=true;CHEST.lid.rotation.x=-1.6;SND.knock();toast('Locked. It opens again in '+mmss(+d.next_s||0)+'.');updateAct();return}chestFound(d)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
+function openChest(){if(visitGuard('open the trunk'))return;if(chestOpened()){SND.knock();chip(P69()?'Empty. It fills again in '+mmss(chestLeft())+'.':'Opened today. It moves tomorrow.');return}
+  if(P69()){if(BUSY)return;BUSY=true;RPC('chest_find').then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The lid would not lift.'));return}
+    if(!d.ok){CHEST_NEXT=Date.now()+1000*Math.max(0,+d.next_s||0);CHEST.open=true;CHEST.lid.rotation.x=-1.6;SND.knock();chip('Locked. It opens again in '+mmss(+d.next_s||0)+'.');updateAct();return}chestFound(d)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
   /* the ladder (4.11, patch 54): every plain open pays 1,000 gardencoin, the toys ride on opens 3 to 5, dive re-arms halve; live, the server decides (coins, found) */
   const done=(coins,found)=>{const n=((S.chest&&S.chest.n)||0)+1;S.chest={on:today(),n,saw:(S.chest&&S.chest.saw)||'',rearms:(S.chest&&S.chest.rearms)||0};S.gc+=coins;ledger('The trunk',coins,n===1?'the first chest':n===2?'the second chest':'deep in the wood');
     if(!LIVE&&!found){found=CHEST_TOYS.find((k,j)=>n>=j+3&&!owns(k))||null;if(!found&&n>=6&&CHEST_TOYS.every(k=>owns(k))&&trunkLeft())found='packs'}if(found&&found!=='packs'&&!TOOLS[found])found=null;if(found==='packs'){Object.keys(PACKS).forEach(k=>{if(k!=='pack_basic')S.packs[k]=1});WOOD_CAPS=null;if(!S.worn&&hasPack()){S.worn='pack_ivory';setPack('pack_ivory')}paintHotbar()}else if(found){S.tools[found]=1;handAdd(found);if(found==='chainsaw'){S.chest.saw=today();try{localStorage.setItem(SAW_KEY,'1')}catch(e){}}}
@@ -4139,8 +4143,8 @@ function openChest(){if(visitGuard('open the trunk'))return;if(chestOpened()){SN
     if(found==='packs'){SND.tier();setTimeout(()=>SND.buy(12),700);toast('THE WHOLE TRUNK. Five backpack designs are yours, plus '+coins.toLocaleString()+' gardencoin. '+(hasPack()?'Pick one to wear.':'Buy the backpack at THE SHOP to wear them.'));setTimeout(()=>{if(!STORE_ON)openSack()},1400)}
     else if(found){if(found==='chainsaw')SND.saw();else SND.grow();setTimeout(()=>SND.buy(6),900);toast(found==='chainsaw'?'A chainsaw, in the trunk of all places. Slot 5 in your hotbar. +'+coins+' gardencoin too.':found==='bubbles'?'A bubble gun. Slot 6 in your hotbar. +'+coins+' gardencoin too.':'A kite. Slot 7 in your hotbar. Press once and watch the sky. +'+coins+' gardencoin too.')}
     else{SND.buy(coins>=CHEST_GC?12:6);floatGc(coins,null);gtip('It hides somewhere new tomorrow.')}updateAct()};
-  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('chest_open',{p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The lid would not lift.'));return}
-    if(!d.ok){S.chest={on:today()};save();SND.knock();toast('Opened today. It moves tomorrow.');updateAct();return}if(d.balance!=null)S.gc=+d.balance-(+d.coins||0);done(+d.coins||0,d.found||null)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('chest_open',{p_day:today()}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The lid would not lift.'));return}
+    if(!d.ok){S.chest={on:today()};save();SND.knock();chip('Opened today. It moves tomorrow.');updateAct();return}if(d.balance!=null)S.gc=+d.balance-(+d.coins||0);done(+d.coins||0,d.found||null)}).catch(()=>{BUSY=false;toast('The lid would not lift.')});return}
   {const n0=(S.chest&&S.chest.n)||0,rr=(S.chest&&S.chest.rearms)||0;done(n0===0?FIRST_GC:n0===1?SECOND_GC:rr>0&&!CHEST_TOYS.some((k,j)=>n0>=j+2&&!owns(k))?Math.max(1,CHEST_GCS>>Math.min(8,rr)):CHEST_GCS)}}
 /* the oaks and the rings (3.4): sixty trees in seven instanced meshes, the twelve oaks beside the avenue and the forty eight rings in four
    groves that fill in with saplings from the Keeper. One rule for growing and growing back: GROW_S for a sapling, REGROW_S for a felled oak,
@@ -4191,7 +4195,7 @@ function chopTree(i,all){const tr=S.trees[i]||(S.trees[i]={st:0,cut:0,ready:0});
     if(fell){tr.st=0;tr.cut=Date.now();tr.ready=Date.now()+(nextS||REGROW_S)*1000;tr.wt=false;S.wood=Math.min(woodCap(),(S.wood||0)+1);TREE.fall[i]={t:0,dir:Math.atan2(ox-you.x,oz-you.z)};lepDrop('oak',i,ox,oz);setTimeout(()=>SND.rustle(),500);setTimeout(()=>SND.knock(),1150);toast(hasPack()?(S.wood<woodCap()?'The oak comes down. '+S.wood+' of '+woodCap()+' bundles on the pack.':'The oak comes down. The pack is full. Take the wood to the builder.'):'The oak comes down. Take the bundle to the builder at the house.')}
     save();renderHud();paintBundle();updateAct()};
   if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC(all&&PATCH50?'tree_saw':'tree_chop',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};
-      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(gcv(AXE_DCS));else toast(rpcFail(r.error,'The axe slipped.'));return}
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(gcv(AXE_DCS));else chip(rpcFail(r.error,'The axe slipped.'));return}
       if(!d.ok){SND.knock();if((d.reason==='regrowing'||d.reason==='growing')&&+d.next_s>0){tr.ready=Date.now()+(+d.next_s)*1000;save();renderTrees()}
         toast(d.reason==='asleep'?'The oaks are asleep.':d.reason==='regrowing'?'It is growing back.':d.reason==='growing'?'It is still growing.':d.reason==='carrying'?(hasPack()?'The pack is full. Take the wood to the builder.':'Take your bundle to the builder first.'):d.reason==='empty'?'Nothing is planted here.':d.reason==='level'?'The chainsaw takes an oak once the mansion stands.':'That did not chop.');updateAct();return}
       if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(d.fell&&+d.wood>0)S.wood=Math.min(woodCap(),+d.wood)-1;done(+d.stage||0,!!d.fell,+d.next_s||0)}).catch(()=>{BUSY=false;toast('The axe slipped.')});return}
@@ -4200,24 +4204,24 @@ function chopTree(i,all){const tr=S.trees[i]||(S.trees[i]={st:0,cut:0,ready:0});
 /* the chainsaw: a pull, the rev, sawdust, and the oak comes down in one; the first pull still pays the axe */
 function sawTree(i){if(houseLvl()<3){chopTree(i);return}cutStart('saw',i)}
 /* a sapling from the Keeper, planted at the next open ring, or at the ring you stand at */
-function plantTree(i){if(VISIT&&!PATCH64&&visitGuard('plant saplings'))return;if(!treesAwake()){SND.knock();toast('The oaks are asleep.');return}const n=i==null?nextRing():i;
-  if(n<0){SND.knock();toast('Every ring is planted. The wood is full.');return}
-  if(!isRing(n)||planted(n)){SND.knock();toast('Planted already.');return}
-  if(!ringOpen(n)){SND.knock();toast('That grove opens when the one before it is full.');return}
+function plantTree(i){if(VISIT&&!PATCH64&&visitGuard('plant saplings'))return;if(!treesAwake()){SND.knock();chip('The oaks are asleep.');return}const n=i==null?nextRing():i;
+  if(n<0){SND.knock();chip('Every ring is planted. The wood is full.');return}
+  if(!isRing(n)||planted(n)){SND.knock();chip('Planted already.');return}
+  if(!ringOpen(n)){SND.knock();chip('That grove opens when the one before it is full.');return}
   const cost=SAPLING_GC;
   const done=(at,nextS)=>{const tr=S.trees[at]||(S.trees[at]={st:0,cut:0});tr.pl=1;tr.st=0;tr.cut=0;tr.wt=false;tr.ready=Date.now()+(nextS||GROW_S)*1000;const [x,z]=TREEPOS[at];
     save();renderHud();renderTrees();SND.sow();burst(x,0.6,z);if(STORE_ON)renderStore();toast('A sapling, in '+ringName(at)+'. Water it and it grows in '+mmss((nextS||GROW_S)/2)+'.');updateAct()};
   if(LIVE){if(!PATCH47){toast('Run patch 47 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC(VISIT?'tree_gift':'tree_plant',VISIT?{p_owner:VISIT.owner,p_tree:i==null?null:n}:{p_tree:i==null?null:n}).then(r=>{BUSY=false;const d=r.data||{};
-      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,'The Keeper did not answer.'));return}
-      if(!d.ok){SND.knock();toast(d.reason==='taken'?'Planted already.':d.reason==='closed'?'That grove opens when the one before it is full.':d.reason==='full'?'Every ring is planted. The wood is full.':d.reason==='asleep'?'The oaks are asleep.':'That did not plant.');return}
-      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(d.rings_open!=null)RINGS_OPEN=+d.rings_open;ledger('An oak sapling',-cost,'the Keeper');done(d.tree!=null?+d.tree:n,+d.next_s||0)}).catch(()=>{BUSY=false;toast('The Keeper did not answer.')});return}
+      if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,'The Keeper did not answer.'));return}
+      if(!d.ok){SND.knock();chip(d.reason==='taken'?'Planted already.':d.reason==='closed'?'That grove opens when the one before it is full.':d.reason==='full'?'Every ring is planted. The wood is full.':d.reason==='asleep'?'The oaks are asleep.':'That did not plant.');return}
+      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(d.rings_open!=null)RINGS_OPEN=+d.rings_open;ledger('An oak sapling',-cost,'the Keeper');done(d.tree!=null?+d.tree:n,+d.next_s||0)}).catch(()=>{BUSY=false;chip('The Keeper did not answer.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('An oak sapling',-cost,'the Keeper');done(n,GROW_S)}
 /* water a sapling or a felled oak: the time left is halved, once per growth */
-function waterTree(i){const tr=S.trees[i];if(!tr||!planted(i))return;const left=growLeft(tr);if(!left){SND.knock();toast('It is grown.');return}
+function waterTree(i){const tr=S.trees[i];if(!tr||!planted(i))return;const left=growLeft(tr);if(!left){SND.knock();chip('It is grown.');return}
   if(!freeWater()&&tr.wt){SND.knock();gtip('Watered already.');return}
   const done=(nextS)=>{tr.wt=true;tr.ready=Date.now()+nextS*1000;save();renderTrees();SND.splash();toast((tr.cut?'The oak grows back':'The sapling grows')+' in '+mmss(nextS)+'.');updateAct()};
-  if(LIVE){if(!PATCH47){toast('Run patch 47 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('tree_water',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The water did not reach.'));return}
-      if(!d.ok){SND.knock();toast(d.reason==='watered'?'Watered already.':d.reason==='grown'?'It is grown.':'That did not water.');return}done(+d.next_s||0)}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
+  if(LIVE){if(!PATCH47){toast('Run patch 47 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('tree_water',{p_tree:i}).then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The water did not reach.'));return}
+      if(!d.ok){SND.knock();chip(d.reason==='watered'?'Watered already.':d.reason==='grown'?'It is grown.':'That did not water.');return}done(+d.next_s||0)}).catch(()=>{BUSY=false;toast('The water did not reach.')});return}
   done(Math.ceil(left/2))}
 let GROWT=0;
 function tickTrees(dt){let any=false;Object.keys(TREE.fall).forEach(k=>{const i=+k,f=TREE.fall[k];f.t+=dt;const u=Math.min(1,f.t/1.2);const a=u*u*Math.PI/2;setTree(i,true,1,Math.cos(f.dir)*a,-Math.sin(f.dir)*a);any=true;
@@ -4400,16 +4404,16 @@ const BUILDER={swing:-1};
  const bark=new THREE.MeshStandardMaterial({color:0x6B4A2B,roughness:0.9});for(let k=0;k<12;k++){const row=k<5?0:k<9?1:2,c=k<5?k:k<9?k-5:k-9,n=k<5?5:k<9?4:3;const l=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,1.4,10),bark);l.rotation.z=Math.PI/2;l.position.set(0,0.16+row*0.3,(c-(n-1)/2)*0.36);l.castShadow=true;l.visible=false;P.add(l);BUILDER.pile.push(l)}
 }
 function renderPile(){const n=Math.min(12,S.house.stage>=3?12:S.house.wood);BUILDER.pile.forEach((l,k)=>l.visible=k<n)}
-function deliverWood(){if(!S.wood){SND.knock();toast('Bring a bundle of wood from the oaks.');return}
+function deliverWood(){if(!S.wood){SND.knock();chip('Bring a bundle of wood from the oaks.');return}
   const done=(wood,stage,dl)=>{const was=S.house.stage,rb=S.rooms||roomsOf(0,0);S.wood=0;S.house.wood=wood;S.house.stage=stage;S.rooms=roomsOf(wood,stage);save();renderHud();paintBundle();renderHouse();
     if(stage>was){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast(['','The builder raises the fireplace wing.','The main house goes up, with the library.','The mansion. Portico, columns, the upper floor and your bedroom.'][stage])}
     else if(S.rooms.down>rb.down||S.rooms.up>rb.up){BUILDER.swing=0;setTimeout(()=>SND.carved(),900);[0,300,600].forEach(ms=>setTimeout(()=>SND.chip(),ms));const r=S.rooms;
       toast(r.down>rb.down?['','Downstairs is built. The stairs, the hall, the rooms. Go inside.','Downstairs is nice now \u00B7 rugs, curtains, books, lamps.','Downstairs is elegant \u00B7 chandeliers, marble, the fires lit.'][r.down]:['','Upstairs is built \u00B7 the bedroom, the gallery, the study.','Upstairs is nice now \u00B7 rugs, curtains, lamps, paintings.','Upstairs is elegant \u00B7 the four poster, the chandeliers, the gallery hung.'][r.up]);
       if(INSIDE)INTERIOR.setLevels(roomLevels()[0],roomLevels()[1])}
     else{SND.clink();const n=S.rooms.next;toast((dl>1?dl+' bundles delivered':'Delivered')+' \u00B7 '+(stage<3?wood+' of '+HOUSE_TIERS[stage]+' bundles.':n?n.have+' of '+n.need+' bundles \u00B7 '+stepName(n)+'.':'the house is finished.'))}updateAct()};
-  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){toast(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();return}
+  if(LIVE){if(!PATCH46){toast('Run patch 46 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_deliver').then(r=>{BUSY=false;const d=r.data||{};if(r.error){chip(rpcFail(r.error,'The builder did not answer.'));return}if(!d.ok){SND.knock();return}
       if(d.done){woodSold(+d.sold||0,+d.gc||0);return}
-      done(+d.wood||0,+d.stage||0,+d.delivered||1)}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
+      done(+d.wood||0,+d.stage||0,+d.delivered||1)}).catch(()=>{BUSY=false;chip('The builder did not answer.')});return}
   const dl=S.wood;if(ESTATE_DONE||estateDone()){woodSold(dl,dl*WOOD_GC);return}
   const wood=S.house.wood+dl;let stage=S.house.stage;while(stage<3&&wood>=HOUSE_TIERS[stage])stage++;done(wood,stage,dl)}
 /* 6.36: house at stage 3, fence up, every room paid for. After that the builder buys your wood at 500 a bundle */
@@ -4468,15 +4472,15 @@ function estateHydrate(e){const E=EST(),was={coins:E.coins,sown:E.sown,dead:E.de
   placeSprinklers();showGardeners();placeFence();paintLock();if(STORE_ON)renderTabs()}
 /* the lock */
 let LOCKWARN=false,LOCKWAS=false,LOCK_T=0;
-function lockHouse(){if(visitGuard('lock the house'))return;if(houseLvl()<1){SND.knock();toast('Build the house first.');return}
+function lockHouse(){if(visitGuard('lock the house'))return;if(houseLvl()<1){SND.knock();chip('Build the house first.');return}
   const done=s=>{EST().lock=Date.now()+s*1000;EST().locks++;LOCKWARN=false;LOCKWAS=true;save();SND.buy(4);paintLock();updateAct();toast('Locked \u00B7 '+mmss(s)+' on the clock. Nothing burns'+(EST().fence?'':' and the gardeners are safe')+' until it runs out.')};
   if(LIVE){if(!PATCH62){toast('Run patch 62 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('house_lock').then(r=>{BUSY=false;const d=r.data||{};
       if(r.error||!d.ok){toast(r.error?rpcFail(r.error,'The lock stuck.'):d.reason==='no_house'?'Build the house first.':'The lock stuck.');return}done(+d.lock_s||LOCK_S)}).catch(()=>{BUSY=false;toast('The lock stuck.')});return}
   done(LOCK_S)}
 function paintLock(){const el=$('#lockchip');const on=houseLocked();el.classList.toggle('on',on);if(!on){el.innerHTML='';return}const s=lockLeft();el.classList.toggle('amber',s<=60);el.innerHTML=LOCK_SVG+'<b>'+mmss(s)+'</b>'}
 function lockTick(dt){LOCK_T+=dt;if(LOCK_T<1)return;LOCK_T=0;const on=houseLocked();
-  if(on&&!LOCKWARN&&lockLeft()<=60){LOCKWARN=true;SND.knock();toast('The lock runs out in a minute. Back to the door.')}
-  if(LOCKWAS&&!on){LOCKWAS=false;SND.nope();toast(houseLvl()>=3&&ph==='night'?'The lock ran out. The wolves know.':'The lock ran out.');updateAct()}
+  if(on&&!LOCKWARN&&lockLeft()<=60){LOCKWARN=true;SND.knock();chip('The lock runs out in a minute. Back to the door.')}
+  if(LOCKWAS&&!on){LOCKWAS=false;SND.nope();chip(houseLvl()>=3&&ph==='night'?'The lock ran out. The wolves know.':'The lock ran out.');updateAct()}
   if(on)LOCKWAS=true;paintLock()}
 /* the sprinklers: a brass head on a stem in the middle of each bought quadrant, turning */
 const SPRG=[0,1,2,3].map(q=>{const g=new THREE.Group();g.position.set(QC[q].x,0,QC[q].z);g.visible=false;scene.add(g);
@@ -4491,8 +4495,8 @@ function sprinklerRain(qs){(qs||[]).forEach(q=>BED.filter(b=>b.q===q).forEach((b
 function sprinklerBuy(q){if(EST().spr.indexOf(q)>=0)return;const cost=SPRINKLER_GC;
   const done=()=>{EST().spr.push(q);save();placeSprinklers();renderHud();SND.buy(8);renderTabs();toast('Sprinklers in quadrant '+(q+1)+'. They water every bed in it, every cycle, whether you are here or not.')};
   if(LIVE){if(!PATCH62){toast('Run patch 62 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC('sprinkler_buy',{p_quad:q}).then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'That quadrant has sprinklers.':'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('Sprinklers',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'That quadrant has sprinklers.':'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('Sprinklers',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();chip('The Keeper did not answer.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('Sprinklers',-cost,'the Keeper');done()}
 /* the gardener: a man in a straw hat and green overalls with a hoe over his shoulder, walking bed to bed */
 function buildGardFigure(){const GARD={};const G=new THREE.Group();G.visible=false;scene.add(G);GARD.g=G;
@@ -4528,7 +4532,7 @@ function lumberHire(){if(visitGuard('hire'))return;const E=EST();const free=(E.l
   if(!free&&ljCount()>=LUMBER_MAX){SND.knock();return}const cost=free?0:LUMBER_GC;
   const done=()=>{if(free)E.ljD=Math.max(0,(E.ljD|0)-1);else E.ljN=ljCount()+1;E.lj=true;E.ljd=(E.ljD|0)>=ljCount();save();showLumber();renderHud();SND.buy(10);renderTabs()};
   if(LIVE){if(!PATCH64){toast('Run patch 68 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC('lumber_hire').then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'He is already at work.':'The Keeper did not answer.'));return}
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'He is already at work.':'The Keeper did not answer.'));return}
       const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(!d.free)ledger('A lumberjack',-cost,'the Keeper');done();
       if(d.lumberjacks!=null){E.ljN=+d.lumberjacks;E.ljD=Math.max(0,E.ljN-(+d.alive||0));E.lj=E.ljN>0;E.ljd=E.ljD>=E.ljN;showLumber();renderTabs()}}).catch(()=>{BUSY=false;renderTabs()});return}
   if(!free){const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('The lumberjack',-cost,'the Keeper')}done()}
@@ -4575,18 +4579,18 @@ function gardPrey(){if(gardSafe())return null;const w=WOLVES.list[0];let best=nu
 function gardenerDeath(){const G=PREY||GARD,E=EST();if(G.lj){lumberDeath();return}if(!G||!G.on||G.dead>=0||gardSafe())return;G.dead=0;G.wait=0;SND.knock();
   E.nd=Math.min(E.n,(E.nd||0)+1);E.dead=E.nd>=E.n;E.deaths++;save();toast(gardAlive()?'The wolves took a gardener. '+gardAlive()+' left. Drop him in again at the Shop, no charge.':'The wolves took the last gardener. He is at the Shop again, no charge. Build the fence.');
   if(STORE_ON)renderTabs();if(LIVE&&PATCH62)RPC('gardener_kill').then(r=>{const d=r.data||{};if(!r.error&&d.ok===false&&(d.reason==='locked'||d.reason==='fenced'||d.reason==='no_gardener'))refresh()}).catch(()=>{})}
-function gardenerHire(){if(visitGuard('hire'))return;const E=EST();const free=(E.nd||0)>0;if(!free&&(E.n||0)>=GARD_MAX){SND.knock();toast('The crew is full.');return}const cost=free?0:GARDENER_GC;
+function gardenerHire(){if(visitGuard('hire'))return;const E=EST();const free=(E.nd||0)>0;if(!free&&(E.n||0)>=GARD_MAX){SND.knock();chip('The crew is full.');return}const cost=free?0:GARDENER_GC;
   const done=()=>{if(free)E.nd=Math.max(0,E.nd-1);else E.n=(E.n||0)+1;E.gard=E.n>0;E.dead=E.nd>=E.n;save();showGardeners();renderHud();SND.buy(10);renderTabs();
     toast(free?'He is back at the beds.'+(E.fence?'':' Build the fence, or lock the house at night.'):gardAlive()===1?'The gardener is yours. He picks the full beds in quadrant 1, sells to Flora at '+Math.round(GARD_CUT*100)+' cents on the coin, and plants what is in your sack.':'Gardener '+gardAlive()+' takes quadrant '+gardAlive()+'.')};
   if(LIVE){if(!PATCH62){toast('Run patch 62 on DEEDS first.');return}if(BUSY)return;BUSY=true;renderTabs();RPC('gardener_hire').then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'He is already at work.':/full/.test(m)?'The crew is full.':'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(!d.free)ledger('A gardener',-cost,'the Keeper');done();if(d.gardeners!=null){E.n=+d.gardeners;E.nd=Math.max(0,E.n-(+d.alive||0));E.gard=E.n>0;E.dead=E.nd>=E.n;showGardeners();renderTabs()}}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'He is already at work.':/full/.test(m)?'The crew is full.':'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;if(!d.free)ledger('A gardener',-cost,'the Keeper');done();if(d.gardeners!=null){E.n=+d.gardeners;E.nd=Math.max(0,E.n-(+d.alive||0));E.gard=E.n>0;E.dead=E.nd>=E.n;showGardeners();renderTabs()}}).catch(()=>{BUSY=false;renderTabs();chip('The Keeper did not answer.')});return}
   if(!free){const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('A gardener',-cost,'the Keeper')}done()}
-function fenceBuy(){if(visitGuard('build the fence'))return;const E=EST();if(E.fence){SND.knock();toast('The fence stands.');return}if(houseLvl()<1){SND.knock();toast('Build the house first.');return}const cost=FENCE_GC;
+function fenceBuy(){if(visitGuard('build the fence'))return;const E=EST();if(E.fence){SND.knock();chip('The fence stands.');return}if(houseLvl()<1){SND.knock();chip('Build the house first.');return}const cost=FENCE_GC;
   const done=()=>{E.fence=true;save();placeFence();SND.carved();updateAct();if(STORE_ON)renderTabs();toast('A white picket fence, by the builder. The gardeners walk into it at dusk and the wolves cannot follow.')};
   if(LIVE){if(!PATCH64){toast('Run patch 64 on DEEDS first.');return}if(BUSY)return;BUSY=true;RPC('fence_buy').then(r=>{BUSY=false;const d=r.data||{};
       if(r.error||!d.ok){const m=String(r.error&&r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(r.error?rpcFail(r.error,/owned/.test(m)?'The fence stands.':'The builder did not answer.'):d.reason==='no_house'?'Build the house first.':'The builder did not answer.');return}
-      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The picket fence',-cost,'the builder');done()}).catch(()=>{BUSY=false;toast('The builder did not answer.')});return}
+      if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The picket fence',-cost,'the builder');done()}).catch(()=>{BUSY=false;chip('The builder did not answer.')});return}
   const pay=payGc(cost);if(!pay){showShort(cost);return}ledger('The picket fence',-cost,'the builder');done()}
 function estateCards(){const E=EST(),n=E.n||0,nd=E.nd||0,alive=gardAlive();
   const qb=[0,1,2,3].map(q=>E.spr.indexOf(q)>=0?'<span class="micro" style="opacity:.7;padding:6px 6px">Q'+(q+1)+' \u00B7 YOURS</span>':'<button class="btn on" data-spr="'+q+'">Quadrant '+(q+1)+' \u00B7 '+SPRINKLER_GC.toLocaleString()+'.</button>').join('');
@@ -4729,7 +4733,7 @@ function updateAct(){if(STORE_ON||BLOOM){hideAct();return}
   if(canWater){if(thirsty().length>1)extra.push({l:'Get the can.',f:()=>setCan(true)});showAct('Water bed '+(b.plot+1)+'.','water',b.plot,null,c.n+' blooms in '+mmss(rp.next)+' \u00B7 water halves it',extra,at);return}
   showAct(c.n+' \u00B7 blooms in '+mmss(rp.next)+'.',null,null,null,p.watered?'watered':'',extra,at)}
 function shakeAct(){actMain.classList.remove('shake');void actMain.offsetWidth;actMain.classList.add('shake')}
-function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='rosie')flTalk();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='hank')openGaShop();else if(ACT.mode==='car')carRide(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();toast('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
+function act(){if(DRIVE){mowerToggle();return}if(FLAME.on&&TOOL==='flamethrower'){flameToggle(false);return}if(!ACT)return;if(LIVE&&BUSY&&ACT.mode!=='sword'&&ACT.mode!=='takesword'&&ACT.mode!=='chess'&&ACT.mode!=='enter'&&ACT.mode!=='leave'&&ACT.mode!=='read'&&ACT.mode!=='pick'&&ACT.mode!=='sow'&&ACT.mode!=='water'&&ACT.mode!=='can'&&ACT.mode!=='rocket'){shakeAct();return}if(ACT.mode==='enter')enterHouse();else if(ACT.mode==='leave')leaveHouse();else if(ACT.mode==='read')openLibrary();else if(ACT.mode==='friends')openFriends();else if(ACT.mode==='home')location.href=location.pathname;else if(ACT.mode==='portal')portalGo();else if(ACT.mode==='witch')openHwShop();else if(ACT.mode==='flag')portalGo('flag');else if(ACT.mode==='chess')portalGo('chess');else if(ACT.mode==='chessbuy')chessBuy();else if(ACT.mode==='rosie')flTalk();else if(ACT.mode==='farmbuy')farmBuy();else if(ACT.mode==='farmsow')openFarmSheet(ACT.plot);else if(ACT.mode==='farmpick')farmPick(ACT.plot);else if(ACT.mode==='farmwater')farmWaterAll();else if(ACT.mode==='hank')openGaShop();else if(ACT.mode==='car')carRide(ACT.plot);else if(ACT.mode==='mower')mowerToggle();else if(ACT.mode==='roomlist'){toast(roomWords())}else if(ACT.mode==='stand')openStore('stand');else if(ACT.mode==='sell')sellFlowers();else if(ACT.mode==='fishsell')sellFish();else if(ACT.mode==='fish')catchFish();else if(ACT.mode==='sow')sowAt(ACT.plot,SOWT);else if(ACT.mode==='pick')pickAt(ACT.plot);else if(ACT.mode==='water')waterAt(ACT.plot);else if(ACT.mode==='marble'){if(reach()<gcv(MARBLE)){SND.knock();chip('Marble is '+gcv(MARBLE)+' gardencoin. Sell flowers or log a deed.')}else openForms(ACT.plot)}else if(ACT.mode==='chip')chipThing(ACT.plot);else if(ACT.mode==='can')setCan(false);else if(ACT.mode==='rocket')fireRocket(ACT.plot);else if(ACT.mode==='launcher')fireLauncher(ACT.plot);else if(ACT.mode==='chest')openChest();else if(ACT.mode==='plant')plantTree(ACT.plot);else if(ACT.mode==='twater')waterTree(ACT.plot);else if(ACT.mode==='chop')chopTree(ACT.plot);else if(ACT.mode==='saw')sawTree(ACT.plot);else if(ACT.mode==='wild'){}else if(ACT.mode==='bubbles')blowBubbles();else if(ACT.mode==='compass')readCompass();else if(ACT.mode==='kite')flyKite();else if(ACT.mode==='wood')deliverWood();else if(ACT.mode==='sword')swingSword();else if(ACT.mode==='burn')burnAt(ACT.plot);else if(ACT.mode==='takesword')takeSword();else if(ACT.mode==='toolchest')openChestPick(null,false);else if(ACT.mode==='piano')pianoSit();else if(ACT.mode==='pianobuy')openPianoBuy();else if(ACT.mode==='inst')instPlay(ACT.plot);else if(ACT.mode==='instbuy')instBuy(ACT.plot);else if(ACT.mode==='artpaint')artStart(ACT.plot);updateAct()}
 function cycleSeed(){const types=FLOWERS.filter(t=>S.sack[t]>0);if(types.length<2)return;SOWT=types[(types.indexOf(SOWT)+1)%types.length];updateAct()}
 /* the prompt floats over what it is about, kept on screen; it acts on the press, never the release, and a keyboard still gets there */
 const _pv=new THREE.Vector3();
@@ -4788,8 +4792,8 @@ function mowerToggle(){rideToggle(MOWER)}
 function mowerBuy(){if(visitGuard('buy the mower'))return;if(S.tools.mower){toast('It is parked by the house.');return}const cost=gcv(TOOLS.mower.dc);
   const done=()=>{S.tools.mower=1;save();renderHud();SND.buy(8);closeStore();showMower();toast('The gold mower is yours. It is parked by the house.')};
   if(LIVE){if(BUSY)return;BUSY=true;renderTabs();RPC('mower_buy').then(r=>{BUSY=false;
-      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else toast(rpcFail(r.error,/owned/.test(m)?'It is parked by the house.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
-      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The gold mower',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();toast('The Keeper did not answer.')});return}
+      if(r.error){renderTabs();const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(cost);else chip(rpcFail(r.error,/owned/.test(m)?'It is parked by the house.':/Run patch/.test(m)?m:'The Keeper did not answer.'));return}
+      const d=r.data||{};if(d.balance!=null)S.gc=+d.balance;if(d.dc_balance!=null)S.coins=+d.dc_balance;ledger('The gold mower',-cost,'the Keeper');done()}).catch(()=>{BUSY=false;renderTabs();chip('The Keeper did not answer.')});return}
   if(!payGc(cost)){showShort(cost);return}done()}
 
 function rotXZ(x,z,th){const c=Math.cos(th),sn=Math.sin(th);return [x*c-z*sn,x*sn+z*c]}
@@ -4876,10 +4880,10 @@ function tapAt(cx,cy){if(STORE_ON||BLOOM||INSIDE||$('#forms').classList.contains
   const h=rayHit(cx,cy);if(!h)return false;const [hx,hz]=h;
   const best=bedAt(hx,hz);
   if(best){const reach=bedDist(best);
-    if(reach>3.4){SND.knock();toast('Come closer to bed '+(best.plot+1)+'.');return true}
+    if(reach>3.4){SND.knock();chip('Come closer to bed '+(best.plot+1)+'.');return true}
     const p=S.plants[best.plot];
     if(p){if(p.pending)return true;if(CAN){waterAt(best.plot,true);POUR=performance.now()+900}else pickAt(best.plot);return true}
-    const types=FLOWERS.filter(k=>S.sack[k]>0);if(!types.length){SND.knock();toast('Bed '+(best.plot+1)+' is empty. Seeds are at the stand by the south gate.');return true}
+    const types=FLOWERS.filter(k=>S.sack[k]>0);if(!types.length){SND.knock();chip('Bed '+(best.plot+1)+' is empty. Seeds are at the stand by the south gate.');return true}
     if(!SOWT||!(S.sack[SOWT]>0))SOWT=types[0];sowAt(best.plot,SOWT);updateAct();return true}
   if(Math.hypot(hx-STAND.x,hz-STAND.z)<2.6&&Math.hypot(you.x-STAND.front.x,you.z-STAND.front.z)<3.4){openStore('stand');return true}
   if(Math.hypot(hx-FLORIST.x,hz-FLORIST.z)<2.6&&Math.hypot(you.x-FLORIST.front.x,you.z-FLORIST.front.z)<3.4){sellFlowers();return true}
@@ -5136,7 +5140,7 @@ window.addEventListener('pagehide',pingLeave);
 let FULLT=0;
 function onPresence(state){state=state||{};const seen={};Object.keys(state).forEach(k=>{if(k===ME)return;const p=(state[k]||[])[0];if(!p||!p.id)return;seen[k]=Object.assign(PRESENCE[k]||{},p)});
   PRESENCE=seen;const n=Object.keys(PRESENCE).length;
-  if(VISIT&&n>=4&&!FULLT){FULLT=1;SND.knock();toast('The garden is full. Four at a time.');setTimeout(()=>{location.href=location.pathname},1800);return}
+  if(VISIT&&n>=4&&!FULLT){FULLT=1;SND.knock();chip('The garden is full. Four at a time.');setTimeout(()=>{location.href=location.pathname},1800);return}
   syncFriends()}
 function onPos(p){if(!p||!p.id||p.id===ME)return;const f=FR[p.id];if(!f){if(!PRESENCE[p.id])PRESENCE[p.id]={id:p.id,h:p.h||''};syncFriends()}const g=FR[p.id];if(!g)return;
   g.tx=+p.x||0;g.tz=+p.z||0;g.tyaw=+p.yaw||0;g.moving=!!p.m;g.last=performance.now();if(p.h)g.h=p.h;if(p.k!==undefined&&g.pk!==(p.k||'')){g.pk=p.k||'';attachPack(g.av,g.pk)}if(p.tool!==undefined&&g.tool!==(p.tool||'hand')){g.tool=p.tool||'hand';friendTool(g)}if(p.kite!==undefined)g.kite=!!p.kite;if(p.in!==undefined){const was=!!g.tin;g.tin=!!p.in;g.tfeet=+p.feet||0;if(g.tin!==was){g.x=g.tx;g.z=g.tz;g.feet=g.tfeet}}}
@@ -5177,7 +5181,7 @@ function visitState(handle){return Promise.resolve(sb.from('profiles').select('i
       return v})})}
 function loadState(){return GHANDLE?visitState(GHANDLE):Promise.resolve(sb.rpc('garden_state12')).then(r12=>(!r12.error&&r12.data)?r12:sb.rpc('garden_state11')).then(r11=>(!r11.error&&r11.data)?r11:sb.rpc('garden_state10')).then(r10=>(!r10.error&&r10.data)?r10:sb.rpc('garden_state9')).then(r9=>(!r9.error&&r9.data)?r9:sb.rpc('garden_state8')).then(r8=>(!r8.error&&r8.data)?r8:sb.rpc('garden_state7')).then(r7=>(!r7.error&&r7.data)?r7:sb.rpc('garden_state6')).then(r6=>(!r6.error&&r6.data)?r6:sb.rpc('garden_state5')).then(r5=>(!r5.error&&r5.data)?r5:sb.rpc('garden_state4')).then(r4=>(!r4.error&&r4.data)?r4:sb.rpc('garden_state3'))}
 function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function visitGuard(what){if(!VISIT)return false;SND.knock();toast('Only '+VISIT.handle+' can '+what+' here. Pick, water, sell and chop all you like.');return true}
+function visitGuard(what){if(!VISIT)return false;SND.knock();chip('Only '+VISIT.handle+' can '+what+' here. Pick, water, sell and chop all you like.');return true}
 /* the friends sheet: who follows you back, and their gardens */
 function openFriends(){$('#friends').classList.add('on');SND.open();const box=$('#frRows');
   if(!LIVE){box.innerHTML='<div class="micro" style="opacity:.7;padding:12px 0">SIGN IN ON DEEDS TO VISIT FRIENDS</div>';return}
@@ -5219,9 +5223,9 @@ function floraSay(){if(!P69())return '\u201CBring me what you grew. I pay in gar
 /* the things you keep: variants, fish, what the chest gave */
 function fishItems(){return ITEMS.filter(i=>/^fish_/.test(i.kind))}
 function fishWorth(){return fishItems().reduce((a,i)=>a+i.worth,0)}
-function sellItems(list,where){if(!list.length){SND.knock();toast('Nothing to sell.');return}if(BUSY)return;BUSY=true;
+function sellItems(list,where){if(!list.length){SND.knock();chip('Nothing to sell.');return}if(BUSY)return;BUSY=true;
   (async()=>{let n=0,coins=0,fail=null;for(const it of list){let r;try{r=await RPC('item_sell',{p_id:it.id})}catch(e){r={error:e||{message:'network'}}}if(r.error){fail=r.error;break}const d=r.data||{};if(!d.ok)continue;n++;coins+=(+d.coins||0);if(d.balance!=null)S.gc=+d.balance;ITEMS=ITEMS.filter(x=>x.id!==it.id);ledger(it.label,+d.coins||0,where)}
-    BUSY=false;save();renderHud();if($('#sack').classList.contains('on'))renderSack();if(fail)toast(rpcFail(fail,'That did not sell.'));
+    BUSY=false;save();renderHud();if($('#sack').classList.contains('on'))renderSack();if(fail)chip(rpcFail(fail,'That did not sell.'));
     if(n){SND.buy(Math.min(16,n));floatGc(coins,null);toast('Sold '+(n===1?list[0].label.toLowerCase():plural(n,'thing'))+' \u00B7 '+coins.toLocaleString()+' gardencoin.')}updateAct()})().catch(()=>{BUSY=false;toast('That did not sell.')})}
 function fishCaught2(d){const name=String(d.fish||'fish');const it={id:+d.id,kind:'fish_'+name.replace(/ /g,'_'),label:name.replace(/\b\w/g,c=>c.toUpperCase()),worth:+d.worth||0,source:'fountain'};ITEMS.unshift(it);
   if(S.fountain){S.fountain.held=Math.max(0,(+d.held||1)-1);S.fountain.fish=Math.max(0,(S.fountain.fish||0)-1);S.fountain.next_s=d.next_s==null?null:+d.next_s;S.fountain.at=snow()}
@@ -5499,13 +5503,13 @@ function farmAct(){if(INSIDE||!FX.known||you.feet>=1)return false;const F=FARMER
   showAct(farmWords(i),null,i,null,VISIT?VISIT.handle+'\u2019s '+c.p:(p.wet?'\u201CWatered. Give it time.\u201D':'\u201CWater it and it comes on twice as quick.\u201D'),chips,at);return true}
 /* 6.18 watering the rows: once per sowing, halves the wait to the next harvest (stacks with irrigation); the can does it as you walk by, the launcher does the field */
 function farmThirsty(){if(!FX.owned||VISIT)return [];return Object.entries(FX.plots).filter(([k,p])=>{if(!farmCrop(p.crop)||p.wet)return false;const rp=farmRipe(p);return !rp.full}).map(([k])=>+k)}
-function farmWater(i,quiet){const p=FX.plots[i];if(!p||p.wet)return;const c=farmCrop(p.crop);if(!c)return;if(visitGuard('water here'))return;const rp=farmRipe(p);if(rp.full){if(!quiet){SND.knock();toast('That row is full. Pick it.')}return}
+function farmWater(i,quiet){const p=FX.plots[i];if(!p||p.wet)return;const c=farmCrop(p.crop);if(!c)return;if(visitGuard('water here'))return;const rp=farmRipe(p);if(rp.full){if(!quiet){SND.knock();chip('That row is full. Pick it.')}return}
   const secs=Math.ceil(rp.next/2)*(FX.irr?2:1);const P=FARM_PLOTS[i],[x,z]=farmW(P[0],P[1]);rain(x,z,3.4);SND.splash();p.wet=true;farmSoilPaint();
   const done=(srvAt)=>{if(srvAt>0)p.at=srvAt*1000;else p.at-=secs*1000;const r2=farmRipe(p);farmPlants();setTimeout(()=>SND.grow(),200);toast('Row '+(i+1)+' watered. '+c.n+' in '+mmss(r2.next)+'.'+(farmThirsty().length?' '+farmThirsty().length+' still thirsty.':''));updateAct()};
   if(!LIVE){const L=farmLocal().plots[i];if(L){L.at=(L.at||snow())-secs*1000;L.wet=true;save()}done();return}
   if(!PATCH78){p.wet=false;farmSoilPaint();toast('Run patch 78 on DEEDS first.');return}
   RPC('farm_water',{p_plot:i,p_secs:secs}).then(r=>{if(r.error){p.wet=false;farmSoilPaint();toast(farmFail(r.error,'That did not water.')||'Not done.');return}const q=(r.data||{}).plot||{};done(+q.sown_at||0)},()=>{p.wet=false;farmSoilPaint();toast('The farmer did not answer.')})}
-function farmWaterAll(){const th=farmThirsty();if(!th.length){SND.knock();toast('The field is watered.');return}th.forEach((i,k)=>setTimeout(()=>farmWater(i,true),160+k*140));LAUNCH.t=0;LAUNCH.h=0}
+function farmWaterAll(){const th=farmThirsty();if(!th.length){SND.knock();chip('The field is watered.');return}th.forEach((i,k)=>setTimeout(()=>farmWater(i,true),160+k*140));LAUNCH.t=0;LAUNCH.h=0}
 /* ---------- the doors ---------- */
 function farmFail(e,fb){const m=String(e&&e.message||e||'');if(/not_enough/.test(m))return null;if(/no_wallet/.test(m))return 'Your purse is not open yet. Walk the garden once.';if(/no_farm/.test(m))return 'Pay the farmer first.';if(/taken/.test(m))return 'That row is planted.';if(/not_yet/.test(m))return 'Not ripe yet.';if(/watered/.test(m))return 'That row is watered.';if(/full/.test(m))return 'That row is full. Pick it.';if(/empty/.test(m))return 'Nothing in that row.';if(/farm_water/.test(m)&&/not find|function|schema cache/i.test(m))return 'Run patch 78 on DEEDS first.';if(/not find|function|schema cache/i.test(m))return 'Run patch 75 on DEEDS first.';if(/owner_only|sign in/i.test(m))return rpcFail(e,fb);return 'The farmer said: '+(m||fb)}
 function farmBuy(){if(visitGuard('buy the field'))return;if(BUSY)return;
@@ -5526,7 +5530,7 @@ function farmSow(i,k){const c=farmCrop(k);if(!c||FX.plots[i])return;if(visitGuar
     const q=d.plot||{};const p={crop:k,at:(+q.sown_at||snow()/1000)*1000,est:!!q.est,variant:String(q.variant||''),picks:0,plot:i};FX.plots[i]=p;farmPlants();SND.sow();toast('Sown. '+c.n+' in row '+(i+1)+'. Ripe in '+mmss(Math.round(c.m/(FX.irr?2:1)))+'.');farmVariantCheer(p,c);updateAct()},()=>{BUSY=false;toast('The farmer did not answer.')})}
 function farmPick(i){const p=FX.plots[i];if(!p)return;const c=farmCrop(p.crop);if(!c)return;if(visitGuard('pick here'))return;if(BUSY)return;const P=FARM_PLOTS[i],[x,z]=farmW(P[0],P[1]);
   const done=(n,coins)=>{if(n>=c.cap)SND.allWatered();else SND.bloom();floatGc(coins,null);burst(x,1.0,z);toast('Picked. '+n+' '+c.p+(FARM_VAR[p.variant]?', '+FARM_VAR[p.variant].name.toLowerCase():'')+' \u00B7 '+coins.toLocaleString()+' gardencoin.');updateAct()};
-  if(!LIVE){const rp=farmRipe(p);if(rp.n<1){SND.knock();toast('Not ripe yet. '+mmss(rp.next)+'.');return}const mult=FARM_VAR[p.variant]?FARM_VAR[p.variant].mult:1;const coins=rp.n*c.w*mult;S.gc+=coins;const L=farmLocal().plots[i];L.at=snow();L.est=true;L.wet=false;L.picks=(L.picks||0)+rp.n;save();renderHud();farmFromLocal();done(rp.n,coins);return}
+  if(!LIVE){const rp=farmRipe(p);if(rp.n<1){SND.knock();chip('Not ripe yet. '+mmss(rp.next)+'.');return}const mult=FARM_VAR[p.variant]?FARM_VAR[p.variant].mult:1;const coins=rp.n*c.w*mult;S.gc+=coins;const L=farmLocal().plots[i];L.at=snow();L.est=true;L.wet=false;L.picks=(L.picks||0)+rp.n;save();renderHud();farmFromLocal();done(rp.n,coins);return}
   BUSY=true;RPC('farm_pick',{p_plot:i}).then(r=>{BUSY=false;if(r.error){toast(farmFail(r.error,'That did not pick.')||'Not enough.');return}const d=r.data||{};if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}
     const q=d.plot||{};p.at=(+q.sown_at||snow()/1000)*1000;p.est=true;p.picks=+q.picks||p.picks;p.wet=false;farmPlants();done(+d.n||0,+d.coins||0)},()=>{BUSY=false;toast('The farmer did not answer.')})}
 function farmClear(i){const p=FX.plots[i];if(!p)return;if(visitGuard('pull this up'))return;if(BUSY)return;
@@ -5690,7 +5694,7 @@ function hwRender(){const host=$('#hwRows');if(!host)return;host.innerHTML='';co
 function hwBuy(k){const it=HW_ITEMS.find(i=>i.k===k);if(!it||hwOwns(k))return;if(VISIT){visitGuard('buy decorations');return}
  if(!LIVE){if(reach()<it.gc){showShort(it.gc);return}payGc(it.gc);HW.own.add(k);hwLocalSave();save();renderHud();SND.buy(6);placeHW();hwRender();toast(it.n+' set. '+it.gc+' gardencoin.');return}
  if(BUSY)return;BUSY=true;hwRender();
- RPC('deco_buy',{p_kind:k}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(it.gc);else if(/not find|function|schema cache/i.test(m))toast('Run patch '+HW_PATCH+' on DEEDS first.');else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Morgana said: '+(m||'nothing')));hwRender();return}
+ RPC('deco_buy',{p_kind:k}).then(r=>{BUSY=false;if(r.error){const m=String(r.error.message||'');if(/not_enough/.test(m))showShort(it.gc);else if(/not find|function|schema cache/i.test(m))toast('Run patch '+HW_PATCH+' on DEEDS first.');else chip(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Morgana said: '+(m||'nothing')));hwRender();return}
   const d=r.data||{};if(Array.isArray(d.kinds))HW.own=new Set(d.kinds);HW.own.add(k);if(typeof d.balance==='number'){S.gc=d.balance;save();renderHud()}SND.buy(6);placeHW();hwRender();toast(d.already?it.n+' were set already.':it.n+' set. '+it.gc.toLocaleString()+' gardencoin.')},e=>{BUSY=false;toast('Morgana said: '+String(e&&e.message||e||'nothing'));hwRender()})}
 /* the tick: after dark the pumpkins light, the purple comes up, the bulbs twinkle, the bats fly; inside the cauldrons fog and the ghosts drift */
 function hwTick(t,dt){if(!HW.on)return;const night=ph==='night'||ph==='dusk';const dark=night?1:ph==='golden'?0.35:0;HW.night=night;
@@ -6080,7 +6084,7 @@ const HANK=new THREE.Group();HANK.visible=false;scene.add(HANK);
 const HANK_AT={x:13.6,z:3.2};
 function hankPlace(){const v=new THREE.Vector3(HANK_AT.x,0,HANK_AT.z);HG.localToWorld(v);GA.x=v.x;GA.z=v.z;
  HANK.position.set(v.x,floorAtW(v.x,v.z),v.z);HANK.rotation.y=HG.rotation.y+Math.atan2(0-HANK_AT.x,9-HANK_AT.z);
- HANK.visible=!VISIT&&houseLvl()>=1}
+ HANK.visible=!VISIT&&houseLvl()>=1&&!gaHas();}   /* 6.38: he is done once the garage is up */
 /* the shop */
 function openGaShop(){$('#gaShop').classList.add('on');gaRender()}
 function closeGaShop(){$('#gaShop').classList.remove('on')}
@@ -6093,8 +6097,8 @@ function gaRender(){const host=$('#gaRows');if(!host)return;host.innerHTML='';co
  const bal=$('#gaBal');if(bal)bal.textContent=(S.gc|0).toLocaleString()+' gardencoin';
  const sub=$('#gaSub');if(sub)sub.textContent=has?'Six bays. The mower has the first. Walk up to a car and drive it out.':'Five thousand, and it is up by the afternoon. Six bays and a weathervane.'}
 function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(VISIT){visitGuard(it.house?'buy for the house':it.yard?'buy the garden':'buy the garage');return}
- if(it.house&&houseLvl()<3){SND.knock();toast('The mansion first.');return}
- if(!it.yard&&!it.house&&k!=='garage'&&!gaHas()){SND.knock();toast('The garage first.');return}
+ if(it.house&&houseLvl()<3){SND.knock();chip('The mansion first.');return}
+ if(!it.yard&&!it.house&&k!=='garage'&&!gaHas()){SND.knock();chip('The garage first.');return}
  const done=()=>{GA.own.add(k);gaLocalSave();SND.buy(8);placeGA();gaRender();renderHud();
   if(it.yard){gdnStart(k);return}
   if(it.house){SND.tier();flPlace(true);toast(k==='florist'?'Rosie is in the hall. Every vase is full, and stays full.':it.n.replace(/^A |^An /,'')+' stands in the house'+(flHas()?', and Rosie has already filled it.':'. Empty until the florist comes.'));return}
@@ -6106,7 +6110,7 @@ function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(V
    if(/not_enough/.test(m))showShort(it.gc);
    else if(/not find|function|schema cache|no_such_kind/i.test(m))toast('Run patch '+(it.house?FL_PATCH:it.yard?GDN_PATCH:GA_PATCH)+' on DEEDS first.');
    else if(/no_garage/.test(m))toast('The garage first.');
-   else toast(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Hank said: '+(m||'nothing')));
+   else chip(rpcFail(r.error,/no_wallet/.test(m)?'Your purse is not open yet. Walk the garden once.':'Hank said: '+(m||'nothing')));
    gaRender();return}
   const d=r.data||{};if(Array.isArray(d.kinds))GA.own=new Set(d.kinds);
   if(typeof d.balance==='number'){S.gc=d.balance;save()}ledger(it.n,-it.gc,'Hank');done()},
@@ -6269,7 +6273,7 @@ function gdnTick(t,dt){if(!GDB.k)return;
  if(F.body)F.body.rotation.x=0.12+Math.sin(t*4.2)*0.06;
  if(F.head)F.head.rotation.x=0.25}
 
-window.__walk={FL_VASES,FL_ROWS,FL_PATCH,ROSIE_AT,ROSIE:()=>ROSIE,FLG,flPlace,flAct,flTalk,flTick,flVase,flBuildRosie,flOwned,flHas,flVasesOwned,GDN,GDR,GDP,GDPW,GDPR,GDM,GDB,GWALK,GROSE,GDN_ROWS,GA_ALL,gdnBuild,gdnRun,gdnCone,gdnFlowers,gdnMark,gdnVis,gdnU,gdnStart,gdnDone,gdnTick,gdnOwns,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,ljCount,readyOaks,lumberAt,woodSold,estateDone,LJ_BASE,BORROW:()=>BORROW,borrowSeats,syncBorrow,borrowBase,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
+window.__walk={FL_VASES,FL_ROWS,FL_PATCH,ROSIE_AT,ROSIE:()=>ROSIE,FLG,flPlace,flAct,flTalk,flTick,flVase,flBuildRosie,flOwned,flHas,flVasesOwned,GDN,GDR,GDP,GDPW,GDPR,GDM,GDB,GWALK,GROSE,GDN_ROWS,GA_ALL,gdnBuild,gdnRun,gdnCone,gdnFlowers,gdnMark,gdnVis,gdnU,gdnStart,gdnDone,gdnTick,gdnOwns,placeGarden,GA,GA_CARS,GA_ROWS,GA_SPEC,GA_GC,GARG,GACAR,GADOOR,HANK,HANK_AT,gaBuild,gaCar,gaCarBuild,gaCarNear,gaBayL,gaBayW,gaFrontW,gaHas,gaOwns,gaMark,placeGA,gaSync,gaBuy,gaRender,openGaShop,closeGaShop,gaTick,hankPlace,carRide,carEngineOn,carEngineOff,rideToggle,rideOff,rideSp,rideSit,RIDE:()=>RIDE,HW,HW_ITEMS,HWO,HWI,HWL,WITCH,hwSeason,placeHW,hwSync,hwBuy,openHwShop,closeHwShop,hwTick,hwWitchPlace,GEYSER,GEY_S,GEY_R,geyserFire,geyserHeat,fountainInCone,tickGeyser,GEYG,INST,INST_AT,SAMP,DRUM_SND,DKITS,DSTICKS,DLESSONS,DMIDI,dKit,dKitIx,dPads,dSetKit,dStick,dStickIx,dOwnsKit,dCleared,dPasses,dStars,dOpen,dMine,dCharAt,drmStart,drmStop,drmHit,drmHold,drmTick,drmAdvance,drmListPaint,drmPaintBar,drmHud,drmBuy,drmMidiChip,DS:()=>DS,DX:()=>DX,setDS:v=>{DS=v},placeInst,instAct,instBuy,instPlay,instStop,instPaint,instHit,instRemote,instFlash,harpNotes,CHORDS,FARM_AT,FARM_PLOTS,CROPS,FX,farmRipe,farmBuild,farmPlace,farmPlants,farmAct,farmBuy,farmIrrigate,farmSow,farmPick,farmClear,openFarmSheet,farmSync,farmHydrate,farmW,farmL,FARMER:()=>FARMER,FARMG:()=>FARMG,MOUNTG:()=>MOUNTG,farmStands:()=>FARM_STANDS,farmGlow:()=>FARM_GLOW,farmWater,farmWaterAll,farmThirsty,farmVeg:()=>FARM_VEG,farmSoil:()=>FARM_SOIL,farmWetSync,patch78:()=>PATCH78,setPatch78:v=>{PATCH78=v},FURROWS,farmLayout,patch75:()=>PATCH75,setPatch75:v=>{PATCH75=v},CHESS_AT,CHX,placeChess,chessAct,chessBuy,chessSync,buildChessTable,buildChessPortrait,CHESSG:()=>CHESSG,CHPORT:()=>CHPORT,PIANO_SND,pianoSit,pianoStand,placePiano,pianoAct,pianoBuy,pianoUpgrade,SONGS,songPlay,songStop,songHit,songSection,songHands,songSteps,songSecs,SONG:()=>SONG,PX:()=>PX,setPX:v=>{PX=v;pxSave()},placePortraits,placeMozart,MOZART_SHEETS,pianoSync,pxMerge,pxPush,ownerPX:()=>OWNER_PX,patch73:()=>PATCH73,setPatch73:v=>{PATCH73=v},PORTG,PORTRAITS,buildPortrait,standInTex,SEATED:()=>SEATED,PKEYS:()=>PKEYS,PIANOG:()=>PIANOG,ROOM:()=>WROOM,bindSeat,SEATXZ,BOUND:()=>BOUND,roomWords,VISIT:()=>VISIT,RPC,joinGarden,leaveGarden,onPresence,onPos,onAct,FR,PRESENCE:()=>PRESENCE,openFriends,announce,handle:()=>MYHANDLE,setHandle:h=>{MYHANDLE=h},makeGardener,SKELS,skelEat,ripeBeds,handList,chestList,inHand,handAdd,openChestPick,closeChestPick,pick:()=>PICK,CHEST_AT,ownerHand:()=>OWNER_HAND,GATE,actWords,showAway,go:(x,z,yaw,pitch)=>{you.x=x;you.z=z;you.yaw=yaw||0;you.face=yaw||0;you.pitch=pitch==null?-0.36:pitch;you.feet=floorAt(x,z);you.grounded=true;you.vx=you.vz=0},you,AV,cam:()=>camera.position.toArray(),lock:LOCK,anchor:()=>ANCHOR,rayHit,bedAt,bedDist,dig:()=>DIGSHOW,BED,MARKET3,fountainNow,plinthsOpen,quadrantsFull,sellFlowers,sellFish,catchFish,payGc,rate:()=>RATE,gc:()=>S.gc,setGc:v=>{S.gc=v;save();renderHud()},setSprung,sprung:()=>SPRUNG,picking:PICKING,calibrate,batch:()=>FISH_BATCH,setTool,tool:()=>TOOL,fireRocket,fireLauncher,openChest,chopTree,deliverWood,OAKS,RINGS,TREEPOS,TREE,plantTree,waterTree,ringsOpen,nextRing,ringsPlanted,growLeft,treeProg,planted,ringOpen,patch47:()=>PATCH47,HOUSE,CHEST,chestSpot,treesAwake,ripeIn,thirstyHalf,QC,quadHere,running:()=>RUNNING,buyTool,openSack,renderHouse,STAGE,sawTree,SAWG,SAW,sawFound,ROCKETS,renderTrees,BUILDER,patch46:()=>PATCH46,patch50:()=>PATCH50,patch51:()=>PATCH51,patch52:()=>PATCH52,blowBubbles,flyKite,KITE,BUBBLES,BUBMESH,fountainDive,DIVE,patch53:()=>PATCH53,COMPASS,readCompass,GUIDE,GLIM,CUT,cutStart,cutEnd,fellWild,CHEST_TOYS,houseLvl,wildOk,WILD_LVL,FIRST_GC,WILD,WILDCUT:()=>WILDCUT,WILDFALL,wildNear,wildLeft,wildBoot,STUMPS,PACKS,hasPack,makePack,attachPack,setPack,wearPack,buyPack,anyPack,woodCap,paintHotbar,renderFan,paintWood,trunkLeft,patch55:()=>PATCH55,worn:()=>S.worn,sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},project:(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(camera);return [(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z]},actEl,phase:n=>{ph=n;PHPIN=Date.now()+180000;applyPhase()},estate:{EST,houseLocked,lockLeft,lockHouse,sprinklerBuy,gardenerHire,gardenerDeath,gardPrey,GARD,GARDS,gardAlive,fenceBuy,placeFence,FENCEG,CORRAL,nightClock,lumberHire,lumberDeath,ljAlive,ljCount,readyOaks,lumberAt,woodSold,estateDone,LJ_BASE,BORROW:()=>BORROW,borrowSeats,syncBorrow,borrowBase,nums:()=>[CHOPS,HOUSE_TIERS,SAPLING_GC],friendTool,friendKite,SPRG,killBeast,killsTonight,tonightBeast,nightDone,floatGc,sawStrike,flameStrike,beastNear,setBeast:b=>{BEAST_SRV=b},estateTickLocal,estateHydrate,estateCards,livePhase,dayT,clockTick,toNight,nightWarn,warned:()=>WARNED,pin:v=>{PHPIN=v}},floorAt,S:()=>S,act,updateAct,openStore,cartAdd,sowAt,waterAt,pickAt,digAt,ripe,plantBeds,tapAt,setCan,thirsty,canTick,can:()=>CAN,live:()=>LIVE,setSow:t=>{SOWT=t},buyThing,chipThing,SPOTS,FLORIST,STAND,bedLabel,snow,dressToy,loadLook,look:()=>LOOK,toy:()=>!!AV.toy,trackMe,lookFromRows,WOLVES,LEP,goHome,paintHome,lepDrop,lepCaught,lepGiggle,blood,flameToggle,flameSweep,treeFireTick,flameOn:()=>FLAME.on,treeFire:()=>TREEFIRE,KS:()=>KS,drive:()=>DRIVE,swingSword,takeSword,burnAt,hearts:()=>HEARTS,setHearts:n=>{HEARTS=n},dying:()=>DYING,wolfBite,wolfDeath,SWORDG,FLAMEG,SWORDWALL,SWORD_AT,raids:()=>RAIDS,patch61:()=>PATCH61,inside:()=>INSIDE,enterHouse,leaveHouse,setPh:n=>{ph=n},ph:()=>ph,BALLOON,balloonTick,CHEST_SPOTS,PORTAL,portalGo,portalTick,FLAGP,flagTick,FLAGG:()=>FLAGG,FLAGF:()=>FLAGF,WILD:()=>WILD,setInside:v=>{INSIDE=v},act:()=>ACT,act_:act,patch69:()=>PATCH69,wx:()=>WX,setWx:w=>{WX=w},prices:()=>PRICES,items:()=>ITEMS,levels:()=>LEVELS,hydrate69,applyWeather,wxTick,paintWx,wxDayTick,fishItems,fishWorth,sellItems,bedUpgrade,paintLevels,chestFound,chestTick,chestLeft,chestNext:()=>CHEST_NEXT,setChestNext:v=>{CHEST_NEXT=v},floraWorth,floraSay,goldenNow,chip,roomEnter,roomStart,pickExtras,fishCaught2,rainPts:()=>RAINPTS,P69};
 
 applyPhase();
 you.feet=floorAt(you.x,you.z);plantBeds();renderThings();renderPlinths();setSprung(!!(S.fountain&&S.fountain.sprung));placeChest();renderTrees();renderHouse();showMower();paintBundle();paintBar();renderHud();labels();updateAct();
