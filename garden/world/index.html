@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.38">
+<meta name="world-build" content="6.39">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -1779,7 +1779,7 @@ const gcv=x=>Math.round(x*RATE);                  /* a Deedcoin price or worth i
 const reach=()=>S.gc+Math.floor(S.coins*RATE);   /* the most you can pay: gardencoin, then every Deedcoin you hold */
 const today=()=>new Date().toISOString().slice(0,10);
 const store={g:{},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){this.g[k]=v}},get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):this.g[k]}catch(e){return this.g[k]}}};
-const fresh=()=>({deeds:0,coins:START_COINS,gc:0,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[],fountain:null});
+const fresh=()=>({deeds:0,coins:START_COINS,gc:5000,sack:{},bank:0,plants:{},pads:{},flags:{},ledger:[{t:Date.now(),l:'Starter coins',w:'the purse opens',a:START_COINS}],earned:0,sent:0,gifts:[],fountain:null});
 let S=store.get('garden')||null;
 if(!S||typeof S!=='object')S=fresh();
 if(S.daily!==undefined||S.water!==undefined||S.grewOn!==undefined)S=fresh();
@@ -2411,7 +2411,7 @@ function lepGrab(){if(DYING||INSIDE)return;HEARTS=Math.max(0,HEARTS-1);REGEN=0;S
   if(HEARTS<=0){lepDeath();return}toast(HEARTS===2?'A leprechaun got you. Two hearts left. Run.':'One heart left. Get inside or get clear.')}
 function lepDeath(){if(DYING)return;DYING=true;paintHearts();hideAct();$('#dead').firstElementChild.textContent='The leprechauns got you.';$('#deadLine').textContent='you took his gold three times too many';$('#dead').classList.add('on');
   setTimeout(()=>{$('#dead').classList.remove('on');$('#dead').firstElementChild.textContent='The wolves got you.';if(INSIDE)leaveHouse();you.x=DOORW.x;you.z=DOORW.z+1.2;you.feet=floorAtW(you.x,you.z);you.vx=you.vz=you.vy=0;you.grounded=true;you.yaw=Math.PI;you.face=Math.PI;
-    HEARTS=3;DYING=false;RAGE.scatter(you.x,you.z,4);paintHearts();refresh();toast('You wake at your own front door. They are still out there. '+mmss(RAGE.left())+' to go. Get inside.')},2800)}
+    HEARTS=3;DYING=false;RAGE.end(true);lepGiggle();paintHearts();refresh();chip('Once was enough. They giggle and vanish into the wood.')},2800)}
 function rageTick(t,dt){if(!RAGE.on())return;RAGE.tick(t,dt,{x:you.x,z:you.z,inside:INSIDE,dying:DYING,door:{x:DOORW.x,z:DOORW.z},onGrab:lepGrab,onNear:()=>{lepGiggle()},
   onLost:()=>{toast('You lost them. They are prowling the garden. Keep your distance.')},onFound:()=>{lepGiggle();toast('They found you. RUN.')}})}
 
@@ -5747,7 +5747,7 @@ const FL_VASES=[
  {k:'vase_bedroom', n:'A vase for the bedroom',     fl:1,lv:1,x:-8.3, y:INTERIOR.H.UF+0.7, z:4.2,  vase:'jug',     fw:'tulip',     d:'A little blue and white jug on the dresser. Tulips.'},
  {k:'vase_gallery', n:'A vase for the gallery',     fl:1,lv:2,x:-0.6, y:INTERIOR.H.UF+0.48,z:4.8,  vase:'bowl',    fw:'hydrangea', d:'A black lacquer bowl on the console upstairs. Hydrangeas.'}];
 const FL_ROWS=FL_VASES.map(v=>({k:v.k,n:v.n,gc:3000,house:1,d:v.d})).concat([
- {k:'florist',n:'The florist',gc:20000,house:1,d:'Rosie keeps every vase in the house fresh and full, forever. Until she comes, the vases stand empty.'}]);
+ {k:'florist',n:'The florist',gc:20000,house:1,d:'Every vase in the house kept fresh and full, forever. Until then they stand empty.'}]);
 const FLMAT={
  skin:new THREE.MeshStandardMaterial({color:0xF2C9A0,roughness:0.85}),
  hair:new THREE.MeshStandardMaterial({color:0x5B3A22,roughness:0.9}),
@@ -5843,8 +5843,7 @@ function flPlace(force){const L=roomLevels(),full=flHas();
  if(!force&&sig===FL_SIG)return;FL_SIG=sig;
  FL_VASES.forEach(v=>{if(FLG[v.k]){INTERIOR.scene.remove(FLG[v.k]);FLG[v.k]=null}
   if(flOwned(v.k)&&L[v.fl]>=v.lv){FLG[v.k]=flVase(v,full);INTERIOR.scene.add(FLG[v.k])}});
- if(full){if(!ROSIE){ROSIE=flBuildRosie();ROSIE.position.set(ROSIE_AT.x,0,ROSIE_AT.z);ROSIE.rotation.y=0;INTERIOR.scene.add(ROSIE)}ROSIE.visible=true}
- else if(ROSIE)ROSIE.visible=false}
+ if(ROSIE){ROSIE.visible=false}}
 const FL_LINES=['Fresh this morning. Every one of them.','Peonies do not last, so I bring more.','I was up at five for these.','Your roses are the best in the garden. I only cut the best.','Smell that. That is the lavender.','Nobody sees the hall vase and does not smile.','The delphiniums wanted the tall urn. I gave in.','Six vases. I know each one by name.'];
 let FL_LINE=0;
 function flAct(){if(you.feet>=1||!ROSIE||!ROSIE.visible)return false;const d=Math.hypot(you.x-ROSIE_AT.x,you.z-ROSIE_AT.z);if(d>2.4)return false;
@@ -6101,7 +6100,7 @@ function gaBuy(k){const it=GA_ALL.find(r=>r.k===k);if(!it||gaOwns(k))return;if(V
  if(!it.yard&&!it.house&&k!=='garage'&&!gaHas()){SND.knock();chip('The garage first.');return}
  const done=()=>{GA.own.add(k);gaLocalSave();SND.buy(8);placeGA();gaRender();renderHud();
   if(it.yard){gdnStart(k);return}
-  if(it.house){SND.tier();flPlace(true);toast(k==='florist'?'Rosie is in the hall. Every vase is full, and stays full.':it.n.replace(/^A |^An /,'')+' stands in the house'+(flHas()?', and Rosie has already filled it.':'. Empty until the florist comes.'));return}
+  if(it.house){SND.tier();flPlace(true);toast(k==='florist'?'Every vase in the house is full, and stays full.':it.n.replace(/^A |^An /,'')+' stands in the house'+(flHas()?', and Rosie has already filled it.':'. Empty until the florist comes.'));return}
   if(k==='garage'){setTimeout(()=>SND.carved(),700);[0,260,520].forEach(ms=>setTimeout(()=>SND.chip(),ms));toast('The garage is up. Six bays, and the mower has a home.')}
   else{SND.tier();toast(it.n+' is in bay '+(GA_ROWS.indexOf(it)+1)+'. Walk up to it and drive it out.')}};
  if(!LIVE){if(reach()<it.gc){showShort(it.gc);return}payGc(it.gc);save();done();return}
