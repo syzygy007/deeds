@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="blast-build" content="2.0">
+<meta name="blast-build" content="2.1">
 <title>Wolf Blast</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
@@ -248,6 +248,8 @@ function partTick(dt){for(var k=0;k<PN;k++){if(pLife[k]<=0)continue;pLife[k]-=dt
   pVel[j+1]-=pG[k]*dt;pPos[j]+=pVel[j]*dt;pPos[j+1]+=pVel[j+1]*dt;pPos[j+2]+=pVel[j+2]*dt;
   if(pPos[j+1]<pFloor[k]&&pG[k]>0){pPos[j+1]=pFloor[k];pVel[j+1]*=-.45;pVel[j]*=.7;pVel[j+2]*=.7}}
   pGeo.attributes.position.needsUpdate=true;pGeo.attributes.color.needsUpdate=true}
+function spray(x,y,z,dx,dz,n){var fl=hAt(x,z)+.08;for(var i=0;i<n;i++){var k=pi;pi=(pi+1)%PN;var v=rnd(3,9),sx=dx+rnd(-.45,.45),sz=dz+rnd(-.45,.45),r=rnd(.55,1);
+  pPos[k*3]=x;pPos[k*3+1]=y+rnd(-.15,.2);pPos[k*3+2]=z;pVel[k*3]=sx*v;pVel[k*3+1]=rnd(.5,4.5);pVel[k*3+2]=sz*v;pCol[k*3]=.78*r;pCol[k*3+1]=.03*r;pCol[k*3+2]=.06*r;pLife[k]=rnd(.5,1.1);pG[k]=17;pFloor[k]=fl}}
 var BOOMS=[];
 for(var b0=0;b0<8;b0++){var bm=new THREE.Mesh(new THREE.SphereGeometry(1,14,10),B(0xffb24a,{transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));bm.visible=false;bm.t=0;scene.add(bm);BOOMS.push(bm)}
 function boomFx(x,y,z,r,col){var b=BOOMS.shift();BOOMS.push(b);b.position.set(x,y,z);b.t=.38;b.r=r;b.material.color.set(col||0xffb24a);b.visible=true;
@@ -337,8 +339,18 @@ function tone(type,f0,f1,dur,vol,when){if(!AC)return;var t=(when||AC.currentTime
  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(BUS);o.start(t);o.stop(t+dur+.02)}
 function noise(dur,vol,f0,f1,when){if(!AC)return;var t=(when||AC.currentTime),s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();s.buffer=NOISE;f.type='lowpass';f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),t+dur);
  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(BUS);s.start(t);s.stop(t+dur+.02)}
+function band(dur,vol,f,q,when){if(!AC)return;var t=(when||AC.currentTime),b=AC.createBufferSource(),g=AC.createGain(),fl=AC.createBiquadFilter();b.buffer=NOISE;fl.type='bandpass';fl.frequency.value=f;fl.Q.value=q;
+ g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);b.connect(fl);fl.connect(g);g.connect(BUS);b.start(t,Math.random()*.5);b.stop(t+dur+.02)}
 var SND={
- shot:function(){noise(.3,1,5200,300);tone('triangle',220,60,.16,.7);tone('sine',150,38,.22,.9);if(AC)noise(.05,.25,6000,3000,AC.currentTime+.2)},
+ shot:function(){if(!AC)return;var t=AC.currentTime,dt=(Math.random()-.5)*.08;
+  band(.035,1,3400,1.2,t);                         /* the crack */
+  noise(.34,1,6500*(1+dt),170,t);                  /* the blast */
+  tone('sine',125*(1+dt),30,.3,1,t);               /* the thump in the chest */
+  tone('square',92,44,.1,.3,t);                    /* bark */
+  noise(.75,.2,1100,110,t+.05);                    /* it rolls off down the hollow */
+  band(.03,.5,1750,7,t+.17);tone('square',410,300,.025,.12,t+.17);   /* chk */
+  band(.035,.6,2500,7,t+.26);tone('square',620,430,.025,.14,t+.26)}, /* chk */
+ splat:function(){if(!AC)return;var t=AC.currentTime;band(.09,.5,650+Math.random()*300,1.4,t);tone('sine',170,70,.07,.3,t)},
  pop:function(m){var f=520*Math.pow(2,Math.min(m,10)/12);tone('triangle',f,f*1.9,.09,.35);if(AC)tone('triangle',f*2,f*2.6,.1,.22,AC.currentTime+.06)},
  coin:function(){tone('square',1318,1318,.05,.1);if(AC)tone('square',1760,1760,.12,.1,AC.currentTime+.05)},
  bite:function(){tone('sawtooth',210,70,.22,.4);noise(.14,.3,900,200)},
@@ -402,7 +414,7 @@ function addScore(base,x,y,z,big){var m=S.combo*(S.pick==='double'?2:1),pts=base
 function kill(w,dx,dz,chain){if(!w.alive)return;w.alive=false;w.dying=.22;w.kx=dx*16;w.kz=dz*16;
  var T=w.T,y=w.y+(w.t==='boss'?2.6:.9*T.sc);
  S.kills++;var c0=S.combo;if(S.ct>0)S.combo=Math.min(10,S.combo+1);S.ct=COMBO_S;if(S.combo!==c0){if(S.combo===5)banner('ON FIRE.','#ff9a3c');if(S.combo===10)banner('UNSTOPPABLE.','#7df9ff')}if(S.combo>S.best)S.best=S.combo;
- addScore(T.pts,w.x,y+1,w.z);SND.pop(S.combo);SND.coin();
+ addScore(T.pts,w.x,y+1,w.z);SND.pop(S.combo);SND.coin();if(!chain){spray(w.x,y,w.z,dx,dz,w.t==='pup'?8:16);SND.splat()}
  puff(w.x,y,w.z,w.t==='pup'?10:22,0xffd84a,7,5,16,1.5);puff(w.x,y,w.z,10,T.col,5,3,7,.7);
  S.shake=Math.max(S.shake,w.t==='pup'?.03:.09);
  if(S.kills%12===0&&S.hp<HEARTS){S.hp++;floatAt('♥',w.x,y+1.8,w.z,true);SND.pick()}
@@ -414,7 +426,7 @@ function explode(x,z,r,src){var gy=hAt(x,z);boomFx(x,gy+1.2,z,r);SND.boom();S.sh
  for(var i=WOLVES.length-1;i>=0;i--){var w=WOLVES[i];if(!w||!w.alive||w===src||w.state)continue;var dx=w.x-x,dz=w.z-z,d=Math.sqrt(dx*dx+dz*dz);if(d<r+w.T.r){d=d||1;if(w.t==='boss'){hurt(w,4,dx/d,dz/d)}else{kill(w,dx/d,dz/d,true);n++}}}
  PROPS.forEach(function(p){if(p.on&&p.k==='barrel'){var dx=p.x-x,dz=p.z-z;if(dx*dx+dz*dz<r*r&&(dx||dz)){p.on=false;p.g.visible=false;setTimeout(function(){if(S.mode==='play')explode(p.x,p.z,8)},140)}}});
  if(n>=4)banner(n+' IN ONE.','#ff9a3c');return n}
-function hurt(w,n,dx,dz){w.hp-=n;w.kx+=dx*5;w.kz+=dz*5;w.flash=.12;puff(w.x,w.y+(w.t==='boss'?2.6:1),w.z,8,0xffffff,5,2,8,.4);
+function hurt(w,n,dx,dz){w.hp-=n;w.kx+=dx*5;w.kz+=dz*5;w.flash=.12;puff(w.x,w.y+(w.t==='boss'?2.6:1),w.z,6,0xffffff,5,2,8,.4);spray(w.x,w.y+(w.t==='boss'?2.6:1),w.z,dx,dz,10);
  if(w.hp<=0)kill(w,dx,dz);else{tone('square',180,120,.07,.25);S.shake=Math.max(S.shake,.12)}}
 function bossDown(w){S.bossDead=true;S.slow=.25;S.slowT=1.2;boomFx(w.x,w.y+2.6,w.z,9,0xd58bff);SND.boom();puff(w.x,w.y+2.6,w.z,120,0xffd84a,14,9,14,2.6);S.shake=1;
  banner('THE WEREWOLF IS DOWN.','#d58bff',3);S.endT=3.4;
