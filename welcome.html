@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Deedable. Do anonymous good.</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="https://deedable.fun/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<meta name="apple-mobile-web-app-title" content="Deedable">
+<script>
+/* a member who is already signed in never needs the front door: a home screen icon saved from this page goes straight into the app */
+(function(){try{if(/[?&]c=/.test(location.search))return;var k,i,inn=false;for(i=0;i<localStorage.length;i++){k=localStorage.key(i);if(/^sb-.+-auth-token$/.test(k)&&localStorage.getItem(k)){inn=true;break}}
+if(!inn)return;try{sessionStorage.setItem('deeds_welcomed','1')}catch(e){}location.replace('/'+location.search)}catch(e){}})();
+</script>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deedable.">
 <meta property="og:title" content="Do anonymous good.">
