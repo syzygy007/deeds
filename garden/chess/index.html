@@ -169,6 +169,7 @@ return {start:start,legal:legal,make:make,status:status,inCheck:inCheck,pick:pic
 
 </script>
 <script>
+const BACK=new URLSearchParams(location.search).get('from')==='cave'?'../cave/?from=chess':'../world/?in=house';[['gateback'],['garden']].forEach(function(x){var e=document.getElementById(x[0]);if(e){e.href=BACK;if(BACK.indexOf('cave')>0)e.textContent='Back to the cave'}});
 /* ---------- the engine runs here for the rules and in a worker for the opponent ---------- */
 const ENG=document.getElementById('eng').textContent;new Function(ENG+';window.CH=CH')();
 let WORKER=null;try{WORKER=new Worker(URL.createObjectURL(new Blob([ENG+';onmessage=function(e){var d=e.data;var r=CH.pick(d.s,d.level,d.seed);postMessage({id:d.id,r:r})}'],{type:'text/javascript'})))}catch(e){WORKER=null}
@@ -553,13 +554,13 @@ $('#go').addEventListener('click',()=>{SFX.unlock();
   $('#gate').style.display='none';openLevels()});
 function paintPurse(bal){if(bal==null)return;const el=$('#purse');el.style.display='';el.textContent=bal.toLocaleString()+' gc';try{localStorage.setItem('deeds_gc',String(bal))}catch(e){}}
 $('#bnew').addEventListener('click',()=>{if(MODE==='friend'&&GAMEON&&!OVER){$('#quit').style.display='flex';return}openLevels()});
-$('#garden').addEventListener('click',e=>{if(MODE==='friend'&&GAMEON&&!OVER){e.preventDefault();frResign();setTimeout(()=>{location.href='../world/?in=house'},350)}});
+$('#garden').addEventListener('click',e=>{if(MODE==='friend'&&GAMEON&&!OVER){e.preventDefault();frResign();setTimeout(()=>{location.href=BACK},350)}});
 $('#lvback').addEventListener('click',()=>{$('#levels').style.display='none';if(!GAMEON&&!OVER)line('Sit down whenever you like.','new game to start')});
 $('#again').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');if(MODE==='friend'){const f=FR;if(f){$('#levels').style.display='none';invite({id:f.id,handle:f.handle})}else openLevels();return}newGame(LEVEL)});
 $('#tothewall').addEventListener('click',()=>{$('#end').style.display='none';$('#tothewall').classList.remove('gold');CAM.mode='wall';$('#bwall').textContent='The board';line('Tap a painting.','')});
 $('#bwall').addEventListener('click',()=>{if(CAM.mode==='board'){CAM.mode='wall';CAM.yaw=0;$('#bwall').textContent='The board';line('Tap a painting.','')}else{CAM.mode='board';CAM.yaw=0;CAM.pitch=0;$('#bwall').textContent='The wall';line(GAMEON?(BUSY?LEVEL.name+' is thinking.':(STATE.turn===MYC?'Your move.':LEVEL.name+' is thinking.')):'New game to start.','')}});
 $('#rank').addEventListener('click',()=>{if(CAM.mode!=='wall'){$('#bwall').click()}});
-$('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href='../world/?in=house'});
+$('#bleave').addEventListener('click',()=>{if(GAMEON&&!OVER)$('#quit').style.display='flex';else location.href=BACK});
 $('#stay').addEventListener('click',()=>{$('#quit').style.display='none'});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#view').style.display==='block')$('#close').click();else if($('#quit').style.display==='flex')$('#stay').click()}});
 
