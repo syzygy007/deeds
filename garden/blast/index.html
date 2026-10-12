@@ -89,7 +89,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#050814;color:#fff;fon
   <div id="wrow"><button class="wb" id="w0"><b>THE HOLLOW</b><u></u></button><button class="wb" id="w1"><b>THE GRAVEYARD</b><u></u></button><button class="wb" id="w2"><b>THE PYRAMID</b><u></u></button><button class="wb" id="w3"><b>THE TOMB</b><u></u></button></div>
   <p id="how">60 SECONDS. BLAST EVERYTHING WITH EYES.</p>
   <button class="btn" id="play">PLAY</button>
-  <div style="display:flex;gap:26px;flex-wrap:wrap;justify-content:center"><a class="lnk" id="partyb">PLAY TOGETHER</a><a class="lnk" id="shopb">THE SHOP</a><a class="lnk" id="home1">BACK TO THE GARDEN</a></div>
+  <div style="display:flex;gap:26px;flex-wrap:wrap;justify-content:center"><a class="lnk" id="partyb">PLAY TOGETHER</a><a class="lnk" id="shopb">THE SHOP</a><a class="lnk" id="home1">BACK TO THE CAVE</a></div>
 </div>
 
 <div class="card" id="shop" style="display:none">
@@ -136,7 +136,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#050814;color:#fff;fon
   <button class="btn" id="next">NEXT</button>
   <button class="btn" id="again">RUN IT BACK</button>
   <a class="lnk" id="worlds">PICK A WORLD</a>
-  <a class="lnk" id="home2">BACK TO THE GARDEN</a>
+  <a class="lnk" id="home2">BACK TO THE CAVE</a>
 </div>
 <div id="err"></div>
 
@@ -149,7 +149,7 @@ var QS=new URLSearchParams(location.search);
 var TEST=QS.get('test')==='1';
 var $=function(id){return document.getElementById(id)};
 var TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-var HOME='../world/?from=blast';
+var HOME='../cave/?from=blast';
 $('home1').href=HOME;$('home2').href=HOME;
 $('how').textContent=TOUCH?'FOLLOW THE LIGHT. FOUR PACKS AND A BOSS IN EVERY WORLD. LEFT THUMB RUNS, RIGHT THUMB AIMS AND FIRES. WALK OVER A GLOWING GUN TO TAKE IT.':'FOLLOW THE LIGHT. FOUR PACKS AND A BOSS IN EVERY WORLD. WASD RUNS, MOUSE AIMS, CLICK OR SPACE FIRES. WALK OVER A GLOWING GUN TO TAKE IT.';
 
