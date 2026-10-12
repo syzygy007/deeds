@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="world-build" content="6.42">
+<meta name="world-build" content="6.43">
 <title>The Garden · Walk</title>
 <style>
 :root{--ink:#15130E;--ivory:#F6F3EB;--gold:#C9A227;--green:#2F4A34}
@@ -254,6 +254,7 @@ body.seated #stick,body.seated #jump,body.seated #sprint,body.seated #act,body.s
   <button class="btn" id="friendsBtn">Friends’ gardens</button>
   <button class="btn" id="homeBtn" style="display:none">Home</button>
   <div class="micro mlabel">LEAVE</div>
+  <button class="btn" id="caveBtn">The cave &middot; all games</button>
   <button class="btn" id="garden">Garden map</button>
   <button class="btn" id="back">&larr; DEEDS</button>
 </div>
@@ -1936,7 +1937,7 @@ function openSack(){renderSack();$('#sack').classList.add('on');SND.open()}
 function closeSack(){$('#sack').classList.remove('on')}
 $('#purse').onclick=()=>{if(BLOOM)return;if($('#sack').classList.contains('on'))closeSack();else openSack()};
 $('#sackClose').onclick=closeSack;$('#sack').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSack()});
-$('#gearBtn').onclick=e=>{e.stopPropagation();$('#menu').classList.toggle('on')};
+$('#gearBtn').onclick=e=>{e.stopPropagation();$('#menu').classList.toggle('on')};$('#caveBtn').onclick=()=>{location.href='../cave/?from=world'};
 /* ---------- the sounds: one family, synthesized in the browser. ticks for actions, bells for confirmations,
    cascades for rewards that grow with the win. voice limited, under the music, muted with one tap (remembered). ---------- */
 const SND=(()=>{
