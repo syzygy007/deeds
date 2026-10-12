@@ -201,7 +201,7 @@ body.busy #say,body.fight #say{bottom:auto;top:30%}
   <button class="btn" id="mRank">The ladder</button>
   <button class="btn" id="mSound">Sound</button>
   <button class="btn" id="mMusic">Music</button>
-  <button class="btn" id="mGarden">&larr; The garden</button>
+  <button class="btn" id="mGarden">&larr; The cave</button>
 </div>
 <div id="goal"></div>
 <div id="quick"><button class="btn" id="qMap">Map</button><button class="btn" id="qPack">Pack</button><button class="btn" id="qCast" style="display:none">Cast</button></div>
@@ -1927,7 +1927,7 @@ $('#mSound').onclick=()=>{SND.setMute(!SND.muted());if(SND.muted())MUSIC.stop();
 $('#mMusic').onclick=()=>{if(MUSIC.on())MUSIC.stop(true);else{if(SND.muted())SND.setMute(false);MUSIC.start()}paintMenu()};
 const menuGo=fn=>()=>{$('#menu').classList.remove('on');fn()};
 $('#mMap').onclick=menuGo(openMap);$('#mPack').onclick=menuGo(()=>openPack());$('#mRank').onclick=menuGo(openLadder);$('#qMap').onclick=openMap;$('#qPack').onclick=()=>openPack();$('#purse').onclick=()=>openPack();$('#rankpill').onclick=openLadder;
-function leaveToGarden(){if(PREVIEW){say('On the site, this is the way back to the garden.');tp(SPAWN.x,SPAWN.z,SPAWN.yaw,-0.12);setTimeout(()=>{LEAVING=false},600);return}save();SND.whoosh();const f=$('#fade');f.classList.add('on');setTimeout(()=>{location.href=(ON_SITE?'/garden/world/':'../world/')+'?from=castle'},650)}
+function leaveToGarden(){if(PREVIEW){say('On the site, this is the way back to the garden.');tp(SPAWN.x,SPAWN.z,SPAWN.yaw,-0.12);setTimeout(()=>{LEAVING=false},600);return}save();SND.whoosh();const f=$('#fade');f.classList.add('on');setTimeout(()=>{location.href='../cave/?from=castle'},650)}
 $('#mGarden').onclick=menuGo(leaveToGarden);
 function onKey(k,e){if(k==='escape'){if(SHEET){closeSheet();return true}$('#menu').classList.remove('on');if(BUSYMODE&&BUSYMODE.leave){BUSYMODE.leave();return true}return true}
   if(SHEET)return true;
