@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="deeds-casino" content="1.0">
+<meta name="deeds-casino" content="1.1">
 <title>The Card Room · Deedable</title>
 <style>
 :root{--felt:#0e4a36;--felt2:#0a3527;--ink:#07120e;--gold:#e3b964;--gold2:#f3d58f;--cream:#f4efe2;--amber:#f0a83c;--blue:#7fb6ff;--green:#69d79a;--line:rgba(244,239,226,.16)}
@@ -894,6 +894,8 @@ const FRIENDS={};let sb=null,CH=null,ME=null;
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const u=r&&r.data&&r.data.session&&r.data.session.user;if(!u)return;ME=u.id;
     sb.from('profiles').select('handle').eq('id',ME).maybeSingle().then(p=>{if(p&&p.data&&p.data.handle)MYNAME.h=p.data.handle});
+    Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',ME)).then(r=>{if(!r||r.error)return;const eq={},cw={};(r.data||[]).forEach(x=>{if(x.slot&&x.item_id)eq[x.slot]=x.item_id;if(x.item_id&&x.colorway)cw[x.item_id]=x.colorway});if(!Object.keys(eq).length)return;const lk={eq,cw};try{localStorage.setItem('deeds_look',JSON.stringify(lk))}catch(e){}
+      if(JSON.stringify(lk)===JSON.stringify(AV.look))return;AV.look=lk;window.__toyReady.then(ok=>{if(!ok)return;const nd=makeToy(lk);if(!nd)return;scene.remove(AV.g);AV=Object.assign(nd,{look:lk});scene.add(AV.g);lastPos=''})},()=>{});
     try{sb.rpc('presence_ping',{p_game:'casino',p_room:null}).then(()=>{},()=>{})}catch(e){}
     CH=sb.channel('casino:room',{config:{presence:{key:ME},broadcast:{self:false}}});
     CH.on('broadcast',{event:'pos'},m=>{const p=m.payload;if(!p||p.id===ME)return;let f=FRIENDS[p.id];if(!f){let d=TOY&&p.av?makeToy(p.av):null;if(!d)d=makeDrawn(rng(p.id.length*31));d.tag=nameSprite(p.h||'friend',0xe3b964);d.tag.position.y=2.15;d.g.add(d.tag);scene.add(d.g);f=FRIENDS[p.id]=d;toast((p.h||'A friend')+' walked in.')}
