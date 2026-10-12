@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="deeds-cave" content="1.1">
+<meta name="deeds-cave" content="1.2">
 <title>The Cave · Deedable</title>
 <style>
 :root{--cream:#fbf6ea;--gold:#ffd98a;--line:rgba(255,255,255,.2)}
@@ -164,7 +164,7 @@ const FONT='"Helvetica Neue",Helvetica,Arial,sans-serif';
 function sprite(tex,w,h,x,y,z,p){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,fog:false,toneMapped:false}));s.scale.set(w,h,1);s.position.set(x,y,z);s.renderOrder=6;(p||scene).add(s);return s}
 NICHES.forEach(n=>{const ring=mesh(new THREE.RingGeometry(1.15,1.3,40),glow(0xffd98a,0.55),n.x,0.05,n.z);ring.rotation.x=-Math.PI/2;n.ring=ring;const disc=mesh(new THREE.CircleGeometry(1.15,40),glow(0xffd98a,0.07),n.x,0.04,n.z);disc.rotation.x=-Math.PI/2;
   cluster(n.x+Math.cos(n.a)*2.9,n.z+Math.sin(n.a)*2.9,n.i%2?0xffb347:0xa56bff,0.7,0)});
-sprite(label([{t:'THE HOLLOW',f:'800 60px '+FONT,c:'#fff',y:50,glow:'#ffd98a'},{t:'E1.1YONE STARTS HERE · THE WORLDS ARE DOWN THE GALLERY',f:'500 24px '+FONT,c:'rgba(255,255,255,.8)',y:108}],1024,150),7,1.03,0,5.4,-2.5);
+sprite(label([{t:'THE HOLLOW',f:'800 60px '+FONT,c:'#fff',y:50,glow:'#ffd98a'},{t:'E1.2YONE STARTS HERE · THE WORLDS ARE DOWN THE GALLERY',f:'500 24px '+FONT,c:'rgba(255,255,255,.8)',y:108}],1024,150),7,1.03,0,5.4,-2.5);
 
 /* ---------- a carve-out for each world: the ring you stand in, the gate behind it, the name over it ---------- */
 const SWIRL=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');g.translate(128,128);for(let i=0;i<220;i++){const a=i*0.28,r=4+i*0.55;g.fillStyle='rgba(255,255,255,'+(0.5-i/520)+')';g.beginPath();g.arc(Math.cos(a)*r,Math.sin(a)*r,2+i*0.035,0,7);g.fill()}const gr=g.createRadialGradient(0,0,0,0,0,128);gr.addColorStop(0,'rgba(255,255,255,.9)');gr.addColorStop(0.25,'rgba(255,255,255,.15)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(-128,-128,256,256);return new THREE.CanvasTexture(c)})();
@@ -283,7 +283,7 @@ const SFX=(()=>{let AC=null,SILENT=null,musT=null,musG=null,mp3=null,dly=null,on
   function silentWav(){const sr=8000,n=sr,b=new ArrayBuffer(44+n*2),v=new DataView(b);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);return URL.createObjectURL(new Blob([b],{type:'audio/wav'}))}
   function unlock(){try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
     try{if(!SILENT){SILENT=document.createElement('audio');SILENT.setAttribute('playsinline','');SILENT.loop=true;SILENT.volume=0.01;SILENT.src=silentWav();document.body.appendChild(SILENT)}const p=SILENT.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}
-    const a=ctx();if(a&&a.state!=='running')a.resume().then(()=>{paint();if(on)music(true)}).catch(()=>{});else if(a&&on)music(true);paint()}
+    const a=ctx();if(a&&a.state!=='running')a.resume().then(paint).catch(()=>{});if(on&&(!mp3||mp3.paused))music(true);paint()}
   function paint(){const e=$('#sound');if(AC&&AC.state==='running'){e.textContent=on?'Music on':'Music off';e.classList.remove('off')}else{e.textContent='Tap for sound';e.classList.add('off')}}
   function out(){const a=AC;if(!musG){musG=a.createGain();musG.gain.value=0.9;musG.connect(a.destination);dly=a.createDelay(1.5);dly.delayTime.value=0.45;const fb=a.createGain();fb.gain.value=0.38;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;dly.connect(lp);lp.connect(fb);fb.connect(dly);lp.connect(musG)}return musG}
   function tone(f,t,d,type,g0,dest,att){const a=ctx();if(!a||a.state!=='running')return;const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(att){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(g0,t+att)}else g.gain.setValueAtTime(g0||0.2,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(dest||a.destination);o.start(t);o.stop(t+d+0.05);return o}
@@ -304,11 +304,12 @@ const SFX=(()=>{let AC=null,SILENT=null,musT=null,musG=null,mp3=null,dly=null,on
     ARP.forEach((ix,i)=>{const m=c[ix]+12;const t=t0+i*beat/2;const os=tone(hz(m),t,0.32,'triangle',0.06,o);tone(hz(m),t,0.28,'triangle',0.035,dly)});
     /* the tune */
     if(lap%2===1||lap===0&&k>=2){const base=(k%4)*4;TUNE.forEach(([m,b])=>{if(b>=base&&b<base+4){const t=t0+(b-base)*beat;tone(hz(m),t,0.9,'sine',0.07,o);tone(hz(m)*2,t,0.5,'sine',0.018,o);tone(hz(m),t,0.7,'sine',0.03,dly)}})}}
-  function music(v){const a=ctx();if(!a||a.state!=='running')return;
-    if(!v){if(musT){clearInterval(musT);musT=null}if(musG)musG.gain.setTargetAtTime(0,a.currentTime,0.15);if(mp3)mp3.pause();return}
-    if(mp3){mp3.play().catch(()=>{});return}if(musT)return;out().gain.setTargetAtTime(0.9,a.currentTime,0.3);
-    let k=0,next=a.currentTime+0.12;const len=4*60/104;const pump=()=>{while(next<a.currentTime+0.7){bar(k++,next);next+=len}};pump();musT=setInterval(pump,180)}
-  function tryMp3(){try{const m=new Audio();m.loop=true;m.volume=0.6;m.preload='auto';m.addEventListener('canplaythrough',()=>{if(mp3)return;mp3=m;if(musT){clearInterval(musT);musT=null;if(musG)musG.gain.setTargetAtTime(0,AC.currentTime,0.4)}if(on&&AC&&AC.state==='running')m.play().catch(()=>{})},{once:true});m.src='cave.mp3'}catch(e){}}
+  /* the music is a real track: cave.mp3 beside this file if there is one, else the flag lobby track he made. No track, no music */
+  const TRACKS=['cave.mp3','../flag/lobby.mp3'];let ti=0;
+  function music(v){if(!v){if(mp3)mp3.pause();return}
+    if(!mp3){mp3=new Audio();mp3.loop=true;mp3.volume=0.55;mp3.preload='auto';mp3.setAttribute('playsinline','');mp3.addEventListener('error',()=>{ti++;if(ti<TRACKS.length){mp3.src=TRACKS[ti];if(on){const p=mp3.play();if(p&&p.catch)p.catch(()=>{})}}});mp3.src=TRACKS[0]}
+    const p=mp3.play();if(p&&p.catch)p.catch(()=>{})}
+  function tryMp3(){}
   const now=()=>{const a=ctx();return a?a.currentTime:0};
   return {unlock,paint,ac:ctx,tryMp3,toggle(){on=!on;try{localStorage.setItem('deeds_cave_music',on?'1':'0')}catch(e){}music(on);paint()},
     step(){noise(now(),0.05,900+Math.random()*500,1.2,0.05)},hop(){const t=now();tone(420,t,0.12,'sine',0.06);tone(640,t+0.05,0.12,'sine',0.04)},
@@ -325,6 +326,9 @@ function count(){const n=Object.values(FRIENDS).filter(f=>!f.at).length;$('#who'
 function goLive(){try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){return}
   sb.auth.getSession().then(r=>{const u=r&&r.data&&r.data.session&&r.data.session.user;if(!u)return;ME=u.id;
     sb.from('profiles').select('handle').eq('id',ME).maybeSingle().then(p=>{if(p&&p.data&&p.data.handle){MYNAME.h=p.data.handle;tagMe()}});
+    /* your own clothes, straight from the wardrobe, so you are dressed even on a device that never opened the garden */
+    Promise.resolve(sb.from('avatar_equipped').select('slot,item_id,colorway').eq('profile_id',ME)).then(r=>{if(!r||r.error)return;const eq={},cw={};(r.data||[]).forEach(x=>{if(x.slot&&x.item_id)eq[x.slot]=x.item_id;if(x.item_id&&x.colorway)cw[x.item_id]=x.colorway});if(!Object.keys(eq).length)return;const lk={eq,cw};try{localStorage.setItem('deeds_look',JSON.stringify(lk))}catch(e){}
+      if(JSON.stringify(lk)===JSON.stringify(AV.look))return;AV.look=lk;window.__toyReady.then(ok=>{if(!ok)return;const nd=makeToy(lk);if(!nd)return;scene.remove(AV.g);AV=Object.assign(nd,{look:lk,tag:AV.tag});if(AV.tag)AV.g.add(AV.tag);scene.add(AV.g);lastPos=''})},()=>{});
     try{sb.rpc('presence_ping',{p_game:'cave',p_room:null}).then(()=>{},()=>{})}catch(e){}
     CH=sb.channel('cave:lobby',{config:{presence:{key:ME},broadcast:{self:false}}});
     CH.on('broadcast',{event:'pos'},m=>{const p=m.payload;if(!p||p.id===ME)return;let f=FRIENDS[p.id];
