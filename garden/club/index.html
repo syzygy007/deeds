@@ -91,7 +91,7 @@ body.ondeck #jump,body.ondeck #sprint{display:none}
   <div id="place"><div class="micro" id="walkin">You are in</div><h1 id="area">The Club<span>.</span></h1><div class="micro" id="near"></div></div>
 </div>
 <div id="hype"><div class="lab"><span>Hype</span><span id="hypeN">0</span></div><div class="bar"><i id="hypeBar"></i></div><div class="tier" id="hypeT"></div></div>
-<button id="leave">&larr; The garden</button><button id="snd">Sound</button><div id="purse"></div>
+<button id="leave">&larr; The cave</button><button id="snd">Sound</button><div id="purse"></div>
 <div id="hint" class="micro">Drag left to walk · drag right to look · walk up to the decks</div>
 <div id="act"><button class="abtn" id="actMain">Take the decks.</button></div>
 <div id="status" class="micro"></div>
@@ -830,7 +830,7 @@ function buy(kind,item,onPaid,preview){const it=(kind==='drink'?DRINKS:kind==='p
 
 paintSign([]);
 {const c=document.createElement('script');c.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';c.onload=goLive;c.onerror=()=>{};document.head.appendChild(c)}
-$('#leave').addEventListener('click',()=>{pingLeave();leaveRoom();location.href=ON_SITE?'/garden/world/':'../world/'});
+$('#leave').addEventListener('click',()=>{pingLeave();leaveRoom();location.href='../cave/?from=club'});
 window.__club={YOU,CROWD,MUSIC,DECK,BOOTHS,VIP,POOL,BAR,DRESS,openDressing,closeDressing,FLAMES,CONFETTI,RIG,rigShow,BLACK,blackout,TALKERS,talk:()=>TALK,confettiFire,DRINKS,PIZZA,BOTTLES,openMenu,closeMenu,runBottle,RUNNER,bottleShow,setDeck,padHit,hypeCrowd,hype:()=>HYPE,surge,surgeTick,deckCam,walkCam,tier:()=>TIER,FR,onPresence,onPos,onAct,paintSign,djNames,sign:()=>DECK.signNames,setMe:(id,h)=>{ME=id;MYHANDLE=h},me:()=>ME,buy,goLive,room:()=>PRES,floorAt,updateAct,act:()=>ACT,go:(x,z)=>{YOU.x=x;YOU.z=z;YOU.y=YOU.feet=floorAt(x,z)},sim:(secs,step)=>{step=step||0.05;SIM=true;try{for(let s=0;s<secs;s+=step)loop(last+step*1000)}finally{SIM=false;last=performance.now()}},STYLES,TILES,HEADS,toy:TOY};
 </script>
 </body>
