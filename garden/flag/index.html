@@ -62,9 +62,9 @@ canvas{display:block}
 </style>
 </head>
 <body>
-<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the open middle with the pack round it. Take it, run it home, and hold it on your pad for three seconds while everyone tries to knock it loose. Then the flag lives at your base and the pack guards it for you: hold out to the clock and the round is yours, everyone else comes for it. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button><a href="../world/" id="gatehome">Back to the garden</a></div>
+<div id="gate"><h1>The Flag.</h1><p>Pick a circle. When the count hits zero you drop into the garden with your team. One flag in the open middle with the pack round it. Take it, run it home, and hold it on your pad for three seconds while everyone tries to knock it loose. Then the flag lives at your base and the pack guards it for you: hold out to the clock and the round is yours, everyone else comes for it. First to two rounds wins 200 gardencoin each.</p><button id="walkin">Walk in</button><a href="../cave/?from=flag" id="gatehome">Back to the cave</a></div>
 <div id="hold"><b></b></div><div id="hud"><div class="tag">The Flag<b id="who">Stand in a circle</b><div id="hearts"></div><canvas id="radar" width="112" height="112"></canvas></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div style="display:flex;gap:8px"><button id="leave">Leave</button><div id="sound" class="off">Tap for sound</div></div><div id="score"></div></div></div>
-<div id="quit"><h1>Leave the match?</h1><p>Your team plays on without you.</p><a href="#" id="quitno" class="big">Keep playing</a><a href="#" id="quitlobby">Back to the lobby</a><a href="../world/">Back to the garden</a></div>
+<div id="quit"><h1>Leave the match?</h1><p>Your team plays on without you.</p><a href="#" id="quitno" class="big">Keep playing</a><a href="#" id="quitlobby">Back to the lobby</a><a href="../cave/?from=flag">Back to the cave</a></div>
 <div id="card"><b></b><span></span></div><div id="dark"></div>
 <div id="line">Four circles, four teams. Jump in one.<small id="sub">the count starts when someone joins</small></div>
 <div id="stick"></div><div id="knob"><i></i></div>
@@ -73,7 +73,7 @@ canvas{display:block}
 <button class="btn" id="run">RUN</button>
 <div id="arms"></div>
 <div id="flash"><h1 id="flashword">ROSE</h1><p>Game time</p></div>
-<div id="next"><h1 id="nextword">You won.</h1><p id="nexttext"></p><div><a href="#" id="again" class="big">Run it back</a><a href="../world/">Back to the garden</a></div></div>
+<div id="next"><h1 id="nextword">You won.</h1><p id="nexttext"></p><div><a href="#" id="again" class="big">Run it back</a><a href="../cave/?from=flag">Back to the cave</a></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
